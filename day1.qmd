@@ -1,1 +1,487 @@
-# Day I
+# Day 1: Introduction to Shader Programming
+
+## Overview
+
+Today we introduce the fundamental concept of shader programming: computing a function from pixel coordinates to colors, executed in parallel across the entire image. We'll learn basic GLSL syntax, set up a coordinate system, and create simple geometric shapes.
+
+By the end of today, you'll be able to render implicit curves, distance-based coloring, and repeating patterns—all computed in real-time on the GPU.
+
+---
+
+## What is a Shader?
+
+### Mathematical Perspective
+
+A shader is fundamentally a function
+$$f: \mathbb{R}^2 \times \mathbb{R} \times \cdots \to \mathbb{R}^4$$
+that maps pixel coordinates (and potentially time, mouse position, etc.) to color values. For each pixel on the screen, we evaluate this function to determine what color to display.
+
+The key insight: modern GPUs can evaluate this function for **all pixels simultaneously**. If your screen has 1920×1080 pixels, that's over 2 million function evaluations happening in parallel, typically 60 times per second.
+
+This parallelism is what makes shaders extraordinarily fast for mathematical visualization—we're not looping over pixels sequentially, we're computing them all at once.
+
+### Why Shadertoy?
+
+Shadertoy is a web-based platform that abstracts away the complexities of GPU programming (setting up OpenGL contexts, managing buffers, compiling shaders, etc.). You write a single function, and Shadertoy handles everything else.
+
+The platform provides several built-in **uniforms** (read-only global variables):
+- `iResolution`: screen resolution as a `vec3` (width, height, pixel aspect ratio)
+- `iTime`: elapsed time in seconds
+- `iMouse`: mouse position and click state as a `vec4`
+
+We'll use these throughout the week.
+
+---
+
+## First Shader: Solid Colors
+
+### Basic Structure
+
+Every Shadertoy shader has the same entry point:
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // Your code here
+}
+```
+
+**Parameters:**
+- `fragCoord`: the pixel coordinate we're currently computing, as a `vec2` (x, y)
+- `fragColor`: the output color we need to set, as a `vec4` (red, green, blue, alpha)
+
+Colors are represented in RGBA format with values in $[0, 1]$. So `vec4(1.0, 0.0, 0.0, 1.0)` represents opaque red, while `vec4(0.5, 0.5, 0.5, 1.0)` is middle gray.
+
+### Example: Red Screen
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    fragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+```
+
+This sets every pixel to red. The function is evaluated once per pixel, but since the output doesn't depend on `fragCoord`, every pixel gets the same value.
+
+### GLSL Syntax Basics
+
+A few essential points about the GLSL language:
+
+**Semicolons are required.** Every statement must end with a semicolon. This is not Python!
+
+**Vector types:** GLSL has built-in types `vec2`, `vec3`, `vec4` for 2D, 3D, and 4D vectors. You can construct them with:
+```glsl
+vec2 v = vec2(1.0, 2.0);
+vec3 w = vec3(1.0, 2.0, 3.0);
+vec4 color = vec4(v, 0.0, 1.0);  // Can combine vectors and scalars
+```
+
+**Swizzling:** You can access components by name: `v.x`, `v.y` or `v.r`, `v.g` (same thing, different naming convention). We'll cover more syntax in the appendix.
+
+**Floating point literals:** Write `1.0` not `1` for floating point values. GLSL is picky about types.
+
+### Animating with Time
+
+Let's make something that changes:
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    float red = 0.5 + 0.5 * sin(iTime);
+    fragColor = vec4(red, 0.0, 0.0, 1.0);
+}
+```
+
+Here `iTime` grows continuously, `sin(iTime)` oscillates between $-1$ and $1$, and we remap to $[0, 1]$ with the affine transformation $x \mapsto \frac{1}{2}(1 + x)$. The screen now pulses between black and red.
+
+---
+
+## Coordinate Systems
+
+### Raw Coordinates
+
+By default, `fragCoord` gives pixel coordinates with:
+- Origin $(0, 0)$ at the bottom-left
+- $x$ increases rightward to `iResolution.x`
+- $y$ increases upward to `iResolution.y`
+
+For mathematical work, we want:
+- Origin at the center
+- Coordinates normalized (not in pixels)
+- Aspect ratio handled correctly
+
+### Centered, Normalized Coordinates
+
+Here's a standard transformation:
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // Normalize to [0,1]
+    vec2 uv = fragCoord / iResolution.xy;
+    
+    // Center at origin: [-0.5, 0.5]
+    uv = uv - 0.5;
+    
+    // Scale to account for aspect ratio
+    uv.x *= iResolution.x / iResolution.y;
+    
+    // Now uv is centered and aspect-corrected
+    // Scale to desired viewing window (e.g., [-2, 2] on x-axis)
+    vec2 p = uv * 4.0;  // Now p is in [-2, 2] × [-h, h] where h depends on aspect ratio
+    
+    fragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+```
+
+From now on, we'll assume this coordinate setup is done at the start of every shader, storing the result in a variable `p` for "position."
+
+### Visualizing Coordinates
+
+Let's color pixels by their position:
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // [Coordinate setup as above, resulting in p]
+    
+    // Map x coordinate to red, y to green
+    vec2 color_rg = p * 0.5 + 0.5;  // Remap to [0, 1]
+    fragColor = vec4(color_rg, 0.0, 1.0);
+}
+```
+
+You should see a smooth gradient: red increases rightward, green increases upward.
+
+---
+
+## Conditional Coloring: Half-Planes
+
+### The Concept
+
+Given a linear function $L(x, y) = ax + by$, we want to color pixels differently depending on whether $L(p) < 0$ or $L(p) \geq 0$. This divides the plane into two half-planes.
+
+### Implementation
+
+GLSL provides a conditional operator (ternary operator) just like C:
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // [Coordinate setup, resulting in p]
+    
+    float L = p.x;  // The function L(x,y) = x
+    
+    vec3 color = (L < 0.0) ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 0.0, 1.0);
+    fragColor = vec4(color, 1.0);
+}
+```
+
+Left half-plane is red, right half-plane is blue.
+
+### The Step Function
+
+GLSL also provides `step(edge, x)` which returns 0 if $x < \text{edge}$ and 1 otherwise. This is useful for smooth code:
+
+```glsl
+float s = step(0.0, p.x);  // 0 on left, 1 on right
+vec3 color = mix(vec3(1.0, 0.0, 0.0), vec3(0.0, 0.0, 1.0), s);
+```
+
+Here `mix(a, b, t)` performs linear interpolation: $(1-t)a + tb$.
+
+### Arbitrary Half-Planes
+
+For a general line $ax + by = 0$:
+
+```glsl
+float a = 1.0, b = 1.0;
+float L = a * p.x + b * p.y;
+vec3 color = (L < 0.0) ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 0.0, 1.0);
+fragColor = vec4(color, 1.0);
+```
+
+Try different values of $a$ and $b$ to see different line orientations.
+
+---
+
+## Distance Fields and Circles
+
+### Distance to Center
+
+The distance from a point $p = (x, y)$ to the origin is simply
+$$d = \|p\| = \sqrt{x^2 + y^2}$$
+
+In GLSL:
+
+```glsl
+float d = length(p);
+```
+
+The `length()` function computes the Euclidean norm of a vector.
+
+### Filled Circle
+
+A circle of radius $r$ centered at the origin is the set $\{p : \|p\| < r\}$. We can color inside vs. outside:
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // [Coordinate setup]
+    
+    float d = length(p);
+    float r = 1.0;
+    
+    vec3 color = (d < r) ? vec3(1.0, 1.0, 0.0) : vec3(0.1, 0.1, 0.3);
+    fragColor = vec4(color, 1.0);
+}
+```
+
+This renders a yellow disk on a dark blue background.
+
+### Distance-Based Coloring
+
+We can create gradients by mapping distance to color:
+
+```glsl
+float d = length(p);
+float intensity = 1.0 - d / 2.0;  // Fades out with distance
+intensity = clamp(intensity, 0.0, 1.0);  // Keep in [0, 1]
+vec3 color = vec3(intensity);
+fragColor = vec4(color, 1.0);
+```
+
+### Circle Outline
+
+To draw just the boundary of a circle (an annulus of small thickness), we check if $d$ is approximately equal to $r$:
+
+```glsl
+float d = length(p);
+float r = 1.0;
+float thickness = 0.05;
+
+float circle_mask = abs(d - r) < thickness ? 1.0 : 0.0;
+vec3 color = vec3(circle_mask);
+fragColor = vec4(color, 1.0);
+```
+
+Mathematically, we're coloring the set $\{p : |d(p) - r| < \epsilon\}$ where $\epsilon$ is our thickness parameter.
+
+For a smoother edge, we can use `smoothstep`:
+
+```glsl
+float circle_mask = 1.0 - smoothstep(r - thickness, r + thickness, d);
+```
+
+The `smoothstep(a, b, x)` function performs smooth Hermite interpolation between $a$ and $b$.
+
+---
+
+## Grids and Repetition
+
+### Modular Arithmetic
+
+The modulo operation creates periodic repetition. For a period $T$, the function $p \mapsto (p \bmod T) - T/2$ maps $\mathbb{R}$ to $[-T/2, T/2]$ repeatedly.
+
+In GLSL, `mod(x, T)` computes $x \bmod T$.
+
+### Creating a Grid
+
+To create a grid of repeated cells:
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // [Coordinate setup, resulting in p]
+    
+    float spacing = 1.0;
+    vec2 cell_p = mod(p + spacing/2.0, spacing) - spacing/2.0;
+    
+    // Now cell_p repeats every spacing units
+    // Draw a circle in each cell
+    float d = length(cell_p);
+    float r = 0.3;
+    
+    vec3 color = (d < r) ? vec3(1.0, 1.0, 0.0) : vec3(0.1, 0.1, 0.3);
+    fragColor = vec4(color, 1.0);
+}
+```
+
+This creates an infinite grid of yellow circles!
+
+### Alternating Pattern
+
+We can create checkerboard-like patterns using the cell index:
+
+```glsl
+vec2 cell_id = floor(p / spacing);
+float checker = mod(cell_id.x + cell_id.y, 2.0);
+
+vec3 color_a = vec3(1.0, 0.0, 0.0);
+vec3 color_b = vec3(0.0, 0.0, 1.0);
+vec3 bg_color = mix(color_a, color_b, checker);
+```
+
+Here `floor(p / spacing)` gives us integer grid indices, and we alternate colors based on the parity of $i + j$.
+
+### Combining with Circles
+
+Put it all together for a grid of circles on an alternating background:
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // [Coordinate setup]
+    
+    float spacing = 1.0;
+    vec2 cell_id = floor(p / spacing);
+    vec2 cell_p = mod(p + spacing/2.0, spacing) - spacing/2.0;
+    
+    // Checkerboard background
+    float checker = mod(cell_id.x + cell_id.y, 2.0);
+    vec3 bg_color = mix(vec3(0.2, 0.2, 0.3), vec3(0.3, 0.2, 0.2), checker);
+    
+    // Circle in each cell
+    float d = length(cell_p);
+    float r = 0.3;
+    vec3 circle_color = vec3(1.0, 1.0, 0.0);
+    
+    vec3 color = (d < r) ? circle_color : bg_color;
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## Implicit Curves
+
+### General Principle
+
+An implicit curve is defined by an equation $F(x, y) = 0$. To render it, we compute $F(p)$ for each pixel and color based on proximity to zero:
+
+```glsl
+float F = [some function of p.x and p.y];
+float thickness = 0.05;
+float curve_mask = abs(F) < thickness ? 1.0 : 0.0;
+vec3 color = mix(background, curve_color, curve_mask);
+```
+
+### Example: Parabola
+
+The parabola $y = x^2$ can be written implicitly as $F(x, y) = y - x^2 = 0$:
+
+```glsl
+float F = p.y - p.x * p.x;
+float thickness = 0.1;
+float curve_mask = abs(F) < thickness ? 1.0 : 0.0;
+
+vec3 color = mix(vec3(0.1, 0.1, 0.3), vec3(1.0, 1.0, 0.0), curve_mask);
+fragColor = vec4(color, 1.0);
+```
+
+### Example: Circle (Implicit Form)
+
+We've been using $\|p\| < r$ for filled circles, but we can also write the circle implicitly as $x^2 + y^2 - r^2 = 0$:
+
+```glsl
+float r = 1.0;
+float F = dot(p, p) - r * r;  // dot(p,p) = x² + y²
+float thickness = 0.1;
+float curve_mask = abs(F) < thickness ? 1.0 : 0.0;
+```
+
+This is mathematically equivalent to our earlier approach but demonstrates the general implicit curve technique.
+
+---
+
+## Summary
+
+Today we've learned:
+
+1. **Shaders as parallel functions**: Every pixel evaluates $f(x, y, t, \ldots) \to \text{color}$ simultaneously
+2. **GLSL basics**: Syntax, vector types, and built-in functions
+3. **Coordinate systems**: Centering, normalizing, and scaling for mathematical work
+4. **Conditional coloring**: Using boolean expressions and `step()` for discrete color regions
+5. **Distance fields**: Using `length()` to create circles and radial patterns
+6. **Modular arithmetic**: Creating grids and repeating patterns with `mod()`
+7. **Implicit curves**: Rendering curves defined by $F(x, y) = 0$
+
+With these tools, you can already create a wide variety of mathematical visualizations!
+
+---
+
+## Homework
+
+### Required: Parabola Graphing Calculator
+
+Create a shader that draws a customizable parabola $y = ax^2 + bx + c$ along with coordinate axes.
+
+**Requirements:**
+- Define variables `a`, `b`, `c` at the top of your shader (hardcoded values are fine)
+- Draw the $x$-axis and $y$-axis as thick lines (use the implicit line technique: $|y| < \epsilon$ for $x$-axis, $|x| < \epsilon$ for $y$-axis)
+- Plot the parabola $y = ax^2 + bx + c$ as a thick curve
+- Use distinct colors for axes and parabola
+- The visualization should work for any reasonable values of $a$, $b$, $c$
+
+**Suggested approach:**
+```glsl
+// Define parameters
+float a = 1.0;
+float b = 0.0;
+float c = 0.0;
+
+// Axes
+float x_axis_mask = abs(p.y) < 0.05 ? 1.0 : 0.0;
+float y_axis_mask = abs(p.x) < 0.05 ? 1.0 : 0.0;
+
+// Parabola: F(x,y) = y - (ax² + bx + c) = 0
+float F = p.y - (a * p.x * p.x + b * p.x + c);
+float parabola_mask = abs(F) < 0.1 ? 1.0 : 0.0;
+
+// Combine
+vec3 color = background;
+color = mix(color, axis_color, max(x_axis_mask, y_axis_mask));
+color = mix(color, parabola_color, parabola_mask);
+```
+
+Try different values of $a$, $b$, $c$ and verify your grapher works correctly!
+
+### Optional #1: Animated Curve Family
+
+Create a shader that animates through a family of curves.
+
+**Suggestions:**
+- **Elliptic fibration**: Fix a cubic polynomial and vary a parameter: $y^2 = x^3 + ax + b$ where $a$ or $b$ varies with `iTime`
+- **Lissajous curves**: $x = A\sin(at + \delta)$, $y = B\sin(bt)$, animate $\delta$ or the frequency ratio
+
+Use `iTime` creatively to create a compelling animation. The goal is to explore how continuous parameter variation produces interesting mathematical families.
+
+### Optional #2: Beautiful Tiling Pattern
+
+Design an aesthetically pleasing tiling pattern using the `mod()` technique.
+
+**Requirements:**
+- Create a non-trivial pattern within a fundamental domain (a single tile)
+- Use `mod()` to repeat it across the plane
+- The pattern should tile seamlessly (edges should match up)
+
+**Ideas:**
+- Geometric patterns: nested circles, polygons, stars
+- Color gradients that vary by tile position
+- Combinations of implicit curves within each tile
+- Symmetry: use `abs()` to create reflections within tiles
+
+**Challenge**: Can you create a pattern that has different symmetries in different tiles? (For example, alternating rotational symmetry using the checkerboard `cell_id` technique.)
+
+---
+
+## Looking Ahead
+
+Tomorrow we'll use these techniques to explore **complex dynamics** (the Mandelbrot and Julia sets) and **geometric tilings** (including fractals via iterated folding). The coordinate system and implicit curve techniques you've learned today will be the foundation for everything to come.
+
+Make sure you're comfortable with:
+- Setting up coordinates
+- Computing distances and implicit functions  
+- Using `mod()` for repetition
+- Conditionally coloring based on mathematical expressions
+

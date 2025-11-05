@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>2&nbsp; Day I – GPU-Accelerated Mathematical Illustration</title>
+<title>1&nbsp; Day 1: Introduction to Shader Programming – GPU-Accelerated Mathematical Illustration</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -75,8 +75,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-f8dc6eab18fde03278982b0b35885446.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-adf3c98bdceb0a89cc83f21a4cf50f53.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-f9a8516cbc4dfb40944c2b50043af69b.min.css" rel="prefetch" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-ed04f5f1653af6df52378e13bfdac05e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-d37bfdfd9a2222927534875c15a9020f.min.css" rel="prefetch" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -105,6 +105,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -117,7 +146,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./day1.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Day I</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./day1.html"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Day 1: Introduction to Shader Programming</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -136,23 +165,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <div class="sidebar-tools-main tools-wide">
     <a href="https://github.com/yourusername/shader-course" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
     <a href="./GPU-Accelerated-Mathematical-Illustration.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
-    <div class="dropdown">
-      <a href="" title="Share" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label="Share"><i class="bi bi-share"></i></a>
-      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
-          <li>
-            <a class="dropdown-item sidebar-tools-main-item" href="https://twitter.com/intent/tweet?url=|url|">
-              <i class="bi bi-twitter pe-1"></i>
-            Twitter
-            </a>
-          </li>
-          <li>
-            <a class="dropdown-item sidebar-tools-main-item" href="https://www.linkedin.com/sharing/share-offsite/?url=|url|">
-              <i class="bi bi-linkedin pe-1"></i>
-            LinkedIn
-            </a>
-          </li>
-      </ul>
-    </div>
   <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
 </div>
     </div>
@@ -167,49 +179,49 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Preface</span></a>
+ <span class="menu-text">About</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./outline.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Outline</span></span></a>
+ <span class="menu-text">Outline</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./day1.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Day I</span></span></a>
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Day 1: Introduction to Shader Programming</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./day2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Day 2</span></span></a>
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Day 2: Complex Dynamics and Euclidean Geometry</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./day3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Day 3</span></span></a>
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Day 3: Fractals and Hyperbolic Geometry</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./day4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Day 4</span></span></a>
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Day 4</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./day5a.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Day 5a</span></span></a>
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Day 5a</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./day5b.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Day 5bs</span></span></a>
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Day 5bs</span></span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -240,15 +252,74 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"><span class="header-section-number">1.1</span> Overview</a></li>
+  <li><a href="#what-is-a-shader" id="toc-what-is-a-shader" class="nav-link" data-scroll-target="#what-is-a-shader"><span class="header-section-number">1.2</span> What is a Shader?</a>
+  <ul class="collapse">
+  <li><a href="#mathematical-perspective" id="toc-mathematical-perspective" class="nav-link" data-scroll-target="#mathematical-perspective">Mathematical Perspective</a></li>
+  <li><a href="#why-shadertoy" id="toc-why-shadertoy" class="nav-link" data-scroll-target="#why-shadertoy">Why Shadertoy?</a></li>
+  </ul></li>
+  <li><a href="#first-shader-solid-colors" id="toc-first-shader-solid-colors" class="nav-link" data-scroll-target="#first-shader-solid-colors"><span class="header-section-number">1.3</span> First Shader: Solid Colors</a>
+  <ul class="collapse">
+  <li><a href="#basic-structure" id="toc-basic-structure" class="nav-link" data-scroll-target="#basic-structure">Basic Structure</a></li>
+  <li><a href="#example-red-screen" id="toc-example-red-screen" class="nav-link" data-scroll-target="#example-red-screen">Example: Red Screen</a></li>
+  <li><a href="#glsl-syntax-basics" id="toc-glsl-syntax-basics" class="nav-link" data-scroll-target="#glsl-syntax-basics">GLSL Syntax Basics</a></li>
+  <li><a href="#animating-with-time" id="toc-animating-with-time" class="nav-link" data-scroll-target="#animating-with-time">Animating with Time</a></li>
+  </ul></li>
+  <li><a href="#coordinate-systems" id="toc-coordinate-systems" class="nav-link" data-scroll-target="#coordinate-systems"><span class="header-section-number">1.4</span> Coordinate Systems</a>
+  <ul class="collapse">
+  <li><a href="#raw-coordinates" id="toc-raw-coordinates" class="nav-link" data-scroll-target="#raw-coordinates">Raw Coordinates</a></li>
+  <li><a href="#centered-normalized-coordinates" id="toc-centered-normalized-coordinates" class="nav-link" data-scroll-target="#centered-normalized-coordinates">Centered, Normalized Coordinates</a></li>
+  <li><a href="#visualizing-coordinates" id="toc-visualizing-coordinates" class="nav-link" data-scroll-target="#visualizing-coordinates">Visualizing Coordinates</a></li>
+  </ul></li>
+  <li><a href="#conditional-coloring-half-planes" id="toc-conditional-coloring-half-planes" class="nav-link" data-scroll-target="#conditional-coloring-half-planes"><span class="header-section-number">1.5</span> Conditional Coloring: Half-Planes</a>
+  <ul class="collapse">
+  <li><a href="#the-concept" id="toc-the-concept" class="nav-link" data-scroll-target="#the-concept">The Concept</a></li>
+  <li><a href="#implementation" id="toc-implementation" class="nav-link" data-scroll-target="#implementation">Implementation</a></li>
+  <li><a href="#the-step-function" id="toc-the-step-function" class="nav-link" data-scroll-target="#the-step-function">The Step Function</a></li>
+  <li><a href="#arbitrary-half-planes" id="toc-arbitrary-half-planes" class="nav-link" data-scroll-target="#arbitrary-half-planes">Arbitrary Half-Planes</a></li>
+  </ul></li>
+  <li><a href="#distance-fields-and-circles" id="toc-distance-fields-and-circles" class="nav-link" data-scroll-target="#distance-fields-and-circles"><span class="header-section-number">1.6</span> Distance Fields and Circles</a>
+  <ul class="collapse">
+  <li><a href="#distance-to-center" id="toc-distance-to-center" class="nav-link" data-scroll-target="#distance-to-center">Distance to Center</a></li>
+  <li><a href="#filled-circle" id="toc-filled-circle" class="nav-link" data-scroll-target="#filled-circle">Filled Circle</a></li>
+  <li><a href="#distance-based-coloring" id="toc-distance-based-coloring" class="nav-link" data-scroll-target="#distance-based-coloring">Distance-Based Coloring</a></li>
+  <li><a href="#circle-outline" id="toc-circle-outline" class="nav-link" data-scroll-target="#circle-outline">Circle Outline</a></li>
+  </ul></li>
+  <li><a href="#grids-and-repetition" id="toc-grids-and-repetition" class="nav-link" data-scroll-target="#grids-and-repetition"><span class="header-section-number">1.7</span> Grids and Repetition</a>
+  <ul class="collapse">
+  <li><a href="#modular-arithmetic" id="toc-modular-arithmetic" class="nav-link" data-scroll-target="#modular-arithmetic">Modular Arithmetic</a></li>
+  <li><a href="#creating-a-grid" id="toc-creating-a-grid" class="nav-link" data-scroll-target="#creating-a-grid">Creating a Grid</a></li>
+  <li><a href="#alternating-pattern" id="toc-alternating-pattern" class="nav-link" data-scroll-target="#alternating-pattern">Alternating Pattern</a></li>
+  <li><a href="#combining-with-circles" id="toc-combining-with-circles" class="nav-link" data-scroll-target="#combining-with-circles">Combining with Circles</a></li>
+  </ul></li>
+  <li><a href="#implicit-curves" id="toc-implicit-curves" class="nav-link" data-scroll-target="#implicit-curves"><span class="header-section-number">1.8</span> Implicit Curves</a>
+  <ul class="collapse">
+  <li><a href="#general-principle" id="toc-general-principle" class="nav-link" data-scroll-target="#general-principle">General Principle</a></li>
+  <li><a href="#example-parabola" id="toc-example-parabola" class="nav-link" data-scroll-target="#example-parabola">Example: Parabola</a></li>
+  <li><a href="#example-circle-implicit-form" id="toc-example-circle-implicit-form" class="nav-link" data-scroll-target="#example-circle-implicit-form">Example: Circle (Implicit Form)</a></li>
+  </ul></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">1.9</span> Summary</a></li>
+  <li><a href="#homework" id="toc-homework" class="nav-link" data-scroll-target="#homework"><span class="header-section-number">1.10</span> Homework</a>
+  <ul class="collapse">
+  <li><a href="#required-parabola-graphing-calculator" id="toc-required-parabola-graphing-calculator" class="nav-link" data-scroll-target="#required-parabola-graphing-calculator">Required: Parabola Graphing Calculator</a></li>
+  <li><a href="#optional-1-animated-curve-family" id="toc-optional-1-animated-curve-family" class="nav-link" data-scroll-target="#optional-1-animated-curve-family">Optional #1: Animated Curve Family</a></li>
+  <li><a href="#optional-2-beautiful-tiling-pattern" id="toc-optional-2-beautiful-tiling-pattern" class="nav-link" data-scroll-target="#optional-2-beautiful-tiling-pattern">Optional #2: Beautiful Tiling Pattern</a></li>
+  </ul></li>
+  <li><a href="#looking-ahead" id="toc-looking-ahead" class="nav-link" data-scroll-target="#looking-ahead"><span class="header-section-number">1.11</span> Looking Ahead</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Day I</span></h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+<div class="quarto-title-block"><div><h1 class="title"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Day 1: Introduction to Shader Programming</span></h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
 </div>
 
 
@@ -265,10 +336,364 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
+<section id="overview" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="overview"><span class="header-section-number">1.1</span> Overview</h2>
+<p>Today we introduce the fundamental concept of shader programming: computing a function from pixel coordinates to colors, executed in parallel across the entire image. We’ll learn basic GLSL syntax, set up a coordinate system, and create simple geometric shapes.</p>
+<p>By the end of today, you’ll be able to render implicit curves, distance-based coloring, and repeating patterns—all computed in real-time on the GPU.</p>
+<hr>
+</section>
+<section id="what-is-a-shader" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="what-is-a-shader"><span class="header-section-number">1.2</span> What is a Shader?</h2>
+<section id="mathematical-perspective" class="level3">
+<h3 class="anchored" data-anchor-id="mathematical-perspective">Mathematical Perspective</h3>
+<p>A shader is fundamentally a function <span class="math display">\[f: \mathbb{R}^2 \times \mathbb{R} \times \cdots \to \mathbb{R}^4\]</span> that maps pixel coordinates (and potentially time, mouse position, etc.) to color values. For each pixel on the screen, we evaluate this function to determine what color to display.</p>
+<p>The key insight: modern GPUs can evaluate this function for <strong>all pixels simultaneously</strong>. If your screen has 1920×1080 pixels, that’s over 2 million function evaluations happening in parallel, typically 60 times per second.</p>
+<p>This parallelism is what makes shaders extraordinarily fast for mathematical visualization—we’re not looping over pixels sequentially, we’re computing them all at once.</p>
+</section>
+<section id="why-shadertoy" class="level3">
+<h3 class="anchored" data-anchor-id="why-shadertoy">Why Shadertoy?</h3>
+<p>Shadertoy is a web-based platform that abstracts away the complexities of GPU programming (setting up OpenGL contexts, managing buffers, compiling shaders, etc.). You write a single function, and Shadertoy handles everything else.</p>
+<p>The platform provides several built-in <strong>uniforms</strong> (read-only global variables): - <code>iResolution</code>: screen resolution as a <code>vec3</code> (width, height, pixel aspect ratio) - <code>iTime</code>: elapsed time in seconds - <code>iMouse</code>: mouse position and click state as a <code>vec4</code></p>
+<p>We’ll use these throughout the week.</p>
+<hr>
+</section>
+</section>
+<section id="first-shader-solid-colors" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="first-shader-solid-colors"><span class="header-section-number">1.3</span> First Shader: Solid Colors</h2>
+<section id="basic-structure" class="level3">
+<h3 class="anchored" data-anchor-id="basic-structure">Basic Structure</h3>
+<p>Every Shadertoy shader has the same entry point:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">mainImage</span><span class="op">(</span><span class="dt">out</span> <span class="dt">vec4</span> fragColor<span class="op">,</span> <span class="dt">in</span> <span class="dt">vec2</span> fragCoord<span class="op">)</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Your code here</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Parameters:</strong> - <code>fragCoord</code>: the pixel coordinate we’re currently computing, as a <code>vec2</code> (x, y) - <code>fragColor</code>: the output color we need to set, as a <code>vec4</code> (red, green, blue, alpha)</p>
+<p>Colors are represented in RGBA format with values in <span class="math inline">\([0, 1]\)</span>. So <code>vec4(1.0, 0.0, 0.0, 1.0)</code> represents opaque red, while <code>vec4(0.5, 0.5, 0.5, 1.0)</code> is middle gray.</p>
+</section>
+<section id="example-red-screen" class="level3">
+<h3 class="anchored" data-anchor-id="example-red-screen">Example: Red Screen</h3>
+<div class="sourceCode" id="cb2"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">mainImage</span><span class="op">(</span><span class="dt">out</span> <span class="dt">vec4</span> fragColor<span class="op">,</span> <span class="dt">in</span> <span class="dt">vec2</span> fragCoord<span class="op">)</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This sets every pixel to red. The function is evaluated once per pixel, but since the output doesn’t depend on <code>fragCoord</code>, every pixel gets the same value.</p>
+</section>
+<section id="glsl-syntax-basics" class="level3">
+<h3 class="anchored" data-anchor-id="glsl-syntax-basics">GLSL Syntax Basics</h3>
+<p>A few essential points about the GLSL language:</p>
+<p><strong>Semicolons are required.</strong> Every statement must end with a semicolon. This is not Python!</p>
+<p><strong>Vector types:</strong> GLSL has built-in types <code>vec2</code>, <code>vec3</code>, <code>vec4</code> for 2D, 3D, and 4D vectors. You can construct them with:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> v <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">2.0</span><span class="op">);</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> w <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">2.0</span><span class="op">,</span> <span class="fl">3.0</span><span class="op">);</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="dt">vec4</span> color <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>v<span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span>  <span class="co">// Can combine vectors and scalars</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Swizzling:</strong> You can access components by name: <code>v.x</code>, <code>v.y</code> or <code>v.r</code>, <code>v.g</code> (same thing, different naming convention). We’ll cover more syntax in the appendix.</p>
+<p><strong>Floating point literals:</strong> Write <code>1.0</code> not <code>1</code> for floating point values. GLSL is picky about types.</p>
+</section>
+<section id="animating-with-time" class="level3">
+<h3 class="anchored" data-anchor-id="animating-with-time">Animating with Time</h3>
+<p>Let’s make something that changes:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">mainImage</span><span class="op">(</span><span class="dt">out</span> <span class="dt">vec4</span> fragColor<span class="op">,</span> <span class="dt">in</span> <span class="dt">vec2</span> fragCoord<span class="op">)</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> red <span class="op">=</span> <span class="fl">0.5</span> <span class="op">+</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="bu">sin</span><span class="op">(</span>iTime<span class="op">);</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>red<span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Here <code>iTime</code> grows continuously, <code>sin(iTime)</code> oscillates between <span class="math inline">\(-1\)</span> and <span class="math inline">\(1\)</span>, and we remap to <span class="math inline">\([0, 1]\)</span> with the affine transformation <span class="math inline">\(x \mapsto \frac{1}{2}(1 + x)\)</span>. The screen now pulses between black and red.</p>
+<hr>
+</section>
+</section>
+<section id="coordinate-systems" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="coordinate-systems"><span class="header-section-number">1.4</span> Coordinate Systems</h2>
+<section id="raw-coordinates" class="level3">
+<h3 class="anchored" data-anchor-id="raw-coordinates">Raw Coordinates</h3>
+<p>By default, <code>fragCoord</code> gives pixel coordinates with: - Origin <span class="math inline">\((0, 0)\)</span> at the bottom-left - <span class="math inline">\(x\)</span> increases rightward to <code>iResolution.x</code> - <span class="math inline">\(y\)</span> increases upward to <code>iResolution.y</code></p>
+<p>For mathematical work, we want: - Origin at the center - Coordinates normalized (not in pixels) - Aspect ratio handled correctly</p>
+</section>
+<section id="centered-normalized-coordinates" class="level3">
+<h3 class="anchored" data-anchor-id="centered-normalized-coordinates">Centered, Normalized Coordinates</h3>
+<p>Here’s a standard transformation:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">mainImage</span><span class="op">(</span><span class="dt">out</span> <span class="dt">vec4</span> fragColor<span class="op">,</span> <span class="dt">in</span> <span class="dt">vec2</span> fragCoord<span class="op">)</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Normalize to [0,1]</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> uv <span class="op">=</span> fragCoord <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">xy</span><span class="op">;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Center at origin: [-0.5, 0.5]</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    uv <span class="op">=</span> uv <span class="op">-</span> <span class="fl">0.5</span><span class="op">;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Scale to account for aspect ratio</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    uv<span class="op">.</span><span class="fu">x</span> <span class="op">*=</span> iResolution<span class="op">.</span><span class="fu">x</span> <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">y</span><span class="op">;</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Now uv is centered and aspect-corrected</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Scale to desired viewing window (e.g., [-2, 2] on x-axis)</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> p <span class="op">=</span> uv <span class="op">*</span> <span class="fl">4.0</span><span class="op">;</span>  <span class="co">// Now p is in [-2, 2] × [-h, h] where h depends on aspect ratio</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>From now on, we’ll assume this coordinate setup is done at the start of every shader, storing the result in a variable <code>p</code> for “position.”</p>
+</section>
+<section id="visualizing-coordinates" class="level3">
+<h3 class="anchored" data-anchor-id="visualizing-coordinates">Visualizing Coordinates</h3>
+<p>Let’s color pixels by their position:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">mainImage</span><span class="op">(</span><span class="dt">out</span> <span class="dt">vec4</span> fragColor<span class="op">,</span> <span class="dt">in</span> <span class="dt">vec2</span> fragCoord<span class="op">)</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// [Coordinate setup as above, resulting in p]</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Map x coordinate to red, y to green</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> color_rg <span class="op">=</span> p <span class="op">*</span> <span class="fl">0.5</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">;</span>  <span class="co">// Remap to [0, 1]</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color_rg<span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>You should see a smooth gradient: red increases rightward, green increases upward.</p>
+<hr>
+</section>
+</section>
+<section id="conditional-coloring-half-planes" class="level2" data-number="1.5">
+<h2 data-number="1.5" class="anchored" data-anchor-id="conditional-coloring-half-planes"><span class="header-section-number">1.5</span> Conditional Coloring: Half-Planes</h2>
+<section id="the-concept" class="level3">
+<h3 class="anchored" data-anchor-id="the-concept">The Concept</h3>
+<p>Given a linear function <span class="math inline">\(L(x, y) = ax + by\)</span>, we want to color pixels differently depending on whether <span class="math inline">\(L(p) &lt; 0\)</span> or <span class="math inline">\(L(p) \geq 0\)</span>. This divides the plane into two half-planes.</p>
+</section>
+<section id="implementation" class="level3">
+<h3 class="anchored" data-anchor-id="implementation">Implementation</h3>
+<p>GLSL provides a conditional operator (ternary operator) just like C:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">mainImage</span><span class="op">(</span><span class="dt">out</span> <span class="dt">vec4</span> fragColor<span class="op">,</span> <span class="dt">in</span> <span class="dt">vec2</span> fragCoord<span class="op">)</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// [Coordinate setup, resulting in p]</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> L <span class="op">=</span> p<span class="op">.</span><span class="fu">x</span><span class="op">;</span>  <span class="co">// The function L(x,y) = x</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span> color <span class="op">=</span> <span class="op">(</span>L <span class="op">&lt;</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">?</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">:</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Left half-plane is red, right half-plane is blue.</p>
+</section>
+<section id="the-step-function" class="level3">
+<h3 class="anchored" data-anchor-id="the-step-function">The Step Function</h3>
+<p>GLSL also provides <code>step(edge, x)</code> which returns 0 if <span class="math inline">\(x &lt; \text{edge}\)</span> and 1 otherwise. This is useful for smooth code:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> s <span class="op">=</span> <span class="bu">step</span><span class="op">(</span><span class="fl">0.0</span><span class="op">,</span> p<span class="op">.</span><span class="fu">x</span><span class="op">);</span>  <span class="co">// 0 on left, 1 on right</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> color <span class="op">=</span> <span class="bu">mix</span><span class="op">(</span><span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">),</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">),</span> s<span class="op">);</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Here <code>mix(a, b, t)</code> performs linear interpolation: <span class="math inline">\((1-t)a + tb\)</span>.</p>
+</section>
+<section id="arbitrary-half-planes" class="level3">
+<h3 class="anchored" data-anchor-id="arbitrary-half-planes">Arbitrary Half-Planes</h3>
+<p>For a general line <span class="math inline">\(ax + by = 0\)</span>:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> a <span class="op">=</span> <span class="fl">1.0</span><span class="op">,</span> b <span class="op">=</span> <span class="fl">1.0</span><span class="op">;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> L <span class="op">=</span> a <span class="op">*</span> p<span class="op">.</span><span class="fu">x</span> <span class="op">+</span> b <span class="op">*</span> p<span class="op">.</span><span class="fu">y</span><span class="op">;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> color <span class="op">=</span> <span class="op">(</span>L <span class="op">&lt;</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">?</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">:</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Try different values of <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> to see different line orientations.</p>
+<hr>
+</section>
+</section>
+<section id="distance-fields-and-circles" class="level2" data-number="1.6">
+<h2 data-number="1.6" class="anchored" data-anchor-id="distance-fields-and-circles"><span class="header-section-number">1.6</span> Distance Fields and Circles</h2>
+<section id="distance-to-center" class="level3">
+<h3 class="anchored" data-anchor-id="distance-to-center">Distance to Center</h3>
+<p>The distance from a point <span class="math inline">\(p = (x, y)\)</span> to the origin is simply <span class="math display">\[d = \|p\| = \sqrt{x^2 + y^2}\]</span></p>
+<p>In GLSL:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> d <span class="op">=</span> <span class="bu">length</span><span class="op">(</span>p<span class="op">);</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The <code>length()</code> function computes the Euclidean norm of a vector.</p>
+</section>
+<section id="filled-circle" class="level3">
+<h3 class="anchored" data-anchor-id="filled-circle">Filled Circle</h3>
+<p>A circle of radius <span class="math inline">\(r\)</span> centered at the origin is the set <span class="math inline">\(\{p : \|p\| &lt; r\}\)</span>. We can color inside vs.&nbsp;outside:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">mainImage</span><span class="op">(</span><span class="dt">out</span> <span class="dt">vec4</span> fragColor<span class="op">,</span> <span class="dt">in</span> <span class="dt">vec2</span> fragCoord<span class="op">)</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// [Coordinate setup]</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> d <span class="op">=</span> <span class="bu">length</span><span class="op">(</span>p<span class="op">);</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> r <span class="op">=</span> <span class="fl">1.0</span><span class="op">;</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span> color <span class="op">=</span> <span class="op">(</span>d <span class="op">&lt;</span> r<span class="op">)</span> <span class="op">?</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">:</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.1</span><span class="op">,</span> <span class="fl">0.1</span><span class="op">,</span> <span class="fl">0.3</span><span class="op">);</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This renders a yellow disk on a dark blue background.</p>
+</section>
+<section id="distance-based-coloring" class="level3">
+<h3 class="anchored" data-anchor-id="distance-based-coloring">Distance-Based Coloring</h3>
+<p>We can create gradients by mapping distance to color:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> d <span class="op">=</span> <span class="bu">length</span><span class="op">(</span>p<span class="op">);</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> intensity <span class="op">=</span> <span class="fl">1.0</span> <span class="op">-</span> d <span class="op">/</span> <span class="fl">2.0</span><span class="op">;</span>  <span class="co">// Fades out with distance</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>intensity <span class="op">=</span> <span class="bu">clamp</span><span class="op">(</span>intensity<span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span>  <span class="co">// Keep in [0, 1]</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span>intensity<span class="op">);</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="circle-outline" class="level3">
+<h3 class="anchored" data-anchor-id="circle-outline">Circle Outline</h3>
+<p>To draw just the boundary of a circle (an annulus of small thickness), we check if <span class="math inline">\(d\)</span> is approximately equal to <span class="math inline">\(r\)</span>:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> d <span class="op">=</span> <span class="bu">length</span><span class="op">(</span>p<span class="op">);</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> r <span class="op">=</span> <span class="fl">1.0</span><span class="op">;</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> thickness <span class="op">=</span> <span class="fl">0.05</span><span class="op">;</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> circle_mask <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span>d <span class="op">-</span> r<span class="op">)</span> <span class="op">&lt;</span> thickness <span class="op">?</span> <span class="fl">1.0</span> <span class="op">:</span> <span class="fl">0.0</span><span class="op">;</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span>circle_mask<span class="op">);</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Mathematically, we’re coloring the set <span class="math inline">\(\{p : |d(p) - r| &lt; \epsilon\}\)</span> where <span class="math inline">\(\epsilon\)</span> is our thickness parameter.</p>
+<p>For a smoother edge, we can use <code>smoothstep</code>:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> circle_mask <span class="op">=</span> <span class="fl">1.0</span> <span class="op">-</span> <span class="bu">smoothstep</span><span class="op">(</span>r <span class="op">-</span> thickness<span class="op">,</span> r <span class="op">+</span> thickness<span class="op">,</span> d<span class="op">);</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The <code>smoothstep(a, b, x)</code> function performs smooth Hermite interpolation between <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span>.</p>
+<hr>
+</section>
+</section>
+<section id="grids-and-repetition" class="level2" data-number="1.7">
+<h2 data-number="1.7" class="anchored" data-anchor-id="grids-and-repetition"><span class="header-section-number">1.7</span> Grids and Repetition</h2>
+<section id="modular-arithmetic" class="level3">
+<h3 class="anchored" data-anchor-id="modular-arithmetic">Modular Arithmetic</h3>
+<p>The modulo operation creates periodic repetition. For a period <span class="math inline">\(T\)</span>, the function <span class="math inline">\(p \mapsto (p \bmod T) - T/2\)</span> maps <span class="math inline">\(\mathbb{R}\)</span> to <span class="math inline">\([-T/2, T/2]\)</span> repeatedly.</p>
+<p>In GLSL, <code>mod(x, T)</code> computes <span class="math inline">\(x \bmod T\)</span>.</p>
+</section>
+<section id="creating-a-grid" class="level3">
+<h3 class="anchored" data-anchor-id="creating-a-grid">Creating a Grid</h3>
+<p>To create a grid of repeated cells:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">mainImage</span><span class="op">(</span><span class="dt">out</span> <span class="dt">vec4</span> fragColor<span class="op">,</span> <span class="dt">in</span> <span class="dt">vec2</span> fragCoord<span class="op">)</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// [Coordinate setup, resulting in p]</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> spacing <span class="op">=</span> <span class="fl">1.0</span><span class="op">;</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> cell_p <span class="op">=</span> <span class="bu">mod</span><span class="op">(</span>p <span class="op">+</span> spacing<span class="op">/</span><span class="fl">2.0</span><span class="op">,</span> spacing<span class="op">)</span> <span class="op">-</span> spacing<span class="op">/</span><span class="fl">2.0</span><span class="op">;</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Now cell_p repeats every spacing units</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Draw a circle in each cell</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> d <span class="op">=</span> <span class="bu">length</span><span class="op">(</span>cell_p<span class="op">);</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> r <span class="op">=</span> <span class="fl">0.3</span><span class="op">;</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span> color <span class="op">=</span> <span class="op">(</span>d <span class="op">&lt;</span> r<span class="op">)</span> <span class="op">?</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">:</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.1</span><span class="op">,</span> <span class="fl">0.1</span><span class="op">,</span> <span class="fl">0.3</span><span class="op">);</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>    fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This creates an infinite grid of yellow circles!</p>
+</section>
+<section id="alternating-pattern" class="level3">
+<h3 class="anchored" data-anchor-id="alternating-pattern">Alternating Pattern</h3>
+<p>We can create checkerboard-like patterns using the cell index:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> cell_id <span class="op">=</span> <span class="bu">floor</span><span class="op">(</span>p <span class="op">/</span> spacing<span class="op">);</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> checker <span class="op">=</span> <span class="bu">mod</span><span class="op">(</span>cell_id<span class="op">.</span><span class="fu">x</span> <span class="op">+</span> cell_id<span class="op">.</span><span class="fu">y</span><span class="op">,</span> <span class="fl">2.0</span><span class="op">);</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> color_a <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">);</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> color_b <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> bg_color <span class="op">=</span> <span class="bu">mix</span><span class="op">(</span>color_a<span class="op">,</span> color_b<span class="op">,</span> checker<span class="op">);</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Here <code>floor(p / spacing)</code> gives us integer grid indices, and we alternate colors based on the parity of <span class="math inline">\(i + j\)</span>.</p>
+</section>
+<section id="combining-with-circles" class="level3">
+<h3 class="anchored" data-anchor-id="combining-with-circles">Combining with Circles</h3>
+<p>Put it all together for a grid of circles on an alternating background:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">mainImage</span><span class="op">(</span><span class="dt">out</span> <span class="dt">vec4</span> fragColor<span class="op">,</span> <span class="dt">in</span> <span class="dt">vec2</span> fragCoord<span class="op">)</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// [Coordinate setup]</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> spacing <span class="op">=</span> <span class="fl">1.0</span><span class="op">;</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> cell_id <span class="op">=</span> <span class="bu">floor</span><span class="op">(</span>p <span class="op">/</span> spacing<span class="op">);</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> cell_p <span class="op">=</span> <span class="bu">mod</span><span class="op">(</span>p <span class="op">+</span> spacing<span class="op">/</span><span class="fl">2.0</span><span class="op">,</span> spacing<span class="op">)</span> <span class="op">-</span> spacing<span class="op">/</span><span class="fl">2.0</span><span class="op">;</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Checkerboard background</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> checker <span class="op">=</span> <span class="bu">mod</span><span class="op">(</span>cell_id<span class="op">.</span><span class="fu">x</span> <span class="op">+</span> cell_id<span class="op">.</span><span class="fu">y</span><span class="op">,</span> <span class="fl">2.0</span><span class="op">);</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span> bg_color <span class="op">=</span> <span class="bu">mix</span><span class="op">(</span><span class="dt">vec3</span><span class="op">(</span><span class="fl">0.2</span><span class="op">,</span> <span class="fl">0.2</span><span class="op">,</span> <span class="fl">0.3</span><span class="op">),</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.3</span><span class="op">,</span> <span class="fl">0.2</span><span class="op">,</span> <span class="fl">0.2</span><span class="op">),</span> checker<span class="op">);</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Circle in each cell</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> d <span class="op">=</span> <span class="bu">length</span><span class="op">(</span>cell_p<span class="op">);</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> r <span class="op">=</span> <span class="fl">0.3</span><span class="op">;</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span> circle_color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">);</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span> color <span class="op">=</span> <span class="op">(</span>d <span class="op">&lt;</span> r<span class="op">)</span> <span class="op">?</span> circle_color <span class="op">:</span> bg_color<span class="op">;</span></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>    fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<hr>
+</section>
+</section>
+<section id="implicit-curves" class="level2" data-number="1.8">
+<h2 data-number="1.8" class="anchored" data-anchor-id="implicit-curves"><span class="header-section-number">1.8</span> Implicit Curves</h2>
+<section id="general-principle" class="level3">
+<h3 class="anchored" data-anchor-id="general-principle">General Principle</h3>
+<p>An implicit curve is defined by an equation <span class="math inline">\(F(x, y) = 0\)</span>. To render it, we compute <span class="math inline">\(F(p)\)</span> for each pixel and color based on proximity to zero:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> F <span class="op">=</span> <span class="op">[</span>some function of p<span class="op">.</span><span class="fu">x</span> and p<span class="op">.</span><span class="fu">y</span><span class="op">];</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> thickness <span class="op">=</span> <span class="fl">0.05</span><span class="op">;</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> curve_mask <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span>F<span class="op">)</span> <span class="op">&lt;</span> thickness <span class="op">?</span> <span class="fl">1.0</span> <span class="op">:</span> <span class="fl">0.0</span><span class="op">;</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> color <span class="op">=</span> <span class="bu">mix</span><span class="op">(</span>background<span class="op">,</span> curve_color<span class="op">,</span> curve_mask<span class="op">);</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="example-parabola" class="level3">
+<h3 class="anchored" data-anchor-id="example-parabola">Example: Parabola</h3>
+<p>The parabola <span class="math inline">\(y = x^2\)</span> can be written implicitly as <span class="math inline">\(F(x, y) = y - x^2 = 0\)</span>:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> F <span class="op">=</span> p<span class="op">.</span><span class="fu">y</span> <span class="op">-</span> p<span class="op">.</span><span class="fu">x</span> <span class="op">*</span> p<span class="op">.</span><span class="fu">x</span><span class="op">;</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> thickness <span class="op">=</span> <span class="fl">0.1</span><span class="op">;</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> curve_mask <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span>F<span class="op">)</span> <span class="op">&lt;</span> thickness <span class="op">?</span> <span class="fl">1.0</span> <span class="op">:</span> <span class="fl">0.0</span><span class="op">;</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> color <span class="op">=</span> <span class="bu">mix</span><span class="op">(</span><span class="dt">vec3</span><span class="op">(</span><span class="fl">0.1</span><span class="op">,</span> <span class="fl">0.1</span><span class="op">,</span> <span class="fl">0.3</span><span class="op">),</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">),</span> curve_mask<span class="op">);</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="example-circle-implicit-form" class="level3">
+<h3 class="anchored" data-anchor-id="example-circle-implicit-form">Example: Circle (Implicit Form)</h3>
+<p>We’ve been using <span class="math inline">\(\|p\| &lt; r\)</span> for filled circles, but we can also write the circle implicitly as <span class="math inline">\(x^2 + y^2 - r^2 = 0\)</span>:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> r <span class="op">=</span> <span class="fl">1.0</span><span class="op">;</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> F <span class="op">=</span> <span class="bu">dot</span><span class="op">(</span>p<span class="op">,</span> p<span class="op">)</span> <span class="op">-</span> r <span class="op">*</span> r<span class="op">;</span>  <span class="co">// dot(p,p) = x² + y²</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> thickness <span class="op">=</span> <span class="fl">0.1</span><span class="op">;</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> curve_mask <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span>F<span class="op">)</span> <span class="op">&lt;</span> thickness <span class="op">?</span> <span class="fl">1.0</span> <span class="op">:</span> <span class="fl">0.0</span><span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This is mathematically equivalent to our earlier approach but demonstrates the general implicit curve technique.</p>
+<hr>
+</section>
+</section>
+<section id="summary" class="level2" data-number="1.9">
+<h2 data-number="1.9" class="anchored" data-anchor-id="summary"><span class="header-section-number">1.9</span> Summary</h2>
+<p>Today we’ve learned:</p>
+<ol type="1">
+<li><strong>Shaders as parallel functions</strong>: Every pixel evaluates <span class="math inline">\(f(x, y, t, \ldots) \to \text{color}\)</span> simultaneously</li>
+<li><strong>GLSL basics</strong>: Syntax, vector types, and built-in functions</li>
+<li><strong>Coordinate systems</strong>: Centering, normalizing, and scaling for mathematical work</li>
+<li><strong>Conditional coloring</strong>: Using boolean expressions and <code>step()</code> for discrete color regions</li>
+<li><strong>Distance fields</strong>: Using <code>length()</code> to create circles and radial patterns</li>
+<li><strong>Modular arithmetic</strong>: Creating grids and repeating patterns with <code>mod()</code></li>
+<li><strong>Implicit curves</strong>: Rendering curves defined by <span class="math inline">\(F(x, y) = 0\)</span></li>
+</ol>
+<p>With these tools, you can already create a wide variety of mathematical visualizations!</p>
+<hr>
+</section>
+<section id="homework" class="level2" data-number="1.10">
+<h2 data-number="1.10" class="anchored" data-anchor-id="homework"><span class="header-section-number">1.10</span> Homework</h2>
+<section id="required-parabola-graphing-calculator" class="level3">
+<h3 class="anchored" data-anchor-id="required-parabola-graphing-calculator">Required: Parabola Graphing Calculator</h3>
+<p>Create a shader that draws a customizable parabola <span class="math inline">\(y = ax^2 + bx + c\)</span> along with coordinate axes.</p>
+<p><strong>Requirements:</strong> - Define variables <code>a</code>, <code>b</code>, <code>c</code> at the top of your shader (hardcoded values are fine) - Draw the <span class="math inline">\(x\)</span>-axis and <span class="math inline">\(y\)</span>-axis as thick lines (use the implicit line technique: <span class="math inline">\(|y| &lt; \epsilon\)</span> for <span class="math inline">\(x\)</span>-axis, <span class="math inline">\(|x| &lt; \epsilon\)</span> for <span class="math inline">\(y\)</span>-axis) - Plot the parabola <span class="math inline">\(y = ax^2 + bx + c\)</span> as a thick curve - Use distinct colors for axes and parabola - The visualization should work for any reasonable values of <span class="math inline">\(a\)</span>, <span class="math inline">\(b\)</span>, <span class="math inline">\(c\)</span></p>
+<p><strong>Suggested approach:</strong></p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Define parameters</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> a <span class="op">=</span> <span class="fl">1.0</span><span class="op">;</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> b <span class="op">=</span> <span class="fl">0.0</span><span class="op">;</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> c <span class="op">=</span> <span class="fl">0.0</span><span class="op">;</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="co">// Axes</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> x_axis_mask <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span>p<span class="op">.</span><span class="fu">y</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">0.05</span> <span class="op">?</span> <span class="fl">1.0</span> <span class="op">:</span> <span class="fl">0.0</span><span class="op">;</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> y_axis_mask <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span>p<span class="op">.</span><span class="fu">x</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">0.05</span> <span class="op">?</span> <span class="fl">1.0</span> <span class="op">:</span> <span class="fl">0.0</span><span class="op">;</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="co">// Parabola: F(x,y) = y - (ax² + bx + c) = 0</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> F <span class="op">=</span> p<span class="op">.</span><span class="fu">y</span> <span class="op">-</span> <span class="op">(</span>a <span class="op">*</span> p<span class="op">.</span><span class="fu">x</span> <span class="op">*</span> p<span class="op">.</span><span class="fu">x</span> <span class="op">+</span> b <span class="op">*</span> p<span class="op">.</span><span class="fu">x</span> <span class="op">+</span> c<span class="op">);</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> parabola_mask <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span>F<span class="op">)</span> <span class="op">&lt;</span> <span class="fl">0.1</span> <span class="op">?</span> <span class="fl">1.0</span> <span class="op">:</span> <span class="fl">0.0</span><span class="op">;</span></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a><span class="co">// Combine</span></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> color <span class="op">=</span> background<span class="op">;</span></span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>color <span class="op">=</span> <span class="bu">mix</span><span class="op">(</span>color<span class="op">,</span> axis_color<span class="op">,</span> <span class="bu">max</span><span class="op">(</span>x_axis_mask<span class="op">,</span> y_axis_mask<span class="op">));</span></span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>color <span class="op">=</span> <span class="bu">mix</span><span class="op">(</span>color<span class="op">,</span> parabola_color<span class="op">,</span> parabola_mask<span class="op">);</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Try different values of <span class="math inline">\(a\)</span>, <span class="math inline">\(b\)</span>, <span class="math inline">\(c\)</span> and verify your grapher works correctly!</p>
+</section>
+<section id="optional-1-animated-curve-family" class="level3">
+<h3 class="anchored" data-anchor-id="optional-1-animated-curve-family">Optional #1: Animated Curve Family</h3>
+<p>Create a shader that animates through a family of curves.</p>
+<p><strong>Suggestions:</strong> - <strong>Elliptic fibration</strong>: Fix a cubic polynomial and vary a parameter: <span class="math inline">\(y^2 = x^3 + ax + b\)</span> where <span class="math inline">\(a\)</span> or <span class="math inline">\(b\)</span> varies with <code>iTime</code> - <strong>Lissajous curves</strong>: <span class="math inline">\(x = A\sin(at + \delta)\)</span>, <span class="math inline">\(y = B\sin(bt)\)</span>, animate <span class="math inline">\(\delta\)</span> or the frequency ratio</p>
+<p>Use <code>iTime</code> creatively to create a compelling animation. The goal is to explore how continuous parameter variation produces interesting mathematical families.</p>
+</section>
+<section id="optional-2-beautiful-tiling-pattern" class="level3">
+<h3 class="anchored" data-anchor-id="optional-2-beautiful-tiling-pattern">Optional #2: Beautiful Tiling Pattern</h3>
+<p>Design an aesthetically pleasing tiling pattern using the <code>mod()</code> technique.</p>
+<p><strong>Requirements:</strong> - Create a non-trivial pattern within a fundamental domain (a single tile) - Use <code>mod()</code> to repeat it across the plane - The pattern should tile seamlessly (edges should match up)</p>
+<p><strong>Ideas:</strong> - Geometric patterns: nested circles, polygons, stars - Color gradients that vary by tile position - Combinations of implicit curves within each tile - Symmetry: use <code>abs()</code> to create reflections within tiles</p>
+<p><strong>Challenge</strong>: Can you create a pattern that has different symmetries in different tiles? (For example, alternating rotational symmetry using the checkerboard <code>cell_id</code> technique.)</p>
+<hr>
+</section>
+</section>
+<section id="looking-ahead" class="level2" data-number="1.11">
+<h2 data-number="1.11" class="anchored" data-anchor-id="looking-ahead"><span class="header-section-number">1.11</span> Looking Ahead</h2>
+<p>Tomorrow we’ll use these techniques to explore <strong>complex dynamics</strong> (the Mandelbrot and Julia sets) and <strong>geometric tilings</strong> (including fractals via iterated folding). The coordinate system and implicit curve techniques you’ve learned today will be the foundation for everything to come.</p>
+<p>Make sure you’re comfortable with: - Setting up coordinates - Computing distances and implicit functions<br>
+- Using <code>mod()</code> for repetition - Conditionally coloring based on mathematical expressions</p>
 
 
 <!-- -->
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -891,20 +1316,505 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
       <a href="./outline.html" class="pagination-link" aria-label="Outline">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Outline</span></span>
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Outline</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./day2.html" class="pagination-link" aria-label="Day 2">
-        <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Day 2</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./day2.html" class="pagination-link" aria-label="Day 2: Complex Dynamics and Euclidean Geometry">
+        <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Day 2: Complex Dynamics and Euclidean Geometry</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># Day I</span></span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb22" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># Day 1: Introduction to Shader Programming</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="fu">## Overview</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>Today we introduce the fundamental concept of shader programming: computing a function from pixel coordinates to colors, executed in parallel across the entire image. We'll learn basic GLSL syntax, set up a coordinate system, and create simple geometric shapes.</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>By the end of today, you'll be able to render implicit curves, distance-based coloring, and repeating patterns—all computed in real-time on the GPU.</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a><span class="fu">## What is a Shader?</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a><span class="fu">### Mathematical Perspective</span></span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>A shader is fundamentally a function</span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>$$f: \mathbb{R}^2 \times \mathbb{R} \times \cdots \to \mathbb{R}^4$$</span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>that maps pixel coordinates (and potentially time, mouse position, etc.) to color values. For each pixel on the screen, we evaluate this function to determine what color to display.</span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>The key insight: modern GPUs can evaluate this function for **all pixels simultaneously**. If your screen has 1920×1080 pixels, that's over 2 million function evaluations happening in parallel, typically 60 times per second.</span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>This parallelism is what makes shaders extraordinarily fast for mathematical visualization—we're not looping over pixels sequentially, we're computing them all at once.</span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a><span class="fu">### Why Shadertoy?</span></span>
+<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>Shadertoy is a web-based platform that abstracts away the complexities of GPU programming (setting up OpenGL contexts, managing buffers, compiling shaders, etc.). You write a single function, and Shadertoy handles everything else.</span>
+<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a>The platform provides several built-in **uniforms** (read-only global variables):</span>
+<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`iResolution`</span>: screen resolution as a <span class="in">`vec3`</span> (width, height, pixel aspect ratio)</span>
+<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`iTime`</span>: elapsed time in seconds</span>
+<span id="cb22-30"><a href="#cb22-30" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`iMouse`</span>: mouse position and click state as a <span class="in">`vec4`</span></span>
+<span id="cb22-31"><a href="#cb22-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-32"><a href="#cb22-32" aria-hidden="true" tabindex="-1"></a>We'll use these throughout the week.</span>
+<span id="cb22-33"><a href="#cb22-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-34"><a href="#cb22-34" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb22-35"><a href="#cb22-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-36"><a href="#cb22-36" aria-hidden="true" tabindex="-1"></a><span class="fu">## First Shader: Solid Colors</span></span>
+<span id="cb22-37"><a href="#cb22-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-38"><a href="#cb22-38" aria-hidden="true" tabindex="-1"></a><span class="fu">### Basic Structure</span></span>
+<span id="cb22-39"><a href="#cb22-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-40"><a href="#cb22-40" aria-hidden="true" tabindex="-1"></a>Every Shadertoy shader has the same entry point:</span>
+<span id="cb22-41"><a href="#cb22-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-42"><a href="#cb22-42" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb22-43"><a href="#cb22-43" aria-hidden="true" tabindex="-1"></a><span class="in">void mainImage(out vec4 fragColor, in vec2 fragCoord)</span></span>
+<span id="cb22-44"><a href="#cb22-44" aria-hidden="true" tabindex="-1"></a><span class="in">{</span></span>
+<span id="cb22-45"><a href="#cb22-45" aria-hidden="true" tabindex="-1"></a><span class="in">    // Your code here</span></span>
+<span id="cb22-46"><a href="#cb22-46" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb22-47"><a href="#cb22-47" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-48"><a href="#cb22-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-49"><a href="#cb22-49" aria-hidden="true" tabindex="-1"></a>**Parameters:**</span>
+<span id="cb22-50"><a href="#cb22-50" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`fragCoord`</span>: the pixel coordinate we're currently computing, as a <span class="in">`vec2`</span> (x, y)</span>
+<span id="cb22-51"><a href="#cb22-51" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`fragColor`</span>: the output color we need to set, as a <span class="in">`vec4`</span> (red, green, blue, alpha)</span>
+<span id="cb22-52"><a href="#cb22-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-53"><a href="#cb22-53" aria-hidden="true" tabindex="-1"></a>Colors are represented in RGBA format with values in $<span class="co">[</span><span class="ot">0, 1</span><span class="co">]</span>$. So <span class="in">`vec4(1.0, 0.0, 0.0, 1.0)`</span> represents opaque red, while <span class="in">`vec4(0.5, 0.5, 0.5, 1.0)`</span> is middle gray.</span>
+<span id="cb22-54"><a href="#cb22-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-55"><a href="#cb22-55" aria-hidden="true" tabindex="-1"></a><span class="fu">### Example: Red Screen</span></span>
+<span id="cb22-56"><a href="#cb22-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-57"><a href="#cb22-57" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb22-58"><a href="#cb22-58" aria-hidden="true" tabindex="-1"></a><span class="in">void mainImage(out vec4 fragColor, in vec2 fragCoord)</span></span>
+<span id="cb22-59"><a href="#cb22-59" aria-hidden="true" tabindex="-1"></a><span class="in">{</span></span>
+<span id="cb22-60"><a href="#cb22-60" aria-hidden="true" tabindex="-1"></a><span class="in">    fragColor = vec4(1.0, 0.0, 0.0, 1.0);</span></span>
+<span id="cb22-61"><a href="#cb22-61" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb22-62"><a href="#cb22-62" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-63"><a href="#cb22-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-64"><a href="#cb22-64" aria-hidden="true" tabindex="-1"></a>This sets every pixel to red. The function is evaluated once per pixel, but since the output doesn't depend on <span class="in">`fragCoord`</span>, every pixel gets the same value.</span>
+<span id="cb22-65"><a href="#cb22-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-66"><a href="#cb22-66" aria-hidden="true" tabindex="-1"></a><span class="fu">### GLSL Syntax Basics</span></span>
+<span id="cb22-67"><a href="#cb22-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-68"><a href="#cb22-68" aria-hidden="true" tabindex="-1"></a>A few essential points about the GLSL language:</span>
+<span id="cb22-69"><a href="#cb22-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-70"><a href="#cb22-70" aria-hidden="true" tabindex="-1"></a>**Semicolons are required.** Every statement must end with a semicolon. This is not Python!</span>
+<span id="cb22-71"><a href="#cb22-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-72"><a href="#cb22-72" aria-hidden="true" tabindex="-1"></a>**Vector types:** GLSL has built-in types <span class="in">`vec2`</span>, <span class="in">`vec3`</span>, <span class="in">`vec4`</span> for 2D, 3D, and 4D vectors. You can construct them with:</span>
+<span id="cb22-73"><a href="#cb22-73" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb22-74"><a href="#cb22-74" aria-hidden="true" tabindex="-1"></a><span class="in">vec2 v = vec2(1.0, 2.0);</span></span>
+<span id="cb22-75"><a href="#cb22-75" aria-hidden="true" tabindex="-1"></a><span class="in">vec3 w = vec3(1.0, 2.0, 3.0);</span></span>
+<span id="cb22-76"><a href="#cb22-76" aria-hidden="true" tabindex="-1"></a><span class="in">vec4 color = vec4(v, 0.0, 1.0);  // Can combine vectors and scalars</span></span>
+<span id="cb22-77"><a href="#cb22-77" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-78"><a href="#cb22-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-79"><a href="#cb22-79" aria-hidden="true" tabindex="-1"></a>**Swizzling:** You can access components by name: <span class="in">`v.x`</span>, <span class="in">`v.y`</span> or <span class="in">`v.r`</span>, <span class="in">`v.g`</span> (same thing, different naming convention). We'll cover more syntax in the appendix.</span>
+<span id="cb22-80"><a href="#cb22-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-81"><a href="#cb22-81" aria-hidden="true" tabindex="-1"></a>**Floating point literals:** Write <span class="in">`1.0`</span> not <span class="in">`1`</span> for floating point values. GLSL is picky about types.</span>
+<span id="cb22-82"><a href="#cb22-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-83"><a href="#cb22-83" aria-hidden="true" tabindex="-1"></a><span class="fu">### Animating with Time</span></span>
+<span id="cb22-84"><a href="#cb22-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-85"><a href="#cb22-85" aria-hidden="true" tabindex="-1"></a>Let's make something that changes:</span>
+<span id="cb22-86"><a href="#cb22-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-87"><a href="#cb22-87" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb22-88"><a href="#cb22-88" aria-hidden="true" tabindex="-1"></a><span class="in">void mainImage(out vec4 fragColor, in vec2 fragCoord)</span></span>
+<span id="cb22-89"><a href="#cb22-89" aria-hidden="true" tabindex="-1"></a><span class="in">{</span></span>
+<span id="cb22-90"><a href="#cb22-90" aria-hidden="true" tabindex="-1"></a><span class="in">    float red = 0.5 + 0.5 * sin(iTime);</span></span>
+<span id="cb22-91"><a href="#cb22-91" aria-hidden="true" tabindex="-1"></a><span class="in">    fragColor = vec4(red, 0.0, 0.0, 1.0);</span></span>
+<span id="cb22-92"><a href="#cb22-92" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb22-93"><a href="#cb22-93" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-94"><a href="#cb22-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-95"><a href="#cb22-95" aria-hidden="true" tabindex="-1"></a>Here <span class="in">`iTime`</span> grows continuously, <span class="in">`sin(iTime)`</span> oscillates between $-1$ and $1$, and we remap to $<span class="co">[</span><span class="ot">0, 1</span><span class="co">]</span>$ with the affine transformation $x \mapsto \frac{1}{2}(1 + x)$. The screen now pulses between black and red.</span>
+<span id="cb22-96"><a href="#cb22-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-97"><a href="#cb22-97" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb22-98"><a href="#cb22-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-99"><a href="#cb22-99" aria-hidden="true" tabindex="-1"></a><span class="fu">## Coordinate Systems</span></span>
+<span id="cb22-100"><a href="#cb22-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-101"><a href="#cb22-101" aria-hidden="true" tabindex="-1"></a><span class="fu">### Raw Coordinates</span></span>
+<span id="cb22-102"><a href="#cb22-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-103"><a href="#cb22-103" aria-hidden="true" tabindex="-1"></a>By default, <span class="in">`fragCoord`</span> gives pixel coordinates with:</span>
+<span id="cb22-104"><a href="#cb22-104" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Origin $(0, 0)$ at the bottom-left</span>
+<span id="cb22-105"><a href="#cb22-105" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$x$ increases rightward to <span class="in">`iResolution.x`</span></span>
+<span id="cb22-106"><a href="#cb22-106" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$y$ increases upward to <span class="in">`iResolution.y`</span></span>
+<span id="cb22-107"><a href="#cb22-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-108"><a href="#cb22-108" aria-hidden="true" tabindex="-1"></a>For mathematical work, we want:</span>
+<span id="cb22-109"><a href="#cb22-109" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Origin at the center</span>
+<span id="cb22-110"><a href="#cb22-110" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Coordinates normalized (not in pixels)</span>
+<span id="cb22-111"><a href="#cb22-111" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Aspect ratio handled correctly</span>
+<span id="cb22-112"><a href="#cb22-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-113"><a href="#cb22-113" aria-hidden="true" tabindex="-1"></a><span class="fu">### Centered, Normalized Coordinates</span></span>
+<span id="cb22-114"><a href="#cb22-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-115"><a href="#cb22-115" aria-hidden="true" tabindex="-1"></a>Here's a standard transformation:</span>
+<span id="cb22-116"><a href="#cb22-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-117"><a href="#cb22-117" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb22-118"><a href="#cb22-118" aria-hidden="true" tabindex="-1"></a><span class="in">void mainImage(out vec4 fragColor, in vec2 fragCoord)</span></span>
+<span id="cb22-119"><a href="#cb22-119" aria-hidden="true" tabindex="-1"></a><span class="in">{</span></span>
+<span id="cb22-120"><a href="#cb22-120" aria-hidden="true" tabindex="-1"></a><span class="in">    // Normalize to [0,1]</span></span>
+<span id="cb22-121"><a href="#cb22-121" aria-hidden="true" tabindex="-1"></a><span class="in">    vec2 uv = fragCoord / iResolution.xy;</span></span>
+<span id="cb22-122"><a href="#cb22-122" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb22-123"><a href="#cb22-123" aria-hidden="true" tabindex="-1"></a><span class="in">    // Center at origin: [-0.5, 0.5]</span></span>
+<span id="cb22-124"><a href="#cb22-124" aria-hidden="true" tabindex="-1"></a><span class="in">    uv = uv - 0.5;</span></span>
+<span id="cb22-125"><a href="#cb22-125" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb22-126"><a href="#cb22-126" aria-hidden="true" tabindex="-1"></a><span class="in">    // Scale to account for aspect ratio</span></span>
+<span id="cb22-127"><a href="#cb22-127" aria-hidden="true" tabindex="-1"></a><span class="in">    uv.x *= iResolution.x / iResolution.y;</span></span>
+<span id="cb22-128"><a href="#cb22-128" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb22-129"><a href="#cb22-129" aria-hidden="true" tabindex="-1"></a><span class="in">    // Now uv is centered and aspect-corrected</span></span>
+<span id="cb22-130"><a href="#cb22-130" aria-hidden="true" tabindex="-1"></a><span class="in">    // Scale to desired viewing window (e.g., [-2, 2] on x-axis)</span></span>
+<span id="cb22-131"><a href="#cb22-131" aria-hidden="true" tabindex="-1"></a><span class="in">    vec2 p = uv * 4.0;  // Now p is in [-2, 2] × [-h, h] where h depends on aspect ratio</span></span>
+<span id="cb22-132"><a href="#cb22-132" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb22-133"><a href="#cb22-133" aria-hidden="true" tabindex="-1"></a><span class="in">    fragColor = vec4(1.0, 0.0, 0.0, 1.0);</span></span>
+<span id="cb22-134"><a href="#cb22-134" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb22-135"><a href="#cb22-135" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-136"><a href="#cb22-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-137"><a href="#cb22-137" aria-hidden="true" tabindex="-1"></a>From now on, we'll assume this coordinate setup is done at the start of every shader, storing the result in a variable <span class="in">`p`</span> for "position."</span>
+<span id="cb22-138"><a href="#cb22-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-139"><a href="#cb22-139" aria-hidden="true" tabindex="-1"></a><span class="fu">### Visualizing Coordinates</span></span>
+<span id="cb22-140"><a href="#cb22-140" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-141"><a href="#cb22-141" aria-hidden="true" tabindex="-1"></a>Let's color pixels by their position:</span>
+<span id="cb22-142"><a href="#cb22-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-143"><a href="#cb22-143" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb22-144"><a href="#cb22-144" aria-hidden="true" tabindex="-1"></a><span class="in">void mainImage(out vec4 fragColor, in vec2 fragCoord)</span></span>
+<span id="cb22-145"><a href="#cb22-145" aria-hidden="true" tabindex="-1"></a><span class="in">{</span></span>
+<span id="cb22-146"><a href="#cb22-146" aria-hidden="true" tabindex="-1"></a><span class="in">    // [Coordinate setup as above, resulting in p]</span></span>
+<span id="cb22-147"><a href="#cb22-147" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb22-148"><a href="#cb22-148" aria-hidden="true" tabindex="-1"></a><span class="in">    // Map x coordinate to red, y to green</span></span>
+<span id="cb22-149"><a href="#cb22-149" aria-hidden="true" tabindex="-1"></a><span class="in">    vec2 color_rg = p * 0.5 + 0.5;  // Remap to [0, 1]</span></span>
+<span id="cb22-150"><a href="#cb22-150" aria-hidden="true" tabindex="-1"></a><span class="in">    fragColor = vec4(color_rg, 0.0, 1.0);</span></span>
+<span id="cb22-151"><a href="#cb22-151" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb22-152"><a href="#cb22-152" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-153"><a href="#cb22-153" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-154"><a href="#cb22-154" aria-hidden="true" tabindex="-1"></a>You should see a smooth gradient: red increases rightward, green increases upward.</span>
+<span id="cb22-155"><a href="#cb22-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-156"><a href="#cb22-156" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb22-157"><a href="#cb22-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-158"><a href="#cb22-158" aria-hidden="true" tabindex="-1"></a><span class="fu">## Conditional Coloring: Half-Planes</span></span>
+<span id="cb22-159"><a href="#cb22-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-160"><a href="#cb22-160" aria-hidden="true" tabindex="-1"></a><span class="fu">### The Concept</span></span>
+<span id="cb22-161"><a href="#cb22-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-162"><a href="#cb22-162" aria-hidden="true" tabindex="-1"></a>Given a linear function $L(x, y) = ax + by$, we want to color pixels differently depending on whether $L(p) &lt; 0$ or $L(p) \geq 0$. This divides the plane into two half-planes.</span>
+<span id="cb22-163"><a href="#cb22-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-164"><a href="#cb22-164" aria-hidden="true" tabindex="-1"></a><span class="fu">### Implementation</span></span>
+<span id="cb22-165"><a href="#cb22-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-166"><a href="#cb22-166" aria-hidden="true" tabindex="-1"></a>GLSL provides a conditional operator (ternary operator) just like C:</span>
+<span id="cb22-167"><a href="#cb22-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-168"><a href="#cb22-168" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb22-169"><a href="#cb22-169" aria-hidden="true" tabindex="-1"></a><span class="in">void mainImage(out vec4 fragColor, in vec2 fragCoord)</span></span>
+<span id="cb22-170"><a href="#cb22-170" aria-hidden="true" tabindex="-1"></a><span class="in">{</span></span>
+<span id="cb22-171"><a href="#cb22-171" aria-hidden="true" tabindex="-1"></a><span class="in">    // [Coordinate setup, resulting in p]</span></span>
+<span id="cb22-172"><a href="#cb22-172" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb22-173"><a href="#cb22-173" aria-hidden="true" tabindex="-1"></a><span class="in">    float L = p.x;  // The function L(x,y) = x</span></span>
+<span id="cb22-174"><a href="#cb22-174" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb22-175"><a href="#cb22-175" aria-hidden="true" tabindex="-1"></a><span class="in">    vec3 color = (L &lt; 0.0) ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 0.0, 1.0);</span></span>
+<span id="cb22-176"><a href="#cb22-176" aria-hidden="true" tabindex="-1"></a><span class="in">    fragColor = vec4(color, 1.0);</span></span>
+<span id="cb22-177"><a href="#cb22-177" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb22-178"><a href="#cb22-178" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-179"><a href="#cb22-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-180"><a href="#cb22-180" aria-hidden="true" tabindex="-1"></a>Left half-plane is red, right half-plane is blue.</span>
+<span id="cb22-181"><a href="#cb22-181" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-182"><a href="#cb22-182" aria-hidden="true" tabindex="-1"></a><span class="fu">### The Step Function</span></span>
+<span id="cb22-183"><a href="#cb22-183" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-184"><a href="#cb22-184" aria-hidden="true" tabindex="-1"></a>GLSL also provides <span class="in">`step(edge, x)`</span> which returns 0 if $x &lt; \text{edge}$ and 1 otherwise. This is useful for smooth code:</span>
+<span id="cb22-185"><a href="#cb22-185" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-186"><a href="#cb22-186" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb22-187"><a href="#cb22-187" aria-hidden="true" tabindex="-1"></a><span class="in">float s = step(0.0, p.x);  // 0 on left, 1 on right</span></span>
+<span id="cb22-188"><a href="#cb22-188" aria-hidden="true" tabindex="-1"></a><span class="in">vec3 color = mix(vec3(1.0, 0.0, 0.0), vec3(0.0, 0.0, 1.0), s);</span></span>
+<span id="cb22-189"><a href="#cb22-189" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-190"><a href="#cb22-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-191"><a href="#cb22-191" aria-hidden="true" tabindex="-1"></a>Here <span class="in">`mix(a, b, t)`</span> performs linear interpolation: $(1-t)a + tb$.</span>
+<span id="cb22-192"><a href="#cb22-192" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-193"><a href="#cb22-193" aria-hidden="true" tabindex="-1"></a><span class="fu">### Arbitrary Half-Planes</span></span>
+<span id="cb22-194"><a href="#cb22-194" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-195"><a href="#cb22-195" aria-hidden="true" tabindex="-1"></a>For a general line $ax + by = 0$:</span>
+<span id="cb22-196"><a href="#cb22-196" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-197"><a href="#cb22-197" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb22-198"><a href="#cb22-198" aria-hidden="true" tabindex="-1"></a><span class="in">float a = 1.0, b = 1.0;</span></span>
+<span id="cb22-199"><a href="#cb22-199" aria-hidden="true" tabindex="-1"></a><span class="in">float L = a * p.x + b * p.y;</span></span>
+<span id="cb22-200"><a href="#cb22-200" aria-hidden="true" tabindex="-1"></a><span class="in">vec3 color = (L &lt; 0.0) ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 0.0, 1.0);</span></span>
+<span id="cb22-201"><a href="#cb22-201" aria-hidden="true" tabindex="-1"></a><span class="in">fragColor = vec4(color, 1.0);</span></span>
+<span id="cb22-202"><a href="#cb22-202" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-203"><a href="#cb22-203" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-204"><a href="#cb22-204" aria-hidden="true" tabindex="-1"></a>Try different values of $a$ and $b$ to see different line orientations.</span>
+<span id="cb22-205"><a href="#cb22-205" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-206"><a href="#cb22-206" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb22-207"><a href="#cb22-207" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-208"><a href="#cb22-208" aria-hidden="true" tabindex="-1"></a><span class="fu">## Distance Fields and Circles</span></span>
+<span id="cb22-209"><a href="#cb22-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-210"><a href="#cb22-210" aria-hidden="true" tabindex="-1"></a><span class="fu">### Distance to Center</span></span>
+<span id="cb22-211"><a href="#cb22-211" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-212"><a href="#cb22-212" aria-hidden="true" tabindex="-1"></a>The distance from a point $p = (x, y)$ to the origin is simply</span>
+<span id="cb22-213"><a href="#cb22-213" aria-hidden="true" tabindex="-1"></a>$$d = \|p\| = \sqrt{x^2 + y^2}$$</span>
+<span id="cb22-214"><a href="#cb22-214" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-215"><a href="#cb22-215" aria-hidden="true" tabindex="-1"></a>In GLSL:</span>
+<span id="cb22-216"><a href="#cb22-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-217"><a href="#cb22-217" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb22-218"><a href="#cb22-218" aria-hidden="true" tabindex="-1"></a><span class="in">float d = length(p);</span></span>
+<span id="cb22-219"><a href="#cb22-219" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-220"><a href="#cb22-220" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-221"><a href="#cb22-221" aria-hidden="true" tabindex="-1"></a>The <span class="in">`length()`</span> function computes the Euclidean norm of a vector.</span>
+<span id="cb22-222"><a href="#cb22-222" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-223"><a href="#cb22-223" aria-hidden="true" tabindex="-1"></a><span class="fu">### Filled Circle</span></span>
+<span id="cb22-224"><a href="#cb22-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-225"><a href="#cb22-225" aria-hidden="true" tabindex="-1"></a>A circle of radius $r$ centered at the origin is the set $<span class="sc">\{</span>p : \|p\| &lt; r<span class="sc">\}</span>$. We can color inside vs. outside:</span>
+<span id="cb22-226"><a href="#cb22-226" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-227"><a href="#cb22-227" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb22-228"><a href="#cb22-228" aria-hidden="true" tabindex="-1"></a><span class="in">void mainImage(out vec4 fragColor, in vec2 fragCoord)</span></span>
+<span id="cb22-229"><a href="#cb22-229" aria-hidden="true" tabindex="-1"></a><span class="in">{</span></span>
+<span id="cb22-230"><a href="#cb22-230" aria-hidden="true" tabindex="-1"></a><span class="in">    // [Coordinate setup]</span></span>
+<span id="cb22-231"><a href="#cb22-231" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb22-232"><a href="#cb22-232" aria-hidden="true" tabindex="-1"></a><span class="in">    float d = length(p);</span></span>
+<span id="cb22-233"><a href="#cb22-233" aria-hidden="true" tabindex="-1"></a><span class="in">    float r = 1.0;</span></span>
+<span id="cb22-234"><a href="#cb22-234" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb22-235"><a href="#cb22-235" aria-hidden="true" tabindex="-1"></a><span class="in">    vec3 color = (d &lt; r) ? vec3(1.0, 1.0, 0.0) : vec3(0.1, 0.1, 0.3);</span></span>
+<span id="cb22-236"><a href="#cb22-236" aria-hidden="true" tabindex="-1"></a><span class="in">    fragColor = vec4(color, 1.0);</span></span>
+<span id="cb22-237"><a href="#cb22-237" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb22-238"><a href="#cb22-238" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-239"><a href="#cb22-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-240"><a href="#cb22-240" aria-hidden="true" tabindex="-1"></a>This renders a yellow disk on a dark blue background.</span>
+<span id="cb22-241"><a href="#cb22-241" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-242"><a href="#cb22-242" aria-hidden="true" tabindex="-1"></a><span class="fu">### Distance-Based Coloring</span></span>
+<span id="cb22-243"><a href="#cb22-243" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-244"><a href="#cb22-244" aria-hidden="true" tabindex="-1"></a>We can create gradients by mapping distance to color:</span>
+<span id="cb22-245"><a href="#cb22-245" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-246"><a href="#cb22-246" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb22-247"><a href="#cb22-247" aria-hidden="true" tabindex="-1"></a><span class="in">float d = length(p);</span></span>
+<span id="cb22-248"><a href="#cb22-248" aria-hidden="true" tabindex="-1"></a><span class="in">float intensity = 1.0 - d / 2.0;  // Fades out with distance</span></span>
+<span id="cb22-249"><a href="#cb22-249" aria-hidden="true" tabindex="-1"></a><span class="in">intensity = clamp(intensity, 0.0, 1.0);  // Keep in [0, 1]</span></span>
+<span id="cb22-250"><a href="#cb22-250" aria-hidden="true" tabindex="-1"></a><span class="in">vec3 color = vec3(intensity);</span></span>
+<span id="cb22-251"><a href="#cb22-251" aria-hidden="true" tabindex="-1"></a><span class="in">fragColor = vec4(color, 1.0);</span></span>
+<span id="cb22-252"><a href="#cb22-252" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-253"><a href="#cb22-253" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-254"><a href="#cb22-254" aria-hidden="true" tabindex="-1"></a><span class="fu">### Circle Outline</span></span>
+<span id="cb22-255"><a href="#cb22-255" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-256"><a href="#cb22-256" aria-hidden="true" tabindex="-1"></a>To draw just the boundary of a circle (an annulus of small thickness), we check if $d$ is approximately equal to $r$:</span>
+<span id="cb22-257"><a href="#cb22-257" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-258"><a href="#cb22-258" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb22-259"><a href="#cb22-259" aria-hidden="true" tabindex="-1"></a><span class="in">float d = length(p);</span></span>
+<span id="cb22-260"><a href="#cb22-260" aria-hidden="true" tabindex="-1"></a><span class="in">float r = 1.0;</span></span>
+<span id="cb22-261"><a href="#cb22-261" aria-hidden="true" tabindex="-1"></a><span class="in">float thickness = 0.05;</span></span>
+<span id="cb22-262"><a href="#cb22-262" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-263"><a href="#cb22-263" aria-hidden="true" tabindex="-1"></a><span class="in">float circle_mask = abs(d - r) &lt; thickness ? 1.0 : 0.0;</span></span>
+<span id="cb22-264"><a href="#cb22-264" aria-hidden="true" tabindex="-1"></a><span class="in">vec3 color = vec3(circle_mask);</span></span>
+<span id="cb22-265"><a href="#cb22-265" aria-hidden="true" tabindex="-1"></a><span class="in">fragColor = vec4(color, 1.0);</span></span>
+<span id="cb22-266"><a href="#cb22-266" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-267"><a href="#cb22-267" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-268"><a href="#cb22-268" aria-hidden="true" tabindex="-1"></a>Mathematically, we're coloring the set $<span class="sc">\{</span>p : |d(p) - r| &lt; \epsilon<span class="sc">\}</span>$ where $\epsilon$ is our thickness parameter.</span>
+<span id="cb22-269"><a href="#cb22-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-270"><a href="#cb22-270" aria-hidden="true" tabindex="-1"></a>For a smoother edge, we can use <span class="in">`smoothstep`</span>:</span>
+<span id="cb22-271"><a href="#cb22-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-272"><a href="#cb22-272" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb22-273"><a href="#cb22-273" aria-hidden="true" tabindex="-1"></a><span class="in">float circle_mask = 1.0 - smoothstep(r - thickness, r + thickness, d);</span></span>
+<span id="cb22-274"><a href="#cb22-274" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-275"><a href="#cb22-275" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-276"><a href="#cb22-276" aria-hidden="true" tabindex="-1"></a>The <span class="in">`smoothstep(a, b, x)`</span> function performs smooth Hermite interpolation between $a$ and $b$.</span>
+<span id="cb22-277"><a href="#cb22-277" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-278"><a href="#cb22-278" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb22-279"><a href="#cb22-279" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-280"><a href="#cb22-280" aria-hidden="true" tabindex="-1"></a><span class="fu">## Grids and Repetition</span></span>
+<span id="cb22-281"><a href="#cb22-281" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-282"><a href="#cb22-282" aria-hidden="true" tabindex="-1"></a><span class="fu">### Modular Arithmetic</span></span>
+<span id="cb22-283"><a href="#cb22-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-284"><a href="#cb22-284" aria-hidden="true" tabindex="-1"></a>The modulo operation creates periodic repetition. For a period $T$, the function $p \mapsto (p \bmod T) - T/2$ maps $\mathbb{R}$ to $<span class="co">[</span><span class="ot">-T/2, T/2</span><span class="co">]</span>$ repeatedly.</span>
+<span id="cb22-285"><a href="#cb22-285" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-286"><a href="#cb22-286" aria-hidden="true" tabindex="-1"></a>In GLSL, <span class="in">`mod(x, T)`</span> computes $x \bmod T$.</span>
+<span id="cb22-287"><a href="#cb22-287" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-288"><a href="#cb22-288" aria-hidden="true" tabindex="-1"></a><span class="fu">### Creating a Grid</span></span>
+<span id="cb22-289"><a href="#cb22-289" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-290"><a href="#cb22-290" aria-hidden="true" tabindex="-1"></a>To create a grid of repeated cells:</span>
+<span id="cb22-291"><a href="#cb22-291" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-292"><a href="#cb22-292" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb22-293"><a href="#cb22-293" aria-hidden="true" tabindex="-1"></a><span class="in">void mainImage(out vec4 fragColor, in vec2 fragCoord)</span></span>
+<span id="cb22-294"><a href="#cb22-294" aria-hidden="true" tabindex="-1"></a><span class="in">{</span></span>
+<span id="cb22-295"><a href="#cb22-295" aria-hidden="true" tabindex="-1"></a><span class="in">    // [Coordinate setup, resulting in p]</span></span>
+<span id="cb22-296"><a href="#cb22-296" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb22-297"><a href="#cb22-297" aria-hidden="true" tabindex="-1"></a><span class="in">    float spacing = 1.0;</span></span>
+<span id="cb22-298"><a href="#cb22-298" aria-hidden="true" tabindex="-1"></a><span class="in">    vec2 cell_p = mod(p + spacing/2.0, spacing) - spacing/2.0;</span></span>
+<span id="cb22-299"><a href="#cb22-299" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb22-300"><a href="#cb22-300" aria-hidden="true" tabindex="-1"></a><span class="in">    // Now cell_p repeats every spacing units</span></span>
+<span id="cb22-301"><a href="#cb22-301" aria-hidden="true" tabindex="-1"></a><span class="in">    // Draw a circle in each cell</span></span>
+<span id="cb22-302"><a href="#cb22-302" aria-hidden="true" tabindex="-1"></a><span class="in">    float d = length(cell_p);</span></span>
+<span id="cb22-303"><a href="#cb22-303" aria-hidden="true" tabindex="-1"></a><span class="in">    float r = 0.3;</span></span>
+<span id="cb22-304"><a href="#cb22-304" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb22-305"><a href="#cb22-305" aria-hidden="true" tabindex="-1"></a><span class="in">    vec3 color = (d &lt; r) ? vec3(1.0, 1.0, 0.0) : vec3(0.1, 0.1, 0.3);</span></span>
+<span id="cb22-306"><a href="#cb22-306" aria-hidden="true" tabindex="-1"></a><span class="in">    fragColor = vec4(color, 1.0);</span></span>
+<span id="cb22-307"><a href="#cb22-307" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb22-308"><a href="#cb22-308" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-309"><a href="#cb22-309" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-310"><a href="#cb22-310" aria-hidden="true" tabindex="-1"></a>This creates an infinite grid of yellow circles!</span>
+<span id="cb22-311"><a href="#cb22-311" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-312"><a href="#cb22-312" aria-hidden="true" tabindex="-1"></a><span class="fu">### Alternating Pattern</span></span>
+<span id="cb22-313"><a href="#cb22-313" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-314"><a href="#cb22-314" aria-hidden="true" tabindex="-1"></a>We can create checkerboard-like patterns using the cell index:</span>
+<span id="cb22-315"><a href="#cb22-315" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-316"><a href="#cb22-316" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb22-317"><a href="#cb22-317" aria-hidden="true" tabindex="-1"></a><span class="in">vec2 cell_id = floor(p / spacing);</span></span>
+<span id="cb22-318"><a href="#cb22-318" aria-hidden="true" tabindex="-1"></a><span class="in">float checker = mod(cell_id.x + cell_id.y, 2.0);</span></span>
+<span id="cb22-319"><a href="#cb22-319" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-320"><a href="#cb22-320" aria-hidden="true" tabindex="-1"></a><span class="in">vec3 color_a = vec3(1.0, 0.0, 0.0);</span></span>
+<span id="cb22-321"><a href="#cb22-321" aria-hidden="true" tabindex="-1"></a><span class="in">vec3 color_b = vec3(0.0, 0.0, 1.0);</span></span>
+<span id="cb22-322"><a href="#cb22-322" aria-hidden="true" tabindex="-1"></a><span class="in">vec3 bg_color = mix(color_a, color_b, checker);</span></span>
+<span id="cb22-323"><a href="#cb22-323" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-324"><a href="#cb22-324" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-325"><a href="#cb22-325" aria-hidden="true" tabindex="-1"></a>Here <span class="in">`floor(p / spacing)`</span> gives us integer grid indices, and we alternate colors based on the parity of $i + j$.</span>
+<span id="cb22-326"><a href="#cb22-326" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-327"><a href="#cb22-327" aria-hidden="true" tabindex="-1"></a><span class="fu">### Combining with Circles</span></span>
+<span id="cb22-328"><a href="#cb22-328" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-329"><a href="#cb22-329" aria-hidden="true" tabindex="-1"></a>Put it all together for a grid of circles on an alternating background:</span>
+<span id="cb22-330"><a href="#cb22-330" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-331"><a href="#cb22-331" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb22-332"><a href="#cb22-332" aria-hidden="true" tabindex="-1"></a><span class="in">void mainImage(out vec4 fragColor, in vec2 fragCoord)</span></span>
+<span id="cb22-333"><a href="#cb22-333" aria-hidden="true" tabindex="-1"></a><span class="in">{</span></span>
+<span id="cb22-334"><a href="#cb22-334" aria-hidden="true" tabindex="-1"></a><span class="in">    // [Coordinate setup]</span></span>
+<span id="cb22-335"><a href="#cb22-335" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb22-336"><a href="#cb22-336" aria-hidden="true" tabindex="-1"></a><span class="in">    float spacing = 1.0;</span></span>
+<span id="cb22-337"><a href="#cb22-337" aria-hidden="true" tabindex="-1"></a><span class="in">    vec2 cell_id = floor(p / spacing);</span></span>
+<span id="cb22-338"><a href="#cb22-338" aria-hidden="true" tabindex="-1"></a><span class="in">    vec2 cell_p = mod(p + spacing/2.0, spacing) - spacing/2.0;</span></span>
+<span id="cb22-339"><a href="#cb22-339" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb22-340"><a href="#cb22-340" aria-hidden="true" tabindex="-1"></a><span class="in">    // Checkerboard background</span></span>
+<span id="cb22-341"><a href="#cb22-341" aria-hidden="true" tabindex="-1"></a><span class="in">    float checker = mod(cell_id.x + cell_id.y, 2.0);</span></span>
+<span id="cb22-342"><a href="#cb22-342" aria-hidden="true" tabindex="-1"></a><span class="in">    vec3 bg_color = mix(vec3(0.2, 0.2, 0.3), vec3(0.3, 0.2, 0.2), checker);</span></span>
+<span id="cb22-343"><a href="#cb22-343" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb22-344"><a href="#cb22-344" aria-hidden="true" tabindex="-1"></a><span class="in">    // Circle in each cell</span></span>
+<span id="cb22-345"><a href="#cb22-345" aria-hidden="true" tabindex="-1"></a><span class="in">    float d = length(cell_p);</span></span>
+<span id="cb22-346"><a href="#cb22-346" aria-hidden="true" tabindex="-1"></a><span class="in">    float r = 0.3;</span></span>
+<span id="cb22-347"><a href="#cb22-347" aria-hidden="true" tabindex="-1"></a><span class="in">    vec3 circle_color = vec3(1.0, 1.0, 0.0);</span></span>
+<span id="cb22-348"><a href="#cb22-348" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb22-349"><a href="#cb22-349" aria-hidden="true" tabindex="-1"></a><span class="in">    vec3 color = (d &lt; r) ? circle_color : bg_color;</span></span>
+<span id="cb22-350"><a href="#cb22-350" aria-hidden="true" tabindex="-1"></a><span class="in">    fragColor = vec4(color, 1.0);</span></span>
+<span id="cb22-351"><a href="#cb22-351" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb22-352"><a href="#cb22-352" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-353"><a href="#cb22-353" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-354"><a href="#cb22-354" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb22-355"><a href="#cb22-355" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-356"><a href="#cb22-356" aria-hidden="true" tabindex="-1"></a><span class="fu">## Implicit Curves</span></span>
+<span id="cb22-357"><a href="#cb22-357" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-358"><a href="#cb22-358" aria-hidden="true" tabindex="-1"></a><span class="fu">### General Principle</span></span>
+<span id="cb22-359"><a href="#cb22-359" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-360"><a href="#cb22-360" aria-hidden="true" tabindex="-1"></a>An implicit curve is defined by an equation $F(x, y) = 0$. To render it, we compute $F(p)$ for each pixel and color based on proximity to zero:</span>
+<span id="cb22-361"><a href="#cb22-361" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-362"><a href="#cb22-362" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb22-363"><a href="#cb22-363" aria-hidden="true" tabindex="-1"></a><span class="in">float F = [some function of p.x and p.y];</span></span>
+<span id="cb22-364"><a href="#cb22-364" aria-hidden="true" tabindex="-1"></a><span class="in">float thickness = 0.05;</span></span>
+<span id="cb22-365"><a href="#cb22-365" aria-hidden="true" tabindex="-1"></a><span class="in">float curve_mask = abs(F) &lt; thickness ? 1.0 : 0.0;</span></span>
+<span id="cb22-366"><a href="#cb22-366" aria-hidden="true" tabindex="-1"></a><span class="in">vec3 color = mix(background, curve_color, curve_mask);</span></span>
+<span id="cb22-367"><a href="#cb22-367" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-368"><a href="#cb22-368" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-369"><a href="#cb22-369" aria-hidden="true" tabindex="-1"></a><span class="fu">### Example: Parabola</span></span>
+<span id="cb22-370"><a href="#cb22-370" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-371"><a href="#cb22-371" aria-hidden="true" tabindex="-1"></a>The parabola $y = x^2$ can be written implicitly as $F(x, y) = y - x^2 = 0$:</span>
+<span id="cb22-372"><a href="#cb22-372" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-373"><a href="#cb22-373" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb22-374"><a href="#cb22-374" aria-hidden="true" tabindex="-1"></a><span class="in">float F = p.y - p.x * p.x;</span></span>
+<span id="cb22-375"><a href="#cb22-375" aria-hidden="true" tabindex="-1"></a><span class="in">float thickness = 0.1;</span></span>
+<span id="cb22-376"><a href="#cb22-376" aria-hidden="true" tabindex="-1"></a><span class="in">float curve_mask = abs(F) &lt; thickness ? 1.0 : 0.0;</span></span>
+<span id="cb22-377"><a href="#cb22-377" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-378"><a href="#cb22-378" aria-hidden="true" tabindex="-1"></a><span class="in">vec3 color = mix(vec3(0.1, 0.1, 0.3), vec3(1.0, 1.0, 0.0), curve_mask);</span></span>
+<span id="cb22-379"><a href="#cb22-379" aria-hidden="true" tabindex="-1"></a><span class="in">fragColor = vec4(color, 1.0);</span></span>
+<span id="cb22-380"><a href="#cb22-380" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-381"><a href="#cb22-381" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-382"><a href="#cb22-382" aria-hidden="true" tabindex="-1"></a><span class="fu">### Example: Circle (Implicit Form)</span></span>
+<span id="cb22-383"><a href="#cb22-383" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-384"><a href="#cb22-384" aria-hidden="true" tabindex="-1"></a>We've been using $\|p\| &lt; r$ for filled circles, but we can also write the circle implicitly as $x^2 + y^2 - r^2 = 0$:</span>
+<span id="cb22-385"><a href="#cb22-385" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-386"><a href="#cb22-386" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb22-387"><a href="#cb22-387" aria-hidden="true" tabindex="-1"></a><span class="in">float r = 1.0;</span></span>
+<span id="cb22-388"><a href="#cb22-388" aria-hidden="true" tabindex="-1"></a><span class="in">float F = dot(p, p) - r * r;  // dot(p,p) = x² + y²</span></span>
+<span id="cb22-389"><a href="#cb22-389" aria-hidden="true" tabindex="-1"></a><span class="in">float thickness = 0.1;</span></span>
+<span id="cb22-390"><a href="#cb22-390" aria-hidden="true" tabindex="-1"></a><span class="in">float curve_mask = abs(F) &lt; thickness ? 1.0 : 0.0;</span></span>
+<span id="cb22-391"><a href="#cb22-391" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-392"><a href="#cb22-392" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-393"><a href="#cb22-393" aria-hidden="true" tabindex="-1"></a>This is mathematically equivalent to our earlier approach but demonstrates the general implicit curve technique.</span>
+<span id="cb22-394"><a href="#cb22-394" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-395"><a href="#cb22-395" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb22-396"><a href="#cb22-396" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-397"><a href="#cb22-397" aria-hidden="true" tabindex="-1"></a><span class="fu">## Summary</span></span>
+<span id="cb22-398"><a href="#cb22-398" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-399"><a href="#cb22-399" aria-hidden="true" tabindex="-1"></a>Today we've learned:</span>
+<span id="cb22-400"><a href="#cb22-400" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-401"><a href="#cb22-401" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Shaders as parallel functions**: Every pixel evaluates $f(x, y, t, \ldots) \to \text{color}$ simultaneously</span>
+<span id="cb22-402"><a href="#cb22-402" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**GLSL basics**: Syntax, vector types, and built-in functions</span>
+<span id="cb22-403"><a href="#cb22-403" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Coordinate systems**: Centering, normalizing, and scaling for mathematical work</span>
+<span id="cb22-404"><a href="#cb22-404" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**Conditional coloring**: Using boolean expressions and <span class="in">`step()`</span> for discrete color regions</span>
+<span id="cb22-405"><a href="#cb22-405" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>**Distance fields**: Using <span class="in">`length()`</span> to create circles and radial patterns</span>
+<span id="cb22-406"><a href="#cb22-406" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>**Modular arithmetic**: Creating grids and repeating patterns with <span class="in">`mod()`</span></span>
+<span id="cb22-407"><a href="#cb22-407" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>**Implicit curves**: Rendering curves defined by $F(x, y) = 0$</span>
+<span id="cb22-408"><a href="#cb22-408" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-409"><a href="#cb22-409" aria-hidden="true" tabindex="-1"></a>With these tools, you can already create a wide variety of mathematical visualizations!</span>
+<span id="cb22-410"><a href="#cb22-410" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-411"><a href="#cb22-411" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb22-412"><a href="#cb22-412" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-413"><a href="#cb22-413" aria-hidden="true" tabindex="-1"></a><span class="fu">## Homework</span></span>
+<span id="cb22-414"><a href="#cb22-414" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-415"><a href="#cb22-415" aria-hidden="true" tabindex="-1"></a><span class="fu">### Required: Parabola Graphing Calculator</span></span>
+<span id="cb22-416"><a href="#cb22-416" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-417"><a href="#cb22-417" aria-hidden="true" tabindex="-1"></a>Create a shader that draws a customizable parabola $y = ax^2 + bx + c$ along with coordinate axes.</span>
+<span id="cb22-418"><a href="#cb22-418" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-419"><a href="#cb22-419" aria-hidden="true" tabindex="-1"></a>**Requirements:**</span>
+<span id="cb22-420"><a href="#cb22-420" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Define variables <span class="in">`a`</span>, <span class="in">`b`</span>, <span class="in">`c`</span> at the top of your shader (hardcoded values are fine)</span>
+<span id="cb22-421"><a href="#cb22-421" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Draw the $x$-axis and $y$-axis as thick lines (use the implicit line technique: $|y| &lt; \epsilon$ for $x$-axis, $|x| &lt; \epsilon$ for $y$-axis)</span>
+<span id="cb22-422"><a href="#cb22-422" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Plot the parabola $y = ax^2 + bx + c$ as a thick curve</span>
+<span id="cb22-423"><a href="#cb22-423" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Use distinct colors for axes and parabola</span>
+<span id="cb22-424"><a href="#cb22-424" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The visualization should work for any reasonable values of $a$, $b$, $c$</span>
+<span id="cb22-425"><a href="#cb22-425" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-426"><a href="#cb22-426" aria-hidden="true" tabindex="-1"></a>**Suggested approach:**</span>
+<span id="cb22-427"><a href="#cb22-427" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb22-428"><a href="#cb22-428" aria-hidden="true" tabindex="-1"></a><span class="in">// Define parameters</span></span>
+<span id="cb22-429"><a href="#cb22-429" aria-hidden="true" tabindex="-1"></a><span class="in">float a = 1.0;</span></span>
+<span id="cb22-430"><a href="#cb22-430" aria-hidden="true" tabindex="-1"></a><span class="in">float b = 0.0;</span></span>
+<span id="cb22-431"><a href="#cb22-431" aria-hidden="true" tabindex="-1"></a><span class="in">float c = 0.0;</span></span>
+<span id="cb22-432"><a href="#cb22-432" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-433"><a href="#cb22-433" aria-hidden="true" tabindex="-1"></a><span class="in">// Axes</span></span>
+<span id="cb22-434"><a href="#cb22-434" aria-hidden="true" tabindex="-1"></a><span class="in">float x_axis_mask = abs(p.y) &lt; 0.05 ? 1.0 : 0.0;</span></span>
+<span id="cb22-435"><a href="#cb22-435" aria-hidden="true" tabindex="-1"></a><span class="in">float y_axis_mask = abs(p.x) &lt; 0.05 ? 1.0 : 0.0;</span></span>
+<span id="cb22-436"><a href="#cb22-436" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-437"><a href="#cb22-437" aria-hidden="true" tabindex="-1"></a><span class="in">// Parabola: F(x,y) = y - (ax² + bx + c) = 0</span></span>
+<span id="cb22-438"><a href="#cb22-438" aria-hidden="true" tabindex="-1"></a><span class="in">float F = p.y - (a * p.x * p.x + b * p.x + c);</span></span>
+<span id="cb22-439"><a href="#cb22-439" aria-hidden="true" tabindex="-1"></a><span class="in">float parabola_mask = abs(F) &lt; 0.1 ? 1.0 : 0.0;</span></span>
+<span id="cb22-440"><a href="#cb22-440" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-441"><a href="#cb22-441" aria-hidden="true" tabindex="-1"></a><span class="in">// Combine</span></span>
+<span id="cb22-442"><a href="#cb22-442" aria-hidden="true" tabindex="-1"></a><span class="in">vec3 color = background;</span></span>
+<span id="cb22-443"><a href="#cb22-443" aria-hidden="true" tabindex="-1"></a><span class="in">color = mix(color, axis_color, max(x_axis_mask, y_axis_mask));</span></span>
+<span id="cb22-444"><a href="#cb22-444" aria-hidden="true" tabindex="-1"></a><span class="in">color = mix(color, parabola_color, parabola_mask);</span></span>
+<span id="cb22-445"><a href="#cb22-445" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb22-446"><a href="#cb22-446" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-447"><a href="#cb22-447" aria-hidden="true" tabindex="-1"></a>Try different values of $a$, $b$, $c$ and verify your grapher works correctly!</span>
+<span id="cb22-448"><a href="#cb22-448" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-449"><a href="#cb22-449" aria-hidden="true" tabindex="-1"></a><span class="fu">### Optional #1: Animated Curve Family</span></span>
+<span id="cb22-450"><a href="#cb22-450" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-451"><a href="#cb22-451" aria-hidden="true" tabindex="-1"></a>Create a shader that animates through a family of curves.</span>
+<span id="cb22-452"><a href="#cb22-452" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-453"><a href="#cb22-453" aria-hidden="true" tabindex="-1"></a>**Suggestions:**</span>
+<span id="cb22-454"><a href="#cb22-454" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Elliptic fibration**: Fix a cubic polynomial and vary a parameter: $y^2 = x^3 + ax + b$ where $a$ or $b$ varies with <span class="in">`iTime`</span></span>
+<span id="cb22-455"><a href="#cb22-455" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Lissajous curves**: $x = A\sin(at + \delta)$, $y = B\sin(bt)$, animate $\delta$ or the frequency ratio</span>
+<span id="cb22-456"><a href="#cb22-456" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-457"><a href="#cb22-457" aria-hidden="true" tabindex="-1"></a>Use <span class="in">`iTime`</span> creatively to create a compelling animation. The goal is to explore how continuous parameter variation produces interesting mathematical families.</span>
+<span id="cb22-458"><a href="#cb22-458" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-459"><a href="#cb22-459" aria-hidden="true" tabindex="-1"></a><span class="fu">### Optional #2: Beautiful Tiling Pattern</span></span>
+<span id="cb22-460"><a href="#cb22-460" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-461"><a href="#cb22-461" aria-hidden="true" tabindex="-1"></a>Design an aesthetically pleasing tiling pattern using the <span class="in">`mod()`</span> technique.</span>
+<span id="cb22-462"><a href="#cb22-462" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-463"><a href="#cb22-463" aria-hidden="true" tabindex="-1"></a>**Requirements:**</span>
+<span id="cb22-464"><a href="#cb22-464" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Create a non-trivial pattern within a fundamental domain (a single tile)</span>
+<span id="cb22-465"><a href="#cb22-465" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Use <span class="in">`mod()`</span> to repeat it across the plane</span>
+<span id="cb22-466"><a href="#cb22-466" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The pattern should tile seamlessly (edges should match up)</span>
+<span id="cb22-467"><a href="#cb22-467" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-468"><a href="#cb22-468" aria-hidden="true" tabindex="-1"></a>**Ideas:**</span>
+<span id="cb22-469"><a href="#cb22-469" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Geometric patterns: nested circles, polygons, stars</span>
+<span id="cb22-470"><a href="#cb22-470" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Color gradients that vary by tile position</span>
+<span id="cb22-471"><a href="#cb22-471" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Combinations of implicit curves within each tile</span>
+<span id="cb22-472"><a href="#cb22-472" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Symmetry: use <span class="in">`abs()`</span> to create reflections within tiles</span>
+<span id="cb22-473"><a href="#cb22-473" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-474"><a href="#cb22-474" aria-hidden="true" tabindex="-1"></a>**Challenge**: Can you create a pattern that has different symmetries in different tiles? (For example, alternating rotational symmetry using the checkerboard <span class="in">`cell_id`</span> technique.)</span>
+<span id="cb22-475"><a href="#cb22-475" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-476"><a href="#cb22-476" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb22-477"><a href="#cb22-477" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-478"><a href="#cb22-478" aria-hidden="true" tabindex="-1"></a><span class="fu">## Looking Ahead</span></span>
+<span id="cb22-479"><a href="#cb22-479" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-480"><a href="#cb22-480" aria-hidden="true" tabindex="-1"></a>Tomorrow we'll use these techniques to explore **complex dynamics** (the Mandelbrot and Julia sets) and **geometric tilings** (including fractals via iterated folding). The coordinate system and implicit curve techniques you've learned today will be the foundation for everything to come.</span>
+<span id="cb22-481"><a href="#cb22-481" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-482"><a href="#cb22-482" aria-hidden="true" tabindex="-1"></a>Make sure you're comfortable with:</span>
+<span id="cb22-483"><a href="#cb22-483" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Setting up coordinates</span>
+<span id="cb22-484"><a href="#cb22-484" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Computing distances and implicit functions  </span>
+<span id="cb22-485"><a href="#cb22-485" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Using <span class="in">`mod()`</span> for repetition</span>
+<span id="cb22-486"><a href="#cb22-486" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Conditionally coloring based on mathematical expressions</span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 
 
 
 
-<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions"><ul><li><a href="https://github.com/yourusername/shader-course/edit/main/day1.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/yourusername/shader-course/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>
+</body></html>

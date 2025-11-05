@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>3&nbsp; Day 2 – GPU-Accelerated Mathematical Illustration</title>
+<title>2&nbsp; Day 2: Complex Dynamics and Euclidean Geometry – GPU-Accelerated Mathematical Illustration</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -75,8 +75,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-f8dc6eab18fde03278982b0b35885446.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-adf3c98bdceb0a89cc83f21a4cf50f53.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-f9a8516cbc4dfb40944c2b50043af69b.min.css" rel="prefetch" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-ed04f5f1653af6df52378e13bfdac05e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-d37bfdfd9a2222927534875c15a9020f.min.css" rel="prefetch" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -105,6 +105,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -117,7 +146,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./day2.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Day 2</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./day2.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Day 2: Complex Dynamics and Euclidean Geometry</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -136,23 +165,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <div class="sidebar-tools-main tools-wide">
     <a href="https://github.com/yourusername/shader-course" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
     <a href="./GPU-Accelerated-Mathematical-Illustration.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
-    <div class="dropdown">
-      <a href="" title="Share" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label="Share"><i class="bi bi-share"></i></a>
-      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
-          <li>
-            <a class="dropdown-item sidebar-tools-main-item" href="https://twitter.com/intent/tweet?url=|url|">
-              <i class="bi bi-twitter pe-1"></i>
-            Twitter
-            </a>
-          </li>
-          <li>
-            <a class="dropdown-item sidebar-tools-main-item" href="https://www.linkedin.com/sharing/share-offsite/?url=|url|">
-              <i class="bi bi-linkedin pe-1"></i>
-            LinkedIn
-            </a>
-          </li>
-      </ul>
-    </div>
   <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
 </div>
     </div>
@@ -167,49 +179,49 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Preface</span></a>
+ <span class="menu-text">About</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./outline.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Outline</span></span></a>
+ <span class="menu-text">Outline</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./day1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Day I</span></span></a>
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Day 1: Introduction to Shader Programming</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./day2.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Day 2</span></span></a>
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Day 2: Complex Dynamics and Euclidean Geometry</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./day3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Day 3</span></span></a>
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Day 3: Fractals and Hyperbolic Geometry</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./day4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Day 4</span></span></a>
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Day 4</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./day5a.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Day 5a</span></span></a>
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Day 5a</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./day5b.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Day 5bs</span></span></a>
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Day 5bs</span></span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -240,15 +252,69 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"><span class="header-section-number">2.1</span> Overview</a></li>
+  <li><a href="#complex-numbers-in-glsl" id="toc-complex-numbers-in-glsl" class="nav-link" data-scroll-target="#complex-numbers-in-glsl"><span class="header-section-number">2.2</span> Complex Numbers in GLSL</a>
+  <ul class="collapse">
+  <li><a href="#representation" id="toc-representation" class="nav-link" data-scroll-target="#representation">Representation</a></li>
+  <li><a href="#complex-arithmetic" id="toc-complex-arithmetic" class="nav-link" data-scroll-target="#complex-arithmetic">Complex Arithmetic</a></li>
+  </ul></li>
+  <li><a href="#the-mandelbrot-set" id="toc-the-mandelbrot-set" class="nav-link" data-scroll-target="#the-mandelbrot-set"><span class="header-section-number">2.3</span> The Mandelbrot Set</a>
+  <ul class="collapse">
+  <li><a href="#definition" id="toc-definition" class="nav-link" data-scroll-target="#definition">Definition</a></li>
+  <li><a href="#implementation" id="toc-implementation" class="nav-link" data-scroll-target="#implementation">Implementation</a></li>
+  <li><a href="#coloring-schemes" id="toc-coloring-schemes" class="nav-link" data-scroll-target="#coloring-schemes">Coloring Schemes</a></li>
+  </ul></li>
+  <li><a href="#julia-sets" id="toc-julia-sets" class="nav-link" data-scroll-target="#julia-sets"><span class="header-section-number">2.4</span> Julia Sets</a>
+  <ul class="collapse">
+  <li><a href="#definition-1" id="toc-definition-1" class="nav-link" data-scroll-target="#definition-1">Definition</a></li>
+  <li><a href="#relationship-to-mandelbrot" id="toc-relationship-to-mandelbrot" class="nav-link" data-scroll-target="#relationship-to-mandelbrot">Relationship to Mandelbrot</a></li>
+  <li><a href="#implementation-1" id="toc-implementation-1" class="nav-link" data-scroll-target="#implementation-1">Implementation</a></li>
+  </ul></li>
+  <li><a href="#structs-in-glsl" id="toc-structs-in-glsl" class="nav-link" data-scroll-target="#structs-in-glsl"><span class="header-section-number">2.5</span> Structs in GLSL</a>
+  <ul class="collapse">
+  <li><a href="#motivation" id="toc-motivation" class="nav-link" data-scroll-target="#motivation">Motivation</a></li>
+  <li><a href="#defining-a-struct" id="toc-defining-a-struct" class="nav-link" data-scroll-target="#defining-a-struct">Defining a Struct</a></li>
+  <li><a href="#using-structs" id="toc-using-structs" class="nav-link" data-scroll-target="#using-structs">Using Structs</a></li>
+  <li><a href="#why-structs" id="toc-why-structs" class="nav-link" data-scroll-target="#why-structs">Why Structs?</a></li>
+  </ul></li>
+  <li><a href="#euclidean-triangle-tiling" id="toc-euclidean-triangle-tiling" class="nav-link" data-scroll-target="#euclidean-triangle-tiling"><span class="header-section-number">2.6</span> Euclidean Triangle Tiling</a>
+  <ul class="collapse">
+  <li><a href="#the-fundamental-domain" id="toc-the-fundamental-domain" class="nav-link" data-scroll-target="#the-fundamental-domain">The Fundamental Domain</a></li>
+  <li><a href="#setting-up-the-triangle" id="toc-setting-up-the-triangle" class="nav-link" data-scroll-target="#setting-up-the-triangle">Setting Up the Triangle</a></li>
+  <li><a href="#reflection-across-a-line" id="toc-reflection-across-a-line" class="nav-link" data-scroll-target="#reflection-across-a-line">Reflection Across a Line</a></li>
+  <li><a href="#iterative-folding" id="toc-iterative-folding" class="nav-link" data-scroll-target="#iterative-folding">Iterative Folding</a></li>
+  <li><a href="#visualization" id="toc-visualization" class="nav-link" data-scroll-target="#visualization">Visualization</a></li>
+  </ul></li>
+  <li><a href="#sierpinski-triangle-via-folding" id="toc-sierpinski-triangle-via-folding" class="nav-link" data-scroll-target="#sierpinski-triangle-via-folding"><span class="header-section-number">2.7</span> Sierpinski Triangle via Folding</a>
+  <ul class="collapse">
+  <li><a href="#the-concept" id="toc-the-concept" class="nav-link" data-scroll-target="#the-concept">The Concept</a></li>
+  <li><a href="#folding-algorithm" id="toc-folding-algorithm" class="nav-link" data-scroll-target="#folding-algorithm">Folding Algorithm</a></li>
+  <li><a href="#implementation-sketch" id="toc-implementation-sketch" class="nav-link" data-scroll-target="#implementation-sketch">Implementation Sketch</a></li>
+  <li><a href="#coloring-by-iteration-depth" id="toc-coloring-by-iteration-depth" class="nav-link" data-scroll-target="#coloring-by-iteration-depth">Coloring by Iteration Depth</a></li>
+  <li><a href="#visualization-1" id="toc-visualization-1" class="nav-link" data-scroll-target="#visualization-1">Visualization</a></li>
+  </ul></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">2.8</span> Summary</a></li>
+  <li><a href="#homework" id="toc-homework" class="nav-link" data-scroll-target="#homework"><span class="header-section-number">2.9</span> Homework</a>
+  <ul class="collapse">
+  <li><a href="#required-interactive-julia-sets" id="toc-required-interactive-julia-sets" class="nav-link" data-scroll-target="#required-interactive-julia-sets">Required: Interactive Julia Sets</a></li>
+  <li><a href="#required-circle-inversion" id="toc-required-circle-inversion" class="nav-link" data-scroll-target="#required-circle-inversion">Required: Circle Inversion</a></li>
+  <li><a href="#optional-1-apollonian-gasket" id="toc-optional-1-apollonian-gasket" class="nav-link" data-scroll-target="#optional-1-apollonian-gasket">Optional #1: Apollonian Gasket</a></li>
+  </ul></li>
+  <li><a href="#looking-ahead" id="toc-looking-ahead" class="nav-link" data-scroll-target="#looking-ahead"><span class="header-section-number">2.10</span> Looking Ahead</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Day 2</span></h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+<div class="quarto-title-block"><div><h1 class="title"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Day 2: Complex Dynamics and Euclidean Geometry</span></h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
 </div>
 
 
@@ -265,10 +331,430 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
+<section id="overview" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="overview"><span class="header-section-number">2.1</span> Overview</h2>
+<p>Today we explore the power of iteration and geometric transformations. We’ll implement complex arithmetic in GLSL, use it to render the iconic Mandelbrot and Julia sets, and create geometric tilings through reflection. We conclude by building our first fractal via iterated folding—the Sierpinski triangle.</p>
+<p>By the end of today, you’ll understand how simple iterative processes can generate intricate mathematical structures, how to organize geometric data using structs, and how folding operations can create self-similar fractals.</p>
+<hr>
+</section>
+<section id="complex-numbers-in-glsl" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="complex-numbers-in-glsl"><span class="header-section-number">2.2</span> Complex Numbers in GLSL</h2>
+<section id="representation" class="level3">
+<h3 class="anchored" data-anchor-id="representation">Representation</h3>
+<p>A complex number <span class="math inline">\(z = a + bi\)</span> can be represented as a 2D vector with real part <span class="math inline">\(a\)</span> and imaginary part <span class="math inline">\(b\)</span>. In GLSL:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> z <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span>a<span class="op">,</span> b<span class="op">);</span>  <span class="co">// Represents a + bi</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>We’ll consistently use the convention: <code>z.x</code> is the real part, <code>z.y</code> is the imaginary part.</p>
+</section>
+<section id="complex-arithmetic" class="level3">
+<h3 class="anchored" data-anchor-id="complex-arithmetic">Complex Arithmetic</h3>
+<p>Let <span class="math inline">\(z = a + bi\)</span> and <span class="math inline">\(w = c + di\)</span>. We need to implement the basic operations:</p>
+<p><strong>Addition:</strong> <span class="math inline">\((a + bi) + (c + di) = (a + c) + (b + d)i\)</span></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="fu">cadd</span><span class="op">(</span><span class="dt">vec2</span> z<span class="op">,</span> <span class="dt">vec2</span> w<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> z <span class="op">+</span> w<span class="op">;</span>  <span class="co">// Vector addition is sufficient!</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Multiplication:</strong> <span class="math inline">\((a + bi)(c + di) = (ac - bd) + (ad + bc)i\)</span></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="fu">cmul</span><span class="op">(</span><span class="dt">vec2</span> z<span class="op">,</span> <span class="dt">vec2</span> w<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="dt">vec2</span><span class="op">(</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        z<span class="op">.</span><span class="fu">x</span> <span class="op">*</span> w<span class="op">.</span><span class="fu">x</span> <span class="op">-</span> z<span class="op">.</span><span class="fu">y</span> <span class="op">*</span> w<span class="op">.</span><span class="fu">y</span><span class="op">,</span>  <span class="co">// Real part: ac - bd</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        z<span class="op">.</span><span class="fu">x</span> <span class="op">*</span> w<span class="op">.</span><span class="fu">y</span> <span class="op">+</span> z<span class="op">.</span><span class="fu">y</span> <span class="op">*</span> w<span class="op">.</span><span class="fu">x</span>   <span class="co">// Imaginary part: ad + bc</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">);</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Magnitude squared:</strong> <span class="math inline">\(|z|^2 = a^2 + b^2\)</span></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">cabs2</span><span class="op">(</span><span class="dt">vec2</span> z<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">dot</span><span class="op">(</span>z<span class="op">,</span> z<span class="op">);</span>  <span class="co">// z.x * z.x + z.y * z.y</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Magnitude:</strong> <span class="math inline">\(|z| = \sqrt{a^2 + b^2}\)</span></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">cabs</span><span class="op">(</span><span class="dt">vec2</span> z<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">length</span><span class="op">(</span>z<span class="op">);</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Conjugate:</strong> <span class="math inline">\(\overline{z} = a - bi\)</span></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="fu">cconj</span><span class="op">(</span><span class="dt">vec2</span> z<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="dt">vec2</span><span class="op">(</span>z<span class="op">.</span><span class="fu">x</span><span class="op">,</span> <span class="op">-</span>z<span class="op">.</span><span class="fu">y</span><span class="op">);</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>These are the building blocks we need for complex dynamics.</p>
+<hr>
+</section>
+</section>
+<section id="the-mandelbrot-set" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="the-mandelbrot-set"><span class="header-section-number">2.3</span> The Mandelbrot Set</h2>
+<section id="definition" class="level3">
+<h3 class="anchored" data-anchor-id="definition">Definition</h3>
+<p>The Mandelbrot set <span class="math inline">\(\mathcal{M}\)</span> is defined as the set of complex numbers <span class="math inline">\(c\)</span> for which the iteration <span class="math display">\[z_{n+1} = z_n^2 + c, \quad z_0 = 0\]</span> remains bounded as <span class="math inline">\(n \to \infty\)</span>.</p>
+<p>In practice, we: 1. Start with <span class="math inline">\(z_0 = 0\)</span> 2. Iterate <span class="math inline">\(z_{n+1} = z_n^2 + c\)</span> for a fixed number of iterations (say, 100) 3. Check if <span class="math inline">\(|z_n|\)</span> has escaped some large radius (typically <span class="math inline">\(R = 2\)</span>)</p>
+<p>Points that escape quickly are definitely not in <span class="math inline">\(\mathcal{M}\)</span>. Points that remain bounded after many iterations are likely in <span class="math inline">\(\mathcal{M}\)</span>.</p>
+</section>
+<section id="implementation" class="level3">
+<h3 class="anchored" data-anchor-id="implementation">Implementation</h3>
+<div class="sourceCode" id="cb7"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">mainImage</span><span class="op">(</span><span class="dt">out</span> <span class="dt">vec4</span> fragColor<span class="op">,</span> <span class="dt">in</span> <span class="dt">vec2</span> fragCoord<span class="op">)</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Coordinate setup: center at origin, scale to show interesting region</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> uv <span class="op">=</span> fragCoord <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">xy</span><span class="op">;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    uv <span class="op">=</span> uv <span class="op">-</span> <span class="fl">0.5</span><span class="op">;</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    uv<span class="op">.</span><span class="fu">x</span> <span class="op">*=</span> iResolution<span class="op">.</span><span class="fu">x</span> <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">y</span><span class="op">;</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Scale to view the Mandelbrot set (roughly [-2.5, 1] × [-1.25, 1.25])</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> c <span class="op">=</span> uv <span class="op">*</span> <span class="fl">3.5</span><span class="op">;</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    c<span class="op">.</span><span class="fu">x</span> <span class="op">-=</span> <span class="fl">0.5</span><span class="op">;</span>  <span class="co">// Center on the interesting part</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Mandelbrot iteration</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> z <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span><span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">);</span>  <span class="co">// z_0 = 0</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> max_iter <span class="op">=</span> <span class="dv">100</span><span class="op">;</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> iter<span class="op">;</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    <span class="kw">for</span><span class="op">(</span>iter <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> iter <span class="op">&lt;</span> max_iter<span class="op">;</span> iter<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Check if escaped</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>        <span class="kw">if</span><span class="op">(</span><span class="fu">cabs2</span><span class="op">(</span>z<span class="op">)</span> <span class="op">&gt;</span> <span class="fl">4.0</span><span class="op">)</span> <span class="kw">break</span><span class="op">;</span>  <span class="co">// |z| &gt; 2, so |z|² &gt; 4</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>        <span class="co">// z_{n+1} = z_n² + c</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>        z <span class="op">=</span> <span class="fu">cmul</span><span class="op">(</span>z<span class="op">,</span> z<span class="op">)</span> <span class="op">+</span> c<span class="op">;</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Color based on iteration count</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> t <span class="op">=</span> <span class="dt">float</span><span class="op">(</span>iter<span class="op">)</span> <span class="op">/</span> <span class="dt">float</span><span class="op">(</span>max_iter<span class="op">);</span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span> color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span>t<span class="op">);</span>  <span class="co">// Grayscale for now</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>    fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="coloring-schemes" class="level3">
+<h3 class="anchored" data-anchor-id="coloring-schemes">Coloring Schemes</h3>
+<p>The grayscale rendering shows structure but isn’t very exciting. We can create better colormaps:</p>
+<p><strong>Smooth coloring using escape time:</strong></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span><span class="op">(</span>iter <span class="op">&lt;</span> max_iter<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Smooth iteration count (accounts for continuous escape)</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> log_zn <span class="op">=</span> <span class="bu">log</span><span class="op">(</span><span class="fu">cabs2</span><span class="op">(</span>z<span class="op">))</span> <span class="op">/</span> <span class="fl">2.0</span><span class="op">;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> nu <span class="op">=</span> <span class="bu">log</span><span class="op">(</span>log_zn <span class="op">/</span> <span class="bu">log</span><span class="op">(</span><span class="fl">2.0</span><span class="op">))</span> <span class="op">/</span> <span class="bu">log</span><span class="op">(</span><span class="fl">2.0</span><span class="op">);</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> smooth_iter <span class="op">=</span> <span class="dt">float</span><span class="op">(</span>iter<span class="op">)</span> <span class="op">+</span> <span class="fl">1.0</span> <span class="op">-</span> nu<span class="op">;</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> t <span class="op">=</span> smooth_iter <span class="op">/</span> <span class="dt">float</span><span class="op">(</span>max_iter<span class="op">);</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Use a color palette (see below)</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span> color <span class="op">=</span> <span class="fu">palette</span><span class="op">(</span>t<span class="op">);</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Inside the set: black</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span> color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.0</span><span class="op">);</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Simple color palette:</strong></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> <span class="fu">palette</span><span class="op">(</span><span class="dt">float</span> t<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Create a cyclic color palette</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span> a <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.5</span><span class="op">,</span> <span class="fl">0.5</span><span class="op">,</span> <span class="fl">0.5</span><span class="op">);</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span> b <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.5</span><span class="op">,</span> <span class="fl">0.5</span><span class="op">,</span> <span class="fl">0.5</span><span class="op">);</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span> c <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span> d <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.33</span><span class="op">,</span> <span class="fl">0.67</span><span class="op">);</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> a <span class="op">+</span> b <span class="op">*</span> <span class="bu">cos</span><span class="op">(</span><span class="fl">6.28318</span> <span class="op">*</span> <span class="op">(</span>c <span class="op">*</span> t <span class="op">+</span> d<span class="op">));</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This uses a cosine-based palette function that creates smooth, cyclic colors. Play with the parameters <code>a</code>, <code>b</code>, <code>c</code>, <code>d</code> to get different color schemes!</p>
+<hr>
+</section>
+</section>
+<section id="julia-sets" class="level2" data-number="2.4">
+<h2 data-number="2.4" class="anchored" data-anchor-id="julia-sets"><span class="header-section-number">2.4</span> Julia Sets</h2>
+<section id="definition-1" class="level3">
+<h3 class="anchored" data-anchor-id="definition-1">Definition</h3>
+<p>For a fixed complex parameter <span class="math inline">\(c\)</span>, the filled Julia set <span class="math inline">\(\mathcal{K}_c\)</span> consists of points <span class="math inline">\(z_0\)</span> for which the iteration <span class="math display">\[z_{n+1} = z_n^2 + c\]</span> remains bounded.</p>
+<p><strong>Key difference from Mandelbrot:</strong> Here <span class="math inline">\(c\)</span> is fixed and we vary the initial point <span class="math inline">\(z_0\)</span> (which comes from the pixel position). In Mandelbrot, <span class="math inline">\(z_0 = 0\)</span> and <span class="math inline">\(c\)</span> varies with pixel position.</p>
+</section>
+<section id="relationship-to-mandelbrot" class="level3">
+<h3 class="anchored" data-anchor-id="relationship-to-mandelbrot">Relationship to Mandelbrot</h3>
+<p>There’s a beautiful connection: the Mandelbrot set is essentially a “parameter space” for Julia sets. Each point <span class="math inline">\(c\)</span> in the complex plane has an associated Julia set <span class="math inline">\(\mathcal{K}_c\)</span>: - If <span class="math inline">\(c \in \mathcal{M}\)</span>, then <span class="math inline">\(\mathcal{K}_c\)</span> is connected - If <span class="math inline">\(c \notin \mathcal{M}\)</span>, then <span class="math inline">\(\mathcal{K}_c\)</span> is a Cantor dust (totally disconnected)</p>
+</section>
+<section id="implementation-1" class="level3">
+<h3 class="anchored" data-anchor-id="implementation-1">Implementation</h3>
+<div class="sourceCode" id="cb10"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">mainImage</span><span class="op">(</span><span class="dt">out</span> <span class="dt">vec4</span> fragColor<span class="op">,</span> <span class="dt">in</span> <span class="dt">vec2</span> fragCoord<span class="op">)</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Coordinate setup</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> uv <span class="op">=</span> fragCoord <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">xy</span><span class="op">;</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    uv <span class="op">=</span> uv <span class="op">-</span> <span class="fl">0.5</span><span class="op">;</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    uv<span class="op">.</span><span class="fu">x</span> <span class="op">*=</span> iResolution<span class="op">.</span><span class="fu">x</span> <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">y</span><span class="op">;</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> z <span class="op">=</span> uv <span class="op">*</span> <span class="fl">3.0</span><span class="op">;</span>  <span class="co">// Initial point z_0 comes from pixel position</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Fix c to an interesting value</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> c <span class="op">=</span> <span class="dt">vec2</span><span class="op">(-</span><span class="fl">0.7</span><span class="op">,</span> <span class="fl">0.27015</span><span class="op">);</span>  <span class="co">// A classic choice</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Try: vec2(-0.4, 0.6), vec2(0.285, 0.01), vec2(-0.8, 0.156)</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Iterate z_{n+1} = z_n² + c</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> max_iter <span class="op">=</span> <span class="dv">100</span><span class="op">;</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> iter<span class="op">;</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    <span class="kw">for</span><span class="op">(</span>iter <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> iter <span class="op">&lt;</span> max_iter<span class="op">;</span> iter<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>        <span class="kw">if</span><span class="op">(</span><span class="fu">cabs2</span><span class="op">(</span>z<span class="op">)</span> <span class="op">&gt;</span> <span class="fl">4.0</span><span class="op">)</span> <span class="kw">break</span><span class="op">;</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>        z <span class="op">=</span> <span class="fu">cmul</span><span class="op">(</span>z<span class="op">,</span> z<span class="op">)</span> <span class="op">+</span> c<span class="op">;</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Color (same as Mandelbrot)</span></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> t <span class="op">=</span> <span class="dt">float</span><span class="op">(</span>iter<span class="op">)</span> <span class="op">/</span> <span class="dt">float</span><span class="op">(</span>max_iter<span class="op">);</span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span> color <span class="op">=</span> <span class="fu">palette</span><span class="op">(</span>t<span class="op">);</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>    <span class="kw">if</span><span class="op">(</span>iter <span class="op">==</span> max_iter<span class="op">)</span> color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.0</span><span class="op">);</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>    fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Try different values of <span class="math inline">\(c\)</span> to explore the incredible variety of Julia sets! You can even animate <span class="math inline">\(c\)</span> with time:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> c <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span><span class="fl">0.7</span> <span class="op">*</span> <span class="bu">cos</span><span class="op">(</span>iTime <span class="op">*</span> <span class="fl">0.3</span><span class="op">),</span> <span class="fl">0.7</span> <span class="op">*</span> <span class="bu">sin</span><span class="op">(</span>iTime <span class="op">*</span> <span class="fl">0.3</span><span class="op">));</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<hr>
+</section>
+</section>
+<section id="structs-in-glsl" class="level2" data-number="2.5">
+<h2 data-number="2.5" class="anchored" data-anchor-id="structs-in-glsl"><span class="header-section-number">2.5</span> Structs in GLSL</h2>
+<section id="motivation" class="level3">
+<h3 class="anchored" data-anchor-id="motivation">Motivation</h3>
+<p>As we build more complex geometric objects, we need to organize related data. GLSL provides <strong>structs</strong> (similar to C structs or simple classes without methods).</p>
+</section>
+<section id="defining-a-struct" class="level3">
+<h3 class="anchored" data-anchor-id="defining-a-struct">Defining a Struct</h3>
+<div class="sourceCode" id="cb12"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> Triangle <span class="op">{</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> v0<span class="op">;</span>  <span class="co">// First vertex</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> v1<span class="op">;</span>  <span class="co">// Second vertex</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> v2<span class="op">;</span>  <span class="co">// Third vertex</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="using-structs" class="level3">
+<h3 class="anchored" data-anchor-id="using-structs">Using Structs</h3>
+<div class="sourceCode" id="cb13"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>Triangle tri<span class="op">;</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>tri<span class="op">.</span><span class="fu">v0</span> <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span><span class="fl">0.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>tri<span class="op">.</span><span class="fu">v1</span> <span class="op">=</span> <span class="dt">vec2</span><span class="op">(-</span><span class="fl">0.866</span><span class="op">,</span> <span class="op">-</span><span class="fl">0.5</span><span class="op">);</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>tri<span class="op">.</span><span class="fu">v2</span> <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span><span class="fl">0.866</span><span class="op">,</span> <span class="op">-</span><span class="fl">0.5</span><span class="op">);</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co">// Access fields with dot notation</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="dt">centroid</span> <span class="op">=</span> <span class="op">(</span>tri<span class="op">.</span><span class="fu">v0</span> <span class="op">+</span> tri<span class="op">.</span><span class="fu">v1</span> <span class="op">+</span> tri<span class="op">.</span><span class="fu">v2</span><span class="op">)</span> <span class="op">/</span> <span class="fl">3.0</span><span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="why-structs" class="level3">
+<h3 class="anchored" data-anchor-id="why-structs">Why Structs?</h3>
+<p>For geometric transformations (reflections, rotations), we’ll need to pass around geometric data. Structs make the code cleaner and more mathematical. For example, we can write:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="bu">reflect</span><span class="op">(</span><span class="dt">vec2</span> p<span class="op">,</span> Triangle tri<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Reflect point p across an edge of tri</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// [Implementation details]</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This is more readable than passing six individual float parameters for the triangle vertices.</p>
+<hr>
+</section>
+</section>
+<section id="euclidean-triangle-tiling" class="level2" data-number="2.6">
+<h2 data-number="2.6" class="anchored" data-anchor-id="euclidean-triangle-tiling"><span class="header-section-number">2.6</span> Euclidean Triangle Tiling</h2>
+<section id="the-fundamental-domain" class="level3">
+<h3 class="anchored" data-anchor-id="the-fundamental-domain">The Fundamental Domain</h3>
+<p>An equilateral triangle tiles the Euclidean plane. Given an equilateral triangle, we can: 1. Reflect across its three edges 2. Repeat this process on the resulting triangles 3. Fill the entire plane with copies of the original triangle</p>
+</section>
+<section id="setting-up-the-triangle" class="level3">
+<h3 class="anchored" data-anchor-id="setting-up-the-triangle">Setting Up the Triangle</h3>
+<p>Let’s work with an equilateral triangle with vertices at: <span class="math display">\[v_0 = (0, 1), \quad v_1 = (-\frac{\sqrt{3}}{2}, -\frac{1}{2}), \quad v_2 = (\frac{\sqrt{3}}{2}, -\frac{1}{2})\]</span></p>
+<p>This triangle has side length <span class="math inline">\(\sqrt{3}\)</span> and is centered at the origin.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Define triangle vertices</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> v0 <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span><span class="fl">0.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> v1 <span class="op">=</span> <span class="dt">vec2</span><span class="op">(-</span><span class="fl">0.866</span><span class="op">,</span> <span class="op">-</span><span class="fl">0.5</span><span class="op">);</span>  <span class="co">// -sqrt(3)/2 ≈ -0.866</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> v2 <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span><span class="fl">0.866</span><span class="op">,</span> <span class="op">-</span><span class="fl">0.5</span><span class="op">);</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="reflection-across-a-line" class="level3">
+<h3 class="anchored" data-anchor-id="reflection-across-a-line">Reflection Across a Line</h3>
+<p>To reflect a point <span class="math inline">\(p\)</span> across a line through the origin with unit normal <span class="math inline">\(\mathbf{n}\)</span>, we use: <span class="math display">\[p' = p - 2(\mathbf{n} \cdot p)\mathbf{n}\]</span></p>
+<p>For a line through two points (an edge of our triangle), we need to: 1. Compute the perpendicular direction (normal to the edge) 2. Determine which side of the line we’re on 3. Reflect if necessary</p>
+<p><strong>Placeholder for specific implementation:</strong> The exact formulas depend on how we set up our edges. Here’s the structure:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Reflect across edge v0-v1</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> edge <span class="op">=</span> v1 <span class="op">-</span> v0<span class="op">;</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> normal <span class="op">=</span> <span class="bu">normalize</span><span class="op">(</span><span class="dt">vec2</span><span class="op">(-</span>edge<span class="op">.</span><span class="fu">y</span><span class="op">,</span> edge<span class="op">.</span><span class="fu">x</span><span class="op">));</span>  <span class="co">// Perpendicular to edge</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> dist <span class="op">=</span> <span class="bu">dot</span><span class="op">(</span>p <span class="op">-</span> v0<span class="op">,</span> normal<span class="op">);</span>  <span class="co">// Signed distance to line</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span><span class="op">(</span>dist <span class="op">&lt;</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    p <span class="op">=</span> p <span class="op">-</span> <span class="fl">2.0</span> <span class="op">*</span> dist <span class="op">*</span> normal<span class="op">;</span>  <span class="co">// Reflect if on wrong side</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="iterative-folding" class="level3">
+<h3 class="anchored" data-anchor-id="iterative-folding">Iterative Folding</h3>
+<p>The key insight: we repeatedly reflect <span class="math inline">\(p\)</span> across the three edges of the triangle until it lands inside the fundamental domain.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="fu">foldToTriangle</span><span class="op">(</span><span class="dt">vec2</span> p<span class="op">,</span> <span class="dt">int</span> iterations<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Define the three edges and their normals</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// [Edge definitions here]</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">for</span><span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> iterations<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Reflect across each edge if necessary</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>        <span class="co">// [Reflection code for edge 0]</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>        <span class="co">// [Reflection code for edge 1]</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>        <span class="co">// [Reflection code for edge 2]</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> p<span class="op">;</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>After folding, all points in the plane map to the interior of our triangle. We can then color based on: - The final position within the triangle - The number of reflections needed - Which edge was crossed most recently</p>
+</section>
+<section id="visualization" class="level3">
+<h3 class="anchored" data-anchor-id="visualization">Visualization</h3>
+<div class="sourceCode" id="cb18"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">mainImage</span><span class="op">(</span><span class="dt">out</span> <span class="dt">vec4</span> fragColor<span class="op">,</span> <span class="dt">in</span> <span class="dt">vec2</span> fragCoord<span class="op">)</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Coordinate setup</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> p <span class="op">=</span> <span class="op">[</span>coordinate setup as usual<span class="op">];</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Fold to fundamental domain</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> p_folded <span class="op">=</span> <span class="fu">foldToTriangle</span><span class="op">(</span>p<span class="op">,</span> <span class="dv">10</span><span class="op">);</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Color based on position in triangle</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Could use barycentric coordinates, distance to edges, etc.</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span> color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span>p_folded <span class="op">*</span> <span class="fl">0.5</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">,</span> <span class="fl">0.5</span><span class="op">);</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>    fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Note:</strong> The exact implementation requires careful handling of the geometry. The key mathematical ideas are: 1. Reflection formula: <span class="math inline">\(p' = p - 2(p \cdot n)n\)</span> for a line with normal <span class="math inline">\(n\)</span> through origin 2. Iterative folding brings any point into the fundamental domain 3. Track which reflections occur for interesting coloring</p>
+<hr>
+</section>
+</section>
+<section id="sierpinski-triangle-via-folding" class="level2" data-number="2.7">
+<h2 data-number="2.7" class="anchored" data-anchor-id="sierpinski-triangle-via-folding"><span class="header-section-number">2.7</span> Sierpinski Triangle via Folding</h2>
+<section id="the-concept" class="level3">
+<h3 class="anchored" data-anchor-id="the-concept">The Concept</h3>
+<p>The Sierpinski triangle is a fractal that can be generated by: 1. Starting with an equilateral triangle 2. Removing the middle triangle (connecting midpoints) 3. Repeating on each remaining sub-triangle</p>
+<p>Equivalently, we can generate it by <strong>iterated folding with scaling</strong>.</p>
+</section>
+<section id="folding-algorithm" class="level3">
+<h3 class="anchored" data-anchor-id="folding-algorithm">Folding Algorithm</h3>
+<p>At each iteration: 1. Reflect <span class="math inline">\(p\)</span> across the three edges of the triangle (fold it inside) 2. Scale toward the center 3. Repeat</p>
+<p>Mathematically, after <span class="math inline">\(n\)</span> iterations, we’ve zoomed in by a factor of <span class="math inline">\(2^n\)</span> and applied <span class="math inline">\(n\)</span> reflections.</p>
+</section>
+<section id="implementation-sketch" class="level3">
+<h3 class="anchored" data-anchor-id="implementation-sketch">Implementation Sketch</h3>
+<div class="sourceCode" id="cb19"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="fu">sierpinskiFold</span><span class="op">(</span><span class="dt">vec2</span> p<span class="op">,</span> <span class="dt">int</span> iterations<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Triangle vertices (equilateral)</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> v0 <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span><span class="fl">0.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> v1 <span class="op">=</span> <span class="dt">vec2</span><span class="op">(-</span><span class="fl">0.866</span><span class="op">,</span> <span class="op">-</span><span class="fl">0.5</span><span class="op">);</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> v2 <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span><span class="fl">0.866</span><span class="op">,</span> <span class="op">-</span><span class="fl">0.5</span><span class="op">);</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> scale <span class="op">=</span> <span class="fl">1.0</span><span class="op">;</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">for</span><span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> iterations<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Reflect across each edge (fold into triangle)</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>        <span class="co">// [Reflection code similar to triangle tiling]</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>        <span class="co">// After folding, scale and translate</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>        p <span class="op">=</span> p <span class="op">*</span> <span class="fl">2.0</span><span class="op">;</span>  <span class="co">// Zoom in by factor of 2</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>        scale <span class="op">*=</span> <span class="fl">2.0</span><span class="op">;</span></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>        <span class="co">// [Additional centering/translation may be needed]</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> p<span class="op">;</span></span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="coloring-by-iteration-depth" class="level3">
+<h3 class="anchored" data-anchor-id="coloring-by-iteration-depth">Coloring by Iteration Depth</h3>
+<p>We can track how many times we hit certain conditions during folding:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> orbit <span class="op">=</span> <span class="dv">0</span><span class="op">;</span>  <span class="co">// Track some property during iteration</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="kw">for</span><span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> max_iter<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Folding operations</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Track orbit behavior</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">if</span><span class="op">([</span>some condition<span class="op">])</span> orbit<span class="op">++;</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="co">// Color based on orbit count</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> t <span class="op">=</span> <span class="dt">float</span><span class="op">(</span>orbit<span class="op">)</span> <span class="op">/</span> <span class="dt">float</span><span class="op">(</span>max_iter<span class="op">);</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> color <span class="op">=</span> <span class="fu">palette</span><span class="op">(</span>t<span class="op">);</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The specific conditions to track depend on the geometric setup, but typically we color based on: - Which edge we reflected across most recently - How many reflections were needed - Distance from the center after folding</p>
+</section>
+<section id="visualization-1" class="level3">
+<h3 class="anchored" data-anchor-id="visualization-1">Visualization</h3>
+<div class="sourceCode" id="cb21"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">mainImage</span><span class="op">(</span><span class="dt">out</span> <span class="dt">vec4</span> fragColor<span class="op">,</span> <span class="dt">in</span> <span class="dt">vec2</span> fragCoord<span class="op">)</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> p <span class="op">=</span> <span class="op">[</span>coordinate setup<span class="op">];</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Apply Sierpinski folding</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> p_folded <span class="op">=</span> <span class="fu">sierpinskiFold</span><span class="op">(</span>p<span class="op">,</span> <span class="dv">8</span><span class="op">);</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Color based on the folded position</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> d <span class="op">=</span> <span class="bu">length</span><span class="op">(</span>p_folded<span class="op">);</span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span> color <span class="op">=</span> d <span class="op">&lt;</span> <span class="fl">0.1</span> <span class="op">?</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">)</span> <span class="op">:</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.0</span><span class="op">);</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>    <span class="co">// OR: color based on iteration behavior</span></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">// [More sophisticated coloring]</span></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>    fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The Sierpinski triangle should emerge as a self-similar fractal pattern!</p>
+<hr>
+</section>
+</section>
+<section id="summary" class="level2" data-number="2.8">
+<h2 data-number="2.8" class="anchored" data-anchor-id="summary"><span class="header-section-number">2.8</span> Summary</h2>
+<p>Today we covered:</p>
+<ol type="1">
+<li><strong>Complex arithmetic in GLSL</strong>: Representing complex numbers as <code>vec2</code> and implementing multiplication</li>
+<li><strong>Mandelbrot set</strong>: Iterating <span class="math inline">\(z_{n+1} = z_n^2 + c\)</span> with <span class="math inline">\(z_0 = 0\)</span>, coloring by escape time</li>
+<li><strong>Julia sets</strong>: Fixing <span class="math inline">\(c\)</span> and varying initial point <span class="math inline">\(z_0\)</span>, exploring the parameter space</li>
+<li><strong>Structs</strong>: Organizing geometric data for cleaner code</li>
+<li><strong>Triangle tiling</strong>: Using reflection to fold the plane into a fundamental domain</li>
+<li><strong>Sierpinski triangle</strong>: Generating fractals through iterated folding and scaling</li>
+</ol>
+<p>The key themes: - Simple iterations create complex behavior (chaos and fractals) - Geometric transformations (reflections) can tile or generate fractals - Tracking iteration behavior gives us rich information for coloring - Folding operations create self-similar structures</p>
+<p>Tomorrow we’ll extend these ideas: more fractals via folding, then hyperbolic geometry where the same techniques create entirely different tilings.</p>
+<hr>
+</section>
+<section id="homework" class="level2" data-number="2.9">
+<h2 data-number="2.9" class="anchored" data-anchor-id="homework"><span class="header-section-number">2.9</span> Homework</h2>
+<section id="required-interactive-julia-sets" class="level3">
+<h3 class="anchored" data-anchor-id="required-interactive-julia-sets">Required: Interactive Julia Sets</h3>
+<p>Add mouse control to the julia sets: take iMouse and read it out as a complex number, then draw the julia set for that number.</p>
+</section>
+<section id="required-circle-inversion" class="level3">
+<h3 class="anchored" data-anchor-id="required-circle-inversion">Required: Circle Inversion</h3>
+<p>Circle inversion is a fundamental transformation in geometry that will be the basis for many interesting visualizations. Your task is to implement it as a general operation on the plane.</p>
+<p><strong>Mathematical Background:</strong></p>
+<p>Inversion with respect to a circle of radius <span class="math inline">\(R\)</span> centered at the origin maps a point <span class="math inline">\(p \neq 0\)</span> to: <span class="math display">\[\text{inv}(p) = R^2 \frac{p}{|p|^2}\]</span></p>
+<p>Geometrically, this maps the inside of the circle to the outside and vice versa, with points on the circle remaining fixed. Key properties: - Circles passing through the center become lines (and vice versa) - Circles not passing through the center remain circles - Angles are preserved (it’s a conformal map)</p>
+<p>For a circle centered at <span class="math inline">\(c\)</span> with radius <span class="math inline">\(R\)</span>, we: 1. Translate to center the circle at origin: <span class="math inline">\(p' = p - c\)</span> 2. Apply inversion: <span class="math inline">\(p'' = R^2 \frac{p'}{|p'|^2}\)</span> 3. Translate back: <span class="math inline">\(\text{result} = p'' + c\)</span></p>
+<p><strong>Implementation Tasks:</strong></p>
+<ol type="1">
+<li><strong>Basic inversion centered at origin:</strong></li>
+</ol>
+<div class="sourceCode" id="cb22"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="fu">invert</span><span class="op">(</span><span class="dt">vec2</span> p<span class="op">,</span> <span class="dt">float</span> R<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> r2 <span class="op">=</span> <span class="bu">dot</span><span class="op">(</span>p<span class="op">,</span> p<span class="op">);</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> R <span class="op">*</span> R <span class="op">*</span> p <span class="op">/</span> r2<span class="op">;</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol start="2" type="1">
+<li><strong>Inversion centered at arbitrary point:</strong></li>
+</ol>
+<div class="sourceCode" id="cb23"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="fu">invertCircle</span><span class="op">(</span><span class="dt">vec2</span> p<span class="op">,</span> <span class="dt">vec2</span> center<span class="op">,</span> <span class="dt">float</span> radius<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Translate, invert, translate back</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// [Implement this]</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol start="3" type="1">
+<li><strong>Visualization:</strong> Create a shader that applies circle inversion to a pattern. Suggestions:
+<ul>
+<li>Start with a grid and show its image under inversion</li>
+<li>Draw several circles and show how they transform</li>
+<li>Apply inversion to implicit curves from Day 1</li>
+<li>Make the inversion center follow the mouse position using <code>iMouse.xy</code></li>
+</ul></li>
+<li><strong>Demonstrate properties:</strong> Show that:
+<ul>
+<li>A line through the inversion center maps to itself</li>
+<li>A line not through the center maps to a circle through the center</li>
+<li>A circle through the center maps to a line</li>
+</ul></li>
+</ol>
+<p><strong>Expected Output:</strong> A shader that clearly demonstrates circle inversion operating on the plane, with visual evidence of its geometric properties.</p>
+</section>
+<section id="optional-1-apollonian-gasket" class="level3">
+<h3 class="anchored" data-anchor-id="optional-1-apollonian-gasket">Optional #1: Apollonian Gasket</h3>
+<p>Now that you’ve implemented circle inversion, use it to create the beautiful Apollonian gasket fractal.</p>
+<p><strong>The Construction:</strong></p>
+<p>Start with three mutually tangent circles. The Apollonian gasket is generated by: 1. Finding the fourth circle tangent to all three (Apollonius’s problem—there are generally two solutions) 2. Recursively filling gaps with new tangent circles 3. Continuing indefinitely</p>
+<p><strong>Simplified Approach via Inversion:</strong></p>
+<p>Rather than solving for tangent circles explicitly, we can use inversions: 1. Start with a configuration of circles (e.g., three circles tangent at a point) 2. Define inversions with respect to each circle 3. Apply these inversions repeatedly to generate the fractal pattern 4. Color based on iteration count or which circle was most recently inverted through</p>
+<p><strong>Challenge:</strong> Setting up the initial configuration and inversion circles requires working out the tangency conditions. One standard setup: - Three circles of radius 1 centered at the vertices of an equilateral triangle of side length 2 - These are mutually tangent</p>
+<p><strong>Visualization:</strong> The resulting fractal should show nested circles filling the gaps in a self-similar pattern, creating a beautiful packing.</p>
+<section id="optional-grid-of-julia-sets" class="level4">
+<h4 class="anchored" data-anchor-id="optional-grid-of-julia-sets">Optional: Grid of Julia Sets!</h4>
+<p>Divide the plane into a small rectangular grid, inside each grid draw the julia set for the complex number at its center.</p>
+<hr>
+</section>
+</section>
+</section>
+<section id="looking-ahead" class="level2" data-number="2.10">
+<h2 data-number="2.10" class="anchored" data-anchor-id="looking-ahead"><span class="header-section-number">2.10</span> Looking Ahead</h2>
+<p>Tomorrow we’ll continue with <strong>fractals and hyperbolic geometry</strong>. We’ll start by extending our folding techniques to create the Sierpinski carpet, then dive into hyperbolic space with multiple models (Poincaré disk, upper half-plane, band model) and create beautiful tilings in non-Euclidean geometry.</p>
+<p>Make sure you’re comfortable with: - Complex number iteration and the Mandelbrot/Julia algorithms - Geometric folding operations (reflection via <code>abs()</code>, scaling) - Using iteration count for coloring - Circle inversion (from today’s homework—this will be crucial tomorrow!)</p>
+<p>The circle inversion you implement today will be the foundation for tomorrow’s hyperbolic tilings, so take your time understanding how it works geometrically.</p>
 
 
 <!-- -->
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -890,21 +1376,595 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./day1.html" class="pagination-link" aria-label="Day I">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Day I</span></span>
+      <a href="./day1.html" class="pagination-link" aria-label="Day 1: Introduction to Shader Programming">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Day 1: Introduction to Shader Programming</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./day3.html" class="pagination-link" aria-label="Day 3">
-        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Day 3</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./day3.html" class="pagination-link" aria-label="Day 3: Fractals and Hyperbolic Geometry">
+        <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Day 3: Fractals and Hyperbolic Geometry</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># Day 2</span></span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb24" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># Day 2: Complex Dynamics and Euclidean Geometry</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">## Overview</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>Today we explore the power of iteration and geometric transformations. We'll implement complex arithmetic in GLSL, use it to render the iconic Mandelbrot and Julia sets, and create geometric tilings through reflection. We conclude by building our first fractal via iterated folding—the Sierpinski triangle.</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>By the end of today, you'll understand how simple iterative processes can generate intricate mathematical structures, how to organize geometric data using structs, and how folding operations can create self-similar fractals.</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="fu">## Complex Numbers in GLSL</span></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a><span class="fu">### Representation</span></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>A complex number $z = a + bi$ can be represented as a 2D vector with real part $a$ and imaginary part $b$. In GLSL:</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a><span class="in">vec2 z = vec2(a, b);  // Represents a + bi</span></span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>We'll consistently use the convention: <span class="in">`z.x`</span> is the real part, <span class="in">`z.y`</span> is the imaginary part.</span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a><span class="fu">### Complex Arithmetic</span></span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>Let $z = a + bi$ and $w = c + di$. We need to implement the basic operations:</span>
+<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>**Addition:** $(a + bi) + (c + di) = (a + c) + (b + d)i$</span>
+<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a><span class="in">vec2 cadd(vec2 z, vec2 w) {</span></span>
+<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a><span class="in">    return z + w;  // Vector addition is sufficient!</span></span>
+<span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-34"><a href="#cb24-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-35"><a href="#cb24-35" aria-hidden="true" tabindex="-1"></a>**Multiplication:** $(a + bi)(c + di) = (ac - bd) + (ad + bc)i$</span>
+<span id="cb24-36"><a href="#cb24-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-37"><a href="#cb24-37" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb24-38"><a href="#cb24-38" aria-hidden="true" tabindex="-1"></a><span class="in">vec2 cmul(vec2 z, vec2 w) {</span></span>
+<span id="cb24-39"><a href="#cb24-39" aria-hidden="true" tabindex="-1"></a><span class="in">    return vec2(</span></span>
+<span id="cb24-40"><a href="#cb24-40" aria-hidden="true" tabindex="-1"></a><span class="in">        z.x * w.x - z.y * w.y,  // Real part: ac - bd</span></span>
+<span id="cb24-41"><a href="#cb24-41" aria-hidden="true" tabindex="-1"></a><span class="in">        z.x * w.y + z.y * w.x   // Imaginary part: ad + bc</span></span>
+<span id="cb24-42"><a href="#cb24-42" aria-hidden="true" tabindex="-1"></a><span class="in">    );</span></span>
+<span id="cb24-43"><a href="#cb24-43" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb24-44"><a href="#cb24-44" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-45"><a href="#cb24-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-46"><a href="#cb24-46" aria-hidden="true" tabindex="-1"></a>**Magnitude squared:** $|z|^2 = a^2 + b^2$</span>
+<span id="cb24-47"><a href="#cb24-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-48"><a href="#cb24-48" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb24-49"><a href="#cb24-49" aria-hidden="true" tabindex="-1"></a><span class="in">float cabs2(vec2 z) {</span></span>
+<span id="cb24-50"><a href="#cb24-50" aria-hidden="true" tabindex="-1"></a><span class="in">    return dot(z, z);  // z.x * z.x + z.y * z.y</span></span>
+<span id="cb24-51"><a href="#cb24-51" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb24-52"><a href="#cb24-52" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-53"><a href="#cb24-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-54"><a href="#cb24-54" aria-hidden="true" tabindex="-1"></a>**Magnitude:** $|z| = \sqrt{a^2 + b^2}$</span>
+<span id="cb24-55"><a href="#cb24-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-56"><a href="#cb24-56" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb24-57"><a href="#cb24-57" aria-hidden="true" tabindex="-1"></a><span class="in">float cabs(vec2 z) {</span></span>
+<span id="cb24-58"><a href="#cb24-58" aria-hidden="true" tabindex="-1"></a><span class="in">    return length(z);</span></span>
+<span id="cb24-59"><a href="#cb24-59" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb24-60"><a href="#cb24-60" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-61"><a href="#cb24-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-62"><a href="#cb24-62" aria-hidden="true" tabindex="-1"></a>**Conjugate:** $\overline{z} = a - bi$</span>
+<span id="cb24-63"><a href="#cb24-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-64"><a href="#cb24-64" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb24-65"><a href="#cb24-65" aria-hidden="true" tabindex="-1"></a><span class="in">vec2 cconj(vec2 z) {</span></span>
+<span id="cb24-66"><a href="#cb24-66" aria-hidden="true" tabindex="-1"></a><span class="in">    return vec2(z.x, -z.y);</span></span>
+<span id="cb24-67"><a href="#cb24-67" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb24-68"><a href="#cb24-68" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-69"><a href="#cb24-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-70"><a href="#cb24-70" aria-hidden="true" tabindex="-1"></a>These are the building blocks we need for complex dynamics.</span>
+<span id="cb24-71"><a href="#cb24-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-72"><a href="#cb24-72" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb24-73"><a href="#cb24-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-74"><a href="#cb24-74" aria-hidden="true" tabindex="-1"></a><span class="fu">## The Mandelbrot Set</span></span>
+<span id="cb24-75"><a href="#cb24-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-76"><a href="#cb24-76" aria-hidden="true" tabindex="-1"></a><span class="fu">### Definition</span></span>
+<span id="cb24-77"><a href="#cb24-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-78"><a href="#cb24-78" aria-hidden="true" tabindex="-1"></a>The Mandelbrot set $\mathcal{M}$ is defined as the set of complex numbers $c$ for which the iteration</span>
+<span id="cb24-79"><a href="#cb24-79" aria-hidden="true" tabindex="-1"></a>$$z_{n+1} = z_n^2 + c, \quad z_0 = 0$$</span>
+<span id="cb24-80"><a href="#cb24-80" aria-hidden="true" tabindex="-1"></a>remains bounded as $n \to \infty$.</span>
+<span id="cb24-81"><a href="#cb24-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-82"><a href="#cb24-82" aria-hidden="true" tabindex="-1"></a>In practice, we:</span>
+<span id="cb24-83"><a href="#cb24-83" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Start with $z_0 = 0$</span>
+<span id="cb24-84"><a href="#cb24-84" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Iterate $z_{n+1} = z_n^2 + c$ for a fixed number of iterations (say, 100)</span>
+<span id="cb24-85"><a href="#cb24-85" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Check if $|z_n|$ has escaped some large radius (typically $R = 2$)</span>
+<span id="cb24-86"><a href="#cb24-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-87"><a href="#cb24-87" aria-hidden="true" tabindex="-1"></a>Points that escape quickly are definitely not in $\mathcal{M}$. Points that remain bounded after many iterations are likely in $\mathcal{M}$.</span>
+<span id="cb24-88"><a href="#cb24-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-89"><a href="#cb24-89" aria-hidden="true" tabindex="-1"></a><span class="fu">### Implementation</span></span>
+<span id="cb24-90"><a href="#cb24-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-91"><a href="#cb24-91" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb24-92"><a href="#cb24-92" aria-hidden="true" tabindex="-1"></a><span class="in">void mainImage(out vec4 fragColor, in vec2 fragCoord)</span></span>
+<span id="cb24-93"><a href="#cb24-93" aria-hidden="true" tabindex="-1"></a><span class="in">{</span></span>
+<span id="cb24-94"><a href="#cb24-94" aria-hidden="true" tabindex="-1"></a><span class="in">    // Coordinate setup: center at origin, scale to show interesting region</span></span>
+<span id="cb24-95"><a href="#cb24-95" aria-hidden="true" tabindex="-1"></a><span class="in">    vec2 uv = fragCoord / iResolution.xy;</span></span>
+<span id="cb24-96"><a href="#cb24-96" aria-hidden="true" tabindex="-1"></a><span class="in">    uv = uv - 0.5;</span></span>
+<span id="cb24-97"><a href="#cb24-97" aria-hidden="true" tabindex="-1"></a><span class="in">    uv.x *= iResolution.x / iResolution.y;</span></span>
+<span id="cb24-98"><a href="#cb24-98" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb24-99"><a href="#cb24-99" aria-hidden="true" tabindex="-1"></a><span class="in">    // Scale to view the Mandelbrot set (roughly [-2.5, 1] × [-1.25, 1.25])</span></span>
+<span id="cb24-100"><a href="#cb24-100" aria-hidden="true" tabindex="-1"></a><span class="in">    vec2 c = uv * 3.5;</span></span>
+<span id="cb24-101"><a href="#cb24-101" aria-hidden="true" tabindex="-1"></a><span class="in">    c.x -= 0.5;  // Center on the interesting part</span></span>
+<span id="cb24-102"><a href="#cb24-102" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb24-103"><a href="#cb24-103" aria-hidden="true" tabindex="-1"></a><span class="in">    // Mandelbrot iteration</span></span>
+<span id="cb24-104"><a href="#cb24-104" aria-hidden="true" tabindex="-1"></a><span class="in">    vec2 z = vec2(0.0, 0.0);  // z_0 = 0</span></span>
+<span id="cb24-105"><a href="#cb24-105" aria-hidden="true" tabindex="-1"></a><span class="in">    int max_iter = 100;</span></span>
+<span id="cb24-106"><a href="#cb24-106" aria-hidden="true" tabindex="-1"></a><span class="in">    int iter;</span></span>
+<span id="cb24-107"><a href="#cb24-107" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb24-108"><a href="#cb24-108" aria-hidden="true" tabindex="-1"></a><span class="in">    for(iter = 0; iter &lt; max_iter; iter++) {</span></span>
+<span id="cb24-109"><a href="#cb24-109" aria-hidden="true" tabindex="-1"></a><span class="in">        // Check if escaped</span></span>
+<span id="cb24-110"><a href="#cb24-110" aria-hidden="true" tabindex="-1"></a><span class="in">        if(cabs2(z) &gt; 4.0) break;  // |z| &gt; 2, so |z|² &gt; 4</span></span>
+<span id="cb24-111"><a href="#cb24-111" aria-hidden="true" tabindex="-1"></a><span class="in">        </span></span>
+<span id="cb24-112"><a href="#cb24-112" aria-hidden="true" tabindex="-1"></a><span class="in">        // z_{n+1} = z_n² + c</span></span>
+<span id="cb24-113"><a href="#cb24-113" aria-hidden="true" tabindex="-1"></a><span class="in">        z = cmul(z, z) + c;</span></span>
+<span id="cb24-114"><a href="#cb24-114" aria-hidden="true" tabindex="-1"></a><span class="in">    }</span></span>
+<span id="cb24-115"><a href="#cb24-115" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb24-116"><a href="#cb24-116" aria-hidden="true" tabindex="-1"></a><span class="in">    // Color based on iteration count</span></span>
+<span id="cb24-117"><a href="#cb24-117" aria-hidden="true" tabindex="-1"></a><span class="in">    float t = float(iter) / float(max_iter);</span></span>
+<span id="cb24-118"><a href="#cb24-118" aria-hidden="true" tabindex="-1"></a><span class="in">    vec3 color = vec3(t);  // Grayscale for now</span></span>
+<span id="cb24-119"><a href="#cb24-119" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb24-120"><a href="#cb24-120" aria-hidden="true" tabindex="-1"></a><span class="in">    fragColor = vec4(color, 1.0);</span></span>
+<span id="cb24-121"><a href="#cb24-121" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb24-122"><a href="#cb24-122" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-123"><a href="#cb24-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-124"><a href="#cb24-124" aria-hidden="true" tabindex="-1"></a><span class="fu">### Coloring Schemes</span></span>
+<span id="cb24-125"><a href="#cb24-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-126"><a href="#cb24-126" aria-hidden="true" tabindex="-1"></a>The grayscale rendering shows structure but isn't very exciting. We can create better colormaps:</span>
+<span id="cb24-127"><a href="#cb24-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-128"><a href="#cb24-128" aria-hidden="true" tabindex="-1"></a>**Smooth coloring using escape time:**</span>
+<span id="cb24-129"><a href="#cb24-129" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb24-130"><a href="#cb24-130" aria-hidden="true" tabindex="-1"></a><span class="in">if(iter &lt; max_iter) {</span></span>
+<span id="cb24-131"><a href="#cb24-131" aria-hidden="true" tabindex="-1"></a><span class="in">    // Smooth iteration count (accounts for continuous escape)</span></span>
+<span id="cb24-132"><a href="#cb24-132" aria-hidden="true" tabindex="-1"></a><span class="in">    float log_zn = log(cabs2(z)) / 2.0;</span></span>
+<span id="cb24-133"><a href="#cb24-133" aria-hidden="true" tabindex="-1"></a><span class="in">    float nu = log(log_zn / log(2.0)) / log(2.0);</span></span>
+<span id="cb24-134"><a href="#cb24-134" aria-hidden="true" tabindex="-1"></a><span class="in">    float smooth_iter = float(iter) + 1.0 - nu;</span></span>
+<span id="cb24-135"><a href="#cb24-135" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb24-136"><a href="#cb24-136" aria-hidden="true" tabindex="-1"></a><span class="in">    float t = smooth_iter / float(max_iter);</span></span>
+<span id="cb24-137"><a href="#cb24-137" aria-hidden="true" tabindex="-1"></a><span class="in">    // Use a color palette (see below)</span></span>
+<span id="cb24-138"><a href="#cb24-138" aria-hidden="true" tabindex="-1"></a><span class="in">    vec3 color = palette(t);</span></span>
+<span id="cb24-139"><a href="#cb24-139" aria-hidden="true" tabindex="-1"></a><span class="in">} else {</span></span>
+<span id="cb24-140"><a href="#cb24-140" aria-hidden="true" tabindex="-1"></a><span class="in">    // Inside the set: black</span></span>
+<span id="cb24-141"><a href="#cb24-141" aria-hidden="true" tabindex="-1"></a><span class="in">    vec3 color = vec3(0.0);</span></span>
+<span id="cb24-142"><a href="#cb24-142" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb24-143"><a href="#cb24-143" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-144"><a href="#cb24-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-145"><a href="#cb24-145" aria-hidden="true" tabindex="-1"></a>**Simple color palette:**</span>
+<span id="cb24-146"><a href="#cb24-146" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb24-147"><a href="#cb24-147" aria-hidden="true" tabindex="-1"></a><span class="in">vec3 palette(float t) {</span></span>
+<span id="cb24-148"><a href="#cb24-148" aria-hidden="true" tabindex="-1"></a><span class="in">    // Create a cyclic color palette</span></span>
+<span id="cb24-149"><a href="#cb24-149" aria-hidden="true" tabindex="-1"></a><span class="in">    vec3 a = vec3(0.5, 0.5, 0.5);</span></span>
+<span id="cb24-150"><a href="#cb24-150" aria-hidden="true" tabindex="-1"></a><span class="in">    vec3 b = vec3(0.5, 0.5, 0.5);</span></span>
+<span id="cb24-151"><a href="#cb24-151" aria-hidden="true" tabindex="-1"></a><span class="in">    vec3 c = vec3(1.0, 1.0, 1.0);</span></span>
+<span id="cb24-152"><a href="#cb24-152" aria-hidden="true" tabindex="-1"></a><span class="in">    vec3 d = vec3(0.0, 0.33, 0.67);</span></span>
+<span id="cb24-153"><a href="#cb24-153" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb24-154"><a href="#cb24-154" aria-hidden="true" tabindex="-1"></a><span class="in">    return a + b * cos(6.28318 * (c * t + d));</span></span>
+<span id="cb24-155"><a href="#cb24-155" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb24-156"><a href="#cb24-156" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-157"><a href="#cb24-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-158"><a href="#cb24-158" aria-hidden="true" tabindex="-1"></a>This uses a cosine-based palette function that creates smooth, cyclic colors. Play with the parameters <span class="in">`a`</span>, <span class="in">`b`</span>, <span class="in">`c`</span>, <span class="in">`d`</span> to get different color schemes!</span>
+<span id="cb24-159"><a href="#cb24-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-160"><a href="#cb24-160" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb24-161"><a href="#cb24-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-162"><a href="#cb24-162" aria-hidden="true" tabindex="-1"></a><span class="fu">## Julia Sets</span></span>
+<span id="cb24-163"><a href="#cb24-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-164"><a href="#cb24-164" aria-hidden="true" tabindex="-1"></a><span class="fu">### Definition</span></span>
+<span id="cb24-165"><a href="#cb24-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-166"><a href="#cb24-166" aria-hidden="true" tabindex="-1"></a>For a fixed complex parameter $c$, the filled Julia set $\mathcal{K}_c$ consists of points $z_0$ for which the iteration</span>
+<span id="cb24-167"><a href="#cb24-167" aria-hidden="true" tabindex="-1"></a>$$z_{n+1} = z_n^2 + c$$</span>
+<span id="cb24-168"><a href="#cb24-168" aria-hidden="true" tabindex="-1"></a>remains bounded.</span>
+<span id="cb24-169"><a href="#cb24-169" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-170"><a href="#cb24-170" aria-hidden="true" tabindex="-1"></a>**Key difference from Mandelbrot:** Here $c$ is fixed and we vary the initial point $z_0$ (which comes from the pixel position). In Mandelbrot, $z_0 = 0$ and $c$ varies with pixel position.</span>
+<span id="cb24-171"><a href="#cb24-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-172"><a href="#cb24-172" aria-hidden="true" tabindex="-1"></a><span class="fu">### Relationship to Mandelbrot</span></span>
+<span id="cb24-173"><a href="#cb24-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-174"><a href="#cb24-174" aria-hidden="true" tabindex="-1"></a>There's a beautiful connection: the Mandelbrot set is essentially a "parameter space" for Julia sets. Each point $c$ in the complex plane has an associated Julia set $\mathcal{K}_c$:</span>
+<span id="cb24-175"><a href="#cb24-175" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>If $c \in \mathcal{M}$, then $\mathcal{K}_c$ is connected</span>
+<span id="cb24-176"><a href="#cb24-176" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>If $c \notin \mathcal{M}$, then $\mathcal{K}_c$ is a Cantor dust (totally disconnected)</span>
+<span id="cb24-177"><a href="#cb24-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-178"><a href="#cb24-178" aria-hidden="true" tabindex="-1"></a><span class="fu">### Implementation</span></span>
+<span id="cb24-179"><a href="#cb24-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-180"><a href="#cb24-180" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb24-181"><a href="#cb24-181" aria-hidden="true" tabindex="-1"></a><span class="in">void mainImage(out vec4 fragColor, in vec2 fragCoord)</span></span>
+<span id="cb24-182"><a href="#cb24-182" aria-hidden="true" tabindex="-1"></a><span class="in">{</span></span>
+<span id="cb24-183"><a href="#cb24-183" aria-hidden="true" tabindex="-1"></a><span class="in">    // Coordinate setup</span></span>
+<span id="cb24-184"><a href="#cb24-184" aria-hidden="true" tabindex="-1"></a><span class="in">    vec2 uv = fragCoord / iResolution.xy;</span></span>
+<span id="cb24-185"><a href="#cb24-185" aria-hidden="true" tabindex="-1"></a><span class="in">    uv = uv - 0.5;</span></span>
+<span id="cb24-186"><a href="#cb24-186" aria-hidden="true" tabindex="-1"></a><span class="in">    uv.x *= iResolution.x / iResolution.y;</span></span>
+<span id="cb24-187"><a href="#cb24-187" aria-hidden="true" tabindex="-1"></a><span class="in">    vec2 z = uv * 3.0;  // Initial point z_0 comes from pixel position</span></span>
+<span id="cb24-188"><a href="#cb24-188" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb24-189"><a href="#cb24-189" aria-hidden="true" tabindex="-1"></a><span class="in">    // Fix c to an interesting value</span></span>
+<span id="cb24-190"><a href="#cb24-190" aria-hidden="true" tabindex="-1"></a><span class="in">    vec2 c = vec2(-0.7, 0.27015);  // A classic choice</span></span>
+<span id="cb24-191"><a href="#cb24-191" aria-hidden="true" tabindex="-1"></a><span class="in">    // Try: vec2(-0.4, 0.6), vec2(0.285, 0.01), vec2(-0.8, 0.156)</span></span>
+<span id="cb24-192"><a href="#cb24-192" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb24-193"><a href="#cb24-193" aria-hidden="true" tabindex="-1"></a><span class="in">    // Iterate z_{n+1} = z_n² + c</span></span>
+<span id="cb24-194"><a href="#cb24-194" aria-hidden="true" tabindex="-1"></a><span class="in">    int max_iter = 100;</span></span>
+<span id="cb24-195"><a href="#cb24-195" aria-hidden="true" tabindex="-1"></a><span class="in">    int iter;</span></span>
+<span id="cb24-196"><a href="#cb24-196" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb24-197"><a href="#cb24-197" aria-hidden="true" tabindex="-1"></a><span class="in">    for(iter = 0; iter &lt; max_iter; iter++) {</span></span>
+<span id="cb24-198"><a href="#cb24-198" aria-hidden="true" tabindex="-1"></a><span class="in">        if(cabs2(z) &gt; 4.0) break;</span></span>
+<span id="cb24-199"><a href="#cb24-199" aria-hidden="true" tabindex="-1"></a><span class="in">        z = cmul(z, z) + c;</span></span>
+<span id="cb24-200"><a href="#cb24-200" aria-hidden="true" tabindex="-1"></a><span class="in">    }</span></span>
+<span id="cb24-201"><a href="#cb24-201" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb24-202"><a href="#cb24-202" aria-hidden="true" tabindex="-1"></a><span class="in">    // Color (same as Mandelbrot)</span></span>
+<span id="cb24-203"><a href="#cb24-203" aria-hidden="true" tabindex="-1"></a><span class="in">    float t = float(iter) / float(max_iter);</span></span>
+<span id="cb24-204"><a href="#cb24-204" aria-hidden="true" tabindex="-1"></a><span class="in">    vec3 color = palette(t);</span></span>
+<span id="cb24-205"><a href="#cb24-205" aria-hidden="true" tabindex="-1"></a><span class="in">    if(iter == max_iter) color = vec3(0.0);</span></span>
+<span id="cb24-206"><a href="#cb24-206" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb24-207"><a href="#cb24-207" aria-hidden="true" tabindex="-1"></a><span class="in">    fragColor = vec4(color, 1.0);</span></span>
+<span id="cb24-208"><a href="#cb24-208" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb24-209"><a href="#cb24-209" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-210"><a href="#cb24-210" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-211"><a href="#cb24-211" aria-hidden="true" tabindex="-1"></a>Try different values of $c$ to explore the incredible variety of Julia sets! You can even animate $c$ with time:</span>
+<span id="cb24-212"><a href="#cb24-212" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb24-213"><a href="#cb24-213" aria-hidden="true" tabindex="-1"></a><span class="in">vec2 c = vec2(0.7 * cos(iTime * 0.3), 0.7 * sin(iTime * 0.3));</span></span>
+<span id="cb24-214"><a href="#cb24-214" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-215"><a href="#cb24-215" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-216"><a href="#cb24-216" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb24-217"><a href="#cb24-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-218"><a href="#cb24-218" aria-hidden="true" tabindex="-1"></a><span class="fu">## Structs in GLSL</span></span>
+<span id="cb24-219"><a href="#cb24-219" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-220"><a href="#cb24-220" aria-hidden="true" tabindex="-1"></a><span class="fu">### Motivation</span></span>
+<span id="cb24-221"><a href="#cb24-221" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-222"><a href="#cb24-222" aria-hidden="true" tabindex="-1"></a>As we build more complex geometric objects, we need to organize related data. GLSL provides **structs** (similar to C structs or simple classes without methods).</span>
+<span id="cb24-223"><a href="#cb24-223" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-224"><a href="#cb24-224" aria-hidden="true" tabindex="-1"></a><span class="fu">### Defining a Struct</span></span>
+<span id="cb24-225"><a href="#cb24-225" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-226"><a href="#cb24-226" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb24-227"><a href="#cb24-227" aria-hidden="true" tabindex="-1"></a><span class="in">struct Triangle {</span></span>
+<span id="cb24-228"><a href="#cb24-228" aria-hidden="true" tabindex="-1"></a><span class="in">    vec2 v0;  // First vertex</span></span>
+<span id="cb24-229"><a href="#cb24-229" aria-hidden="true" tabindex="-1"></a><span class="in">    vec2 v1;  // Second vertex</span></span>
+<span id="cb24-230"><a href="#cb24-230" aria-hidden="true" tabindex="-1"></a><span class="in">    vec2 v2;  // Third vertex</span></span>
+<span id="cb24-231"><a href="#cb24-231" aria-hidden="true" tabindex="-1"></a><span class="in">};</span></span>
+<span id="cb24-232"><a href="#cb24-232" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-233"><a href="#cb24-233" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-234"><a href="#cb24-234" aria-hidden="true" tabindex="-1"></a><span class="fu">### Using Structs</span></span>
+<span id="cb24-235"><a href="#cb24-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-236"><a href="#cb24-236" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb24-237"><a href="#cb24-237" aria-hidden="true" tabindex="-1"></a><span class="in">Triangle tri;</span></span>
+<span id="cb24-238"><a href="#cb24-238" aria-hidden="true" tabindex="-1"></a><span class="in">tri.v0 = vec2(0.0, 1.0);</span></span>
+<span id="cb24-239"><a href="#cb24-239" aria-hidden="true" tabindex="-1"></a><span class="in">tri.v1 = vec2(-0.866, -0.5);</span></span>
+<span id="cb24-240"><a href="#cb24-240" aria-hidden="true" tabindex="-1"></a><span class="in">tri.v2 = vec2(0.866, -0.5);</span></span>
+<span id="cb24-241"><a href="#cb24-241" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-242"><a href="#cb24-242" aria-hidden="true" tabindex="-1"></a><span class="in">// Access fields with dot notation</span></span>
+<span id="cb24-243"><a href="#cb24-243" aria-hidden="true" tabindex="-1"></a><span class="in">vec2 centroid = (tri.v0 + tri.v1 + tri.v2) / 3.0;</span></span>
+<span id="cb24-244"><a href="#cb24-244" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-245"><a href="#cb24-245" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-246"><a href="#cb24-246" aria-hidden="true" tabindex="-1"></a><span class="fu">### Why Structs?</span></span>
+<span id="cb24-247"><a href="#cb24-247" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-248"><a href="#cb24-248" aria-hidden="true" tabindex="-1"></a>For geometric transformations (reflections, rotations), we'll need to pass around geometric data. Structs make the code cleaner and more mathematical. For example, we can write:</span>
+<span id="cb24-249"><a href="#cb24-249" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-250"><a href="#cb24-250" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb24-251"><a href="#cb24-251" aria-hidden="true" tabindex="-1"></a><span class="in">vec2 reflect(vec2 p, Triangle tri) {</span></span>
+<span id="cb24-252"><a href="#cb24-252" aria-hidden="true" tabindex="-1"></a><span class="in">    // Reflect point p across an edge of tri</span></span>
+<span id="cb24-253"><a href="#cb24-253" aria-hidden="true" tabindex="-1"></a><span class="in">    // [Implementation details]</span></span>
+<span id="cb24-254"><a href="#cb24-254" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb24-255"><a href="#cb24-255" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-256"><a href="#cb24-256" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-257"><a href="#cb24-257" aria-hidden="true" tabindex="-1"></a>This is more readable than passing six individual float parameters for the triangle vertices.</span>
+<span id="cb24-258"><a href="#cb24-258" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-259"><a href="#cb24-259" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb24-260"><a href="#cb24-260" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-261"><a href="#cb24-261" aria-hidden="true" tabindex="-1"></a><span class="fu">## Euclidean Triangle Tiling</span></span>
+<span id="cb24-262"><a href="#cb24-262" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-263"><a href="#cb24-263" aria-hidden="true" tabindex="-1"></a><span class="fu">### The Fundamental Domain</span></span>
+<span id="cb24-264"><a href="#cb24-264" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-265"><a href="#cb24-265" aria-hidden="true" tabindex="-1"></a>An equilateral triangle tiles the Euclidean plane. Given an equilateral triangle, we can:</span>
+<span id="cb24-266"><a href="#cb24-266" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Reflect across its three edges</span>
+<span id="cb24-267"><a href="#cb24-267" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Repeat this process on the resulting triangles</span>
+<span id="cb24-268"><a href="#cb24-268" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Fill the entire plane with copies of the original triangle</span>
+<span id="cb24-269"><a href="#cb24-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-270"><a href="#cb24-270" aria-hidden="true" tabindex="-1"></a><span class="fu">### Setting Up the Triangle</span></span>
+<span id="cb24-271"><a href="#cb24-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-272"><a href="#cb24-272" aria-hidden="true" tabindex="-1"></a>Let's work with an equilateral triangle with vertices at:</span>
+<span id="cb24-273"><a href="#cb24-273" aria-hidden="true" tabindex="-1"></a>$$v_0 = (0, 1), \quad v_1 = (-\frac{\sqrt{3}}{2}, -\frac{1}{2}), \quad v_2 = (\frac{\sqrt{3}}{2}, -\frac{1}{2})$$</span>
+<span id="cb24-274"><a href="#cb24-274" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-275"><a href="#cb24-275" aria-hidden="true" tabindex="-1"></a>This triangle has side length $\sqrt{3}$ and is centered at the origin.</span>
+<span id="cb24-276"><a href="#cb24-276" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-277"><a href="#cb24-277" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb24-278"><a href="#cb24-278" aria-hidden="true" tabindex="-1"></a><span class="in">// Define triangle vertices</span></span>
+<span id="cb24-279"><a href="#cb24-279" aria-hidden="true" tabindex="-1"></a><span class="in">vec2 v0 = vec2(0.0, 1.0);</span></span>
+<span id="cb24-280"><a href="#cb24-280" aria-hidden="true" tabindex="-1"></a><span class="in">vec2 v1 = vec2(-0.866, -0.5);  // -sqrt(3)/2 ≈ -0.866</span></span>
+<span id="cb24-281"><a href="#cb24-281" aria-hidden="true" tabindex="-1"></a><span class="in">vec2 v2 = vec2(0.866, -0.5);</span></span>
+<span id="cb24-282"><a href="#cb24-282" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-283"><a href="#cb24-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-284"><a href="#cb24-284" aria-hidden="true" tabindex="-1"></a><span class="fu">### Reflection Across a Line</span></span>
+<span id="cb24-285"><a href="#cb24-285" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-286"><a href="#cb24-286" aria-hidden="true" tabindex="-1"></a>To reflect a point $p$ across a line through the origin with unit normal $\mathbf{n}$, we use:</span>
+<span id="cb24-287"><a href="#cb24-287" aria-hidden="true" tabindex="-1"></a>$$p' = p - 2(\mathbf{n} \cdot p)\mathbf{n}$$</span>
+<span id="cb24-288"><a href="#cb24-288" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-289"><a href="#cb24-289" aria-hidden="true" tabindex="-1"></a>For a line through two points (an edge of our triangle), we need to:</span>
+<span id="cb24-290"><a href="#cb24-290" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Compute the perpendicular direction (normal to the edge)</span>
+<span id="cb24-291"><a href="#cb24-291" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Determine which side of the line we're on</span>
+<span id="cb24-292"><a href="#cb24-292" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Reflect if necessary</span>
+<span id="cb24-293"><a href="#cb24-293" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-294"><a href="#cb24-294" aria-hidden="true" tabindex="-1"></a>**Placeholder for specific implementation:** The exact formulas depend on how we set up our edges. Here's the structure:</span>
+<span id="cb24-295"><a href="#cb24-295" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-296"><a href="#cb24-296" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb24-297"><a href="#cb24-297" aria-hidden="true" tabindex="-1"></a><span class="in">// Reflect across edge v0-v1</span></span>
+<span id="cb24-298"><a href="#cb24-298" aria-hidden="true" tabindex="-1"></a><span class="in">vec2 edge = v1 - v0;</span></span>
+<span id="cb24-299"><a href="#cb24-299" aria-hidden="true" tabindex="-1"></a><span class="in">vec2 normal = normalize(vec2(-edge.y, edge.x));  // Perpendicular to edge</span></span>
+<span id="cb24-300"><a href="#cb24-300" aria-hidden="true" tabindex="-1"></a><span class="in">float dist = dot(p - v0, normal);  // Signed distance to line</span></span>
+<span id="cb24-301"><a href="#cb24-301" aria-hidden="true" tabindex="-1"></a><span class="in">if(dist &lt; 0.0) {</span></span>
+<span id="cb24-302"><a href="#cb24-302" aria-hidden="true" tabindex="-1"></a><span class="in">    p = p - 2.0 * dist * normal;  // Reflect if on wrong side</span></span>
+<span id="cb24-303"><a href="#cb24-303" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb24-304"><a href="#cb24-304" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-305"><a href="#cb24-305" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-306"><a href="#cb24-306" aria-hidden="true" tabindex="-1"></a><span class="fu">### Iterative Folding</span></span>
+<span id="cb24-307"><a href="#cb24-307" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-308"><a href="#cb24-308" aria-hidden="true" tabindex="-1"></a>The key insight: we repeatedly reflect $p$ across the three edges of the triangle until it lands inside the fundamental domain.</span>
+<span id="cb24-309"><a href="#cb24-309" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-310"><a href="#cb24-310" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb24-311"><a href="#cb24-311" aria-hidden="true" tabindex="-1"></a><span class="in">vec2 foldToTriangle(vec2 p, int iterations) {</span></span>
+<span id="cb24-312"><a href="#cb24-312" aria-hidden="true" tabindex="-1"></a><span class="in">    // Define the three edges and their normals</span></span>
+<span id="cb24-313"><a href="#cb24-313" aria-hidden="true" tabindex="-1"></a><span class="in">    // [Edge definitions here]</span></span>
+<span id="cb24-314"><a href="#cb24-314" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb24-315"><a href="#cb24-315" aria-hidden="true" tabindex="-1"></a><span class="in">    for(int i = 0; i &lt; iterations; i++) {</span></span>
+<span id="cb24-316"><a href="#cb24-316" aria-hidden="true" tabindex="-1"></a><span class="in">        // Reflect across each edge if necessary</span></span>
+<span id="cb24-317"><a href="#cb24-317" aria-hidden="true" tabindex="-1"></a><span class="in">        // [Reflection code for edge 0]</span></span>
+<span id="cb24-318"><a href="#cb24-318" aria-hidden="true" tabindex="-1"></a><span class="in">        // [Reflection code for edge 1]</span></span>
+<span id="cb24-319"><a href="#cb24-319" aria-hidden="true" tabindex="-1"></a><span class="in">        // [Reflection code for edge 2]</span></span>
+<span id="cb24-320"><a href="#cb24-320" aria-hidden="true" tabindex="-1"></a><span class="in">    }</span></span>
+<span id="cb24-321"><a href="#cb24-321" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb24-322"><a href="#cb24-322" aria-hidden="true" tabindex="-1"></a><span class="in">    return p;</span></span>
+<span id="cb24-323"><a href="#cb24-323" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb24-324"><a href="#cb24-324" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-325"><a href="#cb24-325" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-326"><a href="#cb24-326" aria-hidden="true" tabindex="-1"></a>After folding, all points in the plane map to the interior of our triangle. We can then color based on:</span>
+<span id="cb24-327"><a href="#cb24-327" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The final position within the triangle</span>
+<span id="cb24-328"><a href="#cb24-328" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The number of reflections needed</span>
+<span id="cb24-329"><a href="#cb24-329" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Which edge was crossed most recently</span>
+<span id="cb24-330"><a href="#cb24-330" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-331"><a href="#cb24-331" aria-hidden="true" tabindex="-1"></a><span class="fu">### Visualization</span></span>
+<span id="cb24-332"><a href="#cb24-332" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-333"><a href="#cb24-333" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb24-334"><a href="#cb24-334" aria-hidden="true" tabindex="-1"></a><span class="in">void mainImage(out vec4 fragColor, in vec2 fragCoord)</span></span>
+<span id="cb24-335"><a href="#cb24-335" aria-hidden="true" tabindex="-1"></a><span class="in">{</span></span>
+<span id="cb24-336"><a href="#cb24-336" aria-hidden="true" tabindex="-1"></a><span class="in">    // Coordinate setup</span></span>
+<span id="cb24-337"><a href="#cb24-337" aria-hidden="true" tabindex="-1"></a><span class="in">    vec2 p = [coordinate setup as usual];</span></span>
+<span id="cb24-338"><a href="#cb24-338" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb24-339"><a href="#cb24-339" aria-hidden="true" tabindex="-1"></a><span class="in">    // Fold to fundamental domain</span></span>
+<span id="cb24-340"><a href="#cb24-340" aria-hidden="true" tabindex="-1"></a><span class="in">    vec2 p_folded = foldToTriangle(p, 10);</span></span>
+<span id="cb24-341"><a href="#cb24-341" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb24-342"><a href="#cb24-342" aria-hidden="true" tabindex="-1"></a><span class="in">    // Color based on position in triangle</span></span>
+<span id="cb24-343"><a href="#cb24-343" aria-hidden="true" tabindex="-1"></a><span class="in">    // Could use barycentric coordinates, distance to edges, etc.</span></span>
+<span id="cb24-344"><a href="#cb24-344" aria-hidden="true" tabindex="-1"></a><span class="in">    vec3 color = vec3(p_folded * 0.5 + 0.5, 0.5);</span></span>
+<span id="cb24-345"><a href="#cb24-345" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb24-346"><a href="#cb24-346" aria-hidden="true" tabindex="-1"></a><span class="in">    fragColor = vec4(color, 1.0);</span></span>
+<span id="cb24-347"><a href="#cb24-347" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb24-348"><a href="#cb24-348" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-349"><a href="#cb24-349" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-350"><a href="#cb24-350" aria-hidden="true" tabindex="-1"></a>**Note:** The exact implementation requires careful handling of the geometry. The key mathematical ideas are:</span>
+<span id="cb24-351"><a href="#cb24-351" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Reflection formula: $p' = p - 2(p \cdot n)n$ for a line with normal $n$ through origin</span>
+<span id="cb24-352"><a href="#cb24-352" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Iterative folding brings any point into the fundamental domain</span>
+<span id="cb24-353"><a href="#cb24-353" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Track which reflections occur for interesting coloring</span>
+<span id="cb24-354"><a href="#cb24-354" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-355"><a href="#cb24-355" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb24-356"><a href="#cb24-356" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-357"><a href="#cb24-357" aria-hidden="true" tabindex="-1"></a><span class="fu">## Sierpinski Triangle via Folding</span></span>
+<span id="cb24-358"><a href="#cb24-358" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-359"><a href="#cb24-359" aria-hidden="true" tabindex="-1"></a><span class="fu">### The Concept</span></span>
+<span id="cb24-360"><a href="#cb24-360" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-361"><a href="#cb24-361" aria-hidden="true" tabindex="-1"></a>The Sierpinski triangle is a fractal that can be generated by:</span>
+<span id="cb24-362"><a href="#cb24-362" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Starting with an equilateral triangle</span>
+<span id="cb24-363"><a href="#cb24-363" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Removing the middle triangle (connecting midpoints)</span>
+<span id="cb24-364"><a href="#cb24-364" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Repeating on each remaining sub-triangle</span>
+<span id="cb24-365"><a href="#cb24-365" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-366"><a href="#cb24-366" aria-hidden="true" tabindex="-1"></a>Equivalently, we can generate it by **iterated folding with scaling**.</span>
+<span id="cb24-367"><a href="#cb24-367" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-368"><a href="#cb24-368" aria-hidden="true" tabindex="-1"></a><span class="fu">### Folding Algorithm</span></span>
+<span id="cb24-369"><a href="#cb24-369" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-370"><a href="#cb24-370" aria-hidden="true" tabindex="-1"></a>At each iteration:</span>
+<span id="cb24-371"><a href="#cb24-371" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Reflect $p$ across the three edges of the triangle (fold it inside)</span>
+<span id="cb24-372"><a href="#cb24-372" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Scale toward the center</span>
+<span id="cb24-373"><a href="#cb24-373" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Repeat</span>
+<span id="cb24-374"><a href="#cb24-374" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-375"><a href="#cb24-375" aria-hidden="true" tabindex="-1"></a>Mathematically, after $n$ iterations, we've zoomed in by a factor of $2^n$ and applied $n$ reflections.</span>
+<span id="cb24-376"><a href="#cb24-376" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-377"><a href="#cb24-377" aria-hidden="true" tabindex="-1"></a><span class="fu">### Implementation Sketch</span></span>
+<span id="cb24-378"><a href="#cb24-378" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-379"><a href="#cb24-379" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb24-380"><a href="#cb24-380" aria-hidden="true" tabindex="-1"></a><span class="in">vec2 sierpinskiFold(vec2 p, int iterations) {</span></span>
+<span id="cb24-381"><a href="#cb24-381" aria-hidden="true" tabindex="-1"></a><span class="in">    // Triangle vertices (equilateral)</span></span>
+<span id="cb24-382"><a href="#cb24-382" aria-hidden="true" tabindex="-1"></a><span class="in">    vec2 v0 = vec2(0.0, 1.0);</span></span>
+<span id="cb24-383"><a href="#cb24-383" aria-hidden="true" tabindex="-1"></a><span class="in">    vec2 v1 = vec2(-0.866, -0.5);</span></span>
+<span id="cb24-384"><a href="#cb24-384" aria-hidden="true" tabindex="-1"></a><span class="in">    vec2 v2 = vec2(0.866, -0.5);</span></span>
+<span id="cb24-385"><a href="#cb24-385" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb24-386"><a href="#cb24-386" aria-hidden="true" tabindex="-1"></a><span class="in">    float scale = 1.0;</span></span>
+<span id="cb24-387"><a href="#cb24-387" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb24-388"><a href="#cb24-388" aria-hidden="true" tabindex="-1"></a><span class="in">    for(int i = 0; i &lt; iterations; i++) {</span></span>
+<span id="cb24-389"><a href="#cb24-389" aria-hidden="true" tabindex="-1"></a><span class="in">        // Reflect across each edge (fold into triangle)</span></span>
+<span id="cb24-390"><a href="#cb24-390" aria-hidden="true" tabindex="-1"></a><span class="in">        // [Reflection code similar to triangle tiling]</span></span>
+<span id="cb24-391"><a href="#cb24-391" aria-hidden="true" tabindex="-1"></a><span class="in">        </span></span>
+<span id="cb24-392"><a href="#cb24-392" aria-hidden="true" tabindex="-1"></a><span class="in">        // After folding, scale and translate</span></span>
+<span id="cb24-393"><a href="#cb24-393" aria-hidden="true" tabindex="-1"></a><span class="in">        p = p * 2.0;  // Zoom in by factor of 2</span></span>
+<span id="cb24-394"><a href="#cb24-394" aria-hidden="true" tabindex="-1"></a><span class="in">        scale *= 2.0;</span></span>
+<span id="cb24-395"><a href="#cb24-395" aria-hidden="true" tabindex="-1"></a><span class="in">        </span></span>
+<span id="cb24-396"><a href="#cb24-396" aria-hidden="true" tabindex="-1"></a><span class="in">        // [Additional centering/translation may be needed]</span></span>
+<span id="cb24-397"><a href="#cb24-397" aria-hidden="true" tabindex="-1"></a><span class="in">    }</span></span>
+<span id="cb24-398"><a href="#cb24-398" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb24-399"><a href="#cb24-399" aria-hidden="true" tabindex="-1"></a><span class="in">    return p;</span></span>
+<span id="cb24-400"><a href="#cb24-400" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb24-401"><a href="#cb24-401" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-402"><a href="#cb24-402" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-403"><a href="#cb24-403" aria-hidden="true" tabindex="-1"></a><span class="fu">### Coloring by Iteration Depth</span></span>
+<span id="cb24-404"><a href="#cb24-404" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-405"><a href="#cb24-405" aria-hidden="true" tabindex="-1"></a>We can track how many times we hit certain conditions during folding:</span>
+<span id="cb24-406"><a href="#cb24-406" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-407"><a href="#cb24-407" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb24-408"><a href="#cb24-408" aria-hidden="true" tabindex="-1"></a><span class="in">int orbit = 0;  // Track some property during iteration</span></span>
+<span id="cb24-409"><a href="#cb24-409" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-410"><a href="#cb24-410" aria-hidden="true" tabindex="-1"></a><span class="in">for(int i = 0; i &lt; max_iter; i++) {</span></span>
+<span id="cb24-411"><a href="#cb24-411" aria-hidden="true" tabindex="-1"></a><span class="in">    // Folding operations</span></span>
+<span id="cb24-412"><a href="#cb24-412" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb24-413"><a href="#cb24-413" aria-hidden="true" tabindex="-1"></a><span class="in">    // Track orbit behavior</span></span>
+<span id="cb24-414"><a href="#cb24-414" aria-hidden="true" tabindex="-1"></a><span class="in">    if([some condition]) orbit++;</span></span>
+<span id="cb24-415"><a href="#cb24-415" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb24-416"><a href="#cb24-416" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-417"><a href="#cb24-417" aria-hidden="true" tabindex="-1"></a><span class="in">// Color based on orbit count</span></span>
+<span id="cb24-418"><a href="#cb24-418" aria-hidden="true" tabindex="-1"></a><span class="in">float t = float(orbit) / float(max_iter);</span></span>
+<span id="cb24-419"><a href="#cb24-419" aria-hidden="true" tabindex="-1"></a><span class="in">vec3 color = palette(t);</span></span>
+<span id="cb24-420"><a href="#cb24-420" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-421"><a href="#cb24-421" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-422"><a href="#cb24-422" aria-hidden="true" tabindex="-1"></a>The specific conditions to track depend on the geometric setup, but typically we color based on:</span>
+<span id="cb24-423"><a href="#cb24-423" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Which edge we reflected across most recently</span>
+<span id="cb24-424"><a href="#cb24-424" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>How many reflections were needed</span>
+<span id="cb24-425"><a href="#cb24-425" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Distance from the center after folding</span>
+<span id="cb24-426"><a href="#cb24-426" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-427"><a href="#cb24-427" aria-hidden="true" tabindex="-1"></a><span class="fu">### Visualization</span></span>
+<span id="cb24-428"><a href="#cb24-428" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-429"><a href="#cb24-429" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb24-430"><a href="#cb24-430" aria-hidden="true" tabindex="-1"></a><span class="in">void mainImage(out vec4 fragColor, in vec2 fragCoord)</span></span>
+<span id="cb24-431"><a href="#cb24-431" aria-hidden="true" tabindex="-1"></a><span class="in">{</span></span>
+<span id="cb24-432"><a href="#cb24-432" aria-hidden="true" tabindex="-1"></a><span class="in">    vec2 p = [coordinate setup];</span></span>
+<span id="cb24-433"><a href="#cb24-433" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb24-434"><a href="#cb24-434" aria-hidden="true" tabindex="-1"></a><span class="in">    // Apply Sierpinski folding</span></span>
+<span id="cb24-435"><a href="#cb24-435" aria-hidden="true" tabindex="-1"></a><span class="in">    vec2 p_folded = sierpinskiFold(p, 8);</span></span>
+<span id="cb24-436"><a href="#cb24-436" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb24-437"><a href="#cb24-437" aria-hidden="true" tabindex="-1"></a><span class="in">    // Color based on the folded position</span></span>
+<span id="cb24-438"><a href="#cb24-438" aria-hidden="true" tabindex="-1"></a><span class="in">    float d = length(p_folded);</span></span>
+<span id="cb24-439"><a href="#cb24-439" aria-hidden="true" tabindex="-1"></a><span class="in">    vec3 color = d &lt; 0.1 ? vec3(1.0) : vec3(0.0);</span></span>
+<span id="cb24-440"><a href="#cb24-440" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb24-441"><a href="#cb24-441" aria-hidden="true" tabindex="-1"></a><span class="in">    // OR: color based on iteration behavior</span></span>
+<span id="cb24-442"><a href="#cb24-442" aria-hidden="true" tabindex="-1"></a><span class="in">    // [More sophisticated coloring]</span></span>
+<span id="cb24-443"><a href="#cb24-443" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
+<span id="cb24-444"><a href="#cb24-444" aria-hidden="true" tabindex="-1"></a><span class="in">    fragColor = vec4(color, 1.0);</span></span>
+<span id="cb24-445"><a href="#cb24-445" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb24-446"><a href="#cb24-446" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-447"><a href="#cb24-447" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-448"><a href="#cb24-448" aria-hidden="true" tabindex="-1"></a>The Sierpinski triangle should emerge as a self-similar fractal pattern!</span>
+<span id="cb24-449"><a href="#cb24-449" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-450"><a href="#cb24-450" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb24-451"><a href="#cb24-451" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-452"><a href="#cb24-452" aria-hidden="true" tabindex="-1"></a><span class="fu">## Summary</span></span>
+<span id="cb24-453"><a href="#cb24-453" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-454"><a href="#cb24-454" aria-hidden="true" tabindex="-1"></a>Today we covered:</span>
+<span id="cb24-455"><a href="#cb24-455" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-456"><a href="#cb24-456" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Complex arithmetic in GLSL**: Representing complex numbers as <span class="in">`vec2`</span> and implementing multiplication</span>
+<span id="cb24-457"><a href="#cb24-457" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Mandelbrot set**: Iterating $z_{n+1} = z_n^2 + c$ with $z_0 = 0$, coloring by escape time</span>
+<span id="cb24-458"><a href="#cb24-458" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Julia sets**: Fixing $c$ and varying initial point $z_0$, exploring the parameter space</span>
+<span id="cb24-459"><a href="#cb24-459" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**Structs**: Organizing geometric data for cleaner code</span>
+<span id="cb24-460"><a href="#cb24-460" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>**Triangle tiling**: Using reflection to fold the plane into a fundamental domain</span>
+<span id="cb24-461"><a href="#cb24-461" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>**Sierpinski triangle**: Generating fractals through iterated folding and scaling</span>
+<span id="cb24-462"><a href="#cb24-462" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-463"><a href="#cb24-463" aria-hidden="true" tabindex="-1"></a>The key themes:</span>
+<span id="cb24-464"><a href="#cb24-464" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Simple iterations create complex behavior (chaos and fractals)</span>
+<span id="cb24-465"><a href="#cb24-465" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Geometric transformations (reflections) can tile or generate fractals</span>
+<span id="cb24-466"><a href="#cb24-466" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Tracking iteration behavior gives us rich information for coloring</span>
+<span id="cb24-467"><a href="#cb24-467" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Folding operations create self-similar structures</span>
+<span id="cb24-468"><a href="#cb24-468" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-469"><a href="#cb24-469" aria-hidden="true" tabindex="-1"></a>Tomorrow we'll extend these ideas: more fractals via folding, then hyperbolic geometry where the same techniques create entirely different tilings.</span>
+<span id="cb24-470"><a href="#cb24-470" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-471"><a href="#cb24-471" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb24-472"><a href="#cb24-472" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-473"><a href="#cb24-473" aria-hidden="true" tabindex="-1"></a><span class="fu">## Homework</span></span>
+<span id="cb24-474"><a href="#cb24-474" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-475"><a href="#cb24-475" aria-hidden="true" tabindex="-1"></a><span class="fu">### Required: Interactive Julia Sets</span></span>
+<span id="cb24-476"><a href="#cb24-476" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-477"><a href="#cb24-477" aria-hidden="true" tabindex="-1"></a>Add mouse control to the julia sets: take iMouse and read it out as a complex number, then draw the julia set for that number.</span>
+<span id="cb24-478"><a href="#cb24-478" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-479"><a href="#cb24-479" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-480"><a href="#cb24-480" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-481"><a href="#cb24-481" aria-hidden="true" tabindex="-1"></a><span class="fu">### Required: Circle Inversion</span></span>
+<span id="cb24-482"><a href="#cb24-482" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-483"><a href="#cb24-483" aria-hidden="true" tabindex="-1"></a>Circle inversion is a fundamental transformation in geometry that will be the basis for many interesting visualizations. Your task is to implement it as a general operation on the plane.</span>
+<span id="cb24-484"><a href="#cb24-484" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-485"><a href="#cb24-485" aria-hidden="true" tabindex="-1"></a>**Mathematical Background:**</span>
+<span id="cb24-486"><a href="#cb24-486" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-487"><a href="#cb24-487" aria-hidden="true" tabindex="-1"></a>Inversion with respect to a circle of radius $R$ centered at the origin maps a point $p \neq 0$ to:</span>
+<span id="cb24-488"><a href="#cb24-488" aria-hidden="true" tabindex="-1"></a>$$\text{inv}(p) = R^2 \frac{p}{|p|^2}$$</span>
+<span id="cb24-489"><a href="#cb24-489" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-490"><a href="#cb24-490" aria-hidden="true" tabindex="-1"></a>Geometrically, this maps the inside of the circle to the outside and vice versa, with points on the circle remaining fixed. Key properties:</span>
+<span id="cb24-491"><a href="#cb24-491" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Circles passing through the center become lines (and vice versa)</span>
+<span id="cb24-492"><a href="#cb24-492" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Circles not passing through the center remain circles</span>
+<span id="cb24-493"><a href="#cb24-493" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Angles are preserved (it's a conformal map)</span>
+<span id="cb24-494"><a href="#cb24-494" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-495"><a href="#cb24-495" aria-hidden="true" tabindex="-1"></a>For a circle centered at $c$ with radius $R$, we:</span>
+<span id="cb24-496"><a href="#cb24-496" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Translate to center the circle at origin: $p' = p - c$</span>
+<span id="cb24-497"><a href="#cb24-497" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Apply inversion: $p'' = R^2 \frac{p'}{|p'|^2}$</span>
+<span id="cb24-498"><a href="#cb24-498" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Translate back: $\text{result} = p'' + c$</span>
+<span id="cb24-499"><a href="#cb24-499" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-500"><a href="#cb24-500" aria-hidden="true" tabindex="-1"></a>**Implementation Tasks:**</span>
+<span id="cb24-501"><a href="#cb24-501" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-502"><a href="#cb24-502" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Basic inversion centered at origin:**</span>
+<span id="cb24-503"><a href="#cb24-503" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb24-504"><a href="#cb24-504" aria-hidden="true" tabindex="-1"></a><span class="in">vec2 invert(vec2 p, float R) {</span></span>
+<span id="cb24-505"><a href="#cb24-505" aria-hidden="true" tabindex="-1"></a><span class="in">    float r2 = dot(p, p);</span></span>
+<span id="cb24-506"><a href="#cb24-506" aria-hidden="true" tabindex="-1"></a><span class="in">    return R * R * p / r2;</span></span>
+<span id="cb24-507"><a href="#cb24-507" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb24-508"><a href="#cb24-508" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-509"><a href="#cb24-509" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-510"><a href="#cb24-510" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Inversion centered at arbitrary point:**</span>
+<span id="cb24-511"><a href="#cb24-511" aria-hidden="true" tabindex="-1"></a><span class="in">```glsl</span></span>
+<span id="cb24-512"><a href="#cb24-512" aria-hidden="true" tabindex="-1"></a><span class="in">vec2 invertCircle(vec2 p, vec2 center, float radius) {</span></span>
+<span id="cb24-513"><a href="#cb24-513" aria-hidden="true" tabindex="-1"></a><span class="in">    // Translate, invert, translate back</span></span>
+<span id="cb24-514"><a href="#cb24-514" aria-hidden="true" tabindex="-1"></a><span class="in">    // [Implement this]</span></span>
+<span id="cb24-515"><a href="#cb24-515" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb24-516"><a href="#cb24-516" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-517"><a href="#cb24-517" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-518"><a href="#cb24-518" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Visualization:** Create a shader that applies circle inversion to a pattern. Suggestions:</span>
+<span id="cb24-519"><a href="#cb24-519" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>Start with a grid and show its image under inversion</span>
+<span id="cb24-520"><a href="#cb24-520" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>Draw several circles and show how they transform</span>
+<span id="cb24-521"><a href="#cb24-521" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>Apply inversion to implicit curves from Day 1</span>
+<span id="cb24-522"><a href="#cb24-522" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>Make the inversion center follow the mouse position using <span class="in">`iMouse.xy`</span></span>
+<span id="cb24-523"><a href="#cb24-523" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-524"><a href="#cb24-524" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**Demonstrate properties:** Show that:</span>
+<span id="cb24-525"><a href="#cb24-525" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>A line through the inversion center maps to itself</span>
+<span id="cb24-526"><a href="#cb24-526" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>A line not through the center maps to a circle through the center</span>
+<span id="cb24-527"><a href="#cb24-527" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>A circle through the center maps to a line</span>
+<span id="cb24-528"><a href="#cb24-528" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-529"><a href="#cb24-529" aria-hidden="true" tabindex="-1"></a>**Expected Output:** A shader that clearly demonstrates circle inversion operating on the plane, with visual evidence of its geometric properties.</span>
+<span id="cb24-530"><a href="#cb24-530" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-531"><a href="#cb24-531" aria-hidden="true" tabindex="-1"></a><span class="fu">### Optional #1: Apollonian Gasket</span></span>
+<span id="cb24-532"><a href="#cb24-532" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-533"><a href="#cb24-533" aria-hidden="true" tabindex="-1"></a>Now that you've implemented circle inversion, use it to create the beautiful Apollonian gasket fractal.</span>
+<span id="cb24-534"><a href="#cb24-534" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-535"><a href="#cb24-535" aria-hidden="true" tabindex="-1"></a>**The Construction:**</span>
+<span id="cb24-536"><a href="#cb24-536" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-537"><a href="#cb24-537" aria-hidden="true" tabindex="-1"></a>Start with three mutually tangent circles. The Apollonian gasket is generated by:</span>
+<span id="cb24-538"><a href="#cb24-538" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Finding the fourth circle tangent to all three (Apollonius's problem—there are generally two solutions)</span>
+<span id="cb24-539"><a href="#cb24-539" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Recursively filling gaps with new tangent circles</span>
+<span id="cb24-540"><a href="#cb24-540" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Continuing indefinitely</span>
+<span id="cb24-541"><a href="#cb24-541" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-542"><a href="#cb24-542" aria-hidden="true" tabindex="-1"></a>**Simplified Approach via Inversion:**</span>
+<span id="cb24-543"><a href="#cb24-543" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-544"><a href="#cb24-544" aria-hidden="true" tabindex="-1"></a>Rather than solving for tangent circles explicitly, we can use inversions:</span>
+<span id="cb24-545"><a href="#cb24-545" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Start with a configuration of circles (e.g., three circles tangent at a point)</span>
+<span id="cb24-546"><a href="#cb24-546" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Define inversions with respect to each circle</span>
+<span id="cb24-547"><a href="#cb24-547" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Apply these inversions repeatedly to generate the fractal pattern</span>
+<span id="cb24-548"><a href="#cb24-548" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Color based on iteration count or which circle was most recently inverted through</span>
+<span id="cb24-549"><a href="#cb24-549" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-550"><a href="#cb24-550" aria-hidden="true" tabindex="-1"></a>**Challenge:** Setting up the initial configuration and inversion circles requires working out the tangency conditions. One standard setup:</span>
+<span id="cb24-551"><a href="#cb24-551" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Three circles of radius 1 centered at the vertices of an equilateral triangle of side length 2</span>
+<span id="cb24-552"><a href="#cb24-552" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>These are mutually tangent</span>
+<span id="cb24-553"><a href="#cb24-553" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-554"><a href="#cb24-554" aria-hidden="true" tabindex="-1"></a>**Visualization:** The resulting fractal should show nested circles filling the gaps in a self-similar pattern, creating a beautiful packing.</span>
+<span id="cb24-555"><a href="#cb24-555" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-556"><a href="#cb24-556" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-557"><a href="#cb24-557" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-558"><a href="#cb24-558" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Optional: Grid of Julia Sets!</span></span>
+<span id="cb24-559"><a href="#cb24-559" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-560"><a href="#cb24-560" aria-hidden="true" tabindex="-1"></a>Divide the plane into a small rectangular grid, inside each grid draw the julia set for the complex number at its center.</span>
+<span id="cb24-561"><a href="#cb24-561" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-562"><a href="#cb24-562" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-563"><a href="#cb24-563" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb24-564"><a href="#cb24-564" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-565"><a href="#cb24-565" aria-hidden="true" tabindex="-1"></a><span class="fu">## Looking Ahead</span></span>
+<span id="cb24-566"><a href="#cb24-566" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-567"><a href="#cb24-567" aria-hidden="true" tabindex="-1"></a>Tomorrow we'll continue with **fractals and hyperbolic geometry**. We'll start by extending our folding techniques to create the Sierpinski carpet, then dive into hyperbolic space with multiple models (Poincaré disk, upper half-plane, band model) and create beautiful tilings in non-Euclidean geometry.</span>
+<span id="cb24-568"><a href="#cb24-568" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-569"><a href="#cb24-569" aria-hidden="true" tabindex="-1"></a>Make sure you're comfortable with:</span>
+<span id="cb24-570"><a href="#cb24-570" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Complex number iteration and the Mandelbrot/Julia algorithms</span>
+<span id="cb24-571"><a href="#cb24-571" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Geometric folding operations (reflection via <span class="in">`abs()`</span>, scaling)</span>
+<span id="cb24-572"><a href="#cb24-572" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Using iteration count for coloring</span>
+<span id="cb24-573"><a href="#cb24-573" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Circle inversion (from today's homework—this will be crucial tomorrow!)</span>
+<span id="cb24-574"><a href="#cb24-574" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-575"><a href="#cb24-575" aria-hidden="true" tabindex="-1"></a>The circle inversion you implement today will be the foundation for tomorrow's hyperbolic tilings, so take your time understanding how it works geometrically.</span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 
 
 
 
-<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions"><ul><li><a href="https://github.com/yourusername/shader-course/edit/main/day2.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/yourusername/shader-course/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>
+</body></html>

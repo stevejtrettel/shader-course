@@ -1,1 +1,504 @@
-# Day 3
+# Day 3: Fractals and Hyperbolic Geometry
+
+## Overview
+
+Today we complete our exploration of 2D fractals and then venture into hyperbolic space. We'll extend yesterday's triangle folding to create the Sierpinski carpet, then implement hyperbolic tilings in the upper half-plane model. Finally, we'll transform our work into the Poincaré disk model to see the same tiling from a different perspective.
+
+By the end of today, you'll have working implementations of hyperbolic geometry computations and be able to create beautiful tilings in non-Euclidean space.
+
+---
+
+## Sierpinski Carpet via Box Folding
+
+### From Triangle to Square
+
+Yesterday we created the Sierpinski triangle by folding across the edges of an equilateral triangle. The Sierpinski carpet applies the same principle to a square, using axis-aligned reflections.
+
+### The Algorithm
+
+Starting with a square domain (say $[-1, 1]^2$), we:
+1. Fold using `abs()` to create 4-fold symmetry (map all quadrants to first quadrant)
+2. Scale by factor of 3
+3. Remove the middle square
+4. Repeat
+
+After $n$ iterations, we've subdivided the square into a $3^n \times 3^n$ grid and removed all middle squares at every scale.
+
+### Implementation
+
+```glsl
+vec2 sierpinskiCarpetFold(vec2 p, int iterations, out int removed) {
+    removed = 0;
+    
+    for(int i = 0; i < iterations; i++) {
+        // Fold to first quadrant
+        p = abs(p);
+        
+        // Scale by 3, shift to center
+        p = p * 3.0 - vec2(1.0);
+        
+        // Check if we're in the middle square (to be removed)
+        // After scaling and shifting, the middle square is roughly centered
+        if(abs(p.x) < 1.0 && abs(p.y) < 1.0) {
+            removed = 1;
+        }
+    }
+    
+    return p;
+}
+```
+
+**Note:** The exact check for "removed" regions depends on the coordinate setup. After the transformation `p * 3.0 - 1.0`, we're centering each sub-square. The middle third is the region we're removing.
+
+### Visualization
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 p = [coordinate setup];
+    
+    int removed;
+    vec2 p_folded = sierpinskiCarpetFold(p, 6, removed);
+    
+    vec3 color = removed == 1 ? vec3(0.0) : vec3(1.0);
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+The characteristic Sierpinski carpet should emerge: a square with self-similar removed regions at all scales.
+
+---
+
+## Hyperbolic Geometry: Models and Metrics
+
+### The Upper Half-Plane Model
+
+The upper half-plane model $\mathbb{H}^2$ consists of complex numbers with positive imaginary part:
+$$\mathbb{H}^2 = \{z \in \mathbb{C} : \text{Im}(z) > 0\}$$
+
+The hyperbolic metric is:
+$$ds^2 = \frac{dx^2 + dy^2}{y^2} = \frac{|dz|^2}{(\text{Im}(z))^2}$$
+
+This metric "blows up" as we approach the real axis (the boundary at infinity), making the geometry shrink near $y = 0$.
+
+### Geodesics in the Upper Half-Plane
+
+Geodesics (hyperbolic "straight lines") in $\mathbb{H}^2$ are:
+1. Vertical lines $\{x = c\}$ for constant $c$
+2. Semicircles centered on the real axis, perpendicular to it
+
+For a semicircle of radius $R$ centered at $(c, 0)$, the equation is:
+$$(x - c)^2 + y^2 = R^2, \quad y > 0$$
+
+### Hyperbolic Distance
+
+The distance between two points $z, w \in \mathbb{H}^2$ is:
+$$d(z, w) = \text{arcosh}\left(1 + \frac{|z - w|^2}{2 \cdot \text{Im}(z) \cdot \text{Im}(w)}\right)$$
+
+In GLSL:
+```glsl
+float hyperbolicDistance(vec2 z, vec2 w) {
+    float diff2 = dot(z - w, z - w);  // |z - w|²
+    float denom = 2.0 * z.y * w.y;    // 2·Im(z)·Im(w)
+    return acosh(1.0 + diff2 / denom);
+}
+```
+
+**Note:** GLSL may not have `acosh` built-in. Use: `acosh(x) = log(x + sqrt(x*x - 1.0))`.
+
+### The Poincaré Disk Model
+
+The Poincaré disk model consists of the interior of the unit disk:
+$$\mathbb{D}^2 = \{z \in \mathbb{C} : |z| < 1\}$$
+
+The metric is:
+$$ds^2 = \frac{4(dx^2 + dy^2)}{(1 - |z|^2)^2}$$
+
+Geodesics are circular arcs perpendicular to the unit circle (or diameters).
+
+### Converting Between Models
+
+The Cayley transform maps the upper half-plane to the disk:
+$$w = \frac{z - i}{z + i}$$
+
+The inverse is:
+$$z = i\frac{1 + w}{1 - w}$$
+
+In GLSL (using complex arithmetic from Day 2):
+```glsl
+vec2 uhpToDisk(vec2 z) {
+    // w = (z - i) / (z + i)
+    vec2 numerator = z - vec2(0.0, 1.0);      // z - i
+    vec2 denominator = z + vec2(0.0, 1.0);    // z + i
+    return cdiv(numerator, denominator);
+}
+
+vec2 diskToUHP(vec2 w) {
+    // z = i(1 + w) / (1 - w)
+    vec2 numerator = vec2(0.0, 1.0) + w;      // i(1 + w) = cmul(i, 1+w)
+    numerator = vec2(-numerator.y, numerator.x);  // Multiply by i
+    vec2 denominator = vec2(1.0, 0.0) - w;    // 1 - w
+    return cdiv(numerator, denominator);
+}
+```
+
+Where `cdiv` is complex division (you'll need to implement this - see homework or use the formula $\frac{a + bi}{c + di} = \frac{(a + bi)(c - di)}{c^2 + d^2}$).
+
+---
+
+## The (2,3,∞) Triangle
+
+### Why This Triangle?
+
+The $(2, 3, \infty)$ triangle has angles $\pi/2$, $\pi/3$, and $0$ (the "ideal vertex" at infinity). In the upper half-plane, this triangle has particularly nice edges:
+- One edge is the unit semicircle centered at the origin: $x^2 + y^2 = 1$, $y > 0$
+- Two edges are vertical lines at $x = \pm c$ for some constant $c$
+
+For the $(2,3,\infty)$ triangle, with the right angle at the origin and the $\pi/3$ angles at the two vertical edges, we have $c = \sqrt{3}$ (this can be derived from hyperbolic trigonometry, but we'll just use it).
+
+Actually, a cleaner setup: let's use the triangle with:
+- Geodesic from $-1$ to $1$ (unit semicircle centered at origin)
+- Vertical geodesic at $x = 1$ 
+- Vertical geodesic at $x = -1$
+
+This creates a fundamental domain bounded by these three geodesics. The angles where they meet determine the triangle group.
+
+**[Note: Need to work out the exact setup here - which specific triangle gives clean angles? The (2,3,∞) triangle or a different choice like (2,4,∞)? Let me provide the framework and you can adjust the specific parameters.]**
+
+### Checking if a Point is in the Triangle
+
+For our triangle with:
+- Bottom edge: unit semicircle
+- Left edge: vertical line at $x = -1$
+- Right edge: vertical line at $x = 1$
+
+```glsl
+bool inTriangle(vec2 p) {
+    // Above the semicircle: x² + y² > 1
+    bool aboveSemicircle = dot(p, p) > 1.0;
+    
+    // Between vertical lines: -1 < x < 1
+    bool betweenLines = (p.x > -1.0) && (p.x < 1.0);
+    
+    return aboveSemicircle && betweenLines;
+}
+```
+
+### Reflection Across Geodesics
+
+**Reflection across a vertical line $x = c$:**
+$$\text{reflect}(x + iy) = (2c - x) + iy$$
+
+```glsl
+vec2 reflectVertical(vec2 p, float c) {
+    return vec2(2.0 * c - p.x, p.y);
+}
+```
+
+**Reflection across the unit semicircle (circle inversion from yesterday!):**
+Circle inversion with respect to a circle of radius $R$ centered at $(c_x, c_y)$ is:
+$$\text{inv}(p) = c + R^2 \frac{p - c}{|p - c|^2}$$
+
+For our unit circle centered at origin:
+```glsl
+vec2 reflectCircle(vec2 p) {
+    return p / dot(p, p);  // Inversion through unit circle
+}
+```
+
+### Folding into the Fundamental Domain
+
+```glsl
+vec2 foldToTriangle(vec2 p, int maxIter, out int foldCount) {
+    foldCount = 0;
+    
+    for(int i = 0; i < maxIter; i++) {
+        bool folded = false;
+        
+        // Reflect across left vertical line if needed
+        if(p.x < -1.0) {
+            p = reflectVertical(p, -1.0);
+            folded = true;
+        }
+        
+        // Reflect across right vertical line if needed
+        if(p.x > 1.0) {
+            p = reflectVertical(p, 1.0);
+            folded = true;
+        }
+        
+        // Reflect across semicircle if needed
+        if(dot(p, p) < 1.0) {
+            p = reflectCircle(p);
+            folded = true;
+        }
+        
+        if(folded) foldCount++;
+        else break;  // In fundamental domain
+    }
+    
+    return p;
+}
+```
+
+### Visualization: Hyperbolic Tiling
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // Coordinate setup - map to upper half-plane
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = (uv - 0.5) * 4.0;  // Scale to see interesting region
+    uv.x *= iResolution.x / iResolution.y;
+    
+    // Map to upper half-plane (shift up so y > 0)
+    vec2 p = uv + vec2(0.0, 1.5);  // Ensure we're above real axis
+    
+    // Fold to fundamental domain
+    int foldCount;
+    vec2 p_folded = foldToTriangle(p, 20, foldCount);
+    
+    // Color based on fold count
+    float t = float(foldCount) / 10.0;
+    vec3 color = palette(t);  // Use palette function from Day 2
+    
+    // If we're in the fundamental triangle, use different color
+    if(inTriangle(p_folded)) {
+        color = mix(color, vec3(1.0, 1.0, 1.0), 0.3);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+The result should be a beautiful hyperbolic tiling - the plane tessellated by copies of our fundamental triangle!
+
+---
+
+## Visualizing in the Poincaré Disk
+
+Now we'll see the same tiling in a different model. The key insight: we can do all our computations in the upper half-plane, then convert the final coordinates to the disk for display.
+
+### By Precomposition
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // Coordinate setup - map to disk
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = (uv - 0.5) * 2.0;  // Map to [-1, 1]
+    uv.x *= iResolution.x / iResolution.y;
+    
+    // Only render inside unit disk
+    if(length(uv) >= 1.0) {
+        fragColor = vec4(0.0, 0.0, 0.0, 1.0);
+        return;
+    }
+    
+    // Convert disk coordinates to upper half-plane
+    vec2 p = diskToUHP(uv);
+    
+    // Now do all computations in UHP
+    int foldCount;
+    vec2 p_folded = foldToTriangle(p, 20, foldCount);
+    
+    // Color based on fold count
+    float t = float(foldCount) / 10.0;
+    vec3 color = palette(t);
+    
+    if(inTriangle(p_folded)) {
+        color = mix(color, vec3(1.0, 1.0, 1.0), 0.3);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+The tiling now appears in the Poincaré disk - the same mathematical object, but displayed in a different model. Notice how the triangles near the boundary appear compressed (they're the same hyperbolic size, but Euclidean distances shrink near the boundary).
+
+---
+
+## Distance to Geodesics
+
+For homework, you'll want to draw geodesic boundaries. Here's the framework:
+
+### Distance to a Vertical Geodesic
+
+For a vertical line $x = c$, the hyperbolic distance from a point $(x, y)$ to the line is:
+$$d = \text{arcosh}\left(\frac{|x - c|}{\text{some formula involving } y}\right)$$
+
+**[Placeholder: exact formula for distance to vertical geodesic]**
+
+### Distance to a Semicircular Geodesic
+
+For a semicircle of radius $R$ centered at $(c, 0)$, the distance calculation is more involved. One approach:
+1. Find the closest point on the semicircle to $p$
+2. Compute hyperbolic distance between $p$ and that closest point
+
+**[Placeholder: geodesic distance formula or algorithm]**
+
+Alternatively, you can find formulas in hyperbolic geometry references, or derive them from the metric.
+
+---
+
+## Summary
+
+Today we covered:
+
+1. **Sierpinski carpet**: Box folding with axis-aligned symmetry creates 2D fractals
+2. **Hyperbolic geometry models**: Upper half-plane and Poincaré disk, with metrics and geodesics
+3. **Coordinate transformations**: Cayley transform connecting the two models
+4. **Hyperbolic triangle tiling**: Using reflections (including circle inversion) to tile hyperbolic space
+5. **Multiple representations**: Same tiling visualized in different models
+
+Key insights:
+- Geometric algorithms transfer to non-Euclidean spaces with the right distance/geodesic formulas
+- Circle inversion (from Day 2) is fundamental to hyperbolic geometry
+- The same mathematical object looks different in different models
+- Folding algorithms work in any geometry with the appropriate reflection operations
+
+---
+
+## Homework
+
+### Required: Sierpinski Carpet
+
+Implement the Sierpinski carpet fractal using box folding.
+
+**Task:**
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 p = [coordinate setup];
+    
+    int iterations = 6;
+    for(int i = 0; i < iterations; i++) {
+        // Fold to first quadrant
+        p = abs(p);
+        
+        // Scale by 3 and recenter
+        p = p * 3.0 - vec2(1.0);
+    }
+    
+    // Check if p is in a "removed" region
+    // [Implement this check]
+    
+    // Color accordingly
+}
+```
+
+**Expected output:** The characteristic Sierpinski carpet pattern with removed squares at all scales.
+
+**Experiments:**
+- Different iteration counts (watch detail increase)
+- Color by iteration depth rather than binary in/out
+- Animate the zoom level with `iTime`
+
+### Required: Drawing Geodesics and Hyperbolic Disks
+
+Implement visualization of basic hyperbolic objects to understand the geometry.
+
+**Part 1: Draw several geodesics in the upper half-plane**
+- Vertical lines at various $x$ values (these are easy!)
+- Semicircles with different centers and radii
+- Use a thickness threshold on the implicit equation to draw them
+
+**Part 2: Draw hyperbolic disks (circles in hyperbolic metric)**
+- Pick a point $z_0 \in \mathbb{H}^2$
+- Draw the set $\{z : d_{\text{hyp}}(z, z_0) < R\}$ for some radius $R$
+- These appear as Euclidean circles, but positioned/sized according to hyperbolic metric
+- Draw several disks at different locations
+
+**Part 3: Visualize how geometry changes**
+- Draw a grid of hyperbolic disks of the same hyperbolic radius
+- Observe how they appear smaller (in Euclidean sense) near the boundary
+- This demonstrates the "shrinking" effect of the hyperbolic metric
+
+**Optional enhancement:** Repeat in Poincaré disk model by precomposition.
+
+### Required: Drawing Triangle Edges and Vertices
+
+Enhance your hyperbolic tiling by drawing the triangle boundaries.
+
+**Task:**
+- Compute the hyperbolic distance from each point to the three geodesics forming your triangle boundary
+- If distance is less than some threshold, color the point as an edge
+- Similarly, compute distance to the three vertices and draw them as points
+
+**Implementation hints:**
+```glsl
+// Distance to vertical line x = c
+float distToVertical(vec2 p, float c) {
+    // [Implement using hyperbolic distance formula]
+}
+
+// Distance to semicircle (center, radius)
+float distToSemicircle(vec2 p, float center, float radius) {
+    // [Implement - find closest point on semicircle, compute distance]
+}
+
+// In main shader:
+float d1 = distToVertical(p, -1.0);
+float d2 = distToVertical(p, 1.0);
+float d3 = distToSemicircle(p, 0.0, 1.0);
+
+float edgeThickness = 0.05;
+bool onEdge = (d1 < edgeThickness) || (d2 < edgeThickness) || (d3 < edgeThickness);
+```
+
+**Expected output:** Your tiling with clearly visible triangle boundaries, making the tessellation structure explicit.
+
+### Required: Model Conversion and Möbius Transformation
+
+Work with different representations of hyperbolic space.
+
+**Part 1: Convert your tiling to Poincaré disk**
+- You already have `uhpToDisk()` and `diskToUHP()` functions
+- Create a shader that displays your (2,3,∞) tiling in the disk model
+- Compare the visual appearance to the upper half-plane version
+
+**Part 2: Apply a Möbius transformation**
+- A Möbius transformation has the form $z \mapsto \frac{az + b}{cz + d}$ with $ad - bc = 1$
+- Choose an interesting transformation (or try: $z \mapsto z + 1$ to translate, or $z \mapsto 2z$ to scale)
+- Apply it to your tiling and observe the result
+- **Key insight:** Möbius transformations are isometries of hyperbolic space, so they permute the tiles but preserve the geometry
+
+**Implementation:**
+```glsl
+vec2 mobius(vec2 z, vec2 a, vec2 b, vec2 c, vec2 d) {
+    // w = (az + b) / (cz + d)
+    vec2 num = cadd(cmul(a, z), b);
+    vec2 den = cadd(cmul(c, z), d);
+    return cdiv(num, den);
+}
+
+// In shader, before folding:
+p = mobius(p, vec2(2.0, 0.0), vec2(0.0, 0.0), vec2(0.0, 0.0), vec2(1.0, 0.0));  // Scale by 2
+```
+
+### Optional: Advanced Hyperbolic Explorations
+
+Choose one or more:
+
+1. **Different triangle groups**: Implement (2,4,6), (3,3,3), or the famous (2,3,7) triangle. Each creates a different tiling pattern.
+
+2. **Klein model**: The Klein model is another representation where geodesics are straight lines. Convert via the Cayley transform from Poincaré disk: $w = \frac{2z}{1 + |z|^2}$
+
+3. **Decorated tiles**: Add patterns inside each triangle (like Escher's Circle Limit prints). Use the barycentric coordinates within each fundamental domain.
+
+4. **Conformal mapping art**: Use complex analysis to map the disk to other regions (strip, annulus, etc.) and visualize hyperbolic geometry in these exotic spaces.
+
+---
+
+## Looking Ahead
+
+Tomorrow we move to 3D! We'll learn raymarching and signed distance functions to render implicit surfaces. The geometric intuition from folding and distance computations will carry over, but now in three dimensions with lighting and shading.
+
+Make sure you're comfortable with:
+- Distance computations (Euclidean and hyperbolic)
+- Reflection operations (these generalize to 3D)
+- Iterative algorithms for geometric structures
+
+The 3D rendering techniques we'll learn are the culmination of everything so far: distance fields, iterative marching, geometric transformations, and real-time GPU computation.
+

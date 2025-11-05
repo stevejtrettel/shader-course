@@ -1,11 +1,11 @@
-# Outline
+# Outline {.unnumbered}
 
 
 ## Course Overview
 
 This mini-course introduces shader programming as a tool for mathematical illustration and exploration. Shaders are programs that run in parallel on the GPU, making them exceptionally fast for visualization tasks. We'll learn to write code that "reads like mathematics" using Shadertoy, a beginner-friendly web-based platform that handles all the low-level programming complexities.
 
-**Format:** Five days, each with one hour of lecture and approximately 1.5 hours of required homework, additional hours of optional homework.
+**Format:** Five days, each with one hour of lecture and approximately 1.5 hours of required homework, additional hours of optional homework (for those looking to really develop some of the skills, either during the course or after)
 
 
 **Prerequisites:** Strong foundation in undergraduate mathematics; no prior experience with shaders or GLSL required
@@ -71,7 +71,11 @@ Create a shader that draws a parabola with customizable coefficients:
 - Use `mod()` to tile it across the screen
 - Focus on aesthetic appeal and mathematical structure
 
----
+
+
+
+
+
 
 ## Day 2: Complex Dynamics and Euclidean Geometry
 
@@ -81,6 +85,7 @@ Create a shader that draws a parabola with customizable coefficients:
 - Understand and render the Mandelbrot and Julia sets
 - Create geometric tilings using mathematical transformations
 - Learn to use structs for organizing data
+- Generate fractals through iterated folding operations
 
 ### In-Class Content
 
@@ -90,7 +95,7 @@ Create a shader that draws a parabola with customizable coefficients:
 - Complex addition, conjugation, and magnitude
 
 #### The Mandelbrot Set
-- Mathematical definition: iterating `z → z² + c`
+- Mathematical definition: iterating `z → z² + c` with `z₀ = 0`
 - Escape-time algorithm
 - Coloring schemes based on iteration count
 - Discussing convergence and divergence
@@ -110,74 +115,105 @@ Create a shader that draws a parabola with customizable coefficients:
 - Reflection across edges to create periodic patterns
 - Symmetry groups and transformations
 
-#### Introduction to Folding Fractals
-- The Sierpinski triangle via iterated reflections
+#### Sierpinski Triangle via Folding
+- Generating fractals through iterated reflections
 - Using `abs()` for geometric folding
-- Iteration count and coloring
+- Scaling and iteration
+- Coloring by iteration depth or distance
+
+### Homework
+
+#### Required: Circle Inversion
+- Implement circle inversion as an operation on the plane
+- For a circle of radius `R` centered at origin: `p' = R² * p / |p|²`
+- For a circle centered at `c` with radius `R`: translate, invert, translate back
+- Visualize by applying inversion to a grid or pattern
+- Demonstrate that circles through the inversion center become lines, and vice versa
+
+#### Optional #1: Apollonian Gasket
+- Use your circle inversion implementation
+- Start with three mutually tangent circles
+- Repeatedly invert through each circle
+- Color by iteration count or which circle was inverted through
+- Explore the fractal structure created by nested circles
+
+#### Optional #2: Hyperbolic Triangle Tiling (Preview)
+- Attempt tiling in Poincaré disk or upper half-plane model
+- Use circle inversions for reflections across geodesics
+- Preview of Day 3 content for those who want to get ahead
+
+
+---
+
+## Day 3: Fractals and Hyperbolic Geometry
+
+### Learning Objectives
+
+- Extend folding techniques to box fractals
+- Understand hyperbolic geometry models and their properties
+- Implement computations in the upper half-plane model
+- Create hyperbolic tilings using inversions and Möbius transformations
+- Convert between different models of hyperbolic geometry
+
+### In-Class Content
+
+#### Sierpinski Carpet
+- Box folding in 2D using `abs()` for square symmetry
+- Recursive subdivision and removal pattern
+- Scaling by factor of 3 at each iteration
+- Connection to Sierpinski triangle from Day 2
+- Coloring strategies (iteration depth, distance to removed regions)
+
+#### Introduction to Hyperbolic Geometry
+- Why hyperbolic space? Negative curvature vs. Euclidean geometry
+- Three primary models: Poincaré disk, upper half-plane, and band model
+- How models are related via Möbius transformations
+- Properties: geodesics, distance, angle measurement
+
+#### Computations in the Upper Half-Plane Model
+- Definition: points `{z : Im(z) > 0}`
+- Geodesics: vertical lines and semicircles perpendicular to real axis
+- Distance formula in the upper half-plane
+- Möbius transformations as isometries: `z → (az + b)/(cz + d)` with `ad - bc = 1`
+- Matrix representation of transformations
+
+#### Hyperbolic Triangle Tiling
+- Setting up a hyperbolic triangle (angles sum to < π)
+- Computing geodesics as circular arcs
+- Implementing circle inversion for reflections across geodesics
+- Folding points into fundamental domain
+- Iterating to create the full tiling
+- Coloring by domain or iteration behavior
+
+#### Drawing in Different Models
+- Converting between Poincaré disk and upper half-plane
+- Möbius transformation: `w = i(1-z)/(1+z)` (disk to half-plane)
+- Band model via additional Möbius transformation
+- Visualizing the same tiling in multiple models simultaneously
+
 
 ### Homework
 
 #### Required: Sierpinski Carpet
 - Implement the 2D Sierpinski carpet using box folding
-- Use repeated subdivision and removal pattern
+- Use `abs()` to create 4-fold symmetry
+- Scale by 3 at each iteration, removing middle square
 - Color by iteration depth or distance
+- Experiment with different iteration counts
 
-#### Optional: Choose Your Adventure
-1. **Apollonian Gasket:** Implement circle inversion and nested circles
-2. **Hyperbolic Triangle Tiling:** Port triangle tiling to Poincaré disk or upper half-plane model
+#### Required: Model Conversion and Möbius Transformation
+- Convert your hyperbolic tiling from upper half-plane to Poincaré disk (or vice versa)
+- Apply a Möbius transformation to your tiling (choose your own or use a suggested one)
+- Render both the original and transformed tiling
+- Observe how the transformation affects the visual appearance
 
----
+#### Optional: Advanced Explorations
+1. **Another Triangle Group:** Implement a different hyperbolic triangle group (e.g., (2,3,7), (2,4,6))
+2. **Klein Model:** Convert to Klein model via Cayley transform
+3. **Conformal Art:** Use complex analysis to map to creative domains
+4. **Decorated Tiles:** Create Escher-style decorated tiles
 
-## Day 3: Non-Euclidean Geometry and Fractals
 
-### Learning Objectives
-
-- Understand hyperbolic geometry visualization
-- Implement circle inversions and Möbius transformations
-- Create hyperbolic tilings in the Poincaré disk or upper half-plane
-- Master 2D folding techniques for fractal generation
-
-### In-Class Content
-
-#### Review: Circle Inversions
-- Mathematical definition and properties
-- Implementation in GLSL
-- Geometric intuition
-
-#### Hyperbolic Geometry Primer
-- Poincaré disk or upper half-plane model
-- Geodesics as circular arcs
-- Fundamental domains for triangle groups
-
-#### Hyperbolic Triangle Tiling
-- Folding into fundamental domain via inversions
-- Iterating to create the full tiling
-- Coloring by fundamental domain or iteration
-
-#### 2D Folding Fractals
-- Review Sierpinski triangle folding technique
-- Sierpinski carpet as box folding
-- Generalizing the folding pattern
-- Iteration depth and visual effects
-
-#### Advanced Techniques
-- Combining multiple folding operations
-- Domain coloring and visualization strategies
-- Parameter exploration
-
-### Homework
-
-#### Required: Fractal Variations
-- Experiment with different folding patterns
-- Try varying iteration depths
-- Create your own folding-based fractal
-
-#### Optional: Hyperbolic Variations
-- Implement different hyperbolic tilings (different triangle groups)
-- Explore Escher-style patterns in hyperbolic space
-- Combine hyperbolic tiling with procedural decoration
-
----
 
 ## Day 4: Introduction to 3D Rendering
 
