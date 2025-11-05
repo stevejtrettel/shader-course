@@ -7,7 +7,6 @@ This mini-course introduces shader programming as a tool for mathematical illust
 
 **Format:** Five days, each with one hour of lecture and approximately 1.5 hours of required homework, additional hours of optional homework (for those looking to really develop some of the skills, either during the course or after)
 
-
 **Prerequisites:** Strong foundation in undergraduate mathematics; no prior experience with shaders or GLSL required
 
 ## Day 1: Introduction to Shader Programming
@@ -85,7 +84,6 @@ Create a shader that draws a parabola with customizable coefficients:
 - Understand and render the Mandelbrot and Julia sets
 - Create geometric tilings using mathematical transformations
 - Learn to use structs for organizing data
-- Generate fractals through iterated folding operations
 
 ### In-Class Content
 
@@ -115,11 +113,6 @@ Create a shader that draws a parabola with customizable coefficients:
 - Reflection across edges to create periodic patterns
 - Symmetry groups and transformations
 
-#### Sierpinski Triangle via Folding
-- Generating fractals through iterated reflections
-- Using `abs()` for geometric folding
-- Scaling and iteration
-- Coloring by iteration depth or distance
 
 ### Homework
 
@@ -137,11 +130,6 @@ Create a shader that draws a parabola with customizable coefficients:
 - Color by iteration count or which circle was inverted through
 - Explore the fractal structure created by nested circles
 
-#### Optional #2: Hyperbolic Triangle Tiling (Preview)
-- Attempt tiling in Poincaré disk or upper half-plane model
-- Use circle inversions for reflections across geodesics
-- Preview of Day 3 content for those who want to get ahead
-
 
 ---
 
@@ -157,12 +145,11 @@ Create a shader that draws a parabola with customizable coefficients:
 
 ### In-Class Content
 
-#### Sierpinski Carpet
-- Box folding in 2D using `abs()` for square symmetry
-- Recursive subdivision and removal pattern
-- Scaling by factor of 3 at each iteration
-- Connection to Sierpinski triangle from Day 2
-- Coloring strategies (iteration depth, distance to removed regions)
+#### Review: Sierpinski Triangle via Folding
+- Generating fractals through iterated reflections
+- Using `abs()` for geometric folding
+- Scaling and iteration
+- Coloring by iteration depth or distance
 
 #### Introduction to Hyperbolic Geometry
 - Why hyperbolic space? Negative curvature vs. Euclidean geometry
@@ -279,7 +266,7 @@ Create a shader that draws a parabola with customizable coefficients:
 
 ## Day 5: Choose Your Adventure
 
-The final day will be determined based on pacing, student interest, and energy levels. Two complete lectures are prepared:
+The final day will be determined based on pacing, student interest, and energy levels. Most likely we will actually use the day to slow down as previous topics or questions took more time.  If we do have the available time for new content, then there will be two choices for the class:
 
 ### Option A: Advanced Raymarching Techniques
 
@@ -315,14 +302,14 @@ The final day will be determined based on pacing, student interest, and energy l
 - Infinite repeated patterns via domain operations
 - Combining techniques for rich scenes
 
-#### Homework
+#### Projects (not homework, as class is over!)
 
-##### Required: Creative Scene Building
+##### Creative Scene Building
 - Build a complex scene using domain operations and boolean combinations
 - Experiment with different SDFs and transformations
 - Focus on mathematical or aesthetic interest
 
-##### Optional: Sierpinski Tetrahedron
+##### Sierpinski Tetrahedron
 - Implement 3D Sierpinski tetrahedron via folding
 - Reflect across four planes (non-axis-aligned)
 - Connection to Day 2's triangle folding in higher dimension
@@ -367,13 +354,13 @@ The final day will be determined based on pacing, student interest, and energy l
 - Providing a stable `dt` value
 - Warning: don't make timestep too large!
 
-#### Homework
+#### Projects
 
-##### Required: Interactive Heat Equation or Reaction-Diffusion
+#####  Interactive Heat Equation or Reaction-Diffusion
 1. **Interactive Heat Source:** Add heat at mouse position, watch it diffuse
 2. **Gray-Scott Reaction-Diffusion:** Implement pattern formation (spots, stripes, etc.) - store U and V in different color channels
 
-##### Optional: Wave Equation
+##### Wave Equation
 - Requires two buffers (current and previous state)
 - Implement `u_tt = c²∇²u`
 - Initial conditions: pluck a "string" or create a disturbance
