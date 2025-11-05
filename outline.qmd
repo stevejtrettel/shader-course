@@ -1,0 +1,370 @@
+# Outline
+
+
+## Course Overview
+
+This mini-course introduces shader programming as a tool for mathematical illustration and exploration. Shaders are programs that run in parallel on the GPU, making them exceptionally fast for visualization tasks. We'll learn to write code that "reads like mathematics" using Shadertoy, a beginner-friendly web-based platform that handles all the low-level programming complexities.
+
+**Format:** Five days, each with one hour of lecture and approximately 1.5 hours of required homework, additional hours of optional homework.
+
+
+**Prerequisites:** Strong foundation in undergraduate mathematics; no prior experience with shaders or GLSL required
+
+## Day 1: Introduction to Shader Programming
+
+### Learning Objectives
+
+- Understand the mathematical model of shader programming (function from pixels to colors)
+- Learn basic GLSL syntax and conventions
+- Master coordinate system setup and distance calculations
+- Create simple geometric shapes and patterns
+
+### In-Class Content
+
+#### Mathematical Introduction
+- What is a shader? Framing as a function: `color = f(x, y, time, ...)`
+- Why GPUs? Parallelism means computing ALL pixels simultaneously
+- Shadertoy overview: available uniforms (`iResolution`, `iTime`, `iMouse`)
+
+#### First Shader: Solid Colors
+- Basic shader structure: `void mainImage(out vec4 fragColor, in vec2 fragCoord)`
+- Setting `fragColor = vec4(1.0, 0.0, 0.0, 1.0)` for a red screen
+- GLSL syntax basics: semicolons, vector types, swizzling
+- Animating colors with `iTime`
+
+#### Coordinate System Setup
+- Converting `fragCoord` to centered, normalized coordinates
+- Standard boilerplate for coordinate transformation
+- Handling aspect ratio correctly
+
+#### Half-Plane Coloring
+- Boolean expressions: `x < 0.0`
+- Conditional coloring with ternary operator or `step()` function
+- Generalizing to arbitrary lines: `ax + by < 0`
+
+#### Circles and Distance Fields
+- Computing distance to center with `length(p)`
+- Filled circle: `length(p) < radius`
+- Circle outline: `abs(length(p) - radius) < thickness`
+- Optional: Color gradients based on distance
+
+#### Grids and Repetition
+- Using `mod(p, spacing)` to create repeating cells
+- Creating a grid of circles
+- Alternating patterns with `mod(floor(p), 2.0)`
+
+### Homework
+
+#### Required: Parabola Graphing Calculator
+Create a shader that draws a parabola with customizable coefficients:
+- Draw x and y axes (thick lines at x=0 and y=0)
+- Define variables: `float a = 1.0; float b = 0.0; float c = 0.0;`
+- Plot the curve `y = ax² + bx + c` as a thick tube
+- Should handle any hardcoded values of a, b, c
+
+#### Optional #1: Animated Curve Family
+- Use `iTime` to vary parameters and animate a family of curves
+- Suggestions: elliptic fibration, Lissajous curves, morphing shapes
+
+#### Optional #2: Beautiful Tiling Pattern
+- Design a pattern within a fundamental square
+- Use `mod()` to tile it across the screen
+- Focus on aesthetic appeal and mathematical structure
+
+---
+
+## Day 2: Complex Dynamics and Euclidean Geometry
+
+### Learning Objectives
+
+- Implement complex number arithmetic in GLSL
+- Understand and render the Mandelbrot and Julia sets
+- Create geometric tilings using mathematical transformations
+- Learn to use structs for organizing data
+
+### In-Class Content
+
+#### Complex Numbers in GLSL
+- Representing complex numbers as `vec2`
+- Implementing complex multiplication
+- Complex addition, conjugation, and magnitude
+
+#### The Mandelbrot Set
+- Mathematical definition: iterating `z → z² + c`
+- Escape-time algorithm
+- Coloring schemes based on iteration count
+- Discussing convergence and divergence
+
+#### Julia Sets
+- Fixing `c` and varying initial `z`
+- Relationship to Mandelbrot set
+- Creating visually interesting Julia sets
+
+#### Introduction to Structs
+- Defining struct types in GLSL
+- Use case: organizing geometric data
+- Example: storing triangle vertices or transformation data
+
+#### Euclidean Triangle Tiling
+- Fundamental domain for triangular tiling
+- Reflection across edges to create periodic patterns
+- Symmetry groups and transformations
+
+#### Introduction to Folding Fractals
+- The Sierpinski triangle via iterated reflections
+- Using `abs()` for geometric folding
+- Iteration count and coloring
+
+### Homework
+
+#### Required: Sierpinski Carpet
+- Implement the 2D Sierpinski carpet using box folding
+- Use repeated subdivision and removal pattern
+- Color by iteration depth or distance
+
+#### Optional: Choose Your Adventure
+1. **Apollonian Gasket:** Implement circle inversion and nested circles
+2. **Hyperbolic Triangle Tiling:** Port triangle tiling to Poincaré disk or upper half-plane model
+
+---
+
+## Day 3: Non-Euclidean Geometry and Fractals
+
+### Learning Objectives
+
+- Understand hyperbolic geometry visualization
+- Implement circle inversions and Möbius transformations
+- Create hyperbolic tilings in the Poincaré disk or upper half-plane
+- Master 2D folding techniques for fractal generation
+
+### In-Class Content
+
+#### Review: Circle Inversions
+- Mathematical definition and properties
+- Implementation in GLSL
+- Geometric intuition
+
+#### Hyperbolic Geometry Primer
+- Poincaré disk or upper half-plane model
+- Geodesics as circular arcs
+- Fundamental domains for triangle groups
+
+#### Hyperbolic Triangle Tiling
+- Folding into fundamental domain via inversions
+- Iterating to create the full tiling
+- Coloring by fundamental domain or iteration
+
+#### 2D Folding Fractals
+- Review Sierpinski triangle folding technique
+- Sierpinski carpet as box folding
+- Generalizing the folding pattern
+- Iteration depth and visual effects
+
+#### Advanced Techniques
+- Combining multiple folding operations
+- Domain coloring and visualization strategies
+- Parameter exploration
+
+### Homework
+
+#### Required: Fractal Variations
+- Experiment with different folding patterns
+- Try varying iteration depths
+- Create your own folding-based fractal
+
+#### Optional: Hyperbolic Variations
+- Implement different hyperbolic tilings (different triangle groups)
+- Explore Escher-style patterns in hyperbolic space
+- Combine hyperbolic tiling with procedural decoration
+
+---
+
+## Day 4: Introduction to 3D Rendering
+
+### Learning Objectives
+
+- Understand ray setup and camera models
+- Implement analytical ray-object intersection
+- Learn the raymarching algorithm and signed distance functions
+- Apply basic lighting models (diffuse shading)
+
+### In-Class Content
+
+#### Ray Setup and Camera Model
+- Defining ray origin and direction from pixel coordinates
+- Simple camera model: position, look-at, up vector
+- Field of view and perspective projection
+
+#### Analytical Ray-Sphere Intersection
+- Deriving the intersection equation (quadratic)
+- Solving for intersection parameter `t`
+- Computing surface normal at intersection point
+- Rendering the sphere with flat color
+
+#### Ray-Torus Intersection
+- Implicit equation for a torus
+- Computing gradient for surface normal
+- Discussion: analytical methods become complex quickly
+
+#### Motivation for Raymarching
+- Combining multiple objects is difficult with analytical methods
+- Boolean operations (union, intersection) are hard
+- Arbitrary implicit surfaces require root-finding
+
+#### Signed Distance Functions (SDFs)
+- Mathematical definition: minimum distance to surface
+- SDFs for basic primitives: sphere, box, plane, torus, cylinder
+- Properties: Lipschitz continuity and safe marching
+
+#### The Raymarching Algorithm
+- Sphere tracing: march along ray by the distance to nearest surface
+- Stopping conditions: hit surface, max iterations, or exit bounds
+- Estimating normals via gradient of the SDF
+
+#### Basic Lighting
+- Computing surface normal from SDF gradient
+- Diffuse shading: dot product with light direction
+- Simple Lambertian lighting model
+
+### Homework
+
+#### Required: Algebraic Variety Rendering
+- Choose a polynomial implicit surface (degree 3 or 4)
+- Implement root-finding algorithm (bisection, Newton's method, etc.)
+- Use gradient for directional derivative to estimate distance
+- Optimization: use sphere bounding box (outside sphere → return sphere SDF, inside → compute polynomial distance)
+
+#### Optional: Advanced Lighting and Transformations
+1. **Specular Lighting:** Implement Phong or Blinn-Phong model
+2. **Transformations:** Use rotation matrices to orient objects in the scene
+3. **Complex Scene:** Combine multiple transformed objects with analytical intersections
+
+---
+
+## Day 5: Choose Your Adventure
+
+The final day will be determined based on pacing, student interest, and energy levels. Two complete lectures are prepared:
+
+### Option A: Advanced Raymarching Techniques
+
+#### Learning Objectives
+- Master domain operations for efficient complex scenes
+- Understand and apply boolean operations on SDFs
+- Create 3D fractals via iterated folding
+- Build sophisticated mathematical visualizations
+
+#### In-Class Content
+
+##### Domain Operations
+- **Repetition:** Using `mod(p, spacing)` for infinite grids of objects
+- **Symmetry:** Using `abs()` for mirror planes
+- **Polar repetition:** Radial patterns around an axis
+- **Computational advantage:** Zero cost for infinite complexity
+
+##### Boolean Operations on SDFs
+- **Union:** `min(d1, d2)`
+- **Intersection:** `max(d1, d2)`
+- **Subtraction:** `max(d1, -d2)`
+- **Smooth minimum:** `smin()` for organic blending
+- Building complex shapes from primitive combinations
+
+##### The Menger Sponge
+- Box folding in 3D with axis-aligned planes
+- Iterated subdivision pattern
+- Scaling and repetition
+- Connection to Day 2's Sierpinski carpet
+
+##### Advanced Examples
+- Architectural structures via boolean operations
+- Infinite repeated patterns via domain operations
+- Combining techniques for rich scenes
+
+#### Homework
+
+##### Required: Creative Scene Building
+- Build a complex scene using domain operations and boolean combinations
+- Experiment with different SDFs and transformations
+- Focus on mathematical or aesthetic interest
+
+##### Optional: Sierpinski Tetrahedron
+- Implement 3D Sierpinski tetrahedron via folding
+- Reflect across four planes (non-axis-aligned)
+- Connection to Day 2's triangle folding in higher dimension
+
+---
+
+### Option B: Buffers and Temporal Dynamics
+
+#### Learning Objectives
+- Understand buffer-based computation in Shadertoy
+- Implement differential operators (Laplacian)
+- Solve partial differential equations on the GPU
+- Create dynamic, evolving mathematical systems
+
+#### In-Class Content
+
+##### Introduction to Buffers
+- Reading from previous frame: `texture(iChannel0, uv)`
+- Multi-pass rendering in Shadertoy
+- Simple example: reading buffer and applying conditional coloring (bright → yellow, dark → blue)
+
+##### Edge Detection and the Laplacian
+- Discrete Laplacian stencil (5-point or 9-point)
+- Sampling neighboring pixels
+- Visualizing edges in imagery
+- Introduction to spatial derivatives on discrete grids
+
+##### The Heat Equation
+- Mathematical formulation: `u_t = α∇²u`
+- Applying the Laplacian stencil for diffusion
+- Time-stepping: `u_new = u_old + dt * α * laplacian(u_old)`
+- Initial conditions: heat distribution in a fractal or Julia set
+- Watching the pattern blur and diffuse
+
+##### Boundary Conditions
+- Zero boundary conditions (edges set to 0)
+- Avoiding wrap-around artifacts
+- Discussion of periodic boundaries (if time)
+
+##### Timestep Stability
+- CFL condition (briefly mentioned)
+- Providing a stable `dt` value
+- Warning: don't make timestep too large!
+
+#### Homework
+
+##### Required: Interactive Heat Equation or Reaction-Diffusion
+1. **Interactive Heat Source:** Add heat at mouse position, watch it diffuse
+2. **Gray-Scott Reaction-Diffusion:** Implement pattern formation (spots, stripes, etc.) - store U and V in different color channels
+
+##### Optional: Wave Equation
+- Requires two buffers (current and previous state)
+- Implement `u_tt = c²∇²u`
+- Initial conditions: pluck a "string" or create a disturbance
+- Watch waves propagate and reflect
+
+---
+
+<!-- ## Resources and References
+
+### Shadertoy
+- Main site: https://www.shadertoy.com
+- Example shaders to explore
+- Community forum for questions
+
+### GLSL References
+- OpenGL Shading Language specification
+- Shadertoy-specific uniforms and functions
+- Common mathematical functions
+
+### Mathematical Background
+- Complex dynamics and fractals
+- Hyperbolic geometry and tilings
+- Signed distance functions and implicit surfaces
+- Numerical PDE methods
+
+### Further Exploration
+- Advanced rendering techniques (path tracing, global illumination)
+- Non-Euclidean ray tracing
+- GPU computing for scientific visualization
+ -->

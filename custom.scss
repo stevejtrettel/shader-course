@@ -1,0 +1,17 @@
+/*-- scss:defaults --*/
+
+// Add any custom variables here
+
+/*-- scss:rules --*/
+
+// Custom styling for GLSL code blocks
+code.language-glsl {
+  // GLSL-specific highlighting tweaks can go here
+}
+
+// Style for embedded Shadertoy iframes
+iframe {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin: 1em 0;
+}
