@@ -40,13 +40,13 @@
     ]
   },
   {
-    "objectID": "outline.html#day-3-non-euclidean-geometry-and-fractals",
-    "href": "outline.html#day-3-non-euclidean-geometry-and-fractals",
-    "title": "1  Outline",
-    "section": "1.4 Day 3: Non-Euclidean Geometry and Fractals",
-    "text": "1.4 Day 3: Non-Euclidean Geometry and Fractals\n\nLearning Objectives\n\nUnderstand hyperbolic geometry visualization\nImplement circle inversions and Möbius transformations\nCreate hyperbolic tilings in the Poincaré disk or upper half-plane\nMaster 2D folding techniques for fractal generation\n\n\n\nIn-Class Content\n\nReview: Circle Inversions\n\nMathematical definition and properties\nImplementation in GLSL\nGeometric intuition\n\n\n\nHyperbolic Geometry Primer\n\nPoincaré disk or upper half-plane model\nGeodesics as circular arcs\nFundamental domains for triangle groups\n\n\n\nHyperbolic Triangle Tiling\n\nFolding into fundamental domain via inversions\nIterating to create the full tiling\nColoring by fundamental domain or iteration\n\n\n\n2D Folding Fractals\n\nReview Sierpinski triangle folding technique\nSierpinski carpet as box folding\nGeneralizing the folding pattern\nIteration depth and visual effects\n\n\n\nAdvanced Techniques\n\nCombining multiple folding operations\nDomain coloring and visualization strategies\nParameter exploration\n\n\n\n\nHomework\n\nRequired: Fractal Variations\n\nExperiment with different folding patterns\nTry varying iteration depths\nCreate your own folding-based fractal\n\n\n\nOptional: Hyperbolic Variations\n\nImplement different hyperbolic tilings (different triangle groups)\nExplore Escher-style patterns in hyperbolic space\nCombine hyperbolic tiling with procedural decoration",
+    "objectID": "outline.html#day-3-fractals-and-hyperbolic-geometry",
+    "href": "outline.html#day-3-fractals-and-hyperbolic-geometry",
+    "title": "Outline",
+    "section": "Day 3: Fractals and Hyperbolic Geometry",
+    "text": "Day 3: Fractals and Hyperbolic Geometry\n\nLearning Objectives\n\nExtend folding techniques to box fractals\nUnderstand hyperbolic geometry models and their properties\nImplement computations in the upper half-plane model\nCreate hyperbolic tilings using inversions and Möbius transformations\nConvert between different models of hyperbolic geometry\n\n\n\nIn-Class Content\n\nSierpinski Carpet\n\nBox folding in 2D using abs() for square symmetry\nRecursive subdivision and removal pattern\nScaling by factor of 3 at each iteration\nConnection to Sierpinski triangle from Day 2\nColoring strategies (iteration depth, distance to removed regions)\n\n\n\nIntroduction to Hyperbolic Geometry\n\nWhy hyperbolic space? Negative curvature vs. Euclidean geometry\nThree primary models: Poincaré disk, upper half-plane, and band model\nHow models are related via Möbius transformations\nProperties: geodesics, distance, angle measurement\n\n\n\nComputations in the Upper Half-Plane Model\n\nDefinition: points {z : Im(z) &gt; 0}\nGeodesics: vertical lines and semicircles perpendicular to real axis\nDistance formula in the upper half-plane\nMöbius transformations as isometries: z → (az + b)/(cz + d) with ad - bc = 1\nMatrix representation of transformations\n\n\n\nHyperbolic Triangle Tiling\n\nSetting up a hyperbolic triangle (angles sum to &lt; π)\nComputing geodesics as circular arcs\nImplementing circle inversion for reflections across geodesics\nFolding points into fundamental domain\nIterating to create the full tiling\nColoring by domain or iteration behavior\n\n\n\nDrawing in Different Models\n\nConverting between Poincaré disk and upper half-plane\nMöbius transformation: w = i(1-z)/(1+z) (disk to half-plane)\nBand model via additional Möbius transformation\nVisualizing the same tiling in multiple models simultaneously\n\n\n\n\nHomework\n\nRequired: Sierpinski Carpet\n\nImplement the 2D Sierpinski carpet using box folding\nUse abs() to create 4-fold symmetry\nScale by 3 at each iteration, removing middle square\nColor by iteration depth or distance\nExperiment with different iteration counts\n\n\n\nRequired: Model Conversion and Möbius Transformation\n\nConvert your hyperbolic tiling from upper half-plane to Poincaré disk (or vice versa)\nApply a Möbius transformation to your tiling (choose your own or use a suggested one)\nRender both the original and transformed tiling\nObserve how the transformation affects the visual appearance\n\n\n\nOptional: Advanced Explorations\n\nAnother Triangle Group: Implement a different hyperbolic triangle group (e.g., (2,3,7), (2,4,6))\nKlein Model: Convert to Klein model via Cayley transform\nConformal Art: Use complex analysis to map to creative domains\nDecorated Tiles: Create Escher-style decorated tiles",
     "crumbs": [
-      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Outline</span>"
+      "Outline"
     ]
   },
   {
@@ -280,26 +280,6 @@
     ]
   },
   {
-    "objectID": "outline.html#day-3-fractals-and-hyperbolic-geometry",
-    "href": "outline.html#day-3-fractals-and-hyperbolic-geometry",
-    "title": "Outline",
-    "section": "Day 3: Fractals and Hyperbolic Geometry",
-    "text": "Day 3: Fractals and Hyperbolic Geometry\n\nLearning Objectives\n\nExtend folding techniques to box fractals\nUnderstand hyperbolic geometry models and their properties\nImplement computations in the upper half-plane model\nCreate hyperbolic tilings using inversions and Möbius transformations\nConvert between different models of hyperbolic geometry\n\n\n\nIn-Class Content\n\nSierpinski Carpet\n\nBox folding in 2D using abs() for square symmetry\nRecursive subdivision and removal pattern\nScaling by factor of 3 at each iteration\nConnection to Sierpinski triangle from Day 2\nColoring strategies (iteration depth, distance to removed regions)\n\n\n\nIntroduction to Hyperbolic Geometry\n\nWhy hyperbolic space? Negative curvature vs. Euclidean geometry\nThree primary models: Poincaré disk, upper half-plane, and band model\nHow models are related via Möbius transformations\nProperties: geodesics, distance, angle measurement\n\n\n\nComputations in the Upper Half-Plane Model\n\nDefinition: points {z : Im(z) &gt; 0}\nGeodesics: vertical lines and semicircles perpendicular to real axis\nDistance formula in the upper half-plane\nMöbius transformations as isometries: z → (az + b)/(cz + d) with ad - bc = 1\nMatrix representation of transformations\n\n\n\nHyperbolic Triangle Tiling\n\nSetting up a hyperbolic triangle (angles sum to &lt; π)\nComputing geodesics as circular arcs\nImplementing circle inversion for reflections across geodesics\nFolding points into fundamental domain\nIterating to create the full tiling\nColoring by domain or iteration behavior\n\n\n\nDrawing in Different Models\n\nConverting between Poincaré disk and upper half-plane\nMöbius transformation: w = i(1-z)/(1+z) (disk to half-plane)\nBand model via additional Möbius transformation\nVisualizing the same tiling in multiple models simultaneously\n\n\n\n\nHomework\n\nRequired: Sierpinski Carpet\n\nImplement the 2D Sierpinski carpet using box folding\nUse abs() to create 4-fold symmetry\nScale by 3 at each iteration, removing middle square\nColor by iteration depth or distance\nExperiment with different iteration counts\n\n\n\nRequired: Model Conversion and Möbius Transformation\n\nConvert your hyperbolic tiling from upper half-plane to Poincaré disk (or vice versa)\nApply a Möbius transformation to your tiling (choose your own or use a suggested one)\nRender both the original and transformed tiling\nObserve how the transformation affects the visual appearance\n\n\n\nOptional: Advanced Explorations\n\nAnother Triangle Group: Implement a different hyperbolic triangle group (e.g., (2,3,7), (2,4,6))\nKlein Model: Convert to Klein model via Cayley transform\nConformal Art: Use complex analysis to map to creative domains\nDecorated Tiles: Create Escher-style decorated tiles",
-    "crumbs": [
-      "Outline"
-    ]
-  },
-  {
-    "objectID": "outline.html#day-3-homework",
-    "href": "outline.html#day-3-homework",
-    "title": "Outline",
-    "section": "Day 3 Homework",
-    "text": "Day 3 Homework\n\nRequired: Sierpinski Carpet\n\nImplement the 2D Sierpinski carpet using box folding\nUse abs() to create 4-fold symmetry\nScale by 3 at each iteration, removing middle square\nColor by iteration depth or distance\nExperiment with different iteration counts\n\n\n\nRequired: Model Conversion and Möbius Transformation\n\nConvert your hyperbolic tiling from upper half-plane to Poincaré disk (or vice versa)\nApply a Möbius transformation to your tiling (choose your own or use a suggested one)\nRender both the original and transformed tiling\nObserve how the transformation affects the visual appearance\n\n\n\nOptional: Advanced Explorations\n\nAnother Triangle Group: Implement a different hyperbolic triangle group (e.g., (2,3,7), (2,4,6))\nKlein Model: Convert to Klein model via Cayley transform\nConformal Art: Use complex analysis to map to creative domains\nDecorated Tiles: Create Escher-style decorated tiles",
-    "crumbs": [
-      "Outline"
-    ]
-  },
-  {
     "objectID": "day3.html",
     "href": "day3.html",
     "title": "3  Day 3: Fractals and Hyperbolic Geometry",
@@ -384,7 +364,7 @@
     "href": "day3.html#looking-ahead",
     "title": "3  Day 3: Fractals and Hyperbolic Geometry",
     "section": "3.9 Looking Ahead",
-    "text": "3.9 Looking Ahead\nTomorrow we move to 3D! We’ll learn raymarching and signed distance functions to render implicit surfaces. The geometric intuition from folding and distance computations will carry over, but now in three dimensions with lighting and shading.\nMake sure you’re comfortable with: - Distance computations (Euclidean and hyperbolic) - Reflection operations (these generalize to 3D) - Iterative algorithms for geometric structures\nThe 3D rendering techniques we’ll learn are the culmination of everything so far: distance fields, iterative marching, geometric transformations, and real-time GPU computation.\nSee you tomorrow!",
+    "text": "3.9 Looking Ahead\nTomorrow we move to 3D! We’ll learn raymarching and signed distance functions to render implicit surfaces. The geometric intuition from folding and distance computations will carry over, but now in three dimensions with lighting and shading.\nMake sure you’re comfortable with: - Distance computations (Euclidean and hyperbolic) - Reflection operations (these generalize to 3D) - Iterative algorithms for geometric structures\nThe 3D rendering techniques we’ll learn are the culmination of everything so far: distance fields, iterative marching, geometric transformations, and real-time GPU computation.",
     "crumbs": [
       "<span class='chapter-number'>3</span>  <span class='chapter-title'>Day 3: Fractals and Hyperbolic Geometry</span>"
     ]
