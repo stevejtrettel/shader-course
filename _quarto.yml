@@ -24,6 +24,7 @@ book:
     - glsl-reference.qmd
     # - shadertoy-tips.qmd
     - debug-reference.qmd
+    - folding-fractals.qmd
 
   sidebar:
     style: "docked"

@@ -1,10 +1,545 @@
-# Day 2: Complex Dynamics and Euclidean Geometry
+# Day 2: Complex Dynamics and Iterated Inversions
 
 ## Overview
 
-Today we explore the power of iteration and geometric transformations. We'll implement complex arithmetic in GLSL, use it to render the iconic Mandelbrot and Julia sets, and create geometric tilings through reflection. We conclude by building our first fractal via iterated folding—the Sierpinski triangle.
+Today we explore the power of iteration to generate fractals. We'll implement complex arithmetic in GLSL and use it to render the iconic Mandelbrot and Julia sets. Then we'll shift to geometric iteration: circle inversion, which creates beautiful nested patterns when applied repeatedly. We'll see how the Apollonian gasket emerges from iterated inversions, and learn to organize geometric data using structs.
 
-By the end of today, you'll understand how simple iterative processes can generate intricate mathematical structures, how to organize geometric data using structs, and how folding operations can create self-similar fractals.
+By the end of today, you'll understand how simple iterative processes—whether in the complex plane or through geometric transformations—can generate intricate fractal structures.
+
+---
+
+## Complex Numbers in GLSL
+
+### Representation
+
+A complex number $z = a + bi$ can be represented as a 2D vector with real part $a$ and imaginary part $b$. In GLSL:
+
+```glsl
+vec2 z = vec2(a, b);  // Represents a + bi
+```
+
+We'll consistently use the convention: `z.x` is the real part, `z.y` is the imaginary part.
+
+### Complex Arithmetic
+
+Let $z = a + bi$ and $w = c + di$. We need to implement the basic operations:
+
+**Addition:** $(a + bi) + (c + di) = (a + c) + (b + d)i$
+
+```glsl
+vec2 cadd(vec2 z, vec2 w) {
+    return z + w;  // Vector addition is sufficient!
+}
+```
+
+**Multiplication:** $(a + bi)(c + di) = (ac - bd) + (ad + bc)i$
+
+```glsl
+vec2 cmul(vec2 z, vec2 w) {
+    return vec2(
+        z.x * w.x - z.y * w.y,  // Real part: ac - bd
+        z.x * w.y + z.y * w.x   // Imaginary part: ad + bc
+    );
+}
+```
+
+**Magnitude squared:** $|z|^2 = a^2 + b^2$
+
+```glsl
+float cabs2(vec2 z) {
+    return dot(z, z);  // z.x * z.x + z.y * z.y
+}
+```
+
+**Magnitude:** $|z| = \sqrt{a^2 + b^2}$
+
+```glsl
+float cabs(vec2 z) {
+    return length(z);
+}
+```
+
+**Conjugate:** $\overline{z} = a - bi$
+
+```glsl
+vec2 cconj(vec2 z) {
+    return vec2(z.x, -z.y);
+}
+```
+
+**Division:** $\frac{a + bi}{c + di} = \frac{(a + bi)(c - di)}{c^2 + d^2}$
+
+```glsl
+vec2 cdiv(vec2 z, vec2 w) {
+    float denom = dot(w, w);  // c² + d²
+    return vec2(
+        (z.x * w.x + z.y * w.y) / denom,  // Real part
+        (z.y * w.x - z.x * w.y) / denom   // Imaginary part
+    );
+}
+```
+
+These are the building blocks we need for complex dynamics.
+
+---
+
+## The Mandelbrot Set
+
+### Definition
+
+The Mandelbrot set $\mathcal{M}$ is defined as the set of complex numbers $c$ for which the iteration
+$$z_{n+1} = z_n^2 + c, \quad z_0 = 0$$
+remains bounded as $n \to \infty$.
+
+In practice, we:
+1. Start with $z_0 = 0$
+2. Iterate $z_{n+1} = z_n^2 + c$ for a fixed number of iterations (say, 100)
+3. Check if $|z_n|$ has escaped some large radius (typically $R = 2$)
+
+Points that escape quickly are definitely not in $\mathcal{M}$. Points that remain bounded after many iterations are likely in $\mathcal{M}$.
+
+### Implementation
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // Coordinate setup: center at origin, scale to show interesting region
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - 0.5;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    // Scale to view the Mandelbrot set (roughly [-2.5, 1] × [-1.25, 1.25])
+    vec2 c = uv * 3.5;
+    c.x -= 0.5;  // Center on the interesting part
+    
+    // Mandelbrot iteration
+    vec2 z = vec2(0.0, 0.0);  // z_0 = 0
+    int max_iter = 100;
+    int iter;
+    
+    for(iter = 0; iter < max_iter; iter++) {
+        // Check if escaped
+        if(cabs2(z) > 4.0) break;  // |z| > 2, so |z|² > 4
+        
+        // z_{n+1} = z_n² + c
+        z = cmul(z, z) + c;
+    }
+    
+    // Color based on iteration count
+    float t = float(iter) / float(max_iter);
+    vec3 color = vec3(t);  // Grayscale for now
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+### Coloring Schemes
+
+The grayscale rendering shows structure but isn't very exciting. We can create better colormaps:
+
+**Smooth coloring using escape time:**
+```glsl
+if(iter < max_iter) {
+    // Smooth iteration count (accounts for continuous escape)
+    float log_zn = log(cabs2(z)) / 2.0;
+    float nu = log(log_zn / log(2.0)) / log(2.0);
+    float smooth_iter = float(iter) + 1.0 - nu;
+    
+    float t = smooth_iter / float(max_iter);
+    // Use a color palette (see below)
+    vec3 color = palette(t);
+} else {
+    // Inside the set: black
+    vec3 color = vec3(0.0);
+}
+```
+
+**Simple color palette:**
+```glsl
+vec3 palette(float t) {
+    // Create a cyclic color palette
+    vec3 a = vec3(0.5, 0.5, 0.5);
+    vec3 b = vec3(0.5, 0.5, 0.5);
+    vec3 c = vec3(1.0, 1.0, 1.0);
+    vec3 d = vec3(0.0, 0.33, 0.67);
+    
+    return a + b * cos(6.28318 * (c * t + d));
+}
+```
+
+This uses a cosine-based palette function that creates smooth, cyclic colors. Play with the parameters `a`, `b`, `c`, `d` to get different color schemes!
+
+---
+
+## Circle Inversion
+
+### Mathematical Definition
+
+Circle inversion is a transformation of the plane with respect to a circle. For a circle of radius $R$ centered at a point $\mathbf{c}$, inversion maps a point $\mathbf{p} \neq \mathbf{c}$ to:
+$$\text{inv}(\mathbf{p}) = \mathbf{c} + R^2 \frac{\mathbf{p} - \mathbf{c}}{|\mathbf{p} - \mathbf{c}|^2}$$
+
+Geometrically:
+- Points inside the circle map to points outside (and vice versa)
+- Points on the circle are fixed
+- The center is mapped to infinity (and infinity to the center)
+
+### Key Properties
+
+1. **Lines through the center** remain lines through the center
+2. **Lines not through the center** become circles through the center
+3. **Circles through the center** become lines (not through the center)
+4. **Circles not through the center** remain circles (but transformed)
+5. **Angles are preserved** (it's a conformal map)
+
+These properties make circle inversion extremely useful for generating fractal patterns.
+
+### Implementation
+
+```glsl
+vec2 invertCircle(vec2 p, vec2 center, float radius) {
+    vec2 diff = p - center;
+    float r2 = dot(diff, diff);
+    
+    // Handle center (would be division by zero)
+    if(r2 < 0.0001) return vec2(1000.0);  // Map to "infinity"
+    
+    return center + (radius * radius) * diff / r2;
+}
+```
+
+### Visualizing Circle Inversion
+
+Let's see what happens when we apply inversion to a grid:
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 p = [coordinate setup];
+    
+    // Inversion circle
+    vec2 circleCenter = vec2(0.0, 0.0);
+    float circleRadius = 1.0;
+    
+    // Apply inversion
+    vec2 p_inverted = invertCircle(p, circleCenter, circleRadius);
+    
+    // Draw a grid in the inverted space
+    vec2 grid = fract(p_inverted * 2.0);  // Create repeating cells
+    float gridLine = step(0.95, max(grid.x, grid.y));  // Draw grid lines
+    
+    vec3 color = vec3(gridLine);
+    
+    // Draw the inversion circle
+    float circDist = abs(length(p) - circleRadius);
+    if(circDist < 0.05) color = vec3(1.0, 0.0, 0.0);
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+You'll see straight grid lines transform into circular arcs!
+
+---
+
+## Structs in GLSL
+
+### Motivation
+
+As we work with multiple circles for the Apollonian gasket, organizing the data becomes important. GLSL provides **structs** (similar to C structs) for grouping related data.
+
+### Defining a Struct
+
+```glsl
+struct Circle {
+    vec2 center;
+    float radius;
+};
+```
+
+### Using Structs
+
+```glsl
+Circle c1;
+c1.center = vec2(0.0, 0.0);
+c1.radius = 1.0;
+
+// Can also initialize directly
+Circle c2 = Circle(vec2(1.0, 0.5), 0.75);
+
+// Pass to functions
+vec2 invertThroughCircle(vec2 p, Circle circ) {
+    return invertCircle(p, circ.center, circ.radius);
+}
+```
+
+### Why Structs?
+
+They make the code more readable and maintainable. Compare:
+
+```glsl
+// Without structs
+vec2 invertThrough3Circles(vec2 p, 
+    vec2 c1_center, float c1_radius,
+    vec2 c2_center, float c2_radius,
+    vec2 c3_center, float c3_radius) { ... }
+
+// With structs
+vec2 invertThrough3Circles(vec2 p, Circle c1, Circle c2, Circle c3) { ... }
+```
+
+Much cleaner!
+
+---
+
+## The Apollonian Gasket
+
+### Construction
+
+The Apollonian gasket is created by starting with three mutually tangent circles and repeatedly filling the gaps with new tangent circles. We can generate it through iterated circle inversions.
+
+### A Simple Configuration
+
+One clean setup: three circles of equal radius, mutually tangent at a point.
+
+Let's use circles of radius 1 centered at the vertices of an equilateral triangle:
+$$\mathbf{c}_1 = (0, \frac{2}{\sqrt{3}}), \quad \mathbf{c}_2 = (-1, -\frac{1}{\sqrt{3}}), \quad \mathbf{c}_3 = (1, -\frac{1}{\sqrt{3}})$$
+
+These three circles are mutually tangent at the origin.
+
+```glsl
+void setupApollonianCircles(out Circle c1, out Circle c2, out Circle c3) {
+    float h = 2.0 / sqrt(3.0);  // ≈ 1.1547
+    c1 = Circle(vec2(0.0, h), 1.0);
+    c2 = Circle(vec2(-1.0, -h/2.0), 1.0);
+    c3 = Circle(vec2(1.0, -h/2.0), 1.0);
+}
+```
+
+### Iterative Inversion Algorithm
+
+Starting from a point $\mathbf{p}$, we repeatedly invert through each of the three circles in sequence:
+
+```glsl
+vec2 apollonianOrbit(vec2 p, Circle c1, Circle c2, Circle c3, int iterations, out int escapeIter) {
+    escapeIter = iterations;
+    
+    for(int i = 0; i < iterations; i++) {
+        // Invert through each circle
+        p = invertCircle(p, c1.center, c1.radius);
+        p = invertCircle(p, c2.center, c2.radius);
+        p = invertCircle(p, c3.center, c3.radius);
+        
+        // Check if escaped (moved very far away)
+        if(length(p) > 100.0) {
+            escapeIter = i;
+            break;
+        }
+    }
+    
+    return p;
+}
+```
+
+### Visualization
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 p = [coordinate setup, scaled to show region around origin];
+    
+    // Setup circles
+    Circle c1, c2, c3;
+    setupApollonianCircles(c1, c2, c3);
+    
+    // Run orbit
+    int escapeIter;
+    vec2 p_final = apollonianOrbit(p, c1, c2, c3, 20, escapeIter);
+    
+    // Color based on escape iteration
+    float t = float(escapeIter) / 20.0;
+    vec3 color = palette(t);
+    
+    // Draw the three circles
+    float d1 = abs(length(p - c1.center) - c1.radius);
+    float d2 = abs(length(p - c2.center) - c2.radius);
+    float d3 = abs(length(p - c3.center) - c3.radius);
+    float circleDist = min(d1, min(d2, d3));
+    
+    if(circleDist < 0.05) color = vec3(1.0, 1.0, 1.0);  // Draw circles white
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+The result should show a beautiful nested pattern of circular regions—the Apollonian gasket emerging from iterated inversions!
+
+### Alternative Coloring
+
+Instead of escape time, we can color based on which circle we're closest to after iteration:
+
+```glsl
+// After orbit
+float d1 = length(p_final - c1.center);
+float d2 = length(p_final - c2.center);
+float d3 = length(p_final - c3.center);
+
+if(d1 < d2 && d1 < d3) color = vec3(1.0, 0.0, 0.0);      // Red for c1
+else if(d2 < d3) color = vec3(0.0, 1.0, 0.0);            // Green for c2
+else color = vec3(0.0, 0.0, 1.0);                        // Blue for c3
+```
+
+This creates regions colored by which circle's "basin of attraction" they belong to.
+
+---
+
+## Summary
+
+Today we covered:
+
+1. **Complex arithmetic in GLSL**: Representing complex numbers as `vec2` and implementing operations
+2. **Mandelbrot set**: Iterating $z_{n+1} = z_n^2 + c$ with $z_0 = 0$, coloring by escape time
+3. **Circle inversion**: A conformal transformation that maps circles to circles (or lines)
+4. **Structs**: Organizing geometric data (circles) for cleaner code
+5. **Apollonian gasket**: Generating fractals through iterated circle inversions
+
+The key themes:
+- **Iteration creates complexity**: Simple rules repeated produce intricate patterns
+- **Two types of iteration**: Complex arithmetic (Mandelbrot) and geometric transformations (Apollonian)
+- **Escape-time coloring**: Tracking iteration behavior reveals fractal structure
+- **Conformal maps**: Circle inversion preserves angles and creates beautiful patterns
+
+Tomorrow we'll explore geometric tilings in both Euclidean and hyperbolic space, using reflection operations similar to today's inversions.
+
+---
+
+## Homework
+
+### Required: Julia Sets
+
+Implement Julia set rendering, exploring the rich variety of patterns for different parameter values.
+
+**Background:** For a fixed complex parameter $c$, the filled Julia set $\mathcal{K}_c$ consists of points $z_0$ for which the iteration $z_{n+1} = z_n^2 + c$ remains bounded.
+
+**Key difference from Mandelbrot:** Here $c$ is fixed and we vary the initial point $z_0$ (which comes from the pixel position). In Mandelbrot, $z_0 = 0$ and $c$ varies with pixel position.
+
+**Task:**
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = [coordinate setup];
+    vec2 z = uv * 3.0;  // Initial point z_0 from pixel
+    
+    // Fix c to an interesting value
+    vec2 c = vec2(-0.7, 0.27015);  // Classic choice
+    
+    // Iterate z_{n+1} = z_n² + c
+    int max_iter = 100;
+    int iter;
+    
+    for(iter = 0; iter < max_iter; iter++) {
+        if(cabs2(z) > 4.0) break;
+        z = cmul(z, z) + c;
+    }
+    
+    // Color based on escape
+    [color based on iteration count]
+}
+```
+
+**Exploration:** Try different values of $c$:
+- `vec2(-0.4, 0.6)` - dendrite-like structures
+- `vec2(0.285, 0.01)` - spiral patterns
+- `vec2(-0.8, 0.156)` - intricate filaments
+- `vec2(-0.7269, 0.1889)` - "douady's rabbit"
+
+**Animation:** Animate $c$ to explore parameter space:
+```glsl
+float angle = iTime * 0.3;
+vec2 c = vec2(0.7 * cos(angle), 0.7 * sin(angle));
+```
+
+Watch how the Julia set morphs as you trace a circle in parameter space!
+
+**Expected output:** Beautiful, intricate fractal patterns that vary dramatically with $c$.
+
+### Optional: Schottky Groups
+
+Explore a more complex iterated inversion system with four or more circles.
+
+**The Setup:** Unlike the Apollonian gasket where circles are mutually tangent, Schottky groups use **disjoint** circles (not touching). The classic setup uses 4 circles arranged symmetrically.
+
+**Example configuration:**
+```glsl
+void setupSchottkyCircles(out Circle[4] circles) {
+    float spacing = 2.5;
+    float radius = 0.8;
+    
+    circles[0] = Circle(vec2(-spacing, 0.0), radius);
+    circles[1] = Circle(vec2(spacing, 0.0), radius);
+    circles[2] = Circle(vec2(0.0, -spacing), radius);
+    circles[3] = Circle(vec2(0.0, spacing), radius);
+}
+```
+
+**Iteration pattern:** Instead of cycling through all circles each iteration, alternate between pairs:
+- Invert through circle 0 or 1 (depending on which side you're on)
+- Then invert through circle 2 or 3
+- Repeat
+
+```glsl
+vec2 schottkyOrbit(vec2 p, Circle[4] circles, int iterations) {
+    for(int i = 0; i < iterations; i++) {
+        // Horizontal pair: invert through whichever is closer
+        float d0 = length(p - circles[0].center);
+        float d1 = length(p - circles[1].center);
+        
+        if(d0 < d1) {
+            p = invertCircle(p, circles[0].center, circles[0].radius);
+        } else {
+            p = invertCircle(p, circles[1].center, circles[1].radius);
+        }
+        
+        // Vertical pair
+        float d2 = length(p - circles[2].center);
+        float d3 = length(p - circles[3].center);
+        
+        if(d2 < d3) {
+            p = invertCircle(p, circles[2].center, circles[2].radius);
+        } else {
+            p = invertCircle(p, circles[3].center, circles[3].radius);
+        }
+    }
+    
+    return p;
+}
+```
+
+**Coloring:** Color based on:
+- Final distance from origin
+- Which sequence of circles was traversed
+- Escape iteration
+- Orbit behavior
+
+**Exploration:** Try:
+- Different circle configurations (more circles, different arrangements)
+- Different iteration rules
+- Varying circle radii with `iTime` for animation
+
+**Expected output:** Intricate patterns in the space between circles, with self-similar structure emerging from the iterated inversions. Very different from Apollonian gasket—more "webby" and less "circular."
+
+---
+
+## Looking Ahead
+
+Tomorrow we'll shift to **geometric tilings**: first in Euclidean space, then in hyperbolic geometry. We'll use reflections across geodesics (similar to today's circle inversions) to tile the plane with triangles. You'll see how the same algorithmic ideas (iterated geometric transformations) work in different geometries.
+
+Make sure you're comfortable with:
+- Iteration and escape-time algorithms
+- Circle inversion (you'll use it extensively tomorrow in hyperbolic geometry!)
+- Structs for organizing geometric data
+- Coloring strategies based on orbit behavior
+
+See you tomorrow!
 
 ---
 
@@ -159,405 +694,8 @@ This uses a cosine-based palette function that creates smooth, cyclic colors. Pl
 
 ---
 
-## Julia Sets
 
-### Definition
 
-For a fixed complex parameter $c$, the filled Julia set $\mathcal{K}_c$ consists of points $z_0$ for which the iteration
-$$z_{n+1} = z_n^2 + c$$
-remains bounded.
-
-**Key difference from Mandelbrot:** Here $c$ is fixed and we vary the initial point $z_0$ (which comes from the pixel position). In Mandelbrot, $z_0 = 0$ and $c$ varies with pixel position.
-
-### Relationship to Mandelbrot
-
-There's a beautiful connection: the Mandelbrot set is essentially a "parameter space" for Julia sets. Each point $c$ in the complex plane has an associated Julia set $\mathcal{K}_c$:
-- If $c \in \mathcal{M}$, then $\mathcal{K}_c$ is connected
-- If $c \notin \mathcal{M}$, then $\mathcal{K}_c$ is a Cantor dust (totally disconnected)
-
-### Implementation
-
-```glsl
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    // Coordinate setup
-    vec2 uv = fragCoord / iResolution.xy;
-    uv = uv - 0.5;
-    uv.x *= iResolution.x / iResolution.y;
-    vec2 z = uv * 3.0;  // Initial point z_0 comes from pixel position
-    
-    // Fix c to an interesting value
-    vec2 c = vec2(-0.7, 0.27015);  // A classic choice
-    // Try: vec2(-0.4, 0.6), vec2(0.285, 0.01), vec2(-0.8, 0.156)
-    
-    // Iterate z_{n+1} = z_n² + c
-    int max_iter = 100;
-    int iter;
-    
-    for(iter = 0; iter < max_iter; iter++) {
-        if(cabs2(z) > 4.0) break;
-        z = cmul(z, z) + c;
-    }
-    
-    // Color (same as Mandelbrot)
-    float t = float(iter) / float(max_iter);
-    vec3 color = palette(t);
-    if(iter == max_iter) color = vec3(0.0);
-    
-    fragColor = vec4(color, 1.0);
-}
-```
-
-Try different values of $c$ to explore the incredible variety of Julia sets! You can even animate $c$ with time:
-```glsl
-vec2 c = vec2(0.7 * cos(iTime * 0.3), 0.7 * sin(iTime * 0.3));
-```
-
----
-
-## Structs in GLSL
-
-### Motivation
-
-As we build more complex geometric objects, we need to organize related data. GLSL provides **structs** (similar to C structs or simple classes without methods).
-
-### Defining a Struct
-
-```glsl
-struct Triangle {
-    vec2 v0;  // First vertex
-    vec2 v1;  // Second vertex
-    vec2 v2;  // Third vertex
-};
-```
-
-### Using Structs
-
-```glsl
-Triangle tri;
-tri.v0 = vec2(0.0, 1.0);
-tri.v1 = vec2(-0.866, -0.5);
-tri.v2 = vec2(0.866, -0.5);
-
-// Access fields with dot notation
-vec2 centroid = (tri.v0 + tri.v1 + tri.v2) / 3.0;
-```
-
-### Why Structs?
-
-For geometric transformations (reflections, rotations), we'll need to pass around geometric data. Structs make the code cleaner and more mathematical. For example, we can write:
-
-```glsl
-vec2 reflect(vec2 p, Triangle tri) {
-    // Reflect point p across an edge of tri
-    // [Implementation details]
-}
-```
-
-This is more readable than passing six individual float parameters for the triangle vertices.
-
----
-
-## Euclidean Triangle Tiling
-
-### The Fundamental Domain
-
-An equilateral triangle tiles the Euclidean plane. Given an equilateral triangle, we can:
-1. Reflect across its three edges
-2. Repeat this process on the resulting triangles
-3. Fill the entire plane with copies of the original triangle
-
-### Setting Up the Triangle
-
-Let's work with an equilateral triangle with vertices at:
-$$v_0 = (0, 1), \quad v_1 = (-\frac{\sqrt{3}}{2}, -\frac{1}{2}), \quad v_2 = (\frac{\sqrt{3}}{2}, -\frac{1}{2})$$
-
-This triangle has side length $\sqrt{3}$ and is centered at the origin.
-
-```glsl
-// Define triangle vertices
-vec2 v0 = vec2(0.0, 1.0);
-vec2 v1 = vec2(-0.866, -0.5);  // -sqrt(3)/2 ≈ -0.866
-vec2 v2 = vec2(0.866, -0.5);
-```
-
-### Reflection Across a Line
-
-To reflect a point $p$ across a line through the origin with unit normal $\mathbf{n}$, we use:
-$$p' = p - 2(\mathbf{n} \cdot p)\mathbf{n}$$
-
-For a line through two points (an edge of our triangle), we need to:
-1. Compute the perpendicular direction (normal to the edge)
-2. Determine which side of the line we're on
-3. Reflect if necessary
-
-**Placeholder for specific implementation:** The exact formulas depend on how we set up our edges. Here's the structure:
-
-```glsl
-// Reflect across edge v0-v1
-vec2 edge = v1 - v0;
-vec2 normal = normalize(vec2(-edge.y, edge.x));  // Perpendicular to edge
-float dist = dot(p - v0, normal);  // Signed distance to line
-if(dist < 0.0) {
-    p = p - 2.0 * dist * normal;  // Reflect if on wrong side
-}
-```
-
-### Iterative Folding
-
-The key insight: we repeatedly reflect $p$ across the three edges of the triangle until it lands inside the fundamental domain.
-
-```glsl
-vec2 foldToTriangle(vec2 p, int iterations) {
-    // Define the three edges and their normals
-    // [Edge definitions here]
-    
-    for(int i = 0; i < iterations; i++) {
-        // Reflect across each edge if necessary
-        // [Reflection code for edge 0]
-        // [Reflection code for edge 1]
-        // [Reflection code for edge 2]
-    }
-    
-    return p;
-}
-```
-
-After folding, all points in the plane map to the interior of our triangle. We can then color based on:
-- The final position within the triangle
-- The number of reflections needed
-- Which edge was crossed most recently
-
-### Visualization
-
-```glsl
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    // Coordinate setup
-    vec2 p = [coordinate setup as usual];
-    
-    // Fold to fundamental domain
-    vec2 p_folded = foldToTriangle(p, 10);
-    
-    // Color based on position in triangle
-    // Could use barycentric coordinates, distance to edges, etc.
-    vec3 color = vec3(p_folded * 0.5 + 0.5, 0.5);
-    
-    fragColor = vec4(color, 1.0);
-}
-```
-
-**Note:** The exact implementation requires careful handling of the geometry. The key mathematical ideas are:
-1. Reflection formula: $p' = p - 2(p \cdot n)n$ for a line with normal $n$ through origin
-2. Iterative folding brings any point into the fundamental domain
-3. Track which reflections occur for interesting coloring
-
----
-
-## Sierpinski Triangle via Folding
-
-### The Concept
-
-The Sierpinski triangle is a fractal that can be generated by:
-1. Starting with an equilateral triangle
-2. Removing the middle triangle (connecting midpoints)
-3. Repeating on each remaining sub-triangle
-
-Equivalently, we can generate it by **iterated folding with scaling**.
-
-### Folding Algorithm
-
-At each iteration:
-1. Reflect $p$ across the three edges of the triangle (fold it inside)
-2. Scale toward the center
-3. Repeat
-
-Mathematically, after $n$ iterations, we've zoomed in by a factor of $2^n$ and applied $n$ reflections.
-
-### Implementation Sketch
-
-```glsl
-vec2 sierpinskiFold(vec2 p, int iterations) {
-    // Triangle vertices (equilateral)
-    vec2 v0 = vec2(0.0, 1.0);
-    vec2 v1 = vec2(-0.866, -0.5);
-    vec2 v2 = vec2(0.866, -0.5);
-    
-    float scale = 1.0;
-    
-    for(int i = 0; i < iterations; i++) {
-        // Reflect across each edge (fold into triangle)
-        // [Reflection code similar to triangle tiling]
-        
-        // After folding, scale and translate
-        p = p * 2.0;  // Zoom in by factor of 2
-        scale *= 2.0;
-        
-        // [Additional centering/translation may be needed]
-    }
-    
-    return p;
-}
-```
-
-### Coloring by Iteration Depth
-
-We can track how many times we hit certain conditions during folding:
-
-```glsl
-int orbit = 0;  // Track some property during iteration
-
-for(int i = 0; i < max_iter; i++) {
-    // Folding operations
-    
-    // Track orbit behavior
-    if([some condition]) orbit++;
-}
-
-// Color based on orbit count
-float t = float(orbit) / float(max_iter);
-vec3 color = palette(t);
-```
-
-The specific conditions to track depend on the geometric setup, but typically we color based on:
-- Which edge we reflected across most recently
-- How many reflections were needed
-- Distance from the center after folding
-
-### Visualization
-
-```glsl
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    vec2 p = [coordinate setup];
-    
-    // Apply Sierpinski folding
-    vec2 p_folded = sierpinskiFold(p, 8);
-    
-    // Color based on the folded position
-    float d = length(p_folded);
-    vec3 color = d < 0.1 ? vec3(1.0) : vec3(0.0);
-    
-    // OR: color based on iteration behavior
-    // [More sophisticated coloring]
-    
-    fragColor = vec4(color, 1.0);
-}
-```
-
-The Sierpinski triangle should emerge as a self-similar fractal pattern!
-
----
-
-## Summary
-
-Today we covered:
-
-1. **Complex arithmetic in GLSL**: Representing complex numbers as `vec2` and implementing multiplication
-2. **Mandelbrot set**: Iterating $z_{n+1} = z_n^2 + c$ with $z_0 = 0$, coloring by escape time
-3. **Julia sets**: Fixing $c$ and varying initial point $z_0$, exploring the parameter space
-4. **Structs**: Organizing geometric data for cleaner code
-5. **Triangle tiling**: Using reflection to fold the plane into a fundamental domain
-6. **Sierpinski triangle**: Generating fractals through iterated folding and scaling
-
-The key themes:
-- Simple iterations create complex behavior (chaos and fractals)
-- Geometric transformations (reflections) can tile or generate fractals
-- Tracking iteration behavior gives us rich information for coloring
-- Folding operations create self-similar structures
-
-Tomorrow we'll extend these ideas: more fractals via folding, then hyperbolic geometry where the same techniques create entirely different tilings.
-
----
-
-## Homework
-
-### Required: Interactive Julia Sets
-
-Add mouse control to the julia sets: take iMouse and read it out as a complex number, then draw the julia set for that number.
-
-
-
-### Required: Circle Inversion
-
-Circle inversion is a fundamental transformation in geometry that will be the basis for many interesting visualizations. Your task is to implement it as a general operation on the plane.
-
-**Mathematical Background:**
-
-Inversion with respect to a circle of radius $R$ centered at the origin maps a point $p \neq 0$ to:
-$$\text{inv}(p) = R^2 \frac{p}{|p|^2}$$
-
-Geometrically, this maps the inside of the circle to the outside and vice versa, with points on the circle remaining fixed. Key properties:
-- Circles passing through the center become lines (and vice versa)
-- Circles not passing through the center remain circles
-- Angles are preserved (it's a conformal map)
-
-For a circle centered at $c$ with radius $R$, we:
-1. Translate to center the circle at origin: $p' = p - c$
-2. Apply inversion: $p'' = R^2 \frac{p'}{|p'|^2}$
-3. Translate back: $\text{result} = p'' + c$
-
-**Implementation Tasks:**
-
-1. **Basic inversion centered at origin:**
-```glsl
-vec2 invert(vec2 p, float R) {
-    float r2 = dot(p, p);
-    return R * R * p / r2;
-}
-```
-
-2. **Inversion centered at arbitrary point:**
-```glsl
-vec2 invertCircle(vec2 p, vec2 center, float radius) {
-    // Translate, invert, translate back
-    // [Implement this]
-}
-```
-
-3. **Visualization:** Create a shader that applies circle inversion to a pattern. Suggestions:
-   - Start with a grid and show its image under inversion
-   - Draw several circles and show how they transform
-   - Apply inversion to implicit curves from Day 1
-   - Make the inversion center follow the mouse position using `iMouse.xy`
-
-4. **Demonstrate properties:** Show that:
-   - A line through the inversion center maps to itself
-   - A line not through the center maps to a circle through the center
-   - A circle through the center maps to a line
-
-**Expected Output:** A shader that clearly demonstrates circle inversion operating on the plane, with visual evidence of its geometric properties.
-
-### Optional #1: Apollonian Gasket
-
-Now that you've implemented circle inversion, use it to create the beautiful Apollonian gasket fractal.
-
-**The Construction:**
-
-Start with three mutually tangent circles. The Apollonian gasket is generated by:
-1. Finding the fourth circle tangent to all three (Apollonius's problem—there are generally two solutions)
-2. Recursively filling gaps with new tangent circles
-3. Continuing indefinitely
-
-**Simplified Approach via Inversion:**
-
-Rather than solving for tangent circles explicitly, we can use inversions:
-1. Start with a configuration of circles (e.g., three circles tangent at a point)
-2. Define inversions with respect to each circle
-3. Apply these inversions repeatedly to generate the fractal pattern
-4. Color based on iteration count or which circle was most recently inverted through
-
-**Challenge:** Setting up the initial configuration and inversion circles requires working out the tangency conditions. One standard setup:
-- Three circles of radius 1 centered at the vertices of an equilateral triangle of side length 2
-- These are mutually tangent
-
-**Visualization:** The resulting fractal should show nested circles filling the gaps in a self-similar pattern, creating a beautiful packing.
-
-
-
-#### Optional: Grid of Julia Sets!
-
-Divide the plane into a small rectangular grid, inside each grid draw the julia set for the complex number at its center.
 
 
 ---
@@ -574,3 +712,4 @@ Make sure you're comfortable with:
 
 The circle inversion you implement today will be the foundation for tomorrow's hyperbolic tilings, so take your time understanding how it works geometrically.
 
+See you tomorrow!

@@ -1,0 +1,859 @@
+# Folding Fractals
+
+## Overview
+
+This appendix explores a fascinating technique for generating fractals: **iterated folding with scaling**. While reflection-based tiling (Days 2-3) fills space with copies of a fundamental domain, folding fractals add scaling at each iteration, creating self-similar structures that exhibit fractal geometry.
+
+We'll explore three classic examples:
+1. **Sierpinski Triangle** (2D, triangle-based)
+2. **Sierpinski Carpet** (2D, square-based)
+3. **Menger Sponge** (3D, cube-based)
+
+These connect naturally to course content: the folding operations use techniques from Day 2-3 (reflection, `abs()`), and the Menger sponge extends to 3D using Day 4's coordinate systems.
+
+---
+
+## Fundamental Concept: Folding + Scaling = Fractals
+
+### The General Pattern
+
+All folding fractals follow this pattern:
+
+1. **Fold**: Use geometric operations (reflection, `abs()`) to bring the point into a fundamental region
+2. **Scale**: Zoom in by some factor (typically 2 or 3)
+3. **Repeat**: Iterate this process
+4. **Classify**: After $n$ iterations, check if the point is in a "removed" region or "kept" region
+
+After $n$ iterations:
+- We've zoomed in by factor $s^n$ (where $s$ is the scale factor)
+- The fractal structure emerges from the removal pattern
+- The result is self-similar: zooming in reveals the same pattern
+
+### Connection to Tilings
+
+Recall from Day 3:
+- **Tiling**: Fold → repeat (fills space with copies)
+- **Fractal**: Fold → scale → repeat (creates self-similar structure with removed regions)
+
+The key difference is the scaling step!
+
+---
+
+## Sierpinski Triangle
+
+### Mathematical Description
+
+The Sierpinski triangle is constructed by:
+1. Start with an equilateral triangle
+2. Remove the middle triangle (formed by connecting edge midpoints)
+3. Recursively repeat on each remaining sub-triangle
+
+Equivalently: iteratively fold into the triangle and scale by 2.
+
+### Mathematical Foundation: Reflection Across a Line
+
+Before implementing the fractal, we need the correct reflection formula.
+
+A line in the plane can be written as $ax + by = c$, with normal vector $\mathbf{n} = (a, b)$.
+
+**Reflection formula:** For a point $\mathbf{p} = (x, y)$, the reflection $\mathbf{p}'$ across the line is:
+
+$$\mathbf{p}' = \mathbf{p} - 2d\hat{\mathbf{n}}$$
+
+where:
+- $d = \frac{ax + by - c}{\sqrt{a^2 + b^2}}$ is the signed distance to the line
+- $\hat{\mathbf{n}} = \frac{(a,b)}{\sqrt{a^2 + b^2}}$ is the unit normal
+
+Combining these:
+$$\mathbf{p}' = \mathbf{p} - \frac{2(ax + by - c)}{a^2 + b^2}(a, b)$$
+
+### Line Struct
+
+Let's organize line data properly:
+
+```glsl
+struct Line {
+    float a, b, c;  // Line equation: ax + by = c
+};
+
+vec2 reflectAcrossLine(vec2 p, Line line) {
+    // Signed distance from point to line (unnormalized)
+    float dist = line.a * p.x + line.b * p.y - line.c;
+    
+    // Normal vector squared length
+    float normSq = line.a * line.a + line.b * line.b;
+    
+    // Reflection formula
+    vec2 normal = vec2(line.a, line.b);
+    return p - (2.0 * dist / normSq) * normal;
+}
+```
+
+### Setting Up the Triangle
+
+For an equilateral triangle with vertices:
+$$v_0 = (0, 1), \quad v_1 = \left(-\frac{\sqrt{3}}{2}, -\frac{1}{2}\right), \quad v_2 = \left(\frac{\sqrt{3}}{2}, -\frac{1}{2}\right)$$
+
+We need the three edge lines:
+
+**Edge from $v_0$ to $v_1$:**
+Direction vector: $v_1 - v_0 = (-\frac{\sqrt{3}}{2}, -\frac{3}{2})$
+Normal (perpendicular): $(\frac{3}{2}, -\frac{\sqrt{3}}{2})$ or simplified: $(3, -\sqrt{3})$
+Line equation: $3x - \sqrt{3}y = c$, passing through $v_0 = (0,1)$: $c = -\sqrt{3}$
+
+**Edge from $v_1$ to $v_2$:**
+This is horizontal: $y = -\frac{1}{2}$
+Line equation: $0x + 1y = -\frac{1}{2}$ or $(0, 1, -0.5)$
+
+**Edge from $v_2$ to $v_0$:**
+By symmetry: $-3x - \sqrt{3}y = -\sqrt{3}$
+
+```glsl
+void setupTriangleEdges(out Line e1, out Line e2, out Line e3) {
+    float sqrt3 = 1.732;
+    
+    // Edge v0 to v1
+    e1.a = 3.0;
+    e1.b = -sqrt3;
+    e1.c = -sqrt3;
+    
+    // Edge v1 to v2 (horizontal)
+    e2.a = 0.0;
+    e2.b = 1.0;
+    e2.c = -0.5;
+    
+    // Edge v2 to v0
+    e3.a = -3.0;
+    e3.b = -sqrt3;
+    e3.c = -sqrt3;
+}
+```
+
+### The Folding Algorithm
+
+Now we can properly fold into the triangle:
+
+### The Folding Algorithm
+
+Now we can properly fold into the triangle:
+
+```glsl
+vec2 foldIntoTriangle(vec2 p, Line e1, Line e2, Line e3, int maxIter) {
+    for(int i = 0; i < maxIter; i++) {
+        vec2 p_old = p;
+        
+        // Reflect across each edge if we're on the wrong side
+        // Check sign of distance: if negative, we're on wrong side
+        float d1 = e1.a * p.x + e1.b * p.y - e1.c;
+        if(d1 < 0.0) p = reflectAcrossLine(p, e1);
+        
+        float d2 = e2.a * p.x + e2.b * p.y - e2.c;
+        if(d2 < 0.0) p = reflectAcrossLine(p, e2);
+        
+        float d3 = e3.a * p.x + e3.b * p.y - e3.c;
+        if(d3 < 0.0) p = reflectAcrossLine(p, e3);
+        
+        // Converged? (no more reflections)
+        if(length(p - p_old) < 0.0001) break;
+    }
+    
+    return p;
+}
+```
+
+### Adding the Scaling Step
+
+For the Sierpinski fractal, we fold and then scale:
+
+```glsl
+vec2 sierpinskiTriangle(vec2 p, int iterations, out int depth) {
+    Line e1, e2, e3;
+    setupTriangleEdges(e1, e2, e3);
+    
+    depth = 0;
+    
+    for(int i = 0; i < iterations; i++) {
+        // Fold into fundamental triangle
+        p = foldIntoTriangle(p, e1, e2, e3, 10);
+        
+        // Scale by 2 toward center
+        vec2 center = vec2(0.0, 0.0);  // Approximate center
+        p = (p - center) * 2.0 + center;
+        
+        depth++;
+        
+        // Optional: early exit if escaped
+        if(length(p) > 100.0) break;
+    }
+    
+    return p;
+}
+```
+
+### Determining if Point is in Fractal
+
+After folding, we need to check if we're in the "removed" middle triangle. Using barycentric coordinates:
+```
+
+### Determining if Point is in Fractal
+
+After folding, we need to check if we're in the "removed" middle triangle. The middle triangle has vertices at the midpoints of the original triangle's edges.
+
+For an equilateral triangle with vertices $v_0, v_1, v_2$, the midpoints are:
+$$m_{01} = \frac{v_0 + v_1}{2}, \quad m_{12} = \frac{v_1 + v_2}{2}, \quad m_{20} = \frac{v_2 + v_0}{2}$$
+
+We can check if point $p$ is inside this middle triangle using barycentric coordinates:
+
+```glsl
+bool inMiddleTriangle(vec2 p) {
+    // Vertices of original triangle
+    vec2 v0 = vec2(0.0, 1.0);
+    vec2 v1 = vec2(-0.866, -0.5);
+    vec2 v2 = vec2(0.866, -0.5);
+    
+    // Midpoints (vertices of removed triangle)
+    vec2 m01 = (v0 + v1) * 0.5;
+    vec2 m12 = (v1 + v2) * 0.5;
+    vec2 m20 = (v2 + v0) * 0.5;
+    
+    // Check if p is inside triangle m01-m12-m20
+    // Using sign of cross products
+    vec2 e0 = m12 - m01;
+    vec2 e1 = m20 - m12;
+    vec2 e2 = m01 - m20;
+    
+    vec2 p0 = p - m01;
+    vec2 p1 = p - m12;
+    vec2 p2 = p - m20;
+    
+    float s0 = e0.x * p0.y - e0.y * p0.x;
+    float s1 = e1.x * p1.y - e1.y * p1.x;
+    float s2 = e2.x * p2.y - e2.y * p2.x;
+    
+    // All same sign means inside
+    return (s0 >= 0.0 && s1 >= 0.0 && s2 >= 0.0) || 
+           (s0 <= 0.0 && s1 <= 0.0 && s2 <= 0.0);
+}
+```
+
+### Complete Implementation
+
+```glsl
+struct Line {
+    float a, b, c;
+};
+
+vec2 reflectAcrossLine(vec2 p, Line line) {
+    float dist = line.a * p.x + line.b * p.y - line.c;
+    float normSq = line.a * line.a + line.b * line.b;
+    vec2 normal = vec2(line.a, line.b);
+    return p - (2.0 * dist / normSq) * normal;
+}
+
+void setupTriangleEdges(out Line e1, out Line e2, out Line e3) {
+    float sqrt3 = 1.732;
+    e1 = Line(3.0, -sqrt3, -sqrt3);
+    e2 = Line(0.0, 1.0, -0.5);
+    e3 = Line(-3.0, -sqrt3, -sqrt3);
+}
+
+vec2 sierpinskiTriangle(vec2 p, int iterations, out bool inFractal) {
+    Line e1, e2, e3;
+    setupTriangleEdges(e1, e2, e3);
+    
+    inFractal = true;
+    
+    for(int i = 0; i < iterations; i++) {
+        // Fold into triangle
+        for(int j = 0; j < 10; j++) {
+            float d1 = e1.a * p.x + e1.b * p.y - e1.c;
+            if(d1 < 0.0) p = reflectAcrossLine(p, e1);
+            
+            float d2 = e2.a * p.x + e2.b * p.y - e2.c;
+            if(d2 < 0.0) p = reflectAcrossLine(p, e2);
+            
+            float d3 = e3.a * p.x + e3.b * p.y - e3.c;
+            if(d3 < 0.0) p = reflectAcrossLine(p, e3);
+        }
+        
+        // Check if in removed region
+        if(inMiddleTriangle(p)) {
+            inFractal = false;
+        }
+        
+        // Scale by 2
+        p = p * 2.0;
+    }
+    
+    return p;
+}
+```
+
+### Visualization
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = (uv - 0.5) * 3.0;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    bool inFractal;
+    vec2 p_final = sierpinskiTriangle(uv, 6, inFractal);
+    
+    vec3 color;
+    if(inFractal) {
+        // Color by final position
+        float t = length(p_final) * 0.1;
+        color = palette(t);
+    } else {
+        // Removed region
+        color = vec3(0.1, 0.1, 0.2);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+The Sierpinski triangle should now render with mathematically correct reflections!
+
+---
+
+## Sierpinski Carpet
+
+### Mathematical Description
+
+The Sierpinski carpet is the square analog:
+1. Start with a square
+2. Divide into a 3×3 grid of sub-squares
+3. Remove the central sub-square
+4. Recursively repeat on each remaining sub-square
+
+**Note:** Unlike the triangle, the carpet uses axis-aligned divisions, so the implementation is both simpler AND mathematically exact—no approximations needed!
+
+### The Algorithm
+
+Much simpler than the triangle because we can use axis-aligned operations!
+
+At each iteration:
+1. **Fold** using `abs()` to create 4-fold symmetry (all quadrants map to first quadrant)
+2. **Scale** by factor of 3
+3. **Check** if we're in the removed middle region
+
+### Implementation
+
+```glsl
+bool sierpinskiCarpet(vec2 p, int iterations) {
+    for(int i = 0; i < iterations; i++) {
+        // Fold to first quadrant (creates 4-fold symmetry)
+        p = abs(p);
+        
+        // Scale by 3 and recenter
+        p = p * 3.0 - vec2(1.0);
+        
+        // After this transformation, the "removed" region is
+        // approximately where both |p.x| < 1 and |p.y| < 1
+    }
+    
+    // Check if in removed region
+    // After n iterations, if we're in the central square, we're removed
+    return (abs(p.x) < 1.0 && abs(p.y) < 1.0);
+}
+```
+
+### More Robust Version
+
+```glsl
+vec2 carpetFold(vec2 p, int iterations, out bool inFractal) {
+    inFractal = true;
+    
+    for(int i = 0; i < iterations; i++) {
+        // Fold to first quadrant
+        p = abs(p);
+        
+        // Check if in middle third in both dimensions
+        // In normalized [0,1] space, middle third is [1/3, 2/3]
+        vec2 normalizedP = fract(p);  // Get fractional part
+        
+        bool inMiddleX = (normalizedP.x > 0.33 && normalizedP.x < 0.67);
+        bool inMiddleY = (normalizedP.y > 0.33 && normalizedP.y < 0.67);
+        
+        if(inMiddleX && inMiddleY) {
+            inFractal = false;
+        }
+        
+        // Scale by 3
+        p = p * 3.0;
+    }
+    
+    return p;
+}
+```
+
+### Clean Implementation
+
+A cleaner approach using the subdivision pattern:
+
+```glsl
+bool inSierpinskiCarpet(vec2 p, int iterations) {
+    // Normalize to [0, 1]
+    p = p * 0.5 + 0.5;
+    
+    for(int i = 0; i < iterations; i++) {
+        // Which cell of 3×3 grid are we in?
+        vec2 cell = floor(p * 3.0);
+        
+        // Middle cell (1,1) is removed
+        if(cell.x == 1.0 && cell.y == 1.0) {
+            return false;  // In removed region
+        }
+        
+        // Zoom into current cell
+        p = fract(p * 3.0);
+    }
+    
+    return true;  // In fractal
+}
+```
+
+### Visualization
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = (uv - 0.5) * 2.0;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    bool inFractal = inSierpinskiCarpet(uv, 6);
+    
+    vec3 color = inFractal ? vec3(1.0, 1.0, 0.8) : vec3(0.1, 0.1, 0.2);
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## Menger Sponge (3D Extension)
+
+### Mathematical Description
+
+The Menger sponge is the 3D analog of the Sierpinski carpet:
+1. Start with a cube
+2. Divide into a 3×3×3 grid of sub-cubes (27 total)
+3. Remove the central sub-cube and the 6 face-centered sub-cubes (7 removed, 20 remain)
+4. Recursively repeat on each remaining sub-cube
+
+**Note:** Like the carpet, the sponge uses axis-aligned divisions, giving us an exact, mathematically precise implementation.
+
+### The Algorithm
+
+Same pattern as the carpet, but in 3D!
+
+1. **Fold** using `abs(p)` to create octahedral symmetry
+2. **Scale** by factor of 3
+3. **Check** if we're in a removed region (middle cross pattern)
+
+### Implementation
+
+```glsl
+bool inMengerSponge(vec3 p, int iterations) {
+    for(int i = 0; i < iterations; i++) {
+        // Fold to first octant
+        p = abs(p);
+        
+        // Which cell of 3×3×3 grid?
+        vec3 cell = floor(p * 3.0);
+        
+        // Removed regions: center cube and face centers
+        // Center: (1,1,1)
+        // Face centers: (1,1,0), (1,1,2), (1,0,1), (1,2,1), (0,1,1), (2,1,1)
+        // Pattern: at least 2 coordinates equal to 1
+        
+        float ones = 0.0;
+        if(cell.x == 1.0) ones += 1.0;
+        if(cell.y == 1.0) ones += 1.0;
+        if(cell.z == 1.0) ones += 1.0;
+        
+        if(ones >= 2.0) {
+            return false;  // Removed region
+        }
+        
+        // Zoom into cell
+        p = fract(p * 3.0);
+    }
+    
+    return true;
+}
+```
+
+### Alternative: Using SDF Approach
+
+We can also implement the Menger sponge as a signed distance function for use with Day 4's raymarching:
+
+```glsl
+float sdBox(vec3 p, vec3 b) {
+    vec3 q = abs(p) - b;
+    return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
+}
+
+float sdMengerSponge(vec3 p, int iterations) {
+    float d = sdBox(p, vec3(1.0));  // Start with unit cube
+    
+    float scale = 1.0;
+    
+    for(int i = 0; i < iterations; i++) {
+        // Fold to first octant
+        vec3 a = mod(p * scale, 2.0) - 1.0;
+        scale *= 3.0;
+        
+        vec3 r = abs(1.0 - 3.0 * abs(a));
+        
+        // Distance to cross (removed region)
+        float da = max(r.x, r.y);
+        float db = max(r.y, r.z);
+        float dc = max(r.z, r.x);
+        float c = (min(da, min(db, dc)) - 1.0) / scale;
+        
+        d = max(d, c);
+    }
+    
+    return d;
+}
+```
+
+### Rendering with Raymarching
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // Setup ray (using Day 4 techniques)
+    Ray ray = getRay(fragCoord, iResolution.xy, 45.0);
+    
+    // Raymarch
+    float t = 0.0;
+    for(int i = 0; i < 100; i++) {
+        vec3 pos = ray.origin + t * ray.direction;
+        float d = sdMengerSponge(pos, 4);
+        
+        if(abs(d) < 0.001) {
+            // Hit!
+            vec3 normal = estimateNormal(pos);  // Day 4 technique
+            
+            vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+            float diffuse = max(0.0, dot(normal, lightDir));
+            
+            vec3 color = vec3(1.0, 0.8, 0.6) * diffuse + vec3(0.1);
+            fragColor = vec4(color, 1.0);
+            return;
+        }
+        
+        t += d;
+        if(t > 100.0) break;
+    }
+    
+    // Miss
+    fragColor = vec4(0.1, 0.1, 0.2, 1.0);
+}
+```
+
+---
+
+## General Principles of Folding Fractals
+
+### Key Ingredients
+
+1. **Symmetry operations**: 
+   - `abs()` for axis-aligned symmetry
+   - Reflections for arbitrary symmetry
+   
+2. **Scaling factor**:
+   - Factor of 2: Sierpinski triangle
+   - Factor of 3: Sierpinski carpet, Menger sponge
+   - General factor $s$: determines fractal dimension
+   
+3. **Removal pattern**:
+   - Which regions get removed at each level
+   - Defines the fractal's structure
+   
+4. **Iteration**:
+   - More iterations = more detail
+   - Computational cost grows linearly
+   - Visual complexity grows exponentially
+
+### Fractal Dimension
+
+The fractal dimension $D$ can be computed from the scaling factor $s$ and the number of remaining pieces $N$:
+
+$$D = \frac{\log N}{\log s}$$
+
+**Examples:**
+- **Sierpinski triangle**: $N = 3$ pieces, scale factor $s = 2$
+  $$D = \frac{\log 3}{\log 2} \approx 1.585$$
+  
+- **Sierpinski carpet**: $N = 8$ pieces, scale factor $s = 3$
+  $$D = \frac{\log 8}{\log 3} \approx 1.893$$
+  
+- **Menger sponge**: $N = 20$ pieces, scale factor $s = 3$
+  $$D = \frac{\log 20}{\log 3} \approx 2.727$$
+
+The fractal dimension is between the topological dimension and the embedding dimension, reflecting the fractal's "in-between" nature!
+
+---
+
+## Coloring Strategies
+
+### By Iteration Depth
+
+Track which iteration first identifies a point as removed:
+
+```glsl
+int firstRemovedIter = -1;
+
+for(int i = 0; i < iterations; i++) {
+    // [Folding and scaling]
+    
+    if([in removed region] && firstRemovedIter < 0) {
+        firstRemovedIter = i;
+    }
+}
+
+float t = float(firstRemovedIter) / float(iterations);
+vec3 color = palette(t);
+```
+
+### By Distance After Folding
+
+```glsl
+vec2 p_final = [after all folding];
+float d = length(p_final);
+vec3 color = vec3(d * 0.5);  // Grayscale by distance
+```
+
+### By Cell Position
+
+For grid-based fractals (carpet, sponge), color by which sub-cell the point lands in:
+
+```glsl
+vec3 cell = floor(p * 3.0);
+vec3 color = cell / 3.0;  // RGB from cell coordinates
+```
+
+### Hybrid: Distance Field + Fractal
+
+For 3D fractals, combine distance estimation with fractal membership:
+
+```glsl
+float d = sdMengerSponge(p, iterations);
+vec3 color;
+
+if(d < 0.0) {
+    // Inside sponge
+    color = vec3(1.0, 0.8, 0.6);
+} else {
+    // Outside, but show distance
+    color = vec3(0.1) + vec3(0.2) / (1.0 + d);
+}
+```
+
+---
+
+## Variations and Experiments
+
+### Different Folding Operations
+
+Try different symmetry groups:
+- Hexagonal symmetry (6-fold)
+- Octahedral symmetry (for 3D)
+- Custom reflection patterns
+
+### Different Scale Factors
+
+- Scale by 4: sparser fractal
+- Scale by 1.5: denser fractal
+- Non-integer scales: unusual structures
+
+### Animated Parameters
+
+```glsl
+float scale = 2.0 + 0.5 * sin(iTime);
+p = p * scale;
+```
+
+Watch the fractal morph as the scale factor changes!
+
+### Color by Orbit
+
+Track the "orbit" of the point through the folding process:
+
+```glsl
+float orbit = 0.0;
+
+for(int i = 0; i < iterations; i++) {
+    orbit += length(p);  // Accumulate total distance traveled
+    // [Folding operations]
+}
+
+vec3 color = palette(orbit / 10.0);
+```
+
+### 3D Variations
+
+- **Cross-Menger**: Different removal pattern (only center)
+- **Jerusalem Cube**: Variation with different symmetry
+- **Hybrid fractals**: Combine different removal patterns at different scales
+
+---
+
+## Connection to Course Topics
+
+### Day 2: Iteration Creates Fractals
+
+Both folding fractals and the Mandelbrot set/Apollonian gasket share the principle: **simple operations iterated create complex structure**.
+
+- **Mandelbrot**: $z \to z^2 + c$ (complex arithmetic iteration)
+- **Apollonian**: Repeated circle inversions (geometric iteration)
+- **Sierpinski**: Fold + scale (geometric iteration with scaling)
+
+### Day 3: Folding Without Scaling
+
+Euclidean and hyperbolic tilings use folding **without** scaling:
+- Reflection brings points into fundamental domain
+- No scaling → fills space with copies
+- With scaling → creates fractal structure
+
+### Day 4: 3D Rendering
+
+The Menger sponge naturally extends to 3D:
+- Can be rendered as SDF (raymarching)
+- Can be rendered as boolean test (simple ray casting)
+- Demonstrates 3D coordinate folding
+
+---
+
+## Exercises
+
+### Exercise 1: Hexagonal Sierpinski
+
+Create a Sierpinski gasket based on a hexagon instead of a triangle:
+- Use 6-fold symmetry
+- Scale by factor of 3
+- Remove appropriate regions
+
+### Exercise 2: Animate the Scale Factor
+
+Modify the Sierpinski carpet to have a time-varying scale factor:
+```glsl
+float scale = 3.0 + sin(iTime);
+```
+Watch how the fractal structure changes!
+
+### Exercise 3: 3D Cross
+
+Implement a 3D fractal using only cross-shaped removal (remove only the center cube, not the face centers). Compare to the standard Menger sponge.
+
+### Exercise 4: Hybrid Fractal
+
+Combine two different fractals:
+- First 3 iterations: Sierpinski triangle folding
+- Next 3 iterations: Sierpinski carpet folding
+- Observe the unusual resulting structure
+
+### Exercise 5: Distance-Colored Sponge
+
+Render the Menger sponge with colors based on distance from the surface:
+- Use `sdMengerSponge` as a distance field
+- Color by distance for points outside
+- Different color for points inside
+
+---
+
+## Further Reading
+
+### Mathematical Theory
+- Hausdorff dimension and box-counting dimension
+- Iterated function systems (IFS)
+- Self-similar sets and scaling symmetries
+
+### Computational Techniques
+- Escape-time algorithms
+- Distance estimation for fractals
+- Efficient rendering of fractal geometry
+
+### Applications
+- Procedural generation in games/graphics
+- Antenna design (fractal antennas)
+- Modeling natural phenomena (coastlines, plants)
+- Compression algorithms
+
+---
+
+## Summary
+
+Folding fractals demonstrate:
+1. **Iteration + scaling** creates self-similar structure
+2. **Simple operations** produce complex results
+3. **GPU parallelism** enables real-time fractal rendering
+4. **Fractals connect** to many course topics (iteration, symmetry, 3D)
+
+The techniques here—folding, scaling, iteration—are fundamental to both mathematical fractals and computer graphics. These methods extend naturally from 2D to 3D, and from static to animated, making them powerful tools for mathematical visualization.
+
+**Key takeaway**: Fractals aren't just beautiful—they're computationally accessible. A few dozen lines of shader code can generate infinite complexity!
+
+---
+
+## Complete Example: Animated Sierpinski Carpet
+
+```glsl
+vec3 palette(float t) {
+    vec3 a = vec3(0.5);
+    vec3 b = vec3(0.5);
+    vec3 c = vec3(1.0);
+    vec3 d = vec3(0.0, 0.33, 0.67);
+    return a + b * cos(6.28318 * (c * t + d));
+}
+
+bool inCarpet(vec2 p, int iterations) {
+    p = p * 0.5 + 0.5;
+    
+    for(int i = 0; i < iterations; i++) {
+        vec2 cell = floor(p * 3.0);
+        if(cell.x == 1.0 && cell.y == 1.0) return false;
+        p = fract(p * 3.0);
+    }
+    return true;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = (uv - 0.5) * 2.0;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    // Zoom animation
+    float zoom = exp(sin(iTime * 0.3) * 2.0);
+    uv *= zoom;
+    
+    // Rotation animation
+    float angle = iTime * 0.2;
+    float c = cos(angle), s = sin(angle);
+    uv = vec2(c * uv.x - s * uv.y, s * uv.x + c * uv.y);
+    
+    int iterations = 6;
+    bool inFractal = inCarpet(uv, iterations);
+    
+    vec3 color;
+    if(inFractal) {
+        // Color based on distance from center
+        float d = length(uv);
+        color = palette(d * 0.5 + iTime * 0.1);
+    } else {
+        color = vec3(0.05, 0.05, 0.1);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+This creates a beautiful, animated Sierpinski carpet that zooms and rotates, with colors flowing through the fractal structure!
