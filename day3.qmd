@@ -2,102 +2,77 @@
 
 ## Overview
 
-Today we explore geometric tilings through reflection operations. We'll start with triangle tilings in Euclidean space, then venture into hyperbolic geometry where the same techniques produce dramatically different patterns. We'll work primarily in the upper half-plane model, learning to compute with geodesics and the hyperbolic metric, then transform our work into the Poincaré disk for visualization.
+Today we explore geometric tilings through reflection operations. We'll start by building a general framework for reflections in Euclidean space, then venture into hyperbolic geometry where the same algorithmic approach produces dramatically different patterns.
 
-By the end of today, you'll understand how reflection-based tiling algorithms work across different geometries, and have working implementations of both Euclidean and hyperbolic tilings.
+The key insight: **the algorithm stays the same across geometries—only the reflection operations change.** This mirrors what we saw yesterday with the Apollonian gasket: iteratively apply a geometric transformation until we reach a desired region.
+
+By the end of today, you'll understand:
+- How to construct reflections using linear algebra
+- The folding algorithm for creating tilings
+- The structure of hyperbolic geometry in the upper half-plane model
+- How to implement hyperbolic triangle tilings using the same algorithmic pattern
+- How to convert between different models of hyperbolic space
 
 ---
 
-## Euclidean Triangle Tiling
+## Part 1: Reflection and Tilings in Euclidean Geometry
 
-### The Fundamental Domain
+### Starting Simple: The Folding Algorithm
 
-An equilateral triangle tiles the Euclidean plane. Given an equilateral triangle, we can:
-1. Reflect across its three edges
-2. Repeat this process on the resulting triangles
-3. Fill the entire plane with copies of the original triangle
+Before we dive into general theory, let's build intuition with the simplest possible example: creating a repeating strip pattern.
 
-This is a **tiling by reflection**: the entire plane is covered by reflected copies of our fundamental domain.
+#### Tiling a Strip
 
-### Setting Up the Triangle
+Imagine we want to tile the plane horizontally. We'll define a fundamental domain—the strip $0 < x < 1$—and reflect any point outside this strip back inside.
 
-Let's work with an equilateral triangle with vertices at:
-$$v_0 = (0, 1), \quad v_1 = \left(-\frac{\sqrt{3}}{2}, -\frac{1}{2}\right), \quad v_2 = \left(\frac{\sqrt{3}}{2}, -\frac{1}{2}\right)$$
+The algorithm is remarkably simple:
+- If $x < 0$, reflect across $x = 0$
+- If $x > 1$, reflect across $x = 1$  
+- Repeat until the point stops moving
 
-This triangle has side length $\sqrt{3}$ and is centered at the origin.
+For a vertical line at $x = c$, reflection just flips the $x$-coordinate: $(x, y) \mapsto (2c - x, y)$.
 
+Here's a complete shader:
 ```glsl
-// Define triangle vertices
-vec2 v0 = vec2(0.0, 1.0);
-vec2 v1 = vec2(-0.866, -0.5);  // -sqrt(3)/2 ≈ -0.866
-vec2 v2 = vec2(0.866, -0.5);
-```
-
-### Reflection Across a Line
-
-To reflect a point $p$ across a line through the origin with unit normal $\mathbf{n}$, we use:
-$$p' = p - 2(\mathbf{n} \cdot p)\mathbf{n}$$
-
-For a line through two points (an edge of our triangle), we:
-1. Compute the edge direction
-2. Find the perpendicular (normal to the edge)
-3. Check which side of the line we're on
-4. Reflect if necessary
-
-**Implementation for one edge:**
-
-```glsl
-vec2 reflectAcrossEdge(vec2 p, vec2 v0, vec2 v1) {
-    // Edge direction
-    vec2 edge = v1 - v0;
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // Standard coordinate setup
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = (uv - 0.5) * 4.0;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv;
     
-    // Normal to edge (perpendicular, pointing outward)
-    vec2 normal = normalize(vec2(-edge.y, edge.x));
-    
-    // Signed distance to line
-    float dist = dot(p - v0, normal);
-    
-    // Reflect if on the wrong side (dist < 0)
-    if(dist < 0.0) {
-        p = p - 2.0 * dist * normal;
+    // Fold into the strip [0, 1]
+    for(int i = 0; i < 20; i++) {
+        if(p.x < 0.0) p.x = -p.x;
+        if(p.x > 1.0) p.x = 2.0 - p.x;
     }
     
-    return p;
+    // Draw something in the fundamental domain
+    vec3 color = vec3(0.2, 0.2, 0.3);  // Dark background
+    
+    // A circle in the strip
+    float d = length(p - vec2(0.5, 0.0));
+    if(d < 0.3) {
+        color = vec3(1.0, 0.8, 0.3);  // Yellow circle
+    }
+    
+    // Draw the boundary lines
+    if(abs(p.x) < 0.02 || abs(p.x - 1.0) < 0.02) {
+        color = vec3(1.0, 1.0, 1.0);
+    }
+    
+    fragColor = vec4(color, 1.0);
 }
 ```
 
-### Iterative Folding into the Triangle
+You should see the yellow circle repeat infinitely across the screen! We only drew it once, but the folding algorithm tiles it everywhere.
 
-We repeatedly reflect $p$ across the three edges until it lands inside the fundamental domain:
+---
 
-```glsl
-vec2 foldToTriangle(vec2 p, int maxIter, out int foldCount) {
-    foldCount = 0;
-    
-    vec2 v0 = vec2(0.0, 1.0);
-    vec2 v1 = vec2(-0.866, -0.5);
-    vec2 v2 = vec2(0.866, -0.5);
-    
-    for(int i = 0; i < maxIter; i++) {
-        vec2 p_old = p;
-        
-        // Reflect across each edge if necessary
-        p = reflectAcrossEdge(p, v0, v1);
-        p = reflectAcrossEdge(p, v1, v2);
-        p = reflectAcrossEdge(p, v2, v0);
-        
-        // Check if we're done (no more reflections)
-        if(length(p - p_old) < 0.0001) break;
-        
-        foldCount++;
-    }
-    
-    return p;
-}
-```
+#### Square Tiling
 
-### Visualization: Euclidean Tiling
-
+Let's extend to two dimensions. Now we have four boundaries: $x = 0$, $x = 1$, $y = 0$, and $y = 1$. Same algorithm, just more boundaries to check:
 ```glsl
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
@@ -107,242 +82,647 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     uv.x *= iResolution.x / iResolution.y;
     vec2 p = uv;
     
-    // Fold to fundamental domain
-    int foldCount;
-    vec2 p_folded = foldToTriangle(p, 20, foldCount);
+    // Fold into the square [0,1] × [0,1]
+    int foldCount = 0;
+    for(int i = 0; i < 20; i++) {
+        vec2 p_old = p;
+        
+        if(p.x < 0.0) p.x = -p.x;
+        if(p.x > 1.0) p.x = 2.0 - p.x;
+        if(p.y < 0.0) p.y = -p.y;
+        if(p.y > 1.0) p.y = 2.0 - p.y;
+        
+        // If point didn't move, we're done
+        if(length(p - p_old) < 0.0001) break;
+        foldCount++;
+    }
     
     // Color based on fold count
-    float t = float(foldCount) / 10.0;
-    vec3 color = palette(t);  // Use palette function from Day 2
+    float t = float(foldCount) / 8.0;
+    vec3 color = 0.5 + 0.5 * cos(6.28318 * (vec3(1.0) * t + vec3(0.0, 0.33, 0.67)));
+    
+    // Draw something in the fundamental domain
+    float d = length(p - vec2(0.5, 0.5));
+    if(d < 0.3) {
+        color = mix(color, vec3(1.0, 1.0, 0.3), smoothstep(0.3, 0.25, d));
+    }
+    
+    // Draw boundaries
+    float border = min(min(p.x, 1.0 - p.x), min(p.y, 1.0 - p.y));
+    if(border < 0.02) {
+        color = vec3(1.0);
+    }
     
     fragColor = vec4(color, 1.0);
 }
 ```
 
-The result: a beautiful triangular tiling of the plane, colored by how many reflections were needed to reach the fundamental domain!
+Perfect! A full 2D tiling. The color gradient shows how many reflections were needed.
+
+Notice the convergence check: we save the old position and check if the point stopped moving. When no boundary causes a reflection, the point has reached the fundamental domain.
 
 ---
 
-## Hyperbolic Geometry: Models and Metrics
+### Abstracting: Half-Spaces
+
+Looking at our square tiling code, we see repetition: check a boundary, reflect if outside, repeat. Let's abstract this pattern so we can handle arbitrary shapes.
+
+#### What is a Half-Space?
+
+A **half-space** is one side of a line. Any line $ax + by = c$ divides the plane into two regions:
+- Points where $ax + by < c$
+- Points where $ax + by > c$
+
+We'll encode a half-space by storing the line parameters and which side we want:
+```glsl
+struct HalfSpace {
+    float a, b, c;  // Line parameters: ax + by = c
+    float side;     // +1 or -1 for which side
+};
+```
+
+::: {.callout-note}
+## A Note on Redundancy
+
+This representation is actually redundant: we could fix the convention to always use $ax + by < c$ (side implicit) and just flip signs of $a$, $b$, $c$ to get the other side. For example, $x < 1$ is the same as $-x > -1$.
+
+But having an explicit `side` parameter is convenient for clarity, and will be essential when we move to hyperbolic geometry where the sign-flipping doesn't work as cleanly. The small redundancy is worth the flexibility!
+:::
+
+#### The Reflection Formula
+
+To reflect a point $\mathbf{p} = (x, y)$ across the line $ax + by = c$, we use linear algebra. The normal vector to the line is $\mathbf{n} = (a, b)$. After normalizing to $\hat{\mathbf{n}} = \mathbf{n}/|\mathbf{n}|$, the reflection formula is:
+
+$$\mathbf{p}' = \mathbf{p} - 2d\hat{\mathbf{n}}$$
+
+where $d$ is the signed distance from $\mathbf{p}$ to the line:
+$$d = \frac{ax + by - c}{\sqrt{a^2 + b^2}}$$
+
+This is a standard result from linear algebra! The signed distance tells us how far we are from the line (positive on one side, negative on the other), and we move twice that distance in the normal direction to get the reflection.
+
+#### Implementation
+
+Let's write a function that reflects into a half-space—checking if we're on the right side, and only reflecting if necessary:
+```glsl
+vec2 reflectInto(vec2 p, HalfSpace hs) {
+    // Compute which side of the line we're on
+    float value = hs.a * p.x + hs.b * p.y;
+    
+    // Check if we're already on the correct side
+    if((value - hs.c) * hs.side < 0.0) {
+        return p;  // Already inside, nothing to do
+    }
+    
+    // We're on the wrong side - reflect across the boundary line
+    vec2 normal = vec2(hs.a, hs.b);
+    float norm = length(normal);
+    normal = normal / norm;
+    
+    float signedDist = (value - hs.c) / norm;
+    return p - 2.0 * signedDist * normal;
+}
+```
+
+This function encapsulates the entire pattern: check if we're on the correct side, and only reflect if we're not.
+
+---
+
+### Square Tiling with Half-Spaces
+
+Let's rewrite our square tiling using this abstraction. For the square $[0, 1] \times [0, 1]$, we need four half-spaces:
+
+- **Left edge** ($x = 0$): We want $x > 0$  
+  Line: $x = 0$ means $1 \cdot x + 0 \cdot y = 0$  
+  For $x > 0$: $(x - 0) \cdot (-1) < 0$ ✓  
+  So: `HalfSpace(1.0, 0.0, 0.0, -1.0)`
+
+- **Right edge** ($x = 1$): We want $x < 1$  
+  So: `HalfSpace(1.0, 0.0, 1.0, 1.0)`
+
+- **Bottom and top**: Similarly for $y$
+
+Complete shader:
+```glsl
+struct HalfSpace {
+    float a, b, c;
+    float side;
+};
+
+vec2 reflectInto(vec2 p, HalfSpace hs) {
+    float value = hs.a * p.x + hs.b * p.y;
+    
+    if((value - hs.c) * hs.side < 0.0) {
+        return p;
+    }
+    
+    vec2 normal = vec2(hs.a, hs.b);
+    float norm = length(normal);
+    normal = normal / norm;
+    
+    float signedDist = (value - hs.c) / norm;
+    return p - 2.0 * signedDist * normal;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // Coordinate setup
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = (uv - 0.5) * 4.0;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv;
+    
+    // Define the four half-spaces for our square [0,1]×[0,1]
+    HalfSpace left   = HalfSpace(1.0, 0.0, 0.0, -1.0);  // x > 0
+    HalfSpace right  = HalfSpace(1.0, 0.0, 1.0,  1.0);  // x < 1
+    HalfSpace bottom = HalfSpace(0.0, 1.0, 0.0, -1.0);  // y > 0
+    HalfSpace top    = HalfSpace(0.0, 1.0, 1.0,  1.0);  // y < 1
+    
+    // Fold into the square
+    int foldCount = 0;
+    for(int i = 0; i < 20; i++) {
+        vec2 p_old = p;
+        
+        p = reflectInto(p, left);
+        p = reflectInto(p, right);
+        p = reflectInto(p, bottom);
+        p = reflectInto(p, top);
+        
+        // If point didn't move, we're inside
+        if(length(p - p_old) < 0.0001) break;
+        foldCount++;
+    }
+    
+    // Color based on fold count
+    float t = float(foldCount) / 8.0;
+    vec3 color = 0.5 + 0.5 * cos(6.28318 * (vec3(1.0) * t + vec3(0.0, 0.33, 0.67)));
+    
+    // Draw something in the fundamental domain
+    float d = length(p - vec2(0.5, 0.5));
+    if(d < 0.3) {
+        color = mix(color, vec3(1.0, 1.0, 0.3), smoothstep(0.3, 0.25, d));
+    }
+    
+    // Draw boundaries
+    float border = min(min(p.x, 1.0 - p.x), min(p.y, 1.0 - p.y));
+    if(border < 0.02) {
+        color = vec3(1.0);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+This looks identical to before, but now our code is flexible. The beauty: **changing from a square to a triangle only requires changing the half-space definitions!**
+
+---
+
+### Triangle Tiling
+
+Now we're ready for triangles. We'll use an equilateral triangle with vertices:
+$$v_0 = (0, 1), \quad v_1 = \left(-\frac{\sqrt{3}}{2}, -\frac{1}{2}\right), \quad v_2 = \left(\frac{\sqrt{3}}{2}, -\frac{1}{2}\right)$$
+
+#### Computing Half-Spaces from Edges
+
+For each edge, we compute the line parameters. The math (shown in the callout below) gives us:
+
+**Edge from $v_0$ to $v_1$:** `HalfSpace(1.5, -0.866, -0.866, -1.0)`  
+**Edge from $v_1$ to $v_2$:** `HalfSpace(0.0, 1.732, -0.866, -1.0)`  
+**Edge from $v_2$ to $v_0$:** `HalfSpace(-1.5, -0.866, -0.866, -1.0)`
+
+::: {.callout-note collapse="true"}
+## Derivation of Half-Space Parameters
+
+For edge from $v_0 = (0, 1)$ to $v_1 = (-0.866, -0.5)$:
+- Edge direction: $\mathbf{d} = v_1 - v_0 = (-0.866, -1.5)$
+- Perpendicular (90° CCW): $\mathbf{n} = (-d_y, d_x) = (1.5, -0.866)$
+- Line: $1.5x - 0.866y = c$ where $c = \mathbf{n} \cdot v_0 = -0.866$
+- For origin (inside): $1.5(0) - 0.866(0) - (-0.866) = 0.866 > 0$
+- Want inside when $(ax + by - c) < 0$, so `side = -1.0`
+
+Similar calculations for the other two edges.
+:::
+
+Here's the complete triangle tiling shader:
+```glsl
+struct HalfSpace {
+    float a, b, c;
+    float side;
+};
+
+vec2 reflectInto(vec2 p, HalfSpace hs) {
+    float value = hs.a * p.x + hs.b * p.y;
+    
+    if((value - hs.c) * hs.side < 0.0) {
+        return p;
+    }
+    
+    vec2 normal = vec2(hs.a, hs.b);
+    float norm = length(normal);
+    normal = normal / norm;
+    
+    float signedDist = (value - hs.c) / norm;
+    return p - 2.0 * signedDist * normal;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // Coordinate setup
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = (uv - 0.5) * 4.0;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv;
+    
+    // Define three half-spaces for the triangle edges
+    HalfSpace hs1 = HalfSpace(1.5, -0.866, -0.866, -1.0);
+    HalfSpace hs2 = HalfSpace(0.0, 1.732, -0.866, -1.0);
+    HalfSpace hs3 = HalfSpace(-1.5, -0.866, -0.866, -1.0);
+    
+    // Fold into the triangle
+    int foldCount = 0;
+    for(int i = 0; i < 20; i++) {
+        vec2 p_old = p;
+        
+        p = reflectInto(p, hs1);
+        p = reflectInto(p, hs2);
+        p = reflectInto(p, hs3);
+        
+        // If point didn't move, we're inside
+        if(length(p - p_old) < 0.0001) break;
+        foldCount++;
+    }
+    
+    // Color based on fold count
+    float t = float(foldCount) / 10.0;
+    vec3 color = 0.5 + 0.5 * cos(6.28318 * (vec3(1.0) * t + vec3(0.0, 0.33, 0.67)));
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+Beautiful! An infinite tiling of equilateral triangles.
+
+::: {.callout-note}
+## The Power of Abstraction
+
+Compare this to our square shader. The algorithm is *identical*:
+1. Define boundaries as half-spaces
+2. Repeatedly reflect into each half-space  
+3. Check for convergence
+4. Color based on iteration count
+
+We changed from squares to triangles by just changing the half-space definitions. This is mathematical abstraction at work!
+:::
+
+This completes our Euclidean foundation. We've seen:
+1. The folding algorithm in concrete examples
+2. The half-space abstraction that makes it general
+3. Convergence checking by detecting when points stop moving
+
+Next, we'll take this exact algorithmic structure into hyperbolic geometry!
+
+---
+
+## Part 2: Hyperbolic Geometry
+
+### Introduction to Hyperbolic Geometry
+
+Hyperbolic geometry is one of the three classical geometries (Euclidean, spherical, and hyperbolic), characterized by constant **negative curvature**. It was discovered independently in the early 1800s by János Bolyai, Nikolai Lobachevsky, and Carl Friedrich Gauss.
+
+Hyperbolic geometry appears throughout modern mathematics:
+- **Moduli spaces** and Teichmüller theory
+- **Kleinian groups** and complex dynamics  
+- **Low-dimensional topology** (3-manifolds, knot theory)
+- **Number theory** (modular forms and the upper half-plane)
+- **General relativity** (negative curvature spacetimes)
+
+Key properties that distinguish hyperbolic geometry:
+- Triangle angles sum to **less than** $\pi$ (not exactly $\pi$ as in Euclidean)
+- **Exponential growth**: The circumference of a circle grows exponentially with its radius
+- Given a line and a point not on it, there are **infinitely many** lines through the point parallel to the given line
+
+This "extra room" in hyperbolic space allows for richer tiling structures than Euclidean geometry.
+
+---
 
 ### The Upper Half-Plane Model
 
-The upper half-plane model $\mathbb{H}^2$ consists of complex numbers with positive imaginary part:
-$$\mathbb{H}^2 = \{z \in \mathbb{C} : \text{Im}(z) > 0\}$$
+We'll work in the **upper half-plane model** of hyperbolic geometry, denoted $\mathbb{H}^2$:
 
-The hyperbolic metric is:
-$$ds^2 = \frac{dx^2 + dy^2}{y^2} = \frac{|dz|^2}{(\text{Im}(z))^2}$$
+$$\mathbb{H}^2 = \{z = x + iy \in \mathbb{C} : y > 0\}$$
 
-This metric "blows up" as we approach the real axis (the boundary at infinity), making the geometry shrink near $y = 0$.
+This is just complex numbers with positive imaginary part. The **real axis** $\{y = 0\}$ forms the boundary "at infinity"—it's not actually part of the hyperbolic plane, but represents points infinitely far away.
 
-### Geodesics in the Upper Half-Plane
+The **hyperbolic metric** (which measures distances and angles) is:
+$$ds^2 = \frac{dx^2 + dy^2}{y^2}$$
 
-Geodesics (hyperbolic "straight lines") in $\mathbb{H}^2$ are:
-1. Vertical lines $\{x = c\}$ for constant $c$
-2. Semicircles centered on the real axis, perpendicular to it
+This makes $\mathbb{H}^2$ a complete Riemannian manifold with constant curvature $-1$.
 
-For a semicircle of radius $R$ centered at $(c, 0)$, the equation is:
-$$(x - c)^2 + y^2 = R^2, \quad y > 0$$
+::: {.callout-note}
+## Understanding the Metric
 
-### Hyperbolic Distance
+The factor $1/y^2$ means Euclidean distances are scaled by $1/y$. As $y \to 0$ (approaching the real axis), this scaling factor blows up—the boundary is infinitely far away in hyperbolic distance.
 
-The distance between two points $z, w \in \mathbb{H}^2$ is:
-$$d(z, w) = \text{arcosh}\left(1 + \frac{|z - w|^2}{2 \cdot \text{Im}(z) \cdot \text{Im}(w)}\right)$$
+Think of it this way: An ant at height $y = 1$ that walks down to height $y = 0.01$ travels a huge hyperbolic distance, even though the Euclidean distance is small. This "compression" near the boundary creates the extra "room" that makes hyperbolic geometry so different from Euclidean geometry.
 
-In GLSL:
-```glsl
-float hyperbolicDistance(vec2 z, vec2 w) {
-    float diff2 = dot(z - w, z - w);  // |z - w|²
-    float denom = 2.0 * z.y * w.y;    // 2·Im(z)·Im(w)
-    float arg = 1.0 + diff2 / denom;
-    return log(arg + sqrt(arg * arg - 1.0));  // acosh(x) = log(x + sqrt(x²-1))
-}
-```
-
-### The Poincaré Disk Model
-
-The Poincaré disk model consists of the interior of the unit disk:
-$$\mathbb{D}^2 = \{z \in \mathbb{C} : |z| < 1\}$$
-
-The metric is:
-$$ds^2 = \frac{4(dx^2 + dy^2)}{(1 - |z|^2)^2}$$
-
-Geodesics are circular arcs perpendicular to the unit circle (or diameters).
-
-### Converting Between Models
-
-The Cayley transform maps the upper half-plane to the disk:
-$$w = \frac{z - i}{z + i}$$
-
-The inverse is:
-$$z = i\frac{1 + w}{1 - w}$$
-
-In GLSL (using complex arithmetic from Day 2):
-```glsl
-vec2 uhpToDisk(vec2 z) {
-    // w = (z - i) / (z + i)
-    vec2 numerator = z - vec2(0.0, 1.0);      // z - i
-    vec2 denominator = z + vec2(0.0, 1.0);    // z + i
-    return cdiv(numerator, denominator);
-}
-
-vec2 diskToUHP(vec2 w) {
-    // z = i(1 + w) / (1 - w)
-    vec2 numerator = vec2(0.0, 1.0) + w;      // i + iw  
-    numerator = vec2(-numerator.y, numerator.x);  // Multiply by i
-    vec2 denominator = vec2(1.0, 0.0) - w;    // 1 - w
-    return cdiv(numerator, denominator);
-}
-```
+The metric is **conformal** to the Euclidean metric—it preserves angles but not lengths. A triangle that looks like it has the right angles when you draw it actually does have those angles hyperbolically!
+:::
 
 ---
 
-## The (2,3,∞) Triangle in the Upper Half-Plane
+### Geodesics and Reflections
 
-### Triangle Setup
+#### Geodesics in the Upper Half-Plane
 
-For our first hyperbolic tiling, we'll use a triangle with particularly nice edges in the upper half-plane:
-- **Bottom edge**: Unit semicircle centered at origin (equation: $x^2 + y^2 = 1$, $y > 0$)
-- **Left edge**: Vertical geodesic at $x = -1$
-- **Right edge**: Vertical geodesic at $x = 1$
+**Geodesics** (the "straight lines" of hyperbolic geometry—curves that locally minimize distance) in $\mathbb{H}^2$ have exactly two forms:
 
-This creates a hyperbolic triangle with one ideal vertex (at infinity on the $y$-axis) and two finite vertices.
+1. **Vertical lines**: $\{x = c\}$ for any constant $c \in \mathbb{R}$
+2. **Semicircles**: Centered on the real axis, perpendicular to it
 
+These are curves that meet the boundary at right angles. Every geodesic is determined by where it intersects the boundary (the real axis).
+
+#### Reflection Across Vertical Lines
+
+For a vertical geodesic at $x = c$, reflection is simple—just flip the $x$-coordinate:
+$$\text{reflect}_{x=c}(x + iy) = (2c - x) + iy$$
+
+This is exactly what we had in Euclidean geometry! Now we implement it with our half-space convention:
 ```glsl
-struct Geodesic {
-    int type;  // 0 = vertical line, 1 = semicircle
-    vec2 data;  // For vertical: (x_pos, unused), for semicircle: (center_x, radius)
-};
-
-void setupTriangle(out Geodesic g1, out Geodesic g2, out Geodesic g3) {
-    g1.type = 1;  // Semicircle
-    g1.data = vec2(0.0, 1.0);  // Center at origin, radius 1
-    
-    g2.type = 0;  // Vertical line
-    g2.data = vec2(-1.0, 0.0);  // At x = -1
-    
-    g3.type = 0;  // Vertical line
-    g3.data = vec2(1.0, 0.0);  // At x = 1
-}
-```
-
-### Checking if a Point is in the Triangle
-
-```glsl
-bool inTriangle(vec2 p) {
-    // Above the semicircle: x² + y² > 1
-    bool aboveSemicircle = dot(p, p) > 1.0;
-    
-    // Between vertical lines: -1 < x < 1
-    bool betweenLines = (p.x > -1.0) && (p.x < 1.0);
-    
-    return aboveSemicircle && betweenLines;
-}
-```
-
-### Reflection Across Geodesics
-
-**Reflection across a vertical line $x = c$:**
-$$\text{reflect}(x + iy) = (2c - x) + iy$$
-
-```glsl
-vec2 reflectVertical(vec2 p, float c) {
-    return vec2(2.0 * c - p.x, p.y);
-}
-```
-
-**Reflection across a semicircle (circle inversion from yesterday!):**
-For a circle of radius $R$ centered at $(c_x, 0)$:
-
-```glsl
-vec2 reflectCircle(vec2 p, vec2 center, float radius) {
-    vec2 diff = p - center;
-    float r2 = dot(diff, diff);
-    return center + (radius * radius) * diff / r2;
-}
-```
-
-### Folding into the Fundamental Domain
-
-```glsl
-vec2 foldToHyperbolicTriangle(vec2 p, int maxIter, out int foldCount) {
-    foldCount = 0;
-    
-    for(int i = 0; i < maxIter; i++) {
-        bool folded = false;
-        
-        // Reflect across left vertical line if needed
-        if(p.x < -1.0) {
-            p = reflectVertical(p, -1.0);
-            folded = true;
-        }
-        
-        // Reflect across right vertical line if needed
-        if(p.x > 1.0) {
-            p = reflectVertical(p, 1.0);
-            folded = true;
-        }
-        
-        // Reflect across semicircle if needed
-        if(dot(p, p) < 1.0) {
-            p = reflectCircle(p, vec2(0.0, 0.0), 1.0);
-            folded = true;
-        }
-        
-        if(folded) foldCount++;
-        else break;  // In fundamental domain
+vec2 reflectIntoVertical(vec2 z, float x_pos, float side) {
+    // Check if we're on the correct side
+    if((z.x - x_pos) * side < 0.0) {
+        return z;  // Already on correct side
     }
     
-    return p;
+    // Reflect across the vertical line
+    z.x = 2.0 * x_pos - z.x;
+    return z;
 }
 ```
 
-### Visualization: Hyperbolic Tiling
+The `side` parameter works the same way: `side = -1.0` means we want $x > x_{\text{pos}}$, and `side = 1.0` means $x < x_{\text{pos}}$.
 
+#### Reflection Across Semicircles
+
+For a semicircular geodesic with endpoints $p$ and $q$ on the real axis, we use **circle inversion from Day 2!**
+
+The semicircle has:
+- Center: $c = (p + q)/2$
+- Radius: $R = |p - q|/2$
+
+The inversion formula is:
+$$z \mapsto c + R^2 \frac{z - c}{|z - c|^2}$$
+
+This is exactly the same as yesterday's Apollonian gasket! The code is nearly identical:
 ```glsl
+vec2 reflectIntoCircular(vec2 z, float p, float q, float side) {
+    // Semicircle from p to q on real axis
+    float center = (p + q) / 2.0;
+    float radius = abs(p - q) / 2.0;
+    
+    // Check which side we're on
+    vec2 rel = z - vec2(center, 0.0);
+    float dist2 = dot(rel, rel);
+    
+    // side = 1.0 means outside circle, side = -1.0 means inside
+    if((dist2 - radius * radius) * side > 0.0) {
+        return z;  // Already on correct side
+    }
+    
+    // Circle inversion (from Day 2!)
+    z.x -= center;
+    z /= radius;
+    z /= dot(z, z);    // The inversion step
+    z *= radius;
+    z.x += center;
+    
+    return z;
+}
+```
+
+The semicircle case uses the same circle inversion we implemented yesterday—same formula, new geometric interpretation!
+
+::: {.callout-important}
+## The Algorithmic Connection to Day 2
+
+Notice the pattern across all three days:
+
+**Day 2 (Apollonian gasket)**:
+- Setup: Three circles defining regions
+- Algorithm: If outside a region, invert through its boundary circle
+- Iterate until stable
+
+**Day 3, Euclidean**:
+- Setup: Half-spaces (lines) defining a region  
+- Algorithm: If outside the region, reflect across the boundary
+- Iterate until point stops moving
+
+**Day 3, Hyperbolic**:
+- Setup: Half-spaces (vertical lines and semicircles) defining a region
+- Algorithm: If outside the region, reflect across the boundary (using line reflection OR circle inversion)
+- Iterate until point stops moving
+
+The pattern is universal: **iteratively apply a geometric transformation to move into a desired region**. The specific transformations change (circle inversion, line reflection, hyperbolic reflection), but the algorithmic structure remains the same!
+:::
+
+---
+
+### The (2,3,∞) Triangle
+
+Let's build our first hyperbolic triangle tiling. The notation $(2,3,\infty)$ means the triangle has angles $\pi/2$, $\pi/3$, and $0$ (an ideal vertex at infinity).
+
+We'll use a particularly nice configuration in the upper half-plane:
+- **Left boundary**: Vertical line at $x = -1$
+- **Right boundary**: Vertical line at $x = 1$  
+- **Bottom boundary**: Unit semicircle from $-1$ to $1$
+
+This creates a triangle with two finite vertices (where the vertical lines meet the semicircle) and one ideal vertex at $\infty$ (straight up the $y$-axis).
+
+Here's the complete shader:
+```glsl
+vec2 reflectIntoVertical(vec2 z, float x_pos, float side) {
+    if((z.x - x_pos) * side < 0.0) return z;
+    z.x = 2.0 * x_pos - z.x;
+    return z;
+}
+
+vec2 reflectIntoCircular(vec2 z, float p, float q, float side) {
+    float center = (p + q) / 2.0;
+    float radius = abs(p - q) / 2.0;
+    vec2 rel = z - vec2(center, 0.0);
+    float dist2 = dot(rel, rel);
+    if((dist2 - radius * radius) * side > 0.0) return z;
+    
+    z.x -= center;
+    z /= radius;
+    z /= dot(z, z);
+    z *= radius;
+    z.x += center;
+    return z;
+}
+
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    // Coordinate setup - map to upper half-plane
+    // Coordinate setup
     vec2 uv = fragCoord / iResolution.xy;
     uv = (uv - 0.5) * 4.0;
     uv.x *= iResolution.x / iResolution.y;
     
-    // Shift up so y > 0
-    vec2 p = uv + vec2(0.0, 1.5);
+    // Shift to upper half-plane (need y > 0)
+    vec2 z = uv + vec2(0.0, 1.5);
     
-    // Fold to fundamental domain
-    int foldCount;
-    vec2 p_folded = foldToHyperbolicTriangle(p, 20, foldCount);
+    // Fold into the (2,3,∞) triangle
+    int foldCount = 0;
+    for(int i = 0; i < 50; i++) {
+        vec2 z_old = z;
+        
+        // Reflect across left vertical line (x = -1, want x > -1)
+        z = reflectIntoVertical(z, -1.0, -1.0);
+        
+        // Reflect across right vertical line (x = 1, want x < 1)
+        z = reflectIntoVertical(z, 1.0, 1.0);
+        
+        // Reflect across semicircle (from -1 to 1, want outside/above)
+        z = reflectIntoCircular(z, -1.0, 1.0, 1.0);
+        
+        // If point didn't move, we're inside
+        if(length(z - z_old) < 0.0001) break;
+        foldCount++;
+    }
     
-    // Color based on fold count
-    float t = float(foldCount) / 10.0;
-    vec3 color = palette(t);
+    // Color by fold count parity
+    float parity = mod(float(foldCount), 2.0);
+    vec3 color;
+    if(parity < 0.5) {
+        color = vec3(0.7, 0.8, 0.9);  // Light blue
+    } else {
+        color = vec3(0.5, 0.6, 0.8);  // Darker blue
+    }
     
-    // Highlight fundamental domain
-    if(inTriangle(p_folded)) {
-        color = mix(color, vec3(1.0, 1.0, 1.0), 0.3);
+    // Darken if below the real axis (outside hyperbolic space)
+    if(z.y < 0.0) {
+        color *= 0.3;
     }
     
     fragColor = vec4(color, 1.0);
 }
 ```
 
-The result: a beautiful hyperbolic tiling! Notice how the triangles appear to shrink near the real axis—they're all the same hyperbolic size, but Euclidean distances compress.
+You should see a beautiful hyperbolic tiling! Notice how the triangles appear to get smaller near the bottom of the screen (approaching the real axis $y = 0$)—they're all the same hyperbolic size, but Euclidean distances compress due to the metric.
+
+The alternating colors show which tiles are orientation-preserving vs orientation-reversing reflections of the fundamental domain.
+
+::: {.callout-note}
+## Compare to Euclidean
+
+Look at the structure of this shader compared to the Euclidean triangle tiling:
+
+**Euclidean:**
+```glsl
+p = reflectInto(p, hs1);
+p = reflectInto(p, hs2);
+p = reflectInto(p, hs3);
+```
+
+**Hyperbolic:**
+```glsl
+z = reflectIntoVertical(z, -1.0, -1.0);
+z = reflectIntoVertical(z, 1.0, 1.0);
+z = reflectIntoCircular(z, -1.0, 1.0, 1.0);
+```
+
+The algorithm is identical! We just have two types of reflection operations instead of one. This is the power of recognizing the pattern.
+:::
 
 ---
 
-## Visualizing in the Poincaré Disk
+### The Poincaré Disk Model
 
-Now we'll see the same tiling in a different model by converting coordinates.
+The upper half-plane model is unbounded—it extends infinitely upward. The **Poincaré disk model** solves this by fitting all of hyperbolic space inside the unit disk.
 
-### By Precomposition
+**Definition**: $\mathbb{D}^2 = \{z \in \mathbb{C} : |z| < 1\}$
 
+The interior of the unit disk represents all of hyperbolic space, and the boundary circle $|z| = 1$ represents points at infinity.
+
+#### The Cayley Transform
+
+The **Cayley transform** is a Möbius transformation that maps between these two models:
+
+**From upper half-plane to disk**:
+$$w = \frac{z - i}{z + i}$$
+
+**From disk to upper half-plane**:
+$$z = i\frac{1 + w}{1 - w}$$
+
+These formulas use complex arithmetic, which we implemented on Day 2:
 ```glsl
+vec2 cmul(vec2 a, vec2 b) {
+    return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);
+}
+
+vec2 cdiv(vec2 a, vec2 b) {
+    float denom = dot(b, b);
+    return vec2(dot(a, b), a.y * b.x - a.x * b.y) / denom;
+}
+
+vec2 diskToUHP(vec2 w) {
+    // z = i(1 + w) / (1 - w)
+    vec2 num = cmul(vec2(0.0, 1.0), vec2(1.0, 0.0) + w);
+    vec2 den = vec2(1.0, 0.0) - w;
+    return cdiv(num, den);
+}
+```
+
+#### Visualization in the Disk
+
+Here's a powerful technique: we can do all our computations in the upper half-plane model, but view the result in the disk model. We just convert coordinates at the start:
+
+1. Pixel coordinates → Disk coordinates
+2. Disk → Upper half-plane (using `diskToUHP`)
+3. Compute tiling in UHP
+4. Display result
+
+Here's the complete shader for viewing the tiling in the Poincaré disk:
+```glsl
+vec2 reflectIntoVertical(vec2 z, float x_pos, float side) {
+    if((z.x - x_pos) * side < 0.0) return z;
+    z.x = 2.0 * x_pos - z.x;
+    return z;
+}
+
+vec2 reflectIntoCircular(vec2 z, float p, float q, float side) {
+    float center = (p + q) / 2.0;
+    float radius = abs(p - q) / 2.0;
+    vec2 rel = z - vec2(center, 0.0);
+    float dist2 = dot(rel, rel);
+    if((dist2 - radius * radius) * side > 0.0) return z;
+    
+    z.x -= center;
+    z /= radius;
+    z /= dot(z, z);
+    z *= radius;
+    z.x += center;
+    return z;
+}
+
+vec2 cmul(vec2 a, vec2 b) {
+    return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);
+}
+
+vec2 cdiv(vec2 a, vec2 b) {
+    float denom = dot(b, b);
+    return vec2(dot(a, b), a.y * b.x - a.x * b.y) / denom;
+}
+
+vec2 diskToUHP(vec2 w) {
+    vec2 num = cmul(vec2(0.0, 1.0), vec2(1.0, 0.0) + w);
+    vec2 den = vec2(1.0, 0.0) - w;
+    return cdiv(num, den);
+}
+
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    // Coordinate setup - map to disk
-    vec2 uv = fragCoord / iResolution.xy;
-    uv = (uv - 0.5) * 2.0;
+    // Setup for disk viewing
+    vec2 uv = (fragCoord / iResolution.xy - 0.5) * 2.0;
     uv.x *= iResolution.x / iResolution.y;
     
     // Only render inside unit disk
@@ -352,194 +732,291 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     }
     
     // Convert disk coordinates to upper half-plane
-    vec2 p = diskToUHP(uv);
+    vec2 z = diskToUHP(uv);
     
     // Now do all computations in UHP
-    int foldCount;
-    vec2 p_folded = foldToHyperbolicTriangle(p, 20, foldCount);
-    
-    // Color based on fold count
-    float t = float(foldCount) / 10.0;
-    vec3 color = palette(t);
-    
-    if(inTriangle(p_folded)) {
-        color = mix(color, vec3(1.0, 1.0, 1.0), 0.3);
+    int foldCount = 0;
+    for(int i = 0; i < 50; i++) {
+        vec2 z_old = z;
+        
+        z = reflectIntoVertical(z, -1.0, -1.0);
+        z = reflectIntoVertical(z, 1.0, 1.0);
+        z = reflectIntoCircular(z, -1.0, 1.0, 1.0);
+        
+        if(length(z - z_old) < 0.0001) break;
+        foldCount++;
     }
+    
+    // Color by parity
+    float parity = mod(float(foldCount), 2.0);
+    vec3 color = (parity < 0.5) ? vec3(0.7, 0.8, 0.9) : vec3(0.5, 0.6, 0.8);
     
     fragColor = vec4(color, 1.0);
 }
 ```
 
-The tiling now appears in the Poincaré disk—the same mathematical object displayed in a different model!
+The tiling now appears in a bounded disk! All of hyperbolic space fits in this circle. Compare it to the upper half-plane view—it's the same mathematical tiling, just displayed in a different coordinate system.
+
+Notice how triangles near the boundary of the disk look very small—they're approaching infinity in hyperbolic terms, and the compression becomes extreme.
 
 ---
 
 ## Summary
 
-Today we covered:
+Today we learned:
 
-1. **Euclidean triangle tiling**: Using reflections to tile the plane with equilateral triangles
-2. **Hyperbolic geometry models**: Upper half-plane and Poincaré disk, with metrics and geodesics
-3. **Coordinate transformations**: Cayley transform connecting the two models
-4. **Hyperbolic triangle tiling**: Using reflections (including circle inversion) to tile hyperbolic space
-5. **Multiple representations**: Same tiling visualized in different models
+1. **The folding algorithm**: Iteratively reflect across boundaries until reaching the fundamental domain—works in any geometry
 
-Key insights:
-- **Reflection-based tilings work in any geometry** with the appropriate reflection operations
-- **Circle inversion** (from Day 2) is fundamental to hyperbolic geometry
-- **The same mathematical object looks different** in different models
-- **Geodesics replace straight lines** as the fundamental "straight" paths
+2. **Half-space structure**: Boundary + side gives a unified way to encode regions in Euclidean geometry
 
-The algorithmic structure is identical across geometries—only the reflection operations change!
+3. **Hyperbolic geometry**: Negative curvature space with two types of geodesics (vertical lines and semicircles)
+
+4. **Two reflection functions**: `reflectIntoVertical` and `reflectIntoCircular` parallel the Euclidean `reflectInto`
+
+5. **Connection to Day 2**: Same algorithmic pattern as Apollonian gasket—iterate a transformation to move into desired region
+
+6. **Multiple models**: Converting between upper half-plane and Poincaré disk using the Cayley transform
+
+**Key insight**: Clean mathematical abstraction lets us write geometry-independent algorithms. The folding algorithm stays identical; only the reflection operations change. This is the power of recognizing patterns and building flexible abstractions!
 
 ---
 
 ## Homework
 
-### Required: Drawing Geodesics and Hyperbolic Disks
+### Required #1: Euclidean Triangle Tiling with Edges and Vertices
 
-Implement visualization of basic hyperbolic objects to understand the geometry.
+**Goal**: Create a beautiful Euclidean triangle tiling that clearly shows the tiling structure.
 
-**Part 1: Draw several geodesics in the upper half-plane**
+**Tasks**:
 
-Vertical lines are easy:
+1. **Implement distance to a half-space**:
 ```glsl
-// Distance to vertical line x = c
-float distToVertical = abs(p.x - c);
-if(distToVertical < thickness) color = geodesicColor;
+   float distToHalfSpace(vec2 p, HalfSpace hs) {
+       return abs(hs.a * p.x + hs.b * p.y - hs.c) / length(vec2(hs.a, hs.b));
+   }
 ```
 
-Semicircular geodesics require the implicit equation:
-```glsl
-// Semicircle: (x - cx)² + y² = R², with y > 0
-float distToSemicircle = abs(sqrt((p.x - cx) * (p.x - cx) + p.y * p.y) - R);
-if(distToSemicircle < thickness && p.y > 0.0) color = geodesicColor;
-```
+2. **Draw the triangle edges**: Use the distance function to draw white lines along the three edges of your triangle.
 
-Draw several of each type to visualize the geodesic structure.
+3. **Draw the triangle vertices**: Compute the vertices of your equilateral triangle and draw small circles at these locations. Use Euclidean distance: `length(p - vertex) < 0.05`.
 
-**Part 2: Draw hyperbolic disks**
+4. **Create an attractive color scheme**: Color tiles based on fold count, parity, or distance to edges. Make it visually appealing!
 
-A hyperbolic disk of radius $r$ centered at $z_0$ is the set:
-$$\{z : d_{\text{hyp}}(z, z_0) < r\}$$
+**Expected output**: A clear triangle tiling where you can see individual triangles, their edges, and vertices. Experiment with colors to create an aesthetically pleasing result.
 
-```glsl
-float d = hyperbolicDistance(p, center);
-if(d < radius) color = diskColor;
-```
-
-Draw several disks at different locations and with the same hyperbolic radius. Observe how they appear smaller (in Euclidean sense) near the boundary—this demonstrates the metric's behavior.
-
-**Part 3: Visualize metric distortion**
-
-Create a grid of hyperbolic disks of equal hyperbolic radius. Watch how their Euclidean sizes vary across the half-plane.
-
-**Optional enhancement:** Repeat in Poincaré disk model by precomposition.
-
-### Required: Drawing Triangle Edges and Vertices
-
-Enhance your hyperbolic tiling by drawing the triangle boundaries.
-
-**Task:**
-For each point, compute the distance to the three geodesics forming your triangle boundary. If the distance is below a threshold, color it as an edge.
-
-**Implementation hints:**
-```glsl
-// Distance to vertical line
-float d1 = abs(p.x - (-1.0));
-float d2 = abs(p.x - 1.0);
-
-// Distance to semicircle (already have this from Part 1)
-float d3 = abs(length(p) - 1.0);
-
-float edgeThickness = 0.05;
-bool onEdge = (d1 < edgeThickness) || (d2 < edgeThickness) || (d3 < edgeThickness);
-
-if(onEdge) color = vec3(1.0, 1.0, 1.0);  // White edges
-```
-
-For vertices, compute Euclidean distance to the three vertex positions and draw small circles.
-
-**Expected output:** Your tiling with clearly visible triangle boundaries, making the tessellation structure explicit.
-
-### Required: Model Conversion and Möbius Transformation
-
-Work with different representations of hyperbolic space.
-
-**Part 1: Convert your tiling to Poincaré disk**
-
-You already have the transformation functions. Create a shader that displays your hyperbolic tiling in the disk model and compare the visual appearance.
-
-**Part 2: Apply a Möbius transformation**
-
-A Möbius transformation has the form:
-$$z \mapsto \frac{az + b}{cz + d}, \quad ad - bc = 1$$
-
-These are isometries of hyperbolic space—they permute the tiles but preserve the geometry.
-
-```glsl
-vec2 mobius(vec2 z, vec2 a, vec2 b, vec2 c, vec2 d) {
-    vec2 num = cadd(cmul(a, z), b);
-    vec2 den = cadd(cmul(c, z), d);
-    return cdiv(num, den);
-}
-```
-
-Try some interesting transformations:
-- Translation: $z \mapsto z + 1$ (in complex plane, not hyperbolic translation!)
-- Scaling: $z \mapsto 2z$
-- Rotation: $z \mapsto e^{i\theta} z$
-
-Apply to your tiling:
-```glsl
-// Before folding:
-p = mobius(p, vec2(2.0, 0.0), vec2(0.0, 0.0), vec2(0.0, 0.0), vec2(1.0, 0.0));
-```
-
-Watch how the tiling transforms!
-
-### Optional: Advanced Hyperbolic Explorations
-
-Choose one or more:
-
-#### 1. Different Triangle Groups
-
-Implement different hyperbolic triangle groups. The $(p, q, r)$ notation indicates angles $\pi/p$, $\pi/q$, $\pi/r$ at the three vertices.
-
-Famous examples:
-- $(2, 3, 7)$: Creates Escher-like tilings
-- $(2, 4, 6)$: Different symmetry structure
-- $(3, 3, 3)$: Equilateral hyperbolic triangle
-
-Each requires setting up different geodesics for the triangle edges.
-
-#### 2. Klein Model
-
-The Klein model represents hyperbolic space where geodesics are Euclidean straight lines (but angles are distorted).
-
-Convert from Poincaré disk to Klein: 
-$$w = \frac{2z}{1 + |z|^2}$$
-
-Visualize your tiling in this model and observe how geodesics become straight!
-
-#### 3. Decorated Tiles
-
-Add patterns inside each triangle (like Escher's Circle Limit prints). Use barycentric coordinates or distance from edges to create decorations within the fundamental domain.
-
-#### 4. Conformal Mapping Art
-
-Use complex analysis to map the disk to other regions (strips, annuli, etc.) and visualize hyperbolic geometry in exotic coordinate systems.
+**Bonus**: Try different triangles! An isosceles right triangle, a 30-60-90 triangle, etc. Just compute new half-spaces for the edges.
 
 ---
 
-## Looking Ahead
+### Required #2: Hyperbolic Triangle Tiling with Edges and Vertices
 
-Tomorrow we move to 3D! We'll learn raymarching and signed distance functions to render implicit surfaces. The geometric intuition from reflections and distance computations will carry over, but now in three dimensions with lighting and shading.
+**Goal**: Create a beautiful hyperbolic triangle tiling with visible structure.
 
-Make sure you're comfortable with:
-- Reflection operations (these generalize to 3D)
-- Distance computations (both Euclidean and hyperbolic)
-- Iterative algorithms for geometric structures
-- Working with different coordinate systems/models
+**Tasks**:
 
-See you tomorrow!
+1. **Implement hyperbolic distance functions**:
+
+   **Distance between two points**:
+```glsl
+   float hyperbolicDistance(vec2 z, vec2 w) {
+       float diff2 = dot(z - w, z - w);
+       float denom = 2.0 * z.y * w.y;
+       float arg = 1.0 + diff2 / denom;
+       return log(arg + sqrt(arg * arg - 1.0));
+   }
+```
+
+   **Distance to vertical geodesic**:
+```glsl
+   float distToVertical(vec2 z, float c) {
+       z.x -= c;
+       float secTheta = length(z) / abs(z.y);
+       return acosh(secTheta);
+   }
+```
+
+   **Distance to circular geodesic**: Use a Möbius transformation to map the geodesic to a vertical line, then measure distance:
+```glsl
+   vec2 applyMobius(vec4 mob, vec2 z) {
+       float a = mob.x, b = mob.y, c = mob.z, d = mob.w;
+       vec2 num = vec2(a, 0.0) * z + vec2(b, 0.0);
+       vec2 den = vec2(c, 0.0) * z + vec2(d, 0.0);
+       return cdiv(num, den);
+   }
+   
+   float distToCircularGeodesic(vec2 z, float p, float q) {
+       vec4 mob = vec4(1.0, -p, 1.0, -q);
+       vec2 w = applyMobius(mob, z);
+       return distToVertical(w, 0.0);
+   }
+```
+
+2. **Draw geodesic edges**: Use these distance functions to draw the three edges of your (2,3,∞) triangle:
+```glsl
+   float d1 = distToVertical(z, -1.0);
+   float d2 = distToVertical(z, 1.0);
+   float d3 = distToCircularGeodesic(z, -1.0, 1.0);
+   float edgeDist = min(d1, min(d2, d3));
+   
+   if(edgeDist < 0.02) {
+       color = vec3(1.0);  // White edges
+   }
+```
+
+3. **Draw vertices**: The finite vertices are at approximately $(-1, 0)$ and $(1, 0)$ on the real axis (actually infinitesimally above). Draw small hyperbolic disks around these points:
+```glsl
+   float d1 = hyperbolicDistance(z, vec2(-1.0, 0.01));
+   float d2 = hyperbolicDistance(z, vec2(1.0, 0.01));
+   if(d1 < 0.1 || d2 < 0.1) {
+       color = vec3(1.0, 1.0, 0.0);  // Yellow vertices
+   }
+```
+
+4. **Create an attractive color scheme**: Make it beautiful!
+
+**Expected output**: A clear hyperbolic tiling in the upper half-plane showing triangle edges and vertices.
+
+**Bonus**: Display the same tiling in the Poincaré disk model and compare how edges and vertices appear in the two models.
+
+---
+
+### Required #3: Model Conversions
+
+**Goal**: See the same tiling in different representations of hyperbolic space.
+
+**Tasks**:
+
+1. **Poincaré Disk** (already provided in lecture): Verify it works with your tiling code.
+
+2. **Klein Model**: Implement the transformation from Poincaré disk:
+   $$w = \frac{2z}{1 + |z|^2}$$
+```glsl
+   vec2 diskToKlein(vec2 z) {
+       float denom = 1.0 + dot(z, z);
+       return 2.0 * z / denom;
+   }
+```
+   
+   In the Klein model, geodesics become Euclidean straight lines! Display your tiling and observe this property.
+
+3. **Band Model** (Optional): The transformation $w = \tanh(z)$ from Poincaré disk represents hyperbolic space as an infinite horizontal strip. Implement this and see how your tiling appears.
+
+**Deliverable**: Show your (2,3,∞) tiling in at least the Poincaré disk and Klein model. Discuss what you observe about how the tiling appears in each model.
+
+---
+
+### Required #4: Different Triangle Groups
+
+**Goal**: Explore other hyperbolic tilings by implementing different triangle groups.
+
+**The Challenge**: This is the hardest homework problem! Computing where the third geodesic should be, given angle constraints, requires hyperbolic trigonometry.
+
+**Suggested triangles to try**:
+- **(2, 3, 7)**: Creates Escher-like tilings with 7-fold symmetry—the most famous hyperbolic tiling
+- **(2, 4, 6)**: Different symmetry pattern
+- **(3, 3, 3)**: Equilateral hyperbolic triangle
+- **(2, 5, 10)**: Pentagonal patterns
+
+**Approach**:
+
+The notation $(p, q, r)$ means angles $\pi/p$, $\pi/q$, and $\pi/r$ at the three vertices.
+
+Start with two geodesics in nice positions (e.g., a vertical line at $x = c$ and the imaginary axis). Now find the third geodesic such that:
+- It meets the first at angle $\pi/p$
+- It meets the second at angle $\pi/q$
+- The angle at the third vertex is $\pi/r$
+
+Use the **hyperbolic law of cosines** for side lengths. If the side opposite angle $\gamma$ has length $s_\gamma$:
+$$\cosh(s_\gamma) = \frac{\cos(\gamma) + \cos(\alpha)\cos(\beta)}{\sin(\alpha)\sin(\beta)}$$
+
+For angles $\alpha = \pi/p$, $\beta = \pi/q$, $\gamma = \pi/r$, this gives you the hyperbolic side length. Then translate this into Euclidean coordinates for the third geodesic.
+
+**Reference structure**:
+```glsl
+// Hyperbolic side length opposite angle r:
+float num = cos(PI/r) + cos(PI/p) * cos(PI/q);
+float denom = sin(PI/p) * sin(PI/q);
+float sr = acosh(num / denom);
+
+// Convert hyperbolic length to Euclidean position
+// (This requires careful geometric work!)
+float eucH = sin(PI/p) * exp(sr);
+float want = eucH / tan(PI/q);
+// ... compute geodesic endpoints
+```
+
+**Deliverable**: Working tilings for at least two different $(p,q,r)$ groups. Include screenshots showing the different symmetry structures. Document any interesting observations about how the tilings differ.
+
+---
+
+### Optional Exercise: Unified Abstractions
+
+**Part 1: Unified HalfSpace Struct**
+
+Create a struct that handles BOTH Euclidean and hyperbolic half-spaces:
+```glsl
+struct HalfSpace {
+    int type;  // 0=Euclidean line, 1=vertical hyperbolic, 2=circular hyperbolic
+    // Parameters for all cases
+    float a, b, c, side;  // Euclidean line
+    float x_pos;          // Vertical hyperbolic
+    float p, q;           // Circular hyperbolic
+};
+
+vec2 reflectInto(vec2 p, HalfSpace hs) {
+    if(hs.type == 0) {
+        // Euclidean reflection (your existing code)
+    } else if(hs.type == 1) {
+        // Vertical hyperbolic reflection
+    } else {
+        // Circular hyperbolic reflection
+    }
+}
+```
+
+**Part 2: Triangle Struct**
+
+Once you have a unified `HalfSpace`, create:
+```glsl
+struct Triangle {
+    HalfSpace a, b, c;
+};
+
+vec2 reflectInto(vec2 p, Triangle T) {
+    p = reflectInto(p, T.a);
+    p = reflectInto(p, T.b);
+    p = reflectInto(p, T.c);
+    return p;
+}
+```
+
+Now your folding loop is just `p = reflectInto(p, T)` for ANY geometry—Euclidean or hyperbolic!
+
+**Goal**: This exercise teaches abstraction and code organization. You're building a single interface that works across multiple geometries, which is exactly how mathematical software should be structured.
+
+---
+
+### Optional: Decorated Tiles
+
+Add patterns within the fundamental domain (Escher-style):
+
+**Ideas**:
+- Draw curves using distance from edges
+- Create radial patterns from vertices
+- Use hyperbolic distance to create concentric patterns
+- The pattern repeats automatically via reflections!
+
+**Challenge**: Create a tessellation that looks like Escher's *Circle Limit* prints—fish or angels that tile the hyperbolic plane!
+
+---
+
+### Optional: Pentagon Tilings
+
+Right-angled pentagons can tile hyperbolic space (impossible in Euclidean geometry!).
+
+**Setup**: Create five geodesics that all meet their neighbors at right angles and enclose a bounded region.
+
+**Challenge**: Computing geodesic positions given side lengths is complex. Start with a vertical line and a semicircle at right angles, then add three more geodesics using the constraint that adjacent geodesics meet orthogonally.
+
+**Reward**: Pentagons give very different aesthetic patterns than triangles!
+

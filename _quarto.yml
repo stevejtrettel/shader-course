@@ -25,6 +25,7 @@ book:
     # - shadertoy-tips.qmd
     - debug-reference.qmd
     - folding-fractals.qmd
+    - schottky.qmd
 
   sidebar:
     style: "docked"

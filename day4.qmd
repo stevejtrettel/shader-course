@@ -2,132 +2,127 @@
 
 ## Overview
 
-Today we enter the third dimension! We'll learn how to set up a camera and cast rays from each pixel, then implement ray-object intersection testing. We'll start with analytical methods (solving equations directly) for spheres and tori, then transition to raymarching with signed distance functions—a more flexible approach that will enable complex scenes.
+Today we enter the third dimension! We'll learn how to cast rays from a camera and test for intersections with 3D objects. We'll start with analytical methods (solving equations directly) for spheres and tori, then transition to raymarching with signed distance functions—a more flexible approach that enables complex procedural scenes.
 
-By the end of today, you'll be able to render implicit surfaces in 3D with basic lighting, setting the foundation for tomorrow's advanced techniques.
+By the end of today, you'll understand:
+- How to set up a camera and generate rays for each pixel
+- Analytical ray-object intersection for simple surfaces
+- Why analytical methods become challenging for complex geometry
+- Signed distance functions as an alternative representation
+- The raymarching algorithm (sphere tracing)
+- How to compose multiple objects and assign materials
 
 ---
 
-## Camera and Ray Setup
+## Part 1: Analytical Ray Tracing
 
-### The Rendering Equation (Simplified)
+### Camera and Ray Setup
+
+#### The Rendering Pipeline
 
 For each pixel, we need to:
-1. Determine which ray in 3D space corresponds to that pixel
+1. Generate a ray from the camera through that pixel
 2. Find where (if anywhere) the ray intersects scene geometry
-3. Compute the color based on surface properties and lighting
+3. Compute color based on surface properties and lighting
 
-### Coordinate System
+#### Coordinate System
 
-We'll use the Three.js convention:
-- Y-axis points up
-- Z-axis points toward the camera (out of the screen)
-- X-axis points right
-- This is a right-handed coordinate system
+We'll use the standard graphics convention:
+- **Y-axis** points up
+- **Z-axis** points toward the camera (out of the screen)
+- **X-axis** points right
+- Right-handed coordinate system
 
-### Camera Model
+#### Pinhole Camera Model
 
-We'll use a simple pinhole camera model:
-- Camera positioned at the origin (for now)
-- Looking down the -Z axis
-- Field of view (FOV) determines the viewing frustum
+Our camera sits at the origin looking down the negative Z-axis. For a pixel at normalized coordinates $(u, v) \in [-1, 1]^2$, we generate a ray:
 
-### Ray Generation
+**Ray origin:** $\mathbf{o} = (0, 0, 0)$ (camera position)  
+**Ray direction:** $\mathbf{d} = \text{normalize}(u, v, -f)$
 
-For a pixel at normalized coordinates $(u, v) \in [-1, 1]^2$, we generate a ray with:
-- **Origin**: $\mathbf{o} = (0, 0, 0)$ (camera position)
-- **Direction**: $\mathbf{d} = \text{normalize}(u \cdot \text{right}, v \cdot \text{up}, -\text{focal length})$
+where $f$ is the focal length, related to field of view by: $f = 1/\tan(\text{FOV}/2)$.
 
-The focal length relates to field of view: for FOV angle $\theta$, we have $\text{focal length} = 1 / \tan(\theta/2)$.
+#### Parametric Ray Equation
 
-### Implementation
+A ray can be written as:
+$$\mathbf{r}(t) = \mathbf{o} + t\mathbf{d}$$
 
+where $t \geq 0$ is the parameter. Points along the ray correspond to different values of $t$.
+
+#### Implementation
+
+Let's start by visualizing our rays without any intersections:
+
+**Shader 1: Ray Visualization**
 ```glsl
-struct Ray {
-    vec3 origin;
-    vec3 direction;
-};
-
-Ray getRay(vec2 fragCoord, vec2 resolution, float fov) {
-    // Normalize to [-1, 1]
-    vec2 uv = (fragCoord / resolution) * 2.0 - 1.0;
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // Normalize pixel coordinates to [-1, 1]
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
     
     // Correct for aspect ratio
-    uv.x *= resolution.x / resolution.y;
+    uv.x *= iResolution.x / iResolution.y;
     
-    // Compute focal length from FOV
+    // Field of view
+    float fov = 45.0;
     float focalLength = 1.0 / tan(radians(fov) / 2.0);
     
-    // Ray from origin through pixel
-    Ray ray;
-    ray.origin = vec3(0.0, 0.0, 0.0);
-    ray.direction = normalize(vec3(uv.x, uv.y, -focalLength));
+    // Ray direction (camera at origin, looking down -Z)
+    vec3 rayDir = normalize(vec3(uv.x, uv.y, -focalLength));
     
-    return ray;
+    // Color based on ray direction (visualize the rays)
+    vec3 color = rayDir * 0.5 + 0.5;
+    
+    fragColor = vec4(color, 1.0);
 }
 ```
 
-### Points Along a Ray
-
-A parametric ray can be written as:
-$$\mathbf{L}(t) = \mathbf{o} + t\mathbf{d}$$
-
-where $\mathbf{o}$ is the origin, $\mathbf{d}$ is the direction, and $t \geq 0$ is the parameter.
-
-```glsl
-vec3 rayPoint(Ray ray, float t) {
-    return ray.origin + t * ray.direction;
-}
-```
+You should see a colorful gradient showing the direction of each ray. This confirms our camera setup is working!
 
 ---
 
-## Analytical Ray-Sphere Intersection
+### Ray-Sphere Intersection
 
-### The Sphere Equation
+#### The Sphere Equation
 
-A sphere of radius $r$ centered at the origin is defined implicitly by:
-$$x^2 + y^2 + z^2 = r^2$$
+A sphere of radius $r$ centered at position $\mathbf{c}$ is defined by:
+$$|\mathbf{p} - \mathbf{c}|^2 = r^2$$
 
-Or more compactly: $|\mathbf{p}|^2 = r^2$ for points $\mathbf{p}$ on the surface.
+All points $\mathbf{p}$ satisfying this equation lie on the sphere's surface.
 
-### Setting Up the Intersection
+#### Finding the Intersection
 
-We want to find where the ray $\mathbf{L}(t) = \mathbf{o} + t\mathbf{d}$ intersects the sphere. Substituting the ray equation into the sphere equation:
-$$|\mathbf{o} + t\mathbf{d}|^2 = r^2$$
+We want to find where our ray $\mathbf{r}(t) = \mathbf{o} + t\mathbf{d}$ intersects the sphere. Substituting the ray equation into the sphere equation:
+$$|\mathbf{o} + t\mathbf{d} - \mathbf{c}|^2 = r^2$$
 
-Expanding:
-$$(\mathbf{o} + t\mathbf{d}) \cdot (\mathbf{o} + t\mathbf{d}) = r^2$$
-$$|\mathbf{o}|^2 + 2t(\mathbf{o} \cdot \mathbf{d}) + t^2|\mathbf{d}|^2 = r^2$$
+Let $\mathbf{oc} = \mathbf{o} - \mathbf{c}$ (vector from sphere center to ray origin). Expanding:
+$$|\mathbf{oc} + t\mathbf{d}|^2 = r^2$$
+$$|\mathbf{oc}|^2 + 2t(\mathbf{oc} \cdot \mathbf{d}) + t^2|\mathbf{d}|^2 = r^2$$
 
 This is a quadratic equation in $t$:
 $$at^2 + bt + c = 0$$
 
 where:
-- $a = |\mathbf{d}|^2$ (which is 1 if $\mathbf{d}$ is normalized)
-- $b = 2(\mathbf{o} \cdot \mathbf{d})$
-- $c = |\mathbf{o}|^2 - r^2$
+- $a = |\mathbf{d}|^2$ (equals 1 if direction is normalized)
+- $b = 2(\mathbf{oc} \cdot \mathbf{d})$
+- $c = |\mathbf{oc}|^2 - r^2$
 
-### Solving the Quadratic
-
-The solutions are:
-$$t = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$$
-
-The discriminant $\Delta = b^2 - 4ac$ tells us:
+The **discriminant** $\Delta = b^2 - 4ac$ tells us:
 - $\Delta < 0$: no intersection (ray misses sphere)
-- $\Delta = 0$: one intersection (ray is tangent)
-- $\Delta > 0$: two intersections (ray enters and exits sphere)
+- $\Delta = 0$: one intersection (ray grazes sphere)
+- $\Delta > 0$: two intersections (ray enters and exits)
 
-We want the smaller positive $t$ (the closer intersection point).
+We want the smaller positive $t$ (the entry point).
 
-### Implementation
+#### Implementation
 
+**Shader 2: Basic Sphere**
 ```glsl
-float intersectSphere(Ray ray, vec3 center, float radius) {
-    vec3 oc = ray.origin - center;  // o - c (sphere center)
+float intersectSphere(vec3 rayOrigin, vec3 rayDir, vec3 sphereCenter, float radius) {
+    vec3 oc = rayOrigin - sphereCenter;
     
-    float a = dot(ray.direction, ray.direction);  // Should be 1 if normalized
-    float b = 2.0 * dot(oc, ray.direction);
+    float a = dot(rayDir, rayDir);  // Should be 1.0 if rayDir is normalized
+    float b = 2.0 * dot(oc, rayDir);
     float c = dot(oc, oc) - radius * radius;
     
     float discriminant = b * b - 4.0 * a * c;
@@ -140,31 +135,34 @@ float intersectSphere(Ray ray, vec3 center, float radius) {
     float t1 = (-b - sqrt(discriminant)) / (2.0 * a);
     float t2 = (-b + sqrt(discriminant)) / (2.0 * a);
     
-    // Return the closest positive t
+    // Return closest positive t
     if (t1 > 0.0) return t1;
     if (t2 > 0.0) return t2;
-    return -1.0;  // Behind camera
+    return -1.0;  // Both behind camera
 }
-```
 
-### Rendering the Sphere
-
-```glsl
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
     // Setup ray
-    Ray ray = getRay(fragCoord, iResolution.xy, 45.0);
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    float fov = 45.0;
+    float focalLength = 1.0 / tan(radians(fov) / 2.0);
+    
+    vec3 rayOrigin = vec3(0.0, 0.0, 0.0);
+    vec3 rayDir = normalize(vec3(uv.x, uv.y, -focalLength));
     
     // Sphere parameters
-    vec3 sphereCenter = vec3(0.0, 0.0, -3.0);  // In front of camera
+    vec3 sphereCenter = vec3(0.0, 0.0, -3.0);
     float sphereRadius = 1.0;
     
     // Test intersection
-    float t = intersectSphere(ray, sphereCenter, sphereRadius);
+    float t = intersectSphere(rayOrigin, rayDir, sphereCenter, sphereRadius);
     
     vec3 color;
     if (t > 0.0) {
-        // Hit the sphere!
+        // Hit the sphere
         color = vec3(1.0, 0.0, 0.0);  // Red
     } else {
         // Background
@@ -175,63 +173,88 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 }
 ```
 
-**Result:** You should see a red disk on a blue background. But it looks flat—we can't see that it's a sphere!
+You should see a flat red disk! It looks 2D because we don't have lighting yet—we can't see the sphere's curvature.
 
 ---
 
-## Adding Lighting: The Surface Normal
+### Adding Lighting
 
-### Computing the Normal
+To see the 3D structure, we need to compute lighting based on the **surface normal**.
 
-For a sphere centered at $\mathbf{c}$, the outward normal at a point $\mathbf{p}$ on the surface is:
-$$\mathbf{n} = \frac{\mathbf{p} - \mathbf{c}}{|\mathbf{p} - \mathbf{c}|} = \frac{\mathbf{p} - \mathbf{c}}{r}$$
+#### Surface Normal
 
-This is just the vector from the center to the surface point, normalized.
+For a sphere centered at $\mathbf{c}$, the outward normal at surface point $\mathbf{p}$ is:
+$$\mathbf{n} = \frac{\mathbf{p} - \mathbf{c}}{r}$$
 
-```glsl
-vec3 sphereNormal(vec3 point, vec3 center, float radius) {
-    return (point - center) / radius;
-}
-```
+This is just the vector from center to surface, normalized.
 
-### Diffuse Lighting
+#### Diffuse Lighting
 
-The simplest lighting model: **Lambertian diffuse shading**. The brightness depends on the angle between the surface normal $\mathbf{n}$ and the light direction $\mathbf{l}$:
+The simplest lighting model: **Lambertian diffuse shading**. Surface brightness depends on the angle between the normal $\mathbf{n}$ and light direction $\mathbf{l}$:
 $$\text{brightness} = \max(0, \mathbf{n} \cdot \mathbf{l})$$
 
-The $\max(0, \cdots)$ ensures we don't get negative light (surfaces facing away from the light are dark).
+The $\max(0, \cdots)$ ensures surfaces facing away from the light remain dark.
 
-### Implementation with Lighting
-
+**Shader 3: Sphere with Lighting**
 ```glsl
+float intersectSphere(vec3 rayOrigin, vec3 rayDir, vec3 sphereCenter, float radius) {
+    vec3 oc = rayOrigin - sphereCenter;
+    float a = dot(rayDir, rayDir);
+    float b = 2.0 * dot(oc, rayDir);
+    float c = dot(oc, oc) - radius * radius;
+    float discriminant = b * b - 4.0 * a * c;
+    
+    if (discriminant < 0.0) return -1.0;
+    
+    float t1 = (-b - sqrt(discriminant)) / (2.0 * a);
+    float t2 = (-b + sqrt(discriminant)) / (2.0 * a);
+    
+    if (t1 > 0.0) return t1;
+    if (t2 > 0.0) return t2;
+    return -1.0;
+}
+
+vec3 sphereNormal(vec3 hitPoint, vec3 sphereCenter, float radius) {
+    return (hitPoint - sphereCenter) / radius;
+}
+
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    Ray ray = getRay(fragCoord, iResolution.xy, 45.0);
+    // Setup ray
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
     
+    float fov = 45.0;
+    float focalLength = 1.0 / tan(radians(fov) / 2.0);
+    
+    vec3 rayOrigin = vec3(0.0, 0.0, 0.0);
+    vec3 rayDir = normalize(vec3(uv.x, uv.y, -focalLength));
+    
+    // Sphere
     vec3 sphereCenter = vec3(0.0, 0.0, -3.0);
     float sphereRadius = 1.0;
     
-    float t = intersectSphere(ray, sphereCenter, sphereRadius);
+    float t = intersectSphere(rayOrigin, rayDir, sphereCenter, sphereRadius);
     
     vec3 color;
     if (t > 0.0) {
-        // Compute intersection point
-        vec3 hitPoint = rayPoint(ray, t);
+        // Hit point
+        vec3 hitPoint = rayOrigin + t * rayDir;
         
-        // Compute normal
+        // Surface normal
         vec3 normal = sphereNormal(hitPoint, sphereCenter, sphereRadius);
         
-        // Light direction (fixed, from above and to the right)
+        // Light direction (from above and to the right)
         vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
         
         // Diffuse lighting
         float diffuse = max(0.0, dot(normal, lightDir));
         
-        // Color the sphere
+        // Sphere color
         vec3 sphereColor = vec3(1.0, 0.0, 0.0);  // Red
         color = sphereColor * diffuse;
         
-        // Add a bit of ambient light so dark side isn't completely black
+        // Add ambient light so dark side isn't completely black
         color += sphereColor * 0.1;
     } else {
         color = vec3(0.1, 0.1, 0.2);
@@ -241,132 +264,167 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 }
 ```
 
-**Result:** Now the sphere looks 3D! The lighting reveals its curvature.
+Now the sphere looks 3D! The lighting reveals its curvature. Beautiful!
 
 ---
 
-## Ray-Torus Intersection
+### Ray-Torus Intersection: Where Analytical Gets Complex
 
-### The Torus Equation
+#### The Torus Equation
 
-A torus with major radius $R$ (center to tube center) and minor radius $r$ (tube radius) centered at the origin with axis along the Y-axis has the implicit equation:
+A torus with major radius $R$ (distance from center to tube center) and minor radius $r$ (tube thickness) has the implicit equation:
 $$\left(\sqrt{x^2 + z^2} - R\right)^2 + y^2 = r^2$$
 
-Or equivalently:
+Or in vector form:
 $$\left(|\mathbf{p}_{xz}| - R\right)^2 + p_y^2 = r^2$$
 
 where $\mathbf{p}_{xz} = (p_x, p_z)$ is the projection onto the XZ-plane.
 
-### Computing the Gradient (Normal)
+#### The Challenge
 
-The gradient of the implicit function $F(x, y, z) = \left(\sqrt{x^2 + z^2} - R\right)^2 + y^2 - r^2$ gives the normal direction.
+Substituting our ray equation into this gives a **quartic polynomial** (degree 4):
+$$at^4 + bt^3 + ct^2 + dt + e = 0$$
 
-Let $q = \sqrt{x^2 + z^2}$. Then:
+Unlike quadratics (which have a simple formula), quartic equations require sophisticated algebraic methods. Here's what solving it actually looks like:
 
-$$\frac{\partial F}{\partial x} = 2\left(q - R\right) \cdot \frac{x}{q}$$
-
-$$\frac{\partial F}{\partial y} = 2y$$
-
-$$\frac{\partial F}{\partial z} = 2\left(q - R\right) \cdot \frac{z}{q}$$
-
-The normal is:
-$$\mathbf{n} = \nabla F = \left(\frac{\partial F}{\partial x}, \frac{\partial F}{\partial y}, \frac{\partial F}{\partial z}\right)$$
-
-normalized to unit length.
-
-### Implementation
-
+**Shader 4: Analytical Torus**
 ```glsl
-vec3 torusNormal(vec3 p, float majorRadius, float minorRadius) {
-    // Project to XZ plane
-    vec2 pxz = vec2(p.x, p.z);
-    float q = length(pxz);
+// From Inigo Quilez - https://www.shadertoy.com/view/XdSGWy
+// Analytical quartic solver for torus intersection
+float intersectTorus(vec3 ro, vec3 rd, vec2 tor)
+{
+    float po = 1.0;
+    float Ra2 = tor.x * tor.x;
+    float ra2 = tor.y * tor.y;
     
-    // Gradient components
-    float factor = q - majorRadius;
-    vec3 grad;
-    grad.x = 2.0 * factor * p.x / q;
-    grad.y = 2.0 * p.y;
-    grad.z = 2.0 * factor * p.z / q;
+    float m = dot(ro, ro);
+    float n = dot(ro, rd);
     
-    return normalize(grad);
-}
-```
-
-### Finding the Intersection
-
-Finding the exact intersection between a ray and a torus requires solving a **quartic equation** (degree 4 polynomial). This is algebraically messy!
-
-We can:
-1. Use a numerical root-finding method (Newton's method, bisection)
-2. Or... use a different approach (foreshadowing: raymarching!)
-
-For now, let's implement a simple bisection method to find the intersection:
-
-```glsl
-float torusImplicit(vec3 p, float R, float r) {
-    vec2 pxz = vec2(p.x, p.z);
-    float q = length(pxz) - R;
-    return q * q + p.y * p.y - r * r;
-}
-
-float intersectTorus(Ray ray, float majorRadius, float minorRadius) {
-    // Bisection method to find root of F(ray(t)) = 0
-    float tMin = 0.0;
-    float tMax = 10.0;  // Search range
+    // Bounding sphere check
+    float h = n*n - m + (tor.x + tor.y) * (tor.x + tor.y);
+    if(h < 0.0) return -1.0;
     
-    // Check if there's a sign change (indicating a root exists)
-    float fMin = torusImplicit(rayPoint(ray, tMin), majorRadius, minorRadius);
-    float fMax = torusImplicit(rayPoint(ray, tMax), majorRadius, minorRadius);
+    // Find quartic coefficients
+    float k = (m - ra2 - Ra2) / 2.0;
+    float k3 = n;
+    float k2 = n*n + Ra2*rd.z*rd.z + k;
+    float k1 = k*n + Ra2*ro.z*rd.z;
+    float k0 = k*k + Ra2*ro.z*ro.z - Ra2*ra2;
     
-    if (fMin * fMax > 0.0) {
-        return -1.0;  // No intersection in range
+    // Prevent numerical issues
+    if(abs(k3*(k3*k3 - k2) + k1) < 0.01)
+    {
+        po = -1.0;
+        float tmp = k1; k1 = k3; k3 = tmp;
+        k0 = 1.0/k0;
+        k1 = k1*k0;
+        k2 = k2*k0;
+        k3 = k3*k0;
     }
     
-    // Bisection
-    for (int i = 0; i < 50; i++) {
-        float tMid = (tMin + tMax) / 2.0;
-        float fMid = torusImplicit(rayPoint(ray, tMid), majorRadius, minorRadius);
-        
-        if (abs(fMid) < 0.001) {
-            return tMid;  // Found intersection
-        }
-        
-        if (fMin * fMid < 0.0) {
-            tMax = tMid;
-            fMax = fMid;
-        } else {
-            tMin = tMid;
-            fMin = fMid;
-        }
+    float c2 = 2.0*k2 - 3.0*k3*k3;
+    float c1 = k3*(k3*k3 - k2) + k1;
+    float c0 = k3*(k3*(-3.0*k3*k3 + 4.0*k2) - 8.0*k1) + 4.0*k0;
+    
+    c2 /= 3.0;
+    c1 *= 2.0;
+    c0 /= 3.0;
+    
+    float Q = c2*c2 + c0;
+    float R = 3.0*c0*c2 - c2*c2*c2 - c1*c1;
+    
+    float h2 = R*R - Q*Q*Q;
+    float z = 0.0;
+    
+    if(h2 < 0.0)
+    {
+        // 4 intersections
+        float sQ = sqrt(Q);
+        z = 2.0*sQ*cos(acos(R/(sQ*Q)) / 3.0);
+    }
+    else
+    {
+        // 2 intersections
+        float sQ = pow(sqrt(h2) + abs(R), 1.0/3.0);
+        z = sign(R)*abs(sQ + Q/sQ);
     }
     
-    return (tMin + tMax) / 2.0;  // Best estimate
+    z = c2 - z;
+    
+    float d1 = z - 3.0*c2;
+    float d2 = z*z - 3.0*c0;
+    
+    if(abs(d1) < 1.0e-4)
+    {
+        if(d2 < 0.0) return -1.0;
+        d2 = sqrt(d2);
+    }
+    else
+    {
+        if(d1 < 0.0) return -1.0;
+        d1 = sqrt(d1/2.0);
+        d2 = c1/d1;
+    }
+    
+    float result = 1e20;
+    
+    h2 = d1*d1 - z + d2;
+    if(h2 > 0.0)
+    {
+        h2 = sqrt(h2);
+        float t1 = -d1 - h2 - k3;
+        float t2 = -d1 + h2 - k3;
+        t1 = (po < 0.0) ? 2.0/t1 : t1;
+        t2 = (po < 0.0) ? 2.0/t2 : t2;
+        if(t1 > 0.0) result = t1;
+        if(t2 > 0.0) result = min(result, t2);
+    }
+    
+    h2 = d1*d1 - z - d2;
+    if(h2 > 0.0)
+    {
+        h2 = sqrt(h2);
+        float t1 = d1 - h2 - k3;
+        float t2 = d1 + h2 - k3;
+        t1 = (po < 0.0) ? 2.0/t1 : t1;
+        t2 = (po < 0.0) ? 2.0/t2 : t2;
+        if(t1 > 0.0) result = min(result, t1);
+        if(t2 > 0.0) result = min(result, t2);
+    }
+    
+    return result;
 }
-```
 
-### Rendering the Torus
+vec3 torusNormal(vec3 pos, vec2 tor)
+{
+    return normalize(pos * (dot(pos,pos) - tor.y*tor.y - tor.x*tor.x*vec3(1.0,1.0,-1.0)));
+}
 
-```glsl
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    Ray ray = getRay(fragCoord, iResolution.xy, 45.0);
+    // Setup ray
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    float fov = 45.0;
+    float focalLength = 1.0 / tan(radians(fov) / 2.0);
+    
+    vec3 rayOrigin = vec3(0.0, 0.0, 0.0);
+    vec3 rayDir = normalize(vec3(uv.x, uv.y, -focalLength));
     
     // Torus parameters
-    float majorRadius = 1.5;
-    float minorRadius = 0.5;
-    vec3 torusCenter = vec3(0.0, 0.0, -4.0);
+    vec2 torus = vec2(1.0, 0.4);  // (major radius, minor radius)
+    vec3 torusCenter = vec3(0.0, 0.0, -3.5);
     
-    // Adjust ray for torus center (translate)
-    Ray torusRay = ray;
-    torusRay.origin = ray.origin - torusCenter;
+    // Adjust ray for torus position
+    vec3 ro = rayOrigin - torusCenter;
     
-    float t = intersectTorus(torusRay, majorRadius, minorRadius);
+    float t = intersectTorus(ro, rayDir, torus);
     
     vec3 color;
     if (t > 0.0) {
-        vec3 hitPoint = rayPoint(torusRay, t);
-        vec3 normal = torusNormal(hitPoint, majorRadius, minorRadius);
+        vec3 hitPoint = ro + t * rayDir;
+        vec3 normal = torusNormal(hitPoint, torus);
         
         vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
         float diffuse = max(0.0, dot(normal, lightDir));
@@ -381,97 +439,44 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 }
 ```
 
-**Result:** A beautiful cyan torus with proper 3D lighting!
+Look at that intersection code! Over 80 lines of complex algebra just to render one torus. And this is still a relatively simple surface—imagine arbitrary algebraic varieties, or trying to combine multiple objects with boolean operations.
+
+Analytical methods work beautifully for simple geometry, but we need a more flexible approach for complex scenes.
 
 ---
 
-## Motivation for Raymarching
+## Part 2: Signed Distance Functions and Raymarching
 
-### The Problem with Analytical Methods
+### Introduction to SDFs
 
-Notice what we had to do:
-- **Sphere:** Solve a quadratic equation (manageable)
-- **Torus:** Solve a quartic equation (we used bisection instead)
-- **Arbitrary implicit surface:** Could be any degree polynomial, or transcendental!
+A **signed distance function** (SDF) gives the distance from any point in space to the nearest surface:
 
-Moreover, combining objects is difficult:
-- How do we render two spheres? Check each separately, take the closer one.
-- How do we render the **union** of a sphere and torus? Check both, take closer.
-- How do we render the **intersection** (only where both objects exist)? Much harder!
-- How about **smooth blending** between objects? Nearly impossible analytically.
+$$d(\mathbf{p}) = \begin{cases}
+> 0 & \text{outside surface} \\
+= 0 & \text{on surface} \\
+< 0 & \text{inside surface}
+\end{cases}$$
 
-We need a more flexible approach that works for:
-- Arbitrary implicit surfaces
-- Complex compositions of objects
-- Procedurally defined geometry
+Crucially, $|d(\mathbf{p})|$ is the actual Euclidean distance to the surface.
 
-**Enter: Raymarching with Signed Distance Functions**
+#### Why SDFs?
 
----
+SDFs have a powerful property: if we're at point $\mathbf{p}$ and the surface is distance $d$ away, we can safely move $d$ units in *any* direction without hitting anything. This enables **sphere tracing**—we march along the ray taking steps proportional to the SDF value.
 
-## Signed Distance Functions (SDFs)
+#### SDF Examples
 
-### Definition
+Let's see SDFs for shapes we've already rendered analytically:
 
-A **signed distance function** $d: \mathbb{R}^3 \to \mathbb{R}$ gives the distance from any point in space to the closest point on a surface:
-- $d(\mathbf{p}) > 0$ if $\mathbf{p}$ is outside the surface
-- $d(\mathbf{p}) = 0$ if $\mathbf{p}$ is on the surface
-- $d(\mathbf{p}) < 0$ if $\mathbf{p}$ is inside the surface
-
-Importantly, $|d(\mathbf{p})|$ is the actual Euclidean distance to the surface.
-
-### Why SDFs?
-
-SDFs have a crucial property: if we're at a point $\mathbf{p}$ and the nearest surface is distance $d$ away, we can safely move $d$ units along any direction without hitting anything.
-
-This enables **sphere tracing**: we march along the ray, taking steps proportional to the SDF value, guaranteed not to overshoot the surface.
-
-### SDF for a Sphere
-
-For a sphere of radius $r$ centered at $\mathbf{c}$:
-$$d(\mathbf{p}) = |\mathbf{p} - \mathbf{c}| - r$$
-
+**Sphere:**
 ```glsl
 float sdSphere(vec3 p, vec3 center, float radius) {
     return length(p - center) - radius;
 }
 ```
 
-### SDF for a Box
+Compare this to our 30+ line analytical intersection! Much simpler.
 
-For an axis-aligned box centered at the origin with half-extents $\mathbf{b} = (b_x, b_y, b_z)$:
-
-```glsl
-float sdBox(vec3 p, vec3 center, vec3 halfExtents) {
-    vec3 q = abs(p - center) - halfExtents;
-    return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
-}
-```
-
-(This formula handles both inside and outside the box correctly.)
-
-### SDF for a Plane
-
-For an infinite plane with normal $\mathbf{n}$ (unit vector) passing through point $\mathbf{p}_0$:
-$$d(\mathbf{p}) = (\mathbf{p} - \mathbf{p}_0) \cdot \mathbf{n}$$
-
-```glsl
-float sdPlane(vec3 p, vec3 planePoint, vec3 normal) {
-    return dot(p - planePoint, normal);
-}
-```
-
-For the XZ-plane (Y = 0):
-```glsl
-float sdPlaneY(vec3 p, float height) {
-    return p.y - height;
-}
-```
-
-### SDF for a Torus
-
-For a torus with major radius $R$ and minor radius $r$, axis along Y:
-
+**Torus:**
 ```glsl
 float sdTorus(vec3 p, vec3 center, float majorRadius, float minorRadius) {
     vec3 q = p - center;
@@ -481,139 +486,232 @@ float sdTorus(vec3 p, vec3 center, float majorRadius, float minorRadius) {
 }
 ```
 
-### Other Primitives
+Again, dramatically simpler than the quartic solver!
 
-Many more SDFs exist! Cylinders, capsules, cones, ellipsoids, etc. See resources like [Inigo Quilez's SDF functions](https://iquilezles.org/articles/distfunctions/).
+**Other Primitives**
+
+Many more SDFs exist: boxes, cylinders, capsules, cones, pyramids, etc. See [Inigo Quilez's comprehensive library](https://iquilezles.org/articles/distfunctions/) for a complete reference. Each SDF is typically just a few lines of code.
 
 ---
 
-## The Raymarching Algorithm
+### The Raymarching Algorithm
 
-### Sphere Tracing
+**Sphere tracing** works like this:
 
-The algorithm:
 1. Start at the ray origin
-2. Evaluate the SDF at the current point
-3. March forward along the ray by that distance
+2. Evaluate the SDF at current position
+3. March forward along the ray by that distance (safe step!)
 4. Repeat until:
-   - We're very close to the surface (SDF ≈ 0) → hit!
-   - We've marched too far → miss
-   - We've taken too many steps → give up
+   - Very close to surface (SDF ≈ 0) → hit!
+   - Too far away → miss
+   - Too many steps → give up
 
+Here's the algorithm:
 ```glsl
-struct HitInfo {
-    bool hit;
-    float t;        // Distance along ray
-    vec3 position;  // Hit position
-};
+float sceneSDF(vec3 p) {
+    // Define scene geometry (we'll implement this)
+    return 0.0;
+}
 
-HitInfo raymarch(Ray ray, float maxDist, int maxSteps) {
-    HitInfo info;
-    info.hit = false;
-    
+bool raymarch(vec3 rayOrigin, vec3 rayDir, out float hitDist, out vec3 hitPos) {
     float t = 0.0;
     
-    for (int i = 0; i < maxSteps; i++) {
-        vec3 pos = rayPoint(ray, t);
-        
-        // Evaluate scene SDF (define this based on your scene)
+    for(int i = 0; i < 100; i++) {
+        vec3 pos = rayOrigin + t * rayDir;
         float d = sceneSDF(pos);
         
         // Close enough to surface?
-        if (abs(d) < 0.001) {
-            info.hit = true;
-            info.t = t;
-            info.position = pos;
-            return info;
+        if(abs(d) < 0.001) {
+            hitDist = t;
+            hitPos = pos;
+            return true;
         }
         
         // March forward
         t += d;
         
         // Too far?
-        if (t > maxDist) {
-            break;
+        if(t > 100.0) {
+            return false;
         }
     }
     
-    return info;
+    return false;
 }
 ```
 
-### Scene SDF
+#### Normal Estimation via Gradient
 
-For a scene with multiple objects, we take the minimum distance to any object:
+For an SDF $d(\mathbf{p})$, the gradient $\nabla d$ points perpendicular to the surface (it's the normal direction). We estimate it using finite differences:
 
-```glsl
-float sceneSDF(vec3 p) {
-    // Sphere at (0, 0, -3)
-    float sphere = sdSphere(p, vec3(0.0, 0.0, -3.0), 1.0);
-    
-    // Ground plane
-    float ground = sdPlaneY(p, -1.0);
-    
-    // Return minimum distance
-    return min(sphere, ground);
-}
-```
-
----
-
-## Normal Estimation via Gradient
-
-### The Gradient as Normal
-
-For an implicit surface $F(\mathbf{p}) = 0$, the gradient $\nabla F$ is perpendicular to the surface (it's the normal direction).
-
-For an SDF $d(\mathbf{p})$, the gradient points away from the surface:
-$$\mathbf{n} = \nabla d = \left(\frac{\partial d}{\partial x}, \frac{\partial d}{\partial y}, \frac{\partial d}{\partial z}\right)$$
-
-### Finite Difference Approximation
-
-We estimate each partial derivative using finite differences:
 $$\frac{\partial d}{\partial x} \approx \frac{d(x + \epsilon, y, z) - d(x - \epsilon, y, z)}{2\epsilon}$$
-
-and similarly for $y$ and $z$.
-
-### Implementation
-
 ```glsl
-vec3 estimateNormal(vec3 p, float epsilon) {
-    // Sample SDF at nearby points
-    float dx = sceneSDF(p + vec3(epsilon, 0.0, 0.0)) - sceneSDF(p - vec3(epsilon, 0.0, 0.0));
-    float dy = sceneSDF(p + vec3(0.0, epsilon, 0.0)) - sceneSDF(p - vec3(0.0, epsilon, 0.0));
-    float dz = sceneSDF(p + vec3(0.0, 0.0, epsilon)) - sceneSDF(p - vec3(0.0, 0.0, epsilon));
-    
+vec3 estimateNormal(vec3 p) {
+    float eps = 0.001;
+    float dx = sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0));
+    float dy = sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0));
+    float dz = sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps));
     return normalize(vec3(dx, dy, dz));
 }
 ```
 
-Typical choice: $\epsilon \approx 0.001$.
+#### First Raymarch Shader
 
----
-
-## Putting It All Together: Raymarched Scenes
-
-### Scene 1: Single Sphere
-
+**Shader 5: Single Sphere with Raymarching**
 ```glsl
+float sdSphere(vec3 p, vec3 center, float radius) {
+    return length(p - center) - radius;
+}
+
 float sceneSDF(vec3 p) {
     return sdSphere(p, vec3(0.0, 0.0, -3.0), 1.0);
 }
 
+vec3 estimateNormal(vec3 p) {
+    float eps = 0.001;
+    float dx = sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0));
+    float dy = sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0));
+    float dz = sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps));
+    return normalize(vec3(dx, dy, dz));
+}
+
+bool raymarch(vec3 rayOrigin, vec3 rayDir, out vec3 hitPos) {
+    float t = 0.0;
+    
+    for(int i = 0; i < 100; i++) {
+        vec3 pos = rayOrigin + t * rayDir;
+        float d = sceneSDF(pos);
+        
+        if(abs(d) < 0.001) {
+            hitPos = pos;
+            return true;
+        }
+        
+        t += d;
+        
+        if(t > 100.0) return false;
+    }
+    
+    return false;
+}
+
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    Ray ray = getRay(fragCoord, iResolution.xy, 45.0);
+    // Setup ray
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
     
-    HitInfo hit = raymarch(ray, 100.0, 100);
+    float fov = 45.0;
+    float focalLength = 1.0 / tan(radians(fov) / 2.0);
+    
+    vec3 rayOrigin = vec3(0.0, 0.0, 0.0);
+    vec3 rayDir = normalize(vec3(uv.x, uv.y, -focalLength));
+    
+    // Raymarch
+    vec3 hitPos;
+    bool hit = raymarch(rayOrigin, rayDir, hitPos);
     
     vec3 color;
-    if (hit.hit) {
-        vec3 normal = estimateNormal(hit.position, 0.001);
+    if(hit) {
+        vec3 normal = estimateNormal(hitPos);
         vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
         float diffuse = max(0.0, dot(normal, lightDir));
         
-        vec3 objectColor = vec3(1.0, 0.0, 0.0);
+        vec3 sphereColor = vec3(1.0, 0.0, 0.0);
+        color = sphereColor * diffuse + sphereColor * 0.1;
+    } else {
+        color = vec3(0.1, 0.1, 0.2);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+Same result as the analytical sphere, but now we have a flexible framework!
+
+---
+
+### The Power of SDFs: Instant Shape Swapping
+
+Here's where SDFs shine: **changing shapes is trivial**. Just swap out one SDF for another!
+
+**Shader 6: Shapeshifting**
+```glsl
+float sdSphere(vec3 p, vec3 center, float radius) {
+    return length(p - center) - radius;
+}
+
+float sdTorus(vec3 p, vec3 center, float majorRadius, float minorRadius) {
+    vec3 q = p - center;
+    vec2 pxz = vec2(q.x, q.z);
+    float d = length(pxz) - majorRadius;
+    return length(vec2(d, q.y)) - minorRadius;
+}
+
+float sdBox(vec3 p, vec3 center, vec3 halfExtents) {
+    vec3 q = abs(p - center) - halfExtents;
+    return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
+}
+
+float sceneSDF(vec3 p) {
+    // Uncomment ONE of these to see different shapes!
+    // Everything else stays the same - same raymarch, same lighting, same normal calculation
+    
+    return sdSphere(p, vec3(0.0, 0.0, -3.0), 1.0);
+    //return sdTorus(p, vec3(0.0, 0.0, -3.0), 1.0, 0.4);
+    //return sdBox(p, vec3(0.0, 0.0, -3.0), vec3(0.8, 0.8, 0.8));
+    
+    // Try any SDF from https://iquilezles.org/articles/distfunctions/
+}
+
+vec3 estimateNormal(vec3 p) {
+    float eps = 0.001;
+    float dx = sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0));
+    float dy = sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0));
+    float dz = sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps));
+    return normalize(vec3(dx, dy, dz));
+}
+
+bool raymarch(vec3 rayOrigin, vec3 rayDir, out vec3 hitPos) {
+    float t = 0.0;
+    
+    for(int i = 0; i < 100; i++) {
+        vec3 pos = rayOrigin + t * rayDir;
+        float d = sceneSDF(pos);
+        
+        if(abs(d) < 0.001) {
+            hitPos = pos;
+            return true;
+        }
+        
+        t += d;
+        if(t > 100.0) return false;
+    }
+    
+    return false;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    float fov = 45.0;
+    float focalLength = 1.0 / tan(radians(fov) / 2.0);
+    
+    vec3 rayOrigin = vec3(0.0, 0.0, 0.0);
+    vec3 rayDir = normalize(vec3(uv.x, uv.y, -focalLength));
+    
+    vec3 hitPos;
+    bool hit = raymarch(rayOrigin, rayDir, hitPos);
+    
+    vec3 color;
+    if(hit) {
+        vec3 normal = estimateNormal(hitPos);
+        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+        float diffuse = max(0.0, dot(normal, lightDir));
+        
+        vec3 objectColor = vec3(0.0, 0.7, 1.0);  // Cyan
         color = objectColor * diffuse + objectColor * 0.1;
     } else {
         color = vec3(0.1, 0.1, 0.2);
@@ -623,70 +721,161 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 }
 ```
 
-### Scene 2: Two Spheres
+Comment/uncomment different SDFs in `sceneSDF()` to instantly see different shapes! Try adding more from Quilez's library. The raymarching algorithm doesn't care what shape you use—it just follows the distance field.
 
+---
+
+### Composing Multiple Objects
+
+To combine multiple objects, we simply take the **minimum distance** to any object. The closest surface wins!
+
+**Shader 7: Multiple Objects with Materials**
 ```glsl
-float sceneSDF(vec3 p) {
-    float sphere1 = sdSphere(p, vec3(-1.2, 0.0, -3.0), 1.0);
-    float sphere2 = sdSphere(p, vec3(1.2, 0.0, -3.0), 0.8);
-    
-    return min(sphere1, sphere2);
+float sdSphere(vec3 p, vec3 center, float radius) {
+    return length(p - center) - radius;
 }
-```
 
-Just change the scene SDF! The raymarching and lighting code stays the same.
-
-### Scene 3: Sphere and Torus
-
-```glsl
-float sceneSDF(vec3 p) {
-    float sphere = sdSphere(p, vec3(0.0, 1.0, -4.0), 1.0);
-    float torus = sdTorus(p, vec3(0.0, -0.5, -4.0), 1.5, 0.4);
-    
-    return min(sphere, torus);
+float sdTorus(vec3 p, vec3 center, float majorRadius, float minorRadius) {
+    vec3 q = p - center;
+    vec2 pxz = vec2(q.x, q.z);
+    float d = length(pxz) - majorRadius;
+    return length(vec2(d, q.y)) - minorRadius;
 }
-```
 
-**Different object colors:** To color objects differently, we need to track which object was hit. One approach:
+float sdPlane(vec3 p, float height) {
+    return p.y - height;
+}
 
-```glsl
-// Return both distance and object ID
-vec2 sceneSDF(vec3 p) {
-    float sphere = sdSphere(p, vec3(0.0, 1.0, -4.0), 1.0);
-    float torus = sdTorus(p, vec3(0.0, -0.5, -4.0), 1.5, 0.4);
+// Global variable to track which object we hit
+float gMaterialID;
+
+float sceneSDF(vec3 p) {
+    float d = 1e10;  // Start with very large distance
     
-    if (sphere < torus) {
-        return vec2(sphere, 1.0);  // ID = 1 for sphere
-    } else {
-        return vec2(torus, 2.0);   // ID = 2 for torus
+    // Sphere
+    float sphere = sdSphere(p, vec3(-1.2, 0.0, -3.5), 0.8);
+    if(sphere < d) {
+        d = sphere;
+        gMaterialID = 1.0;
     }
+    
+    // Torus
+    float torus = sdTorus(p, vec3(1.2, 0.0, -3.5), 1.0, 0.3);
+    if(torus < d) {
+        d = torus;
+        gMaterialID = 2.0;
+    }
+    
+    // Ground plane
+    float plane = sdPlane(p, -1.0);
+    if(plane < d) {
+        d = plane;
+        gMaterialID = 3.0;
+    }
+    
+    return d;
 }
 
-// Then in main shader, use the ID to choose color
+vec3 getMaterialColor(float matID) {
+    if(matID < 1.5) return vec3(1.0, 0.0, 0.0);      // Sphere: red
+    if(matID < 2.5) return vec3(0.0, 0.7, 1.0);      // Torus: cyan
+    return vec3(0.5, 0.5, 0.5);                       // Plane: gray
+}
+
+vec3 estimateNormal(vec3 p) {
+    float eps = 0.001;
+    float dx = sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0));
+    float dy = sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0));
+    float dz = sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps));
+    return normalize(vec3(dx, dy, dz));
+}
+
+bool raymarch(vec3 rayOrigin, vec3 rayDir, out vec3 hitPos, out float matID) {
+    float t = 0.0;
+    
+    for(int i = 0; i < 100; i++) {
+        vec3 pos = rayOrigin + t * rayDir;
+        float d = sceneSDF(pos);
+        
+        if(abs(d) < 0.001) {
+            hitPos = pos;
+            matID = gMaterialID;
+            return true;
+        }
+        
+        t += d;
+        if(t > 100.0) return false;
+    }
+    
+    return false;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    float fov = 45.0;
+    float focalLength = 1.0 / tan(radians(fov) / 2.0);
+    
+    vec3 rayOrigin = vec3(0.0, 0.0, 0.0);
+    vec3 rayDir = normalize(vec3(uv.x, uv.y, -focalLength));
+    
+    vec3 hitPos;
+    float matID;
+    bool hit = raymarch(rayOrigin, rayDir, hitPos, matID);
+    
+    vec3 color;
+    if(hit) {
+        vec3 normal = estimateNormal(hitPos);
+        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+        float diffuse = max(0.0, dot(normal, lightDir));
+        
+        vec3 objectColor = getMaterialColor(matID);
+        color = objectColor * diffuse + objectColor * 0.1;
+    } else {
+        color = vec3(0.1, 0.1, 0.2);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
 ```
+
+Three objects with different colors! Adding more objects is trivial—just add another SDF check in `sceneSDF()`. Compare this to analytical methods where combining objects requires sophisticated CSG (constructive solid geometry) techniques.
 
 ---
 
 ## Summary
 
-Today we covered:
+Today we learned two approaches to 3D rendering:
 
-1. **Camera and ray setup**: Generating rays from pixel coordinates with a simple pinhole camera
-2. **Analytical intersection**: Solving equations directly for spheres and tori
-3. **Lighting introduction**: Using surface normals and dot product for diffuse shading
-4. **Signed distance functions**: A flexible representation of geometry as distance fields
-5. **Raymarching algorithm**: Sphere tracing to render SDFs efficiently
-6. **Normal estimation**: Computing gradients via finite differences
-7. **Scene composition**: Combining multiple objects by taking minimum distance
+**Analytical Ray Tracing:**
+- Solve equations directly for ray-surface intersection
+- Exact solutions, very efficient for simple geometry
+- Sphere: straightforward quadratic equation
+- Torus: complex quartic equation requiring sophisticated algebra
+- Becomes increasingly difficult for complex surfaces
+- Standard in production ray tracers for well-defined geometry
 
-Key insights:
-- Analytical methods require solving equations (quadratic, quartic, etc.)
-- SDFs provide a unified framework for any geometry
-- Raymarching works for arbitrary implicit surfaces
-- The same lighting technique applies to both approaches
-- Composition is trivial with SDFs (just take minimum)
+**SDF-Based Raymarching:**
+- Represent surfaces as distance fields
+- March along rays using sphere tracing
+- Simple, uniform code for any geometry
+- Easy composition: just take minimum distance
+- Flexible—works for procedural, implicit, or arbitrary surfaces
+- Slightly slower than analytical, but much more versatile
 
-Tomorrow we'll explore advanced raymarching techniques: domain operations, boolean operations, and 3D fractals!
+**Key Concepts:**
+- Camera setup and ray generation
+- Parametric ray equation: $\mathbf{r}(t) = \mathbf{o} + t\mathbf{d}$
+- Surface normals for lighting
+- Diffuse (Lambertian) shading
+- Signed distance functions (SDFs)
+- Sphere tracing algorithm
+- Normal estimation via gradient (finite differences)
+- Material tracking for multiple objects
+
+Tomorrow we'll explore advanced raymarching: domain operations for infinite repetition, boolean operations for smooth blending, and 3D fractals!
 
 ---
 
@@ -694,141 +883,163 @@ Tomorrow we'll explore advanced raymarching techniques: domain operations, boole
 
 ### Required: Algebraic Variety Rendering
 
-Choose an interesting polynomial implicit surface and render it using ray intersection.
+Implement analytical ray tracing for an interesting polynomial implicit surface.
 
-**Suggestions:**
-- Degree 3: Torus-like surfaces, saddles
-- Degree 4: Quartic surfaces with interesting topology (Klein bottle projections, etc.)
+**Goal:** Experience the challenges of analytical methods firsthand, then appreciate SDFs even more!
 
-**Implementation approach:**
+**Suggested surfaces:**
+- **Degree 3**: Saddle surfaces, cubic varieties
+- **Degree 4**: Klein bottle projections, quartic surfaces with interesting topology
+- **Cassini ovals** in 3D: $(x^2 + y^2 + z^2)^2 - 2a^2(x^2 - y^2) = b^4 - a^4$
 
-1. **Define your implicit function** $F(x, y, z) = 0$
+**Implementation steps:**
 
-Example - a quartic surface:
+1. **Define your implicit function** $F(x,y,z) = 0$
+
+Example—a quartic surface:
 ```glsl
 float implicitFunction(vec3 p) {
-    // Example: (x^2 + y^2 + z^2)^2 - (x^2 + y^2 - 2z^2)
     float r2 = dot(p, p);
-    return r2 * r2 - (p.x * p.x + p.y * p.y - 2.0 * p.z * p.z);
+    return r2 * r2 - (p.x*p.x + p.y*p.y - 2.0*p.z*p.z);
 }
 ```
 
-2. **Implement a root-finding method** (bisection or Newton's method)
-
-Bisection template:
+2. **Implement root finding** (bisection method)
 ```glsl
-float intersectImplicit(Ray ray) {
+float intersectImplicit(vec3 rayOrigin, vec3 rayDir) {
     float tMin = 0.0;
     float tMax = 10.0;
     
-    // [Bisection loop similar to torus example]
-    // Find where implicitFunction(rayPoint(ray, t)) = 0
+    // Check for sign change
+    float fMin = implicitFunction(rayOrigin + tMin * rayDir);
+    float fMax = implicitFunction(rayOrigin + tMax * rayDir);
+    
+    if(fMin * fMax > 0.0) return -1.0;  // No root
+    
+    // Bisection
+    for(int i = 0; i < 50; i++) {
+        float tMid = (tMin + tMax) / 2.0;
+        float fMid = implicitFunction(rayOrigin + tMid * rayDir);
+        
+        if(abs(fMid) < 0.001) return tMid;
+        
+        if(fMin * fMid < 0.0) {
+            tMax = tMid;
+            fMax = fMid;
+        } else {
+            tMin = tMid;
+            fMin = fMid;
+        }
+    }
+    
+    return (tMin + tMax) / 2.0;
 }
 ```
 
-3. **Compute the gradient for normals**
-
-$$\nabla F = \left(\frac{\partial F}{\partial x}, \frac{\partial F}{\partial y}, \frac{\partial F}{\partial z}\right)$$
-
+3. **Compute normal via gradient**
 ```glsl
-vec3 implicitNormal(vec3 p, float epsilon) {
-    float dx = implicitFunction(p + vec3(epsilon, 0, 0)) - implicitFunction(p - vec3(epsilon, 0, 0));
-    float dy = implicitFunction(p + vec3(0, epsilon, 0)) - implicitFunction(p - vec3(0, epsilon, 0));
-    float dz = implicitFunction(p + vec3(0, 0, epsilon)) - implicitFunction(p - vec3(0, 0, epsilon));
+vec3 implicitNormal(vec3 p) {
+    float eps = 0.001;
+    float dx = implicitFunction(p + vec3(eps, 0, 0)) - implicitFunction(p - vec3(eps, 0, 0));
+    float dy = implicitFunction(p + vec3(0, eps, 0)) - implicitFunction(p - vec3(0, eps, 0));
+    float dz = implicitFunction(p + vec3(0, 0, eps)) - implicitFunction(p - vec3(0, 0, eps));
     return normalize(vec3(dx, dy, dz));
 }
 ```
 
-4. **Optimization: Bounding sphere** (optional but recommended)
+4. **Optimization: Bounding volume** (optional but recommended)
 
-To avoid checking the entire ray, use a bounding sphere:
+Use a bounding sphere to avoid checking the entire ray:
 ```glsl
-// If point is outside bounding sphere, return sphere's SDF
-// If point is inside, compute the actual implicit function
-float boundedImplicit(vec3 p) {
-    float boundingSphere = length(p) - 3.0;  // Sphere of radius 3
-    if (boundingSphere > 0.0) {
-        return boundingSphere;  // Outside, use sphere distance
-    }
-    return implicitFunction(p);  // Inside, compute actual
-}
+// First check if ray intersects bounding sphere
+// Only compute implicit function if inside bounds
 ```
 
-**Expected output:** A rendering of your chosen algebraic surface with proper lighting showing its geometric features.
+**Expected output:** A rendered algebraic surface with proper lighting showing its geometric features.
 
-### Optional: Advanced Lighting and Transformations
-
-Pick one or more to explore:
-
-#### 1. Specular Lighting (Phong Model)
-
-Add specular highlights using the Phong reflection model:
-$$\text{specular} = (\mathbf{r} \cdot \mathbf{v})^n$$
-
-where:
-- $\mathbf{r}$ is the reflected light direction: $\mathbf{r} = 2(\mathbf{n} \cdot \mathbf{l})\mathbf{n} - \mathbf{l}$
-- $\mathbf{v}$ is the view direction (toward camera): $\mathbf{v} = -\text{ray.direction}$
-- $n$ is the shininess exponent (try 32 or 64)
-
-```glsl
-vec3 r = reflect(-lightDir, normal);  // GLSL has reflect built-in
-float specular = pow(max(0.0, dot(r, viewDir)), 32.0);
-color += vec3(1.0) * specular;  // Add white specular highlight
-```
-
-#### 2. Rotation Matrices
-
-Transform objects using rotation matrices.
-
-**Rotation around Y-axis by angle θ:**
-$$R_y(\theta) = \begin{pmatrix}
-\cos\theta & 0 & \sin\theta \\
-0 & 1 & 0 \\
--\sin\theta & 0 & \cos\theta
-\end{pmatrix}$$
-
-```glsl
-vec3 rotateY(vec3 p, float angle) {
-    float c = cos(angle);
-    float s = sin(angle);
-    return vec3(
-        p.x * c + p.z * s,
-        p.y,
-        -p.x * s + p.z * c
-    );
-}
-
-// Use in SDF:
-float sdRotatedTorus(vec3 p, vec3 center, float angle, float R, float r) {
-    vec3 q = rotateY(p - center, angle);
-    return sdTorus(q, vec3(0.0), R, r);
-}
-```
-
-#### 3. Complex Scene
-
-Create a scene with multiple transformed objects:
-- Multiple spheres at different positions
-- Rotated boxes or tori
-- A ground plane
-- Experiment with composition
+**Reflection question:** After implementing this, compare the effort to using SDFs. Which approach would you prefer for a complex scene with many objects?
 
 ---
 
-## Looking Ahead
+### Optional Exercises
 
-Tomorrow (Day 5) we'll explore advanced raymarching techniques:
-- Domain operations (repetition, symmetry) for creating infinite patterns
-- Boolean operations (union, intersection, smooth blending)
-- 3D fractals via iterated folding (Menger sponge)
-- Creating complex scenes from simple primitives
+#### 1. Specular Lighting (Phong Model)
 
-You'll leave with a toolkit for rendering virtually any geometry you can imagine!
+Add shiny highlights using the Phong reflection model:
+
+$$\text{specular} = (R \cdot V)^n$$
+
+where $R$ is reflected light direction, $V$ is view direction, $n$ is shininess.
+```glsl
+vec3 R = reflect(-lightDir, normal);  // Reflected light
+vec3 V = -rayDir;                      // View direction
+float spec = pow(max(0.0, dot(R, V)), 32.0);
+color += vec3(1.0) * spec * 0.5;  // White specular highlight
+```
+
+Try different shininess values (8, 16, 32, 64, 128) to see the effect!
+
+#### 2. Camera Movement
+
+Implement an orbiting camera using time:
+```glsl
+float angle = iTime * 0.5;
+vec3 rayOrigin = vec3(3.0 * cos(angle), 1.0, 3.0 * sin(angle));
+
+// Look-at matrix
+vec3 target = vec3(0.0, 0.0, -3.0);
+vec3 forward = normalize(target - rayOrigin);
+vec3 right = normalize(cross(vec3(0, 1, 0), forward));
+vec3 up = cross(forward, right);
+
+// Transform ray direction
+vec3 rd = normalize(uv.x * right + uv.y * up + focalLength * forward);
+```
+
+#### 3. Complex SDF Scene
+
+Create a scene with 5+ objects using different SDFs from [Quilez's library](https://iquilezles.org/articles/distfunctions/):
+- Mix primitives: spheres, boxes, cylinders, tori, cones
+- Position them creatively
+- Use different materials
+- Add interesting lighting
+
+#### 4. Soft Shadows (Preview of Day 5)
+
+Cast rays from the surface toward the light to check for occlusion:
+```glsl
+float softShadow(vec3 pos, vec3 lightDir) {
+    float t = 0.01;  // Start slightly above surface
+    float shadow = 1.0;
+    
+    for(int i = 0; i < 50; i++) {
+        float d = sceneSDF(pos + lightDir * t);
+        shadow = min(shadow, 8.0 * d / t);  // Penumbra factor
+        t += d;
+        if(t > 10.0 || d < 0.001) break;
+    }
+    
+    return clamp(shadow, 0.0, 1.0);
+}
+```
+
+Apply this to your diffuse lighting for more realistic shadows!
+
+---
+
+## Looking Ahead to Day 5
+
+Tomorrow we'll explore advanced raymarching techniques that would be nearly impossible with analytical methods:
+
+- **Domain operations**: Infinite repetition, symmetry, twisting
+- **Boolean operations**: Union, intersection, smooth blending
+- **3D fractals**: Menger sponge, Mandelbulb via iterated transformations
+- **Advanced lighting**: Ambient occlusion, global illumination
 
 Make sure you're comfortable with:
-- The raymarching algorithm (it's the foundation for Day 5)
-- SDF composition (taking min/max for combinations)
+- The raymarching algorithm (it's the foundation)
+- How SDFs compose (taking minimum/maximum)
 - Normal estimation via gradients
-- Basic lighting (diffuse shading)
+- The material tracking pattern we developed
 
 See you tomorrow!
