@@ -6,6 +6,20 @@ Today we introduce the fundamental concept of shader programming: computing a fu
 
 By the end of today, you'll be able to render implicit curves, distance-based coloring, and repeating patterns—all computed in real-time on the GPU.
 
+::: {.callout-note}
+## Roadmap for Today
+
+We'll build up shader programming in layers:
+
+1. **Core concept**: Shaders as parallel functions (What is a Shader?)
+2. **Setup**: Coordinate systems and GLSL syntax (First Shader, Coordinate Systems)
+3. **Basic techniques**: Conditional coloring and distance fields (Half-Planes, Distance Fields)  
+4. **Repetition**: Grids via modular arithmetic (Grids and Repetition)
+5. **Application**: Implicit curves (Implicit Curves)
+
+Each section builds on the previous, so if something feels unclear, it's worth revisiting earlier material before moving forward.
+:::
+
 ---
 
 ## What is a Shader?
@@ -13,18 +27,22 @@ By the end of today, you'll be able to render implicit curves, distance-based co
 ### Mathematical Perspective
 
 A shader is fundamentally a function
-$$f: \mathbb{R}^2 \times \mathbb{R} \times \cdots \to \mathbb{R}^4$$
-that maps pixel coordinates (and potentially time, mouse position, etc.) to color values. For each pixel on the screen, we evaluate this function to determine what color to display.
+$$f: \mathbb{R}^2 \times \mathbb{R} \times \cdots \to [0,1]^4$$
+that maps pixel coordinates $(x,y)$, time $t$, and potentially other parameters to RGBA color values. For today, we'll focus on the spatial dependence—thinking of the shader as a function $f: \mathbb{R}^2 \to [0,1]^4$ that assigns a color to each point in the plane. The domain $[0,1]^4$ represents the red, green, blue, and alpha (transparency) channels, each normalized to the unit interval.
 
 Here's the magic: modern GPUs can evaluate this function for **all pixels simultaneously**. If your screen has 1920×1080 pixels, that's over 2 million function evaluations happening in parallel, typically 60 times per second. We're not looping over pixels one at a time—we're computing them all at once!
 
-This is completely different from how you might write mathematical visualization code in, say, Python. There you'd have nested loops:
+This is completely different from how you might write mathematical visualization code in, say, Python or MATLAB. There you'd have nested loops:
+
 ```python
 for x in range(width):
     for y in range(height):
         color[x,y] = f(x, y)
 ```
-With shaders, there are no loops. You write the function `f`, and the GPU just *does it* everywhere at once. This parallelism is what makes shader-based visualization absurdly fast—fast enough to render complex mathematical objects in real-time, responding to your mouse, animating smoothly, all at 60fps.
+
+With shaders, there are no loops. You write the function $f$, and the GPU just *does it* everywhere at once. This parallelism is what makes shader-based visualization absurdly fast—fast enough to render complex mathematical objects in real-time, responding to your mouse, animating smoothly, all at 60fps.
+
+The computational model is fundamentally different: in traditional CPU programming you have sequential control flow with explicit loops, while in shader programming you express computation as a pure mathematical function that gets evaluated independently at every pixel. The GPU architecture is specifically designed for this kind of massively parallel workload—it has thousands of small processors that can each evaluate your function simultaneously. This is why a relatively modest GPU can outperform even a powerful CPU on graphics tasks by orders of magnitude.
 
 ::: {.callout-note}
 ## Why is this called a "shader"?
@@ -35,6 +53,10 @@ Historically, these programs were used for *shading* 3D objects—computing how 
 ### Why Shadertoy?
 
 Shadertoy is a web-based platform that handles all the annoying GPU setup for you. Normally, working with shaders requires writing a bunch of boilerplate code: setting up OpenGL contexts, compiling shader programs, managing buffers, handling the render loop—it's a pain. Shadertoy abstracts all of that away. You write a single function, hit compile, and instantly see your results.
+
+Shadertoy launched in 2013, created by Pol Jeremias-Vila and Íñigo Quílez (we'll see more of Íñigo's work throughout this week—he's pioneered many shader techniques). Before platforms like Shadertoy, shader programming required managing the entire OpenGL or DirectX pipeline yourself—compiling shaders, linking programs, setting up vertex buffers, managing textures. It was the domain of graphics programmers, not mathematicians.
+
+The genius of Shadertoy was recognizing that for many visualizations, you don't need that complexity. Just give people a function to fill in, handle the boilerplate invisibly, and suddenly shaders become accessible to anyone. It's democratized GPU programming in much the same way that Python notebooks democratized scientific computing—lower the barrier to entry, and a whole new community emerges.
 
 The platform provides several built-in **uniforms** (read-only global variables that are the same for all pixels):
 
@@ -61,8 +83,8 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
 **Parameters:**
 
-- `fragCoord`: the pixel coordinate we're currently computing, as a `vec2` (x, y)
-- `fragColor`: the output color we need to set, as a `vec4` (red, green, blue, alpha)
+- `fragCoord`: the pixel coordinate we're currently computing, as a `vec2` giving the $(x, y)$ position
+- `fragColor`: the output color we need to set, as a `vec4` giving the $(r, g, b, a)$ color
 
 Colors are represented in RGBA format with values in $[0, 1]$. So `vec4(1.0, 0.0, 0.0, 1.0)` represents opaque red, while `vec4(0.5, 0.5, 0.5, 1.0)` is middle gray.
 
@@ -110,9 +132,9 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 }
 ```
 
-Here `iTime` grows continuously, `sin(iTime)` oscillates between $-1$ and $1$, and we remap to $[0, 1]$ with the affine transformation $x \mapsto \frac{1}{2}(1 + x)$. The screen now pulses between black and red!
+Here `iTime` grows continuously, `sin(iTime)` oscillates between $-1$ and $1$, and we remap this to $[0, 1]$ with the affine transformation $t \mapsto \frac{1}{2}(1 + t)$. The screen now pulses between black and red!
 
-This pattern—`0.5 + 0.5 * sin(...)`—comes up constantly when animating. It's the standard way to turn a sinusoid into something that stays in the range $[0,1]$.
+This pattern—`0.5 + 0.5 * sin(...)`—comes up constantly when animating. It's the standard way to turn a sinusoid into something that stays in the range $[0,1]$. You'll use this so often it becomes second nature.
 
 ---
 
@@ -146,25 +168,42 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     
     // Now uv is centered and aspect-corrected
     // Scale to desired viewing window (e.g., [-2, 2] on x-axis)
-    vec2 p = uv * 4.0;  // Now p is in [-2, 2] × [-h, h] where h depends on aspect ratio
+    vec2 p = uv * 4.0;  
     
     fragColor = vec4(1.0, 0.0, 0.0, 1.0);
 }
 ```
 
-Let's break this down step by step:
+Let's understand this transformation rigorously. We're composing four maps. Let's write $w =$ `iResolution.x` and $h =$ `iResolution.y` for the width and height in pixels.
 
-1. **Normalize**: Dividing by `iResolution.xy` maps from pixel coordinates to $[0,1] \times [0,1]$
-2. **Center**: Subtracting $0.5$ shifts the origin to the center: $[-0.5, 0.5] \times [-0.5, 0.5]$
-3. **Aspect correction**: Multiplying `uv.x` by the aspect ratio ensures that equal distances in `uv.x` and `uv.y` correspond to equal screen distances—this makes circles actually circular!
-4. **Scale**: Finally, we scale to whatever viewing window we want for our visualization
+**Step 1: Normalization** 
+$$T_1: [0, w] \times [0, h] \to [0,1]^2, \quad T_1(x,y) = \left(\frac{x}{w}, \frac{y}{h}\right)$$
+
+This makes our coordinates resolution-independent—the same shader code works whether your screen is 1920×1080 or 800×600. A point that's halfway across the screen is $(0.5, v)$ regardless of how many pixels wide the screen actually is.
+
+**Step 2: Centering**
+$$T_2: [0,1]^2 \to [-\tfrac{1}{2}, \tfrac{1}{2}]^2, \quad T_2(u,v) = (u - \tfrac{1}{2}, v - \tfrac{1}{2})$$
+
+Now the origin is at the center of the screen, which is much more natural for mathematical work. We can think about positive and negative coordinates, circles centered at the origin, and so on.
+
+**Step 3: Aspect correction**
+$$T_3(u,v) = \left(\frac{w}{h} \cdot u, v\right)$$
+
+This is crucial! Without it, circles would appear as ellipses on non-square screens. The aspect ratio $w/h$ stretches the $x$-coordinate so that one unit in $x$ corresponds to the same screen distance as one unit in $y$. On a typical 16:9 display ($w/h \approx 1.78$), this means the $x$-axis spans a wider range than the $y$-axis—as it should to maintain equal scaling. A circle of radius $r$ will actually appear circular on screen, not squashed.
+
+**Step 4: Scaling to viewing window**
+$$T_4(u,v) = s \cdot (u,v)$$
+
+Finally, we scale by whatever factor gives us the mathematical viewing window we want. If we choose $s = 4$, then on a 16:9 screen our coordinates range roughly from $[-3.56, 3.56]$ in $x$ and $[-2, 2]$ in $y$—notice the $x$-range is wider to match the screen aspect ratio.
+
+The composition $T_4 \circ T_3 \circ T_2 \circ T_1$ is our complete coordinate transformation, taking us from raw pixel coordinates to a centered, aspect-corrected mathematical coordinate system.
 
 From now on, we'll assume this coordinate setup is done at the start of every shader, storing the result in a variable `p` for "position."
 
 ::: {.callout-tip}
 ## The coordinate transformation boilerplate
 
-You'll do these first few lines in almost every shader you write. It becomes muscle memory quickly! Some people like to wrap it in a function, but for these lectures we'll just write it out each time so the transformation is explicit.
+You'll do these first few lines in almost every shader you write. It becomes muscle memory quickly! Some people like to wrap it in a function, but for these lectures we'll just write it out each time so the transformation is explicit and you can modify it when needed.
 :::
 
 ### Visualizing Coordinates
@@ -174,7 +213,10 @@ Let's verify our coordinate system is working by coloring pixels according to th
 ```glsl
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    // [Coordinate setup as above, resulting in p]
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - 0.5;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
     
     // Map x coordinate to red, y to green
     vec2 color_rg = p * 0.5 + 0.5;  // Remap to [0, 1]
@@ -182,7 +224,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 }
 ```
 
-You should see a smooth gradient: red increases rightward, green increases upward. If you don't see this, something went wrong in your coordinate setup!
+You should see a smooth gradient: red increases rightward, green increases upward. If you don't see this, something went wrong in your coordinate setup! This is a good debugging technique—whenever you're unsure about your coordinates, visualize them directly as colors.
 
 ---
 
@@ -190,7 +232,9 @@ You should see a smooth gradient: red increases rightward, green increases upwar
 
 ### The Concept
 
-Given a linear function $L(x, y) = ax + by$, we want to color pixels differently depending on whether $L(p) < 0$ or $L(p) \geq 0$. This divides the plane into two half-planes—the regions where the function is negative vs. positive.
+Given a linear function $L(x, y) = ax + by + c$, we want to color pixels differently depending on whether $L(p) < 0$ or $L(p) \geq 0$. This divides the plane into two half-planes—the regions where the function is negative versus positive.
+
+The line itself is the zero set: $\{(x,y) : L(x,y) = 0\}$. This is the boundary between the two regions.
 
 ### Implementation
 
@@ -199,7 +243,10 @@ GLSL provides a conditional operator (ternary operator) just like C:
 ```glsl
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    // [Coordinate setup, resulting in p]
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - 0.5;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
     
     float L = p.x;  // The function L(x,y) = x
     
@@ -208,37 +255,37 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 }
 ```
 
-Left half-plane is red, right half-plane is blue. Simple!
+Left half-plane is red, right half-plane is blue. The syntax `(condition) ? value_if_true : value_if_false` should be familiar if you've programmed in C, Java, or JavaScript.
 
 ### The Step Function
 
-GLSL also provides `step(edge, x)` which returns $0$ if $x < \text{edge}$ and $1$ otherwise. This is useful for writing cleaner code without explicit conditionals:
+GLSL also provides `step(edge, x)` which returns $0$ if $x < \text{edge}$ and $1$ otherwise. The name comes from its graph—a step function in the calculus sense, jumping discontinuously from 0 to 1 at the edge value. This is useful for writing cleaner code without explicit conditionals:
 
 ```glsl
 float s = step(0.0, p.x);  // 0 on left, 1 on right
 vec3 color = mix(vec3(1.0, 0.0, 0.0), vec3(0.0, 0.0, 1.0), s);
 ```
 
-Here `mix(a, b, t)` performs linear interpolation: $(1-t)a + tb$. So when `s = 0` we get pure red, when `s = 1` we get pure blue.
+Here `mix(a, b, t)` performs linear interpolation: $(1-t)a + tb$. So when `s = 0` we get pure red, when `s = 1` we get pure blue. The `mix` function is one of GLSL's most useful tools—you'll use it constantly for blending colors, smoothly transitioning between values, and implementing linear interpolation in all sorts of contexts.
 
 ::: {.callout-note}
 ## Why use `step` instead of the ternary operator?
 
-Both work fine! The ternary operator `?:` is more explicit and familiar if you know C-like languages. But `step` and `mix` are more idiomatic in shader code, and they compose nicely with other functions. As you write more shaders, you'll develop a feel for which style is clearer in each situation.
+Both work fine! The ternary operator `?:` is more explicit and familiar if you know C-like languages. But `step` and `mix` are more idiomatic in shader code, and they compose nicely with other functions. As you write more shaders, you'll develop a feel for which style is clearer in each situation. For now, use whichever makes sense to you.
 :::
 
 ### Arbitrary Half-Planes
 
-For a general line $ax + by = 0$, we just evaluate the corresponding linear function:
+For a general line $ax + by + c = 0$, we just evaluate the corresponding linear function:
 
 ```glsl
-float a = 1.0, b = 1.0;
-float L = a * p.x + b * p.y;
+float a = 1.0, b = 1.0, c = 0.0;
+float L = a * p.x + b * p.y + c;
 vec3 color = (L < 0.0) ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 0.0, 1.0);
 fragColor = vec4(color, 1.0);
 ```
 
-Try different values of $a$ and $b$ to see different line orientations. The line itself is where $L = 0$, and we're coloring the two sides differently.
+Try different values of $a$, $b$, and $c$ to see different line orientations and positions. The line itself is where $L = 0$, and we're coloring the two sides differently. Notice that scaling $(a,b,c)$ by a positive constant doesn't change the geometry—it's the zero set that matters, not the specific values of the function away from zero.
 
 ---
 
@@ -255,16 +302,19 @@ In GLSL this is built-in:
 float d = length(p);
 ```
 
-The `length()` function computes the Euclidean norm of a vector. It works for `vec2`, `vec3`, `vec4`—whatever you need.
+The `length()` function computes the Euclidean norm of a vector. It works for `vec2`, `vec3`, `vec4`—whatever you need. Under the hood it's computing the square root of the dot product of the vector with itself, but there's no need to write that out explicitly.
 
 ### Filled Circle
 
-A circle of radius $r$ centered at the origin is the set $\{p : \|p\| < r\}$—just points whose distance from the origin is less than $r$. So to color the inside vs. outside of a circle, we just compare distances:
+A circle of radius $r$ centered at the origin is the set $\{p : \|p\| < r\}$—just points whose distance from the origin is less than $r$. So to color the inside versus outside of a circle, we just compare distances:
 
 ```glsl
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    // [Coordinate setup]
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - 0.5;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
     
     float d = length(p);
     float r = 1.0;
@@ -274,7 +324,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 }
 ```
 
-That's it! This renders a yellow disk on a dark blue background. Every pixel computes its distance to the origin and decides whether it's inside or outside the circle.
+That's it! This renders a yellow disk on a dark blue background. Every pixel computes its distance to the origin and decides whether it's inside or outside the circle. Simple, elegant, and fast—millions of distance calculations per frame, all happening in parallel.
 
 ### Distance-Based Coloring
 
@@ -288,7 +338,9 @@ vec3 color = vec3(intensity);
 fragColor = vec4(color, 1.0);
 ```
 
-This creates a radial gradient—bright at the center, dark at the edges. Distance fields like this are incredibly versatile: you can use them for smooth transitions, glowing effects, or (as we'll see on Day 4) as the foundation for 3D rendering!
+This creates a radial gradient—bright at the center, dark at the edges. The `clamp` function ensures we stay within $[0,1]$ even if our formula would produce values outside that range. Distance fields like this are incredibly versatile: you can use them for smooth transitions, glowing effects, or (as we'll see on Day 4) as the foundation for 3D rendering!
+
+Distance fields will become increasingly important as the week progresses. On Day 4, we'll use them as the foundation for **raymarching**—a technique for rendering 3D geometry without any triangles or polygons, purely by iteratively evaluating distance functions. The `length(p)` function we used for circles today generalizes to arbitrary implicit surfaces: $d(p) = $ "distance to the surface defined by $F(p) = 0$." It's a beautiful connection between analysis and computer graphics.
 
 ### Circle Outline
 
@@ -312,12 +364,17 @@ For a smoother, anti-aliased edge, GLSL provides `smoothstep`:
 float circle_mask = 1.0 - smoothstep(r - thickness, r + thickness, d);
 ```
 
-The `smoothstep(a, b, x)` function performs smooth Hermite interpolation between $a$ and $b$, transitioning gradually instead of having a hard cutoff. This eliminates jagged edges and makes the circle look much nicer—especially important when you're creating publication-quality mathematical illustrations!
+The `smoothstep(a, b, x)` function performs smooth Hermite interpolation. For $x \in [a,b]$, it returns
+$$s(t) = 3t^2 - 2t^3 \quad \text{where } t = \frac{x-a}{b-a}$$
+
+This is a cubic polynomial with $s(0) = 0$, $s(1) = 1$, and crucially $s'(0) = s'(1) = 0$—the zero derivatives at the endpoints mean it transitions smoothly without visible "kinks." For $x < a$ it returns $0$, for $x > b$ it returns $1$.
+
+The result is anti-aliasing: instead of a hard transition at a single pixel, the edge is blurred over the interval $[a,b]$. For circle outlines, using `smoothstep(r - thickness, r + thickness, d)` creates a smooth transition zone of width $2 \cdot \text{thickness}$ around the target radius. This eliminates jagged edges and makes the circle look much nicer—especially important when you're creating publication-quality mathematical illustrations!
 
 ::: {.callout-tip}
 ## Anti-aliasing in shaders
 
-The harsh cutoffs from using `<` or the ternary operator create jagged, pixelated edges. Functions like `smoothstep` give you smooth transitions over a few pixels, which is exactly what you want for anti-aliasing. We'll use this technique constantly: anywhere you have a sharp boolean decision, consider replacing it with `smoothstep` for smoother results.
+The harsh cutoffs from using `<` or the ternary operator create jagged, pixelated edges—what computer graphics people call "aliasing" (the signal is being undersampled relative to its frequency content, creating artifacts). Functions like `smoothstep` give you smooth transitions over a few pixels, which is exactly what you want for anti-aliasing. We'll use this technique constantly: anywhere you have a sharp boolean decision, consider replacing it with `smoothstep` for smoother results.
 :::
 
 ---
@@ -328,6 +385,8 @@ The harsh cutoffs from using `<` or the ternary operator create jagged, pixelate
 
 The modulo operation creates periodic repetition. For a period $T$, the function $p \mapsto (p \bmod T) - T/2$ maps $\mathbb{R}$ to $[-T/2, T/2]$ repeatedly—it "folds" the entire real line into a finite interval over and over again.
 
+More precisely, recall that $x \bmod T$ is the unique value in $[0, T)$ satisfying $x \equiv r \pmod{T}$—that is, $x = nT + r$ for some integer $n$. Geometrically, this takes the real line and wraps it into the interval $[0,T)$. Subtracting $T/2$ recenters this to $[-T/2, T/2]$.
+
 In GLSL, `mod(x, T)` computes $x \bmod T$. This is one of the most powerful tools in shader programming!
 
 ### Creating a Grid
@@ -337,7 +396,10 @@ To create a grid of repeated cells, we apply `mod` to our coordinates:
 ```glsl
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    // [Coordinate setup, resulting in p]
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - 0.5;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
     
     float spacing = 1.0;
     vec2 cell_p = mod(p + spacing/2.0, spacing) - spacing/2.0;
@@ -354,10 +416,14 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
 This creates an infinite grid of yellow circles! The coordinate transformation `cell_p = mod(p + spacing/2.0, spacing) - spacing/2.0` ensures that `cell_p` is always in the range $[-\text{spacing}/2, \text{spacing}/2]$, and this range repeats forever. So every cell of the grid has identical coordinates, and therefore draws identical content.
 
+Think about what just happened: we created infinitely many circles with exactly the same amount of computation as drawing a single circle! There's no loop over grid cells, no array of circle positions—the repetition comes purely from the coordinate transformation. 
+
+Compare this to how you might approach this in Python or MATLAB: you'd probably set up a nested loop over grid cells, compute the center of each cell, then draw a circle there. That's $O(n^2)$ work for an $n \times n$ grid. With shaders, it's $O(1)$ in the grid size—the cost is entirely in the number of *pixels*, not the number of *circles*. This is why shaders can render infinitely complex patterns at the same framerate as simple ones.
+
 ::: {.callout-note}
 ## The power of `mod`
 
-Think about what just happened: we created infinitely many circles with exactly the same amount of computation as drawing a single circle! There's no loop over grid cells, no array of circle positions—the repetition comes purely from the coordinate transformation. This is the kind of efficiency that makes shaders special.
+This computational efficiency through coordinate transformations is a recurring theme in shader programming. You'll see it again when we talk about domain repetition for fractals (Day 2), symmetry groups for hyperbolic tilings (Day 3), and space folding for raymarched scenes (Day 4). The key insight is always the same: instead of explicitly iterating over instances, transform the coordinate system so that all instances share the same local coordinates.
 :::
 
 ### Alternating Pattern
@@ -373,7 +439,9 @@ vec3 color_b = vec3(0.0, 0.0, 1.0);
 vec3 bg_color = mix(color_a, color_b, checker);
 ```
 
-Here `floor(p / spacing)` gives us integer grid indices $(i, j)$, and we alternate colors based on the parity of $i + j$. When $i + j$ is even, `checker = 0` (red), when odd, `checker = 1` (blue).
+Here `floor(p / spacing)` gives us integer grid indices $(i, j)$, and we alternate colors based on the parity of $i + j$. When $i + j$ is even, `checker = 0` (giving us `color_a`), when odd, `checker = 1` (giving us `color_b`).
+
+Notice the elegant separation: `cell_id` tells us *which* cell we're in, while `cell_p` tells us *where within* that cell. This separation of global position and local coordinates is fundamental to working with repeating patterns.
 
 ### Combining with Circles
 
@@ -382,7 +450,10 @@ Let's put it all together—a grid of circles on an alternating background:
 ```glsl
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    // [Coordinate setup]
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - 0.5;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
     
     float spacing = 1.0;
     vec2 cell_id = floor(p / spacing);
@@ -402,7 +473,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 }
 ```
 
-Try varying the `spacing` and `r` parameters. What happens if you make the circles larger than the cells? What if you use different spacing values for `x` and `y`?
+Try varying the `spacing` and `r` parameters. What happens if you make the circles larger than the cells? (They overlap across cell boundaries!) What if you use different spacing values for `x` and `y`? (You get a rectangular rather than square lattice.) This simple framework is incredibly flexible.
 
 ---
 
@@ -419,7 +490,7 @@ float curve_mask = abs(F) < thickness ? 1.0 : 0.0;
 vec3 color = mix(background, curve_color, curve_mask);
 ```
 
-This is a remarkably general technique! It works for any curve you can write as an implicit equation—circles, ellipses, hyperbolas, higher-degree algebraic curves, whatever you want.
+This is a remarkably general technique! It works for any curve you can write as an implicit equation—circles, ellipses, hyperbolas, higher-degree algebraic curves, transcendental curves, whatever you want. If you can write down a formula $F(x,y)$, you can visualize its zero set.
 
 ### Example: Parabola
 
@@ -436,7 +507,16 @@ fragColor = vec4(color, 1.0);
 
 You should see a yellow parabola on a dark blue background. The curve appears wherever $|F(x,y)| < 0.1$—a thin band around the zero set of $F$.
 
-One thing to notice: the visual thickness of the curve varies! Near the vertex where the parabola is flat, the curve looks thicker. This is because we're thresholding on the *value* of $F$, not the geometric distance to the curve. For perfectly uniform thickness, you'd need to compute the actual signed distance function—something we'll talk more about on Day 4.
+One thing to notice: the visual thickness of the curve varies! Near the vertex where the parabola is flat, the curve looks thicker, while in the steep regions it appears thinner. Why does this happen?
+
+We're thresholding on the *value* of $F$, not the *geometric distance* to the curve. Near the vertex at $(0,0)$, the parabola is nearly horizontal—small changes in $y$ correspond to small changes in $x$, so the set $\{p : |y - x^2| < \epsilon\}$ is a thick vertical band. But on the steep parts where $|x|$ is large, the parabola is nearly vertical—now the same change in $y$ corresponds to a large change in $x$, so the band is thin.
+
+To see this more precisely, consider the gradient: $\nabla F = (-2x, 1)$. Near the vertex this has magnitude close to $1$, but for large $|x|$ it has magnitude approximately $2|x|$. The visual thickness is roughly inversely proportional to $|\nabla F|$—where the gradient is small, the level sets are far apart, and where it's large, they're close together.
+
+To get uniform thickness, we'd need the *signed distance function* to the curve: 
+$$d(p) = \inf\{\|p - q\| : F(q) = 0\}$$
+
+Then thresholding on $|d(p)| < \epsilon$ gives exactly thickness $\epsilon$ everywhere. Computing exact signed distance functions is nontrivial (we'll see techniques for this on Day 4 when we discuss raymarching), but for many applications the naive thresholding on $|F|$ works fine—especially if you tune the thickness parameter appropriately or use different thickness values in different regions.
 
 ### Example: Circle (Implicit Form)
 
@@ -449,7 +529,34 @@ float thickness = 0.1;
 float curve_mask = abs(F) < thickness ? 1.0 : 0.0;
 ```
 
-This is mathematically equivalent to our earlier approach but demonstrates the general implicit curve technique. The `dot(p, p)` computes $x^2 + y^2$ efficiently.
+This is mathematically equivalent to our earlier approach but demonstrates the general implicit curve technique. The `dot(p, p)` computes $x^2 + y^2$ as a single GPU operation—more efficient than `p.x * p.x + p.y * p.y` and certainly cleaner than writing it out! For circles, the signed distance function and the implicit function are particularly closely related: $d(p) = |\|p\| - r|$, so the naive implicit approach actually works quite well.
+
+### More Examples
+
+Let's look at a few more interesting curves:
+
+**Hyperbola**: $xy = 1$
+
+```glsl
+float F = p.x * p.y - 1.0;
+```
+
+**Ellipse**: $\frac{x^2}{a^2} + \frac{y^2}{b^2} = 1$
+
+```glsl
+float a = 2.0, b = 1.0;
+float F = (p.x * p.x) / (a * a) + (p.y * p.y) / (b * b) - 1.0;
+```
+
+**Lemniscate of Bernoulli**: $(x^2 + y^2)^2 = a^2(x^2 - y^2)$
+
+```glsl
+float a = 1.0;
+float r2 = dot(p, p);
+float F = r2 * r2 - a * a * (p.x * p.x - p.y * p.y);
+```
+
+Each of these creates beautiful curves! Try implementing them and experimenting with different parameters.
 
 ::: {.callout-tip}
 ## Implicit curves in your homework
@@ -463,13 +570,19 @@ When you're implementing the parabola graphing calculator for homework, you'll u
 
 Today we've learned the fundamental tools of shader programming:
 
-1. **Shaders as parallel functions**: Every pixel evaluates $f(x, y, t, \ldots) \to \text{color}$ simultaneously—no loops required!
-2. **GLSL basics**: Syntax, vector types, and built-in functions like `length()`, `step()`, and `smoothstep()`
-3. **Coordinate systems**: Centering, normalizing, and scaling for mathematical work
-4. **Conditional coloring**: Using boolean expressions and `step()` for discrete color regions
-5. **Distance fields**: Using `length()` to create circles and radial patterns—the foundation for much more complex techniques later
-6. **Modular arithmetic**: Creating grids and repeating patterns with `mod()`—infinite complexity with finite computation
-7. **Implicit curves**: Rendering curves defined by $F(x, y) = 0$ by thresholding on $|F|$
+1. **Shaders as parallel functions**: Every pixel evaluates $f(x, y, t, \ldots) \to \text{color}$ simultaneously—no loops required! The computational model is fundamentally different from sequential CPU programming.
+
+2. **GLSL basics**: Syntax rules (semicolons, `.0` for floats), vector types (`vec2`, `vec3`, `vec4`), and essential built-in functions like `length()`, `dot()`, `step()`, and `smoothstep()`
+
+3. **Coordinate systems**: The four-step transformation (normalize, center, aspect-correct, scale) that takes us from pixel coordinates to a mathematical coordinate system suitable for visualization
+
+4. **Conditional coloring**: Using boolean expressions, the ternary operator, and `step()` combined with `mix()` to create discrete color regions based on mathematical predicates
+
+5. **Distance fields**: Using `length()` to create circles and radial patterns—the foundation for much more complex techniques we'll explore on Day 4 with raymarching
+
+6. **Modular arithmetic**: Creating grids and repeating patterns with `mod()`—achieving infinite complexity with finite computation through coordinate transformations rather than explicit iteration
+
+7. **Implicit curves**: Rendering curves defined by $F(x, y) = 0$ by thresholding on $|F|$—a general technique that works for any curve we can express as an equation, though we must be aware of the non-uniform thickness issue
 
 With these tools, you can already create a wide variety of mathematical visualizations! Tomorrow we'll use these same techniques to explore complex dynamics (Mandelbrot and Julia sets) and geometric transformations (circle inversions and the Apollonian gasket). But everything builds on the foundation we've established today.
 
@@ -483,78 +596,118 @@ Create a shader that draws a customizable parabola $y = ax^2 + bx + c$ along wit
 
 **Requirements:**
 
-- Define variables `a`, `b`, `c` at the top of your shader (hardcoded values are fine)
-- Draw the $x$-axis and $y$-axis as thick lines (use the implicit line technique: $|y| < \epsilon$ for $x$-axis, $|x| < \epsilon$ for $y$-axis)
-- Plot the parabola $y = ax^2 + bx + c$ as a thick curve
-- Use distinct colors for axes and parabola
-- The visualization should work for any reasonable values of $a$, $b$, $c$
+- Define variables `a`, `b`, `c` at the top of your shader (hardcoded values are fine—we're not building a GUI yet)
+- Draw the $x$-axis and $y$-axis as thin lines using the implicit line technique: $|y| < \epsilon$ for the $x$-axis, $|x| < \epsilon$ for the $y$-axis
+- Plot the parabola $y = ax^2 + bx + c$ as a thicker curve
+- Use distinct colors for axes (suggest a neutral gray) and parabola (suggest something bright)
+- The visualization should work for any reasonable values of $a$, $b$, $c$—make sure to test edge cases!
+
+**What it should look like:** A coordinate plane with thin gray axes, and a colored curve tracing out your parabola. The entire parabola should be visible in your viewing window (you may need to adjust your scaling factor depending on your parameters). 
+
+**Test cases to verify:** 
+- $a=1, b=0, c=0$ (standard parabola opening upward)
+- $a=-1, b=0, c=1$ (downward-opening parabola shifted up)
+- $a=0.5, b=1, c=-0.5$ (general case with all parameters nonzero)
+- $a=0, b=1, c=0$ (degenerate case—just a line! Your code should handle this gracefully)
 
 **Suggested approach:**
+
 ```glsl
-// Define parameters
-float a = 1.0;
-float b = 0.0;
-float c = 0.0;
-
-// Axes
-float x_axis_mask = abs(p.y) < 0.05 ? 1.0 : 0.0;
-float y_axis_mask = abs(p.x) < 0.05 ? 1.0 : 0.0;
-
-// Parabola: F(x,y) = y - (ax² + bx + c) = 0
-float F = p.y - (a * p.x * p.x + b * p.x + c);
-float parabola_mask = abs(F) < 0.1 ? 1.0 : 0.0;
-
-// Combine
-vec3 color = background;
-color = mix(color, axis_color, max(x_axis_mask, y_axis_mask));
-color = mix(color, parabola_color, parabola_mask);
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // Coordinate setup
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - 0.5;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
+    
+    // Define parameters
+    float a = 1.0;
+    float b = 0.0;
+    float c = 0.0;
+    
+    // Background
+    vec3 color = vec3(0.1, 0.1, 0.15);
+    
+    // Axes
+    float axis_thickness = 0.02;
+    float x_axis_mask = abs(p.y) < axis_thickness ? 1.0 : 0.0;
+    float y_axis_mask = abs(p.x) < axis_thickness ? 1.0 : 0.0;
+    vec3 axis_color = vec3(0.3, 0.3, 0.3);
+    
+    // Parabola: F(x,y) = y - (ax² + bx + c) = 0
+    float F = p.y - (a * p.x * p.x + b * p.x + c);
+    float curve_thickness = 0.08;
+    float parabola_mask = abs(F) < curve_thickness ? 1.0 : 0.0;
+    vec3 parabola_color = vec3(1.0, 0.8, 0.0);
+    
+    // Combine (axes behind parabola)
+    color = mix(color, axis_color, max(x_axis_mask, y_axis_mask));
+    color = mix(color, parabola_color, parabola_mask);
+    
+    fragColor = vec4(color, 1.0);
+}
 ```
 
-Try different values of $a$, $b$, $c$ and verify your grapher works correctly! What happens with negative $a$? What about $b \neq 0$? Make sure the axes and parabola remain visible for all parameter values you try.
+Try different values of $a$, $b$, $c$ and verify your grapher works correctly! What happens with negative $a$? What about $b \neq 0$? Make sure the axes and parabola remain visible for all parameter values you try. If the parabola goes off-screen, you may need to adjust your coordinate scaling in the setup.
 
 ### Optional #1: Animated Curve Family
 
-Create a shader that animates through a family of curves—watching how a curve morphs continuously as parameters change is a beautiful way to build intuition!
+Create a shader that animates through a family of curves—watching how a curve morphs continuously as parameters change is a beautiful way to build geometric intuition!
 
-**Suggestions:**
+**Easier options:**
 
-- **Elliptic fibration**: Take a cubic polynomial $y^2 = x^3 + ax + b$ and vary one parameter with `iTime`. The topology of the curve changes dramatically as you pass through singular values!
-- **Lissajous curves**: Parametric curves $x = A\sin(at + \delta)$, $y = B\sin(bt)$. Animate $\delta$ or the frequency ratio to watch the curve morph through different patterns
-- **Cassini ovals**: $(x^2 + y^2)^2 - 2c^2(x^2 - y^2) = a^4 - c^4$. Vary the parameter and watch the curve transition from two separate loops to a single figure-eight-like shape
+- **Circle family**: Draw circles of varying radii: $x^2 + y^2 = r^2$ where $r = 1 + 0.5\sin(\text{iTime})$. Simple but mesmerizing!
 
-Use `iTime` creatively to create a compelling animation. The goal is to explore how continuous parameter variation produces interesting mathematical families. Bonus points if you can identify special parameter values where the curve topology changes!
+- **Rotating ellipse**: $(x\cos\theta + y\sin\theta)^2/a^2 + (-x\sin\theta + y\cos\theta)^2/b^2 = 1$ with $\theta = \text{iTime}$. Watch an ellipse rotate continuously.
+
+**More challenging options:**
+
+- **Lissajous curves**: Use parametric equations $x = A\sin(at + \delta)$, $y = B\sin(bt)$ and animate $\delta$ with `iTime`. To render a parametric curve implicitly, you'll need to be clever—one approach is to sample many points along the curve and draw circles at each point (we'll learn better techniques for this later).
+
+- **Cassini ovals**: $(x^2 + y^2)^2 - 2c^2(x^2 - y^2) = a^4 - c^4$. Fix $c = 1$ and vary $a$ with `iTime`. Watch the curve transition from two separate loops to a single figure-eight-like shape as $a$ passes through the critical value $a = c$!
+
+- **Cubic curves**: Take $y^2 = x^3 + ax + b$ and vary one parameter with `iTime`. The topology of the curve changes dramatically as you pass through singular values—this is the beginning of the theory of elliptic curves!
+
+Use `iTime` creatively to create a compelling animation. The goal is to explore how continuous parameter variation produces interesting mathematical families. Bonus points if you can identify special parameter values where the curve topology changes (these are the singularities of the family)!
 
 ### Optional #2: Beautiful Tiling Pattern
 
-Design an aesthetically pleasing tiling pattern using the `mod()` technique. This is your chance to be creative!
+Design an aesthetically pleasing tiling pattern using the `mod()` technique. This is your chance to be creative and make something visually striking!
 
 **Requirements:**
 
 - Create a non-trivial pattern within a fundamental domain (a single tile)
 - Use `mod()` to repeat it across the plane
-- The pattern should tile seamlessly (edges should match up)
+- The pattern should tile seamlessly—edges must match up so there are no visible discontinuities at tile boundaries
 
-**Ideas:**
+**Ideas to get you started:**
 
-- Geometric patterns: nested circles, polygons, stars
-- Color gradients that vary by tile position (using `cell_id`)
-- Combinations of implicit curves within each tile
-- Symmetry: use `abs()` to create reflections within tiles
-- Distance-based effects: make circles pulse or fade based on `iTime` and their position in the grid
+- **Geometric patterns**: Nested circles, polygons approximated by implicit curves, star shapes using angular coordinates
+- **Color gradients**: Use `cell_id` to vary colors smoothly across tiles, creating large-scale gradient effects superimposed on the local pattern
+- **Multiple implicit curves**: Combine several curves within each tile using boolean operations (intersection, union, etc.)
+- **Symmetry**: Use `abs()` to create reflections within tiles—this is a simple way to get complex patterns with built-in symmetry
+- **Distance-based effects**: Make features pulse or fade based on `iTime` and their position in the grid—create waves propagating across the tiling
 
-**Challenge**: Can you create a pattern that has different symmetries in different tiles? (For example, alternating rotational symmetry using the checkerboard `cell_id` technique.) Or a pattern where the colors vary smoothly across the tiling, creating a large-scale gradient effect?
+**Advanced challenge**: Can you create a pattern that has different symmetries in different tiles? For example, alternate between rotational and reflectional symmetry using the checkerboard `cell_id` technique. Or create a pattern where the colors vary smoothly across the entire infinite tiling, creating a large-scale gradient effect that's independent of the tile boundaries?
+
+Think about Islamic geometric patterns, Escher tilings, or quasiperiodic tilings (though true quasiperiodicity requires techniques beyond simple `mod`—we'll see that on Day 3!). The goal is to create something mathematically interesting and visually beautiful.
 
 ---
 
 ## Looking Ahead
 
-Tomorrow we'll use these techniques to explore **complex dynamics** (the Mandelbrot and Julia sets) and **geometric transformations** (circle inversions and the Apollonian gasket). The coordinate system and implicit curve techniques you've learned today will be the foundation for everything to come.
+Tomorrow we'll use these techniques to explore **complex dynamics** and **geometric transformations**:
 
-Make sure you're comfortable with:
+- **Mandelbrot and Julia sets**: Using the implicit curve technique to visualize the boundary of escape sets for complex iteration
+- **Circle inversions**: A geometric transformation that takes lines and circles to lines and circles, creating beautiful fractal-like patterns
+- **Apollonian gasket**: An infinite packing of circles constructed via repeated inversions—a stunning example of how simple geometric rules create intricate structures
 
-- Setting up coordinates (the standard transformation from `fragCoord` to centered, aspect-corrected `p`)
-- Computing distances and implicit functions  
-- Using `mod()` for repetition
-- Conditionally coloring based on mathematical expressions
+The coordinate systems, distance fields, and implicit curve techniques you've learned today will be the foundation for everything to come. Make sure you're comfortable with:
 
-If any of these feel shaky, now is the time to practice! Everything builds on this foundation.
+- Setting up coordinates (the standard four-step transformation from `fragCoord` to centered, aspect-corrected `p`)
+- Computing distances with `length()` and dot products
+- Using `mod()` for repetition and understanding the separation of global `cell_id` and local `cell_p`
+- Conditionally coloring based on mathematical expressions, using both explicit conditionals and smooth interpolation with `smoothstep`
+
+If any of these feel shaky, now is the time to practice! Work through the homework problems, experiment with variations, and make sure you understand not just *how* the code works but *why* the mathematics gives the visual results you see. Everything this week builds on this foundation.

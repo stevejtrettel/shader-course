@@ -2,9 +2,22 @@
 
 ## Overview
 
-Today we explore the power of iteration to generate fractals. We'll implement complex arithmetic in GLSL and use it to render the iconic Mandelbrot set. Then we'll shift gears to geometric iteration: circle inversion, a beautiful conformal transformation that creates intricate nested patterns when applied repeatedly. We'll see how the Apollonian gasket emerges from iterated inversions of three mutually tangent circles, and learn to organize geometric data using structs.
+Today we explore the power of iteration to generate fractals. We'll implement complex arithmetic in GLSL and use it to render the iconic Mandelbrot set, then understand its companion, the Julia set. After that, we shift gears to geometric iteration: circle inversion, a beautiful conformal transformation that creates intricate nested patterns when applied repeatedly. We'll see how the Apollonian gasket emerges from iterated inversions of three mutually tangent circles.
 
 By the end of today, you'll understand how simple iterative processes—whether in the complex plane or through geometric transformations—can generate infinitely detailed fractal structures from just a few lines of code.
+
+::: {.callout-note}
+## Roadmap for Today
+
+We'll explore iteration in two different mathematical settings:
+
+1. **Complex dynamics**: Iterating holomorphic maps (Mandelbrot and Julia sets)
+2. **Geometric dynamics**: Iterating circle inversions (Apollonian gasket)
+
+Both produce fractals through the same fundamental mechanism: simple rules applied repeatedly reveal infinite complexity. The common thread is **conformality**—both complex multiplication and circle inversion preserve angles, and this angle preservation is key to the beautiful structures we'll see.
+
+Along the way, we'll learn shader programming techniques for organizing data (structs), implementing mathematical operations efficiently, and creating sophisticated coloring schemes.
+:::
 
 ---
 
@@ -12,13 +25,13 @@ By the end of today, you'll understand how simple iterative processes—whether 
 
 ### Representation
 
-A complex number $z = a + bi$ can be represented as a 2D vector with real part $a$ and imaginary part $b$. This is actually a completely natural representation—complex numbers *are* the 2D plane! In GLSL:
+A complex number $z = a + bi$ can be represented as a 2D vector with real part $a$ and imaginary part $b$. This is the natural representation—complex numbers are the 2D plane with a particular multiplication structure! In GLSL:
 
 ```glsl
 vec2 z = vec2(a, b);  // Represents a + bi
 ```
 
-We'll consistently use the convention: `z.x` is the real part, `z.y` is the imaginary part. This means you can think of complex arithmetic as geometric operations in the plane, which gives great intuition for what's happening.
+We'll consistently use the convention: `z.x` is the real part, `z.y` is the imaginary part. You already know complex numbers geometrically as rotations and scalings in the plane—here we're just implementing that algebra in shader code.
 
 ### Complex Arithmetic
 
@@ -32,7 +45,7 @@ vec2 cadd(vec2 z, vec2 w) {
 }
 ```
 
-Addition of complex numbers is just vector addition—componentwise! We're literally adding the real and imaginary parts separately. You might not even need this function since you can just write `z + w` directly, but it's here for completeness.
+Addition of complex numbers is just vector addition—componentwise! You might not even need this function since you can just write `z + w` directly, but it's here for completeness.
 
 **Multiplication:** $(a + bi)(c + di) = (ac - bd) + (ad + bc)i$
 
@@ -45,7 +58,7 @@ vec2 cmul(vec2 z, vec2 w) {
 }
 ```
 
-This one requires actually remembering the FOIL pattern and grouping real/imaginary terms. The key is that $i^2 = -1$, which is why we get that minus sign in the real part.
+This implements the familiar FOIL pattern with $i^2 = -1$, giving us that minus sign in the real part.
 
 **Magnitude squared:** $|z|^2 = a^2 + b^2$
 
@@ -55,7 +68,7 @@ float cabs2(vec2 z) {
 }
 ```
 
-The squared magnitude is just the dot product of the complex number with itself. This is computationally cheaper than taking the square root, so when we just need to check if $|z| > 2$, we'll check if $|z|^2 > 4$ instead.
+The squared magnitude is just the dot product with itself. This is computationally cheaper than taking the square root, so when we just need to check if $|z| > 2$, we'll check if $|z|^2 > 4$ instead—millions of avoided square roots per frame!
 
 **Magnitude:** $|z| = \sqrt{a^2 + b^2}$
 
@@ -75,7 +88,7 @@ vec2 cconj(vec2 z) {
 }
 ```
 
-The conjugate just flips the sign of the imaginary part. Geometrically, this is reflection across the real axis.
+The conjugate flips the sign of the imaginary part—reflection across the real axis.
 
 **Division:** $\frac{a + bi}{c + di} = \frac{(a + bi)(c - di)}{c^2 + d^2}$
 
@@ -89,18 +102,14 @@ vec2 cdiv(vec2 z, vec2 w) {
 }
 ```
 
-Division is the trickiest operation—we multiply numerator and denominator by the conjugate of $w$ to rationalize. The denominator becomes real ($c^2 + d^2$), and the numerator becomes a new complex number we can compute.
+Division multiplies numerator and denominator by the conjugate of $w$ to rationalize. The denominator becomes real ($c^2 + d^2$), and the numerator becomes a new complex number we can compute directly.
 
-::: {.callout-note}
-## Why write helper functions?
+::: {.callout-tip}
+## Computational Efficiency in Complex Arithmetic
 
-You might wonder why we're defining all these functions when we could just inline the formulas. There are a few good reasons:
+Notice we use `dot(z, z)` for magnitude squared—this is a single GPU operation rather than component-wise multiplication and addition. Similarly, `dot(w, w)` in the division routine. For operations you'll compute millions of times per frame, these micro-optimizations add up!
 
-1. **Readability**: `cmul(z, z)` is much clearer than `vec2(z.x*z.x - z.y*z.y, 2.0*z.x*z.y)`
-2. **Correctness**: It's easy to make sign errors in complex arithmetic—writing the function once and testing it is safer
-3. **Consistency**: Using the same functions throughout makes the code easier to understand and debug
-
-As your shaders get more complex, these helper functions will make your life much easier!
+We're also using helper functions rather than inlining the formulas everywhere. This makes the code much more readable (`cmul(z, z)` vs `vec2(z.x*z.x - z.y*z.y, 2.0*z.x*z.y)`) and easier to debug. If you make a sign error once in `cmul`, you fix it once. If you inline the formula fifty times, you'll hunt for bugs forever!
 :::
 
 These are the building blocks we need for complex dynamics. Let's put them to work!
@@ -117,13 +126,37 @@ remains bounded as $n \to \infty$.
 
 That's it! Just iterate this simple quadratic map starting from $z_0 = 0$, and see if the orbit escapes to infinity or stays bounded. Points that stay bounded are in the set (traditionally colored black), while points that escape are colored based on how quickly they escape.
 
-In practice, we can't iterate to infinity, so we:
+### The Escape Radius Theorem
 
-1. Start with $z_0 = 0$
-2. Iterate $z_{n+1} = z_n^2 + c$ for a fixed number of iterations (say, 100)
-3. Check if $|z_n|$ has escaped some large radius (typically $R = 2$)
+In practice, we can't iterate to infinity, so we need a criterion to detect escape. Fortunately, there's a beautiful theorem that tells us exactly when to stop:
 
-There's a theorem that says if $|z_n| > 2$ for any $n$, then the orbit escapes to infinity. So points that escape quickly are definitely not in $\mathcal{M}$, while points that remain bounded after many iterations are likely in $\mathcal{M}$ (or at least, very close to the boundary).
+**Theorem (Escape Radius).** If $|z_n| > 2$ for any $n$, then $|z_n| \to \infty$ as $n \to \infty$.
+
+This means: once the orbit leaves the disk of radius 2, it's definitely escaping to infinity. Points that escape are not in the Mandelbrot set, while points that remain bounded after many iterations are (likely) in the set or very close to its boundary.
+
+**Proof.** Suppose $|z_n| > 2$ and write $|z_n| = 2 + \epsilon$ for some $\epsilon > 0$. Then
+\begin{align*}
+|z_{n+1}| &= |z_n^2 + c|\\
+&\geq |z_n^2| - |c|\\
+&= |z_n|^2 - |c|\\
+&> |z_n|^2 - 2 \quad \text{(since $c$ is in or near $\mathcal{M}$, which fits in $|z| \leq 2$)}\\
+&= (2 + \epsilon)^2 - 2\\
+&= 4 + 4\epsilon + \epsilon^2 - 2\\
+&= 2 + 4\epsilon + \epsilon^2\\
+&> 2 + 2\epsilon = |z_n| + \epsilon
+\end{align*}
+
+So once $|z_n| > 2$, we have $|z_{n+1}| > |z_n| + \epsilon$, meaning the magnitude grows by at least $\epsilon$ each iteration. This linear growth accelerates: if $|z_{n+1}| > 2 + \epsilon$, then $|z_{n+2}| > |z_{n+1}| + \epsilon' > 2 + 2\epsilon$, and so on. More carefully, the orbit actually grows exponentially (roughly like $|z_n| \sim 2^{2^n}$ for large $n$), but the key point is: it definitely escapes to infinity.
+
+**Computational Implication:** We only need to check if $|z_n| > 2$. The moment this happens, we can stop iterating—this point will never be in the Mandelbrot set. This single theorem makes efficient rendering possible!
+
+### Historical Context
+
+The Mandelbrot set was discovered remarkably recently—1980! Benoit Mandelbrot, working at IBM, was among the first to have access to computers powerful enough to visualize iterative processes in the complex plane. Before computers, studying these sets was nearly impossible—you'd need to manually iterate complex arithmetic hundreds of times for millions of points.
+
+Interestingly, the mathematical theory predates visualization by over 60 years. Gaston Julia and Pierre Fatou studied iterative complex dynamics extensively in 1918, but without computers, they could only reason about these sets abstractly. They knew Julia sets existed and had deep properties, but had never seen one! When Mandelbrot generated the first images in 1980, it revolutionized the field—suddenly the intricate structure of these sets was visible, creating an explosion of interest in fractal geometry and complex dynamics.
+
+The Mandelbrot set became iconic partly because it's so accessible: anyone can understand the definition (iterate $z \mapsto z^2 + c$), yet it produces infinitely intricate beauty. It also sparked broader interest in fractals, chaos theory, and the idea that simple rules can generate complex behavior—themes that would influence everything from physics to economics to art.
 
 ### Basic Implementation
 
@@ -162,28 +195,35 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 }
 ```
 
-That's the entire Mandelbrot set renderer! Notice how we're using `cabs2` instead of `cabs`—since we're just checking if the magnitude exceeds 2, we can check if the squared magnitude exceeds 4, which saves us a square root computation per pixel per iteration.
+That's the entire Mandelbrot set renderer! The coordinate scaling is tuned to show the "interesting part"—the main cardioid body and its surrounding bulbs. The set extends roughly from $-2.5$ to $0.5$ on the real axis, so we shift our coordinate system accordingly.
 
-The coordinate scaling is tuned to show the "interesting part" of the Mandelbrot set—the main cardioid and its surrounding bulbs. The set actually extends from about $-2.5$ to $0.5$ on the real axis, so we shift our coordinate system accordingly.
+::: {.callout-note}
+## Why This Is Perfect for GPUs
 
-::: {.callout-tip}
-## Understanding the iteration
+Notice what's happening computationally: every pixel performs its own independent calculation. There's no communication between pixels, no shared data structures, no synchronization needed. Each pixel just iterates its own complex number and decides when to stop.
 
-What's actually happening in that loop? Each pixel represents a complex number $c$, and we're asking: "If I start at $z = 0$ and repeatedly apply $z \mapsto z^2 + c$, does the orbit stay bounded?"
+This is **embarrassingly parallel**—the ideal workload for GPU architecture. A modern GPU has thousands of small processors, and they can all work on different pixels simultaneously. No pixel needs to wait for another pixel's result. The entire screen (potentially millions of pixels) is computed in parallel, which is why we can render the Mandelbrot set at 60fps even with 100+ iterations per pixel.
 
-Try adding some debug visualization—color based on the final value of `z`, or visualize the trajectory somehow. Understanding the dynamics geometrically will help you build intuition for Julia sets (which we'll do in homework) and other complex dynamical systems.
+Memory-wise, this is also very efficient: each pixel only needs to store its current $z$ value (two floats) and an iteration counter (one integer). No arrays, no history, no complex data structures. The computation is stateless—we only care about the current iterate, not the full orbit.
+
+This contrasts sharply with sequential CPU code, where you'd iterate over pixels one at a time. Even with clever optimizations and SIMD vectorization, you'd be orders of magnitude slower than a GPU shader doing the same work.
 :::
 
-### Coloring Schemes
+### Smooth Coloring
 
-The grayscale rendering shows the structure of the set, but it's not particularly exciting visually. We can do much better! The classic approach is to color based on how quickly points escape:
+The grayscale rendering shows the structure of the set, but it has harsh banding—sudden transitions between integer iteration counts create visible stripes. We can do much better by interpolating between iteration steps!
 
-**Smooth coloring using escape time:**
+The key insight is that near escape, the orbit grows exponentially. Specifically, once $|z_n|$ is large, we have approximately $|z_{n+1}| \approx |z_n|^2$, which means $\log |z_{n+1}| \approx 2\log|z_n|$. Taking logs repeatedly, we get
+$$\log\log|z_{n+1}| \approx \log(2\log|z_n|) = \log 2 + \log\log|z_n|$$
+
+This suggests that $\log\log|z_n|$ grows approximately linearly near escape, increasing by $\log 2$ per iteration. We can use this to compute a fractional iteration count!
+
+Here's the formula:
 
 ```glsl
 if(iter < max_iter) {
     // Smooth iteration count (accounts for continuous escape)
-    float log_zn = log(cabs2(z)) / 2.0;
+    float log_zn = log(cabs2(z)) / 2.0;  // = log|z_n|
     float nu = log(log_zn / log(2.0)) / log(2.0);
     float smooth_iter = float(iter) + 1.0 - nu;
     
@@ -195,9 +235,19 @@ if(iter < max_iter) {
 }
 ```
 
-This "smooth iteration count" formula eliminates the harsh banding you get from just using integer iteration counts. The math is a bit involved (it comes from the fact that near escape, the magnitude grows roughly exponentially), but the result is smooth, continuous color gradients that look much more professional.
+The variable `nu` represents how far we've progressed toward the next integer iteration. When $|z_n| = 2$ exactly (just hitting the escape threshold), $nu = 0$ and we get the integer iteration count. When $|z_n|$ is large (deep into escape), $nu$ approaches 1. Subtracting `nu` from `iter + 1` gives us a continuous, smooth value that transitions gradually between iteration levels.
 
-**Creating color palettes:**
+This eliminates banding entirely! The result is smooth, continuous color gradients that look much more professional and reveal the fractal structure more clearly.
+
+::: {.callout-tip}
+## Smooth Coloring as Anti-Aliasing
+
+Smooth coloring is fundamentally an anti-aliasing technique. Without it, nearby pixels with iteration counts of, say, 45 and 46 get completely different colors—creating harsh edges. With smooth coloring, these pixels get nearly identical colors (say, iteration 45.3 and 45.8), producing a smooth gradient.
+
+This is especially important at high zoom levels, where tiny changes in position lead to different integer iteration counts. The smooth interpolation ensures that small changes in $c$ produce small changes in color, which is exactly what we want for a continuous mathematical function.
+:::
+
+### Color Palettes
 
 Now we need a good color mapping function. A classic approach uses cosines to create smooth, cyclic color palettes:
 
@@ -213,57 +263,125 @@ vec3 palette(float t) {
 }
 ```
 
-This uses a cosine-based palette function that creates smooth, cyclic colors—perfect for the Mandelbrot set where we want colors to repeat as we zoom in to the fractal boundary. The parameters `a`, `b`, `c`, `d` control different aspects of the palette:
+This uses a cosine-based palette function that creates smooth, cyclic colors—perfect for the Mandelbrot set where we want colors to repeat as we zoom in to the fractal boundary. The parameters control different aspects:
 
-- `a` and `b` control the range and center of the colors
+- `a` and `b` control the range and center of the colors (here, mapping to $[0,1]$)
 - `c` controls the frequency of color cycling
-- `d` controls the phase offset (shifts the colors)
+- `d` controls the phase offset, shifting the entire palette
 
-Play with these parameters to get different color schemes! Try `d = vec3(0.0, 0.1, 0.2)` for a more blue-purple palette, or `d = vec3(0.3, 0.2, 0.2)` for warmer tones.
+Play with these parameters to get different color schemes! Try `d = vec3(0.0, 0.1, 0.2)` for a blue-purple palette, or `d = vec3(0.3, 0.2, 0.2)` for warmer tones. You can also adjust `c` to make the colors cycle faster or slower through the iteration range.
 
-::: {.callout-note}
-## The art of palette design
+The beauty of this cosine approach is that it's smooth (continuous derivatives), cyclic (no seams), and efficient (just a few trig operations). Other approaches exist—hand-picked color stops with interpolation, HSV color spaces, perceptually uniform LAB spaces—but cosine palettes are a great default for fractal visualization.
 
-Creating good color palettes is part science, part art. The cosine palette is mathematically elegant and gives smooth gradients, but you might want to try other approaches:
+---
 
-- Hand-picked color stops with interpolation (more control, more work)
-- HSV color spaces (easy to create rainbow gradients)
-- Perceptually uniform color spaces like LAB (ensures equal perceived color differences)
+## Julia Sets
 
-For mathematical visualization, the key is that the colors should help reveal structure, not obscure it. High contrast can emphasize boundaries, while smooth gradients show continuous variation in escape time.
+The Julia set is the natural companion to the Mandelbrot set, and understanding their relationship is key to understanding complex dynamics. Where the Mandelbrot set varies $c$ and fixes $z_0 = 0$, the Julia set does the opposite: it fixes $c$ and varies $z_0$.
+
+### Definition
+
+For a fixed complex number $c$, the **filled Julia set** $K_c$ is the set of initial conditions $z_0$ for which the iteration
+$$z_{n+1} = z_n^2 + c$$
+remains bounded. The **Julia set** $J_c$ is the boundary of $K_c$—the set where the dynamics are chaotic, neither definitely bounded nor definitely escaping.
+
+Think about what this means: every point $c$ in the complex plane has an associated Julia set $J_c$. The Mandelbrot set is telling us about the topology of these Julia sets! Specifically:
+
+- If $c \in \mathcal{M}$ (inside the Mandelbrot set), then $J_c$ is **connected**—a single, intricate curve
+- If $c \notin \mathcal{M}$ (outside the Mandelbrot set), then $J_c$ is **totally disconnected**—a Cantor-like dust of points
+
+This is one of the most beautiful connections in mathematics: the Mandelbrot set is a map of parameter space, showing which values of $c$ produce connected Julia sets. Julia and Fatou proved this in 1918 without ever seeing a picture—they understood these sets purely abstractly!
+
+### Implementation as Homework
+
+You'll implement Julia set rendering in the homework. The algorithm is nearly identical to the Mandelbrot set—just swap what's fixed and what varies! Instead of setting `z = vec2(0.0)` and varying `c` across pixels, you'll set `c` to a fixed value and let `z` be the pixel coordinate.
+
+The key changes:
+1. Fix `c` to an interesting value (we'll give suggestions)
+2. Initialize `z` from the pixel position (that's your $z_0$)
+3. Iterate $z \mapsto z^2 + c$ exactly as before
+4. Use the same escape criterion and coloring
+
+This will give you a Julia set! Try different values of $c$ to see how the topology changes. You can make `c` depend on time (`iTime`) for animation, or on mouse position (`iMouse`) for interactive exploration.
+
+**Some interesting values to try:**
+- $c = -0.7 + 0.27015i$ — classic Julia set, intricate tendrils
+- $c = -0.4 + 0.6i$ — dendrite-like fractal trees
+- $c = 0.285 + 0.01i$ — beautiful spiral patterns
+- $c = -0.8 + 0.156i$ — highly filamentary
+- $c = -0.70176 - 0.3842i$ — "San Marco dragon"
+
+Values inside the Mandelbrot set give connected Julia sets (single curves), while values outside give disconnected Julia sets (dust). The most interesting Julia sets often come from values right near the boundary of $\mathcal{M}$—this is where the transition between connected and disconnected happens!
+
+::: {.callout-tip}
+## Exploring Parameter Space
+
+When you implement Julia sets, try this: tie $c$ to your mouse position. Move the mouse around and watch the Julia set morph in real time! This is an incredibly powerful way to build intuition for how the parameter $c$ affects the dynamics.
+
+You'll notice that small changes in $c$ can produce dramatic changes in the Julia set topology—this is the sensitive dependence on parameters that makes complex dynamics so rich. Near the boundary of the Mandelbrot set, tiny movements create entirely different structures.
 :::
+
+---
+
+## Interlude: From Complex to Geometric Dynamics
+
+We've been iterating algebraic functions in the complex plane: $z \mapsto z^2 + c$. Now we shift to iterating geometric transformations of the plane itself: circle inversion. The mathematical frameworks are different—holomorphic dynamics versus conformal geometry—but they share fundamental similarities.
+
+Both complex multiplication and circle inversion are **conformal maps**: they preserve angles between curves. In complex dynamics, this comes from the Cauchy-Riemann equations and the geometric interpretation of multiplication as rotation and scaling. In circle inversion, it's a theorem we'll state shortly. This angle preservation is crucial—it's what makes the fractal structures we generate geometrically coherent and visually beautiful.
+
+There's also a deep connection we'll explore tomorrow: circle inversion is actually an isometry of hyperbolic space! The inversions we're about to do are the same transformations that generate Kleinian groups and tessellate the hyperbolic plane. So in some sense, we're already working in non-Euclidean geometry without realizing it. Tomorrow we'll make this explicit when we explore hyperbolic tilings.
+
+For now, let's learn circle inversion and use it to build the Apollonian gasket—a fractal structure every bit as intricate as the Mandelbrot set, but generated through pure Euclidean geometry.
 
 ---
 
 ## Circle Inversion
 
-Now we shift from algebraic dynamics (iterating polynomials) to geometric dynamics (iterating transformations). Circle inversion is a beautiful geometric operation that will be the foundation for everything we do for the rest of the week!
+Circle inversion is a beautiful geometric operation that will be the foundation for everything we do with geometric dynamics. It's a transformation of the plane that turns inside into outside, maps circles to circles (or lines), and preserves angles—making it a powerful tool for creating fractal patterns.
 
 ### Mathematical Definition
 
-Circle inversion is a transformation of the plane with respect to a circle. For a circle of radius $R$ centered at a point $\mathbf{c}$, inversion maps a point $\mathbf{p} \neq \mathbf{c}$ to:
+Circle inversion is a transformation with respect to a circle. For a circle of radius $R$ centered at a point $\mathbf{c}$, inversion maps a point $\mathbf{p} \neq \mathbf{c}$ to:
 $$\text{inv}(\mathbf{p}) = \mathbf{c} + R^2 \frac{\mathbf{p} - \mathbf{c}}{|\mathbf{p} - \mathbf{c}|^2}$$
 
-Let's understand this formula geometrically. The vector $\mathbf{p} - \mathbf{c}$ points from the center to $\mathbf{p}$. We normalize this direction by dividing by its squared length, then scale by $R^2$, and finally translate back by the center. The result?
+The vector $\mathbf{p} - \mathbf{c}$ points from the center to $\mathbf{p}$. We normalize this direction by dividing by its squared length, then scale by $R^2$, and finally translate back by the center. Geometrically:
 
 - Points inside the circle map to points outside (and vice versa)
 - Points on the circle are fixed (they map to themselves)
-- The closer you are to the center, the farther away you go (and vice versa)
+- The closer you are to the center, the farther away you go
 - The center itself maps to infinity, and infinity maps to the center
 
 Here's another way to think about it: draw a ray from the center through $\mathbf{p}$. The inversion of $\mathbf{p}$ is the unique point on this ray such that the product of distances from the center is $R^2$. If $\mathbf{p}$ is at distance $r$ from the center, its image is at distance $R^2/r$.
 
 ### Key Properties
 
-Circle inversion has some remarkable geometric properties that make it incredibly useful:
+Circle inversion has remarkable geometric properties. These aren't obvious from the formula, but they're all classical theorems:
 
-1. **Lines through the center** remain lines through the center (they're just "flipped inside out" along the ray)
+1. **Lines through the center** remain lines through the center (they're "flipped inside out" along the ray)
+
 2. **Lines not through the center** become circles through the center
-3. **Circles through the center** become lines (not through the center)
-4. **Circles not through the center** remain circles (but with different center and radius)
-5. **Angles are preserved** (it's a conformal map—it preserves angles between curves)
 
-These properties mean that circle inversion turns geometric complexity into more geometric complexity in very controlled ways. When we iterate inversions through multiple circles, we'll see beautiful fractal patterns emerge!
+3. **Circles through the center** become lines (not through the center)
+
+4. **Circles not through the center** generally remain circles, but with different center and radius
+
+5. **Angles are preserved** (conformal property)
+
+The angle preservation is the deepest property. It's not at all obvious from the formula, but it can be proved using the chain rule and careful calculation. The key insight is that inversion is locally similar to a complex conjugation-like operation, which preserves angles.
+
+**Why These Properties Matter for Iteration:** When we iterate inversions through multiple circles, these properties ensure that the geometry remains coherent. Circles stay circles (or become lines), and the angles between curves are preserved. This means repeated inversion creates intricate but geometrically regular patterns—the hallmark of fractals generated by conformal maps.
+
+Another key fact: inversion is **involutive**—applying it twice returns to the original point (assuming the point isn't the center). Mathematically, $\text{inv}(\text{inv}(\mathbf{p})) = \mathbf{p}$. This makes inversion a geometric reflection of sorts, which will be important when we think about symmetry groups tomorrow.
+
+::: {.callout-note}
+## Historical Context: Circle Inversion
+
+Circle inversion has ancient roots—Apollonius of Perga studied related problems involving tangent circles around 200 BCE. But the modern theory of inversion as a geometric transformation developed in the 19th century as part of projective and non-Euclidean geometry.
+
+A key insight was recognizing that circle inversion is related to stereographic projection: if you place a sphere on the plane, inversion in a circle corresponds to reflection through the sphere! This connection links circle inversion to spherical geometry and ultimately to hyperbolic geometry.
+
+In the late 19th and early 20th centuries, mathematicians realized that groups of circle inversions (Kleinian groups) could tessellate hyperbolic space and create fractal limit sets. This anticipates the fractal geometry revolution of the 1970s-80s, though the connection wasn't fully appreciated until computers made visualization possible.
+:::
 
 ### Implementation
 
@@ -281,7 +399,9 @@ vec2 invertCircle(vec2 p, vec2 center, float radius) {
 }
 ```
 
-The only tricky part is handling the center point, which mathematically maps to infinity. We approximate this by mapping to a very large value—far enough away that it's effectively off-screen.
+The only tricky part is handling the center point, which mathematically maps to infinity. We approximate this by mapping to a very large value—far enough away that it's effectively off-screen. The threshold `0.0001` is small enough to catch points numerically close to the center but large enough to avoid precision issues.
+
+Computationally, circle inversion is very cheap: just one dot product, a division, a multiplication, and some vector operations. This efficiency is important because we'll be doing many inversions per pixel when generating fractals!
 
 ### Visualizing Circle Inversion
 
@@ -290,7 +410,11 @@ Let's see what happens when we apply inversion to a grid. This is one of the bes
 ```glsl
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    // [Standard coordinate setup, resulting in p]
+    // Standard coordinate setup
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - 0.5;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
     
     // Inversion circle
     vec2 circleCenter = vec2(0.0, 0.0);
@@ -313,18 +437,26 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 }
 ```
 
-You'll see straight grid lines transform into beautiful circular arcs! The lines farther from the inversion circle get bent more dramatically, while lines near the circle stay relatively straight. Horizontal and vertical lines through the center remain horizontal and vertical (but swap inside/outside), while other lines become circles.
+You'll see straight grid lines transform into beautiful circular arcs! Lines farther from the inversion circle get bent more dramatically, while lines near the circle stay relatively straight. Horizontal and vertical lines through the center remain horizontal and vertical (but swap inside/outside), while other lines become circles.
 
-Try animating the circle position or radius to see how the grid deforms. This really helps build intuition for how inversion works!
+This visualization really helps build intuition. You can see:
+- The circle itself (in red) is unchanged—points on it are fixed
+- The grid inside the circle maps to a grid outside (and vice versa)
+- Lines become curves, but the angles where they intersect are preserved
+- The pattern has a pole singularity at the center (infinite distortion)
 
 ::: {.callout-tip}
-## Exploring circle inversion
+## Exploring Circle Inversion
 
 Here are some experiments to try:
 
-1. **Multiple circles**: Invert through a grid of circles instead of just one—create `cell_p` using `mod()` like in Day 1, then invert each cell independently
-2. **Animated radius**: Make `circleRadius = 1.0 + 0.5 * sin(iTime)` to watch the grid breathe in and out
-3. **Different patterns**: Instead of a grid, try drawing circles or other shapes in the inverted space
+1. **Multiple circles**: Create a grid of circles using `mod()` (like we did on Day 1) and invert through each cell's circle independently. You'll see beautiful overlapping patterns!
+
+2. **Animated radius**: Make `circleRadius = 1.0 + 0.5 * sin(iTime)` to watch the grid breathe in and out. This helps you see how the inversion depends on the circle's size.
+
+3. **Different patterns**: Instead of a grid, try drawing circles or other shapes in the inverted space. Circles become circles (or lines), creating intricate nested patterns.
+
+4. **Off-center inversion**: Move the inversion circle away from the origin. Watch how the asymmetry creates even more complex distortions.
 
 Each of these will give you geometric intuition for how inversion behaves, which will be crucial when we iterate multiple inversions!
 :::
@@ -335,7 +467,7 @@ Each of these will give you geometric intuition for how inversion behaves, which
 
 Before we build the Apollonian gasket, we need to talk about organizing our data. We're about to deal with multiple circles, and passing around `center1`, `radius1`, `center2`, `radius2`, etc. gets unwieldy fast. GLSL provides **structs** (just like in C) for grouping related data together.
 
-### Defining a Struct
+### Defining and Using Structs
 
 ```glsl
 struct Circle {
@@ -344,20 +476,16 @@ struct Circle {
 };
 ```
 
-That's it! Now `Circle` is a type we can use just like `vec2` or `float`. Each `Circle` contains a center position and a radius—exactly the data we need to define a circle.
-
-### Using Structs
-
-Creating and using structs is straightforward:
+Now `Circle` is a type we can use just like `vec2` or `float`. Creating and using structs is straightforward:
 
 ```glsl
-// Declare a circle
-Circle c1;
-c1.center = vec2(0.0, 0.0);
-c1.radius = 1.0;
+// Declare and initialize
+Circle c1 = Circle(vec2(0.0, 0.0), 1.0);
 
-// Or initialize directly
-Circle c2 = Circle(vec2(1.0, 0.5), 0.75);
+// Or declare first, set later
+Circle c2;
+c2.center = vec2(1.0, 0.5);
+c2.radius = 0.75;
 
 // Pass to functions
 vec2 invertThroughCircle(vec2 p, Circle circ) {
@@ -365,87 +493,85 @@ vec2 invertThroughCircle(vec2 p, Circle circ) {
 }
 ```
 
-The syntax is exactly what you'd expect—use the dot operator to access fields, just like accessing components of a `vec2` or `vec3`.
-
-### Why Structs?
-
-They make the code dramatically more readable and maintainable. Compare:
+This makes the code dramatically more readable. Compare:
 
 ```glsl
 // Without structs - messy!
-vec2 iterateInversions(vec2 p, 
-    vec2 c1_center, float c1_radius,
-    vec2 c2_center, float c2_radius,
-    vec2 c3_center, float c3_radius) 
-{
-    // ... lots of parameters to keep track of
-}
+vec2 iterate(vec2 p, vec2 c1_cen, float c1_rad, vec2 c2_cen, float c2_rad, vec2 c3_cen, float c3_rad);
 
 // With structs - clean!
-vec2 iterateInversions(vec2 p, Circle c1, Circle c2, Circle c3) 
-{
-    // Much clearer what we're working with
-}
+vec2 iterate(vec2 p, Circle c1, Circle c2, Circle c3);
 ```
 
-For the Apollonian gasket, we'll have three circles we need to keep track of and pass around. Structs make this much more manageable!
-
-::: {.callout-note}
-## Structs vs. arrays
-
-You might wonder: why not just use an array of circles? That works too! The choice depends on your needs:
-
-- **Structs**: Better when circles have different roles (like "outer circle" vs "inner circles")
-- **Arrays**: Better when you have many similar circles and want to loop over them
-
-For the Apollonian gasket, we'll use individual structs because each circle plays a specific geometric role. In the homework you might try arrays if you're working with many circles!
-:::
+For the Apollonian gasket, we'll have three circles we need to track and pass around. Structs make this much more manageable and semantically clear—we're working with circles as geometric objects, not just pairs of vectors and floats.
 
 ---
 
 ## The Apollonian Gasket
 
-Now for the main event! The Apollonian gasket is a fractal generated by iterating circle inversions through three mutually tangent circles. It's named after Apollonius of Perga, who studied the problem of finding circles tangent to three given circles.
+Now for the main event! The Apollonian gasket is a fractal generated by iterating circle inversions through three mutually tangent circles. It's named after Apollonius of Perga, who studied the problem of finding circles tangent to three given circles around 200 BCE, though the fractal interpretation is much more modern.
+
+### Descartes Circle Theorem
+
+To understand the Apollonian gasket, we need to know about a beautiful theorem: **Descartes Circle Theorem** (1643).
+
+Given four mutually tangent circles (each tangent to the other three), let their curvatures be $k_1, k_2, k_3, k_4$ where curvature $k = 1/r$ (positive for external tangency, negative for internal). Then:
+$$(k_1 + k_2 + k_3 + k_4)^2 = 2(k_1^2 + k_2^2 + k_3^2 + k_4^2)$$
+
+This can be rearranged to solve for the fourth curvature given three:
+$$k_4 = k_1 + k_2 + k_3 \pm 2\sqrt{k_1 k_2 + k_2 k_3 + k_3 k_1}$$
+
+The $\pm$ gives two solutions—the two circles tangent to the original three (one inside the curvilinear triangle they form, one outside).
+
+What makes this magical for fractals: if you start with three mutually tangent circles with integer curvatures, then **all** circles in the Apollonian gasket have integer curvatures! This is the Apollonian gasket's connection to number theory—it's a fractal made entirely of circles with rational radii.
+
+We won't use this formula directly in our shader (we'll set up circles geometrically), but it explains why certain configurations are special and why the patterns are so regular despite infinite nesting.
 
 ### Setup: Three Mutually Tangent Circles
 
-We start with three circles that are all tangent to each other—meaning each pair touches at exactly one point. For simplicity, we'll use a nice symmetric configuration:
+We start with three circles that are all tangent to each other—meaning each pair touches at exactly one point. For this to work, the distance between any two circle centers must be exactly twice the radius (so they touch edge-to-edge). The three centers form an equilateral triangle, and we'll position this triangle symmetrically at the origin:
 
 ```glsl
-void setupApollonianCircles(out Circle c1, out Circle c2, out Circle c3) {
-    // A nice symmetric configuration
-    float R = 2.0;  // Outer radius
-    float r = 0.5;  // Inner radius
+void setupApollonianCircles(out Circle c1, out Circle c2, out Circle c3, out Circle outer) {
+    float r = 0.5;  // Radius of each inner circle
+    // For three circles to be mutually tangent: distance between centers = 2r
+    // Centers form equilateral triangle with circumradius = 2r/sqrt(3)
+    float d = 2.0 * r / sqrt(3.0);  // ≈ 0.577 for r = 0.5
     
-    // Three circles arranged in a triangle
-    c1 = Circle(vec2(0.0, R - r), r);
-    c2 = Circle(vec2(-(R - r) * 0.866, -(R - r) * 0.5), r);  // 0.866 ≈ sqrt(3)/2
-    c3 = Circle(vec2((R - r) * 0.866, -(R - r) * 0.5), r);
+    // Three inner circles
+    c1 = Circle(vec2(0.0, d), r);
+    c2 = Circle(vec2(-d * 0.866, -d * 0.5), r);  // 0.866 ≈ sqrt(3)/2
+    c3 = Circle(vec2(d * 0.866, -d * 0.5), r);
+    
+    // Outer circle tangent to all three, centered at origin
+    float R = d + r;  // ≈ 1.077 for r = 0.5
+    outer = Circle(vec2(0.0, 0.0), R);
 }
 ```
 
-These three circles are positioned at the vertices of an equilateral triangle, all tangent to each other and to a large outer circle (which we could add if we wanted).
+With $r = 0.5$, the circumradius $d \approx 0.577$, and the outer circle has radius $R = d + r \approx 1.077$. All four circles are mutually tangent—each inner circle touches the other two inner circles and the outer circle.
+
+This is just one possible configuration! You could use different radii (related by Descartes' theorem), different arrangements, or even animated circles. The key is that they start mutually tangent—this ensures the iteration creates a proper Apollonian packing.
 
 ### The Iteration Algorithm
 
 The algorithm is beautifully simple:
 
 1. Start with a point $p$
-2. For each iteration:
-   - Check which circles contain $p$
-   - If $p$ is inside a circle, invert through that circle
-   - Repeat
-3. Color based on the iteration behavior
+2. Check which circles contain $p$
+3. If $p$ is inside a circle, invert through that circle
+4. Repeat until $p$ is outside all circles or we hit max iterations
+5. Color based on iteration behavior
 
-Here's the code:
+Here's the implementation:
 
 ```glsl
-vec2 iterateApollonian(vec2 p, Circle c1, Circle c2, Circle c3, 
+vec2 iterateApollonian(vec2 p, Circle c1, Circle c2, Circle c3, Circle outer,
                        int maxIter, out int finalIter, out int lastCircle) {
     for(int i = 0; i < maxIter; i++) {
         bool moved = false;
         
-        // Check each circle
+        // Check the three inner circles
         if(length(p - c1.center) < c1.radius) {
             p = invertCircle(p, c1.center, c1.radius);
             lastCircle = 0;
@@ -461,8 +587,14 @@ vec2 iterateApollonian(vec2 p, Circle c1, Circle c2, Circle c3,
             lastCircle = 2;
             moved = true;
         }
+        // Check if outside the outer circle
+        else if(length(p - outer.center) > outer.radius) {
+            p = invertCircle(p, outer.center, outer.radius);
+            lastCircle = 3;
+            moved = true;
+        }
         
-        // If we didn't move, we're done
+        // If we didn't move, we're in the gaps - done!
         if(!moved) {
             finalIter = i;
             return p;
@@ -474,7 +606,13 @@ vec2 iterateApollonian(vec2 p, Circle c1, Circle c2, Circle c3,
 }
 ```
 
-We also track which circle we last inverted through (stored in `lastCircle`) and how many iterations we performed (stored in `finalIter`). These will be useful for coloring!
+We also track which circle we last inverted through (`lastCircle`) and how many iterations we performed (`finalIter`). These will be useful for coloring!
+
+**Why This Creates a Fractal:** Each time we invert through a circle, we "push" the point away from that circle's center. But because the four circles are mutually tangent, pushing away from one circle might push us into another circle, triggering another inversion. The interplay between these four inversions (three inner circles plus the outer circle) creates a complex orbit.
+
+Points in the "gaps" between the inner circles (the curvilinear triangles) escape quickly—they're inside the outer circle but not inside any inner circle, so no inversion happens. But points near the tangency points get bounced back and forth between circles many times before escaping. And at the actual tangency points (where circles touch), the orbit never escapes—these are fixed points or periodic orbits of the iterated inversions.
+
+The fractal structure emerges because these dynamics are self-similar: zooming in near any tangency point reveals the same pattern of nested circles and gaps. This self-similarity is a direct consequence of the conformal nature of circle inversion—the transformation preserves angles, so local geometry looks the same at all scales.
 
 ### Coloring Strategies
 
@@ -486,15 +624,20 @@ float t = float(finalIter) / float(maxIter);
 vec3 color = palette(t);
 ```
 
+This shows the "depth" of the orbit—points that escape quickly are colored differently from points that bounce around many times.
+
 **By last circle hit**:
 ```glsl
-vec3 colors[3] = vec3[3](
+vec3 colors[4] = vec3[4](
     vec3(1.0, 0.0, 0.0),  // Circle 1: red
     vec3(0.0, 1.0, 0.0),  // Circle 2: green
-    vec3(0.0, 0.0, 1.0)   // Circle 3: blue
+    vec3(0.0, 0.0, 1.0),  // Circle 3: blue
+    vec3(1.0, 1.0, 0.0)   // Outer circle: yellow
 );
 vec3 color = colors[lastCircle];
 ```
+
+This shows the basin of attraction—which circle's "influence" each point ultimately fell into. Yellow regions show points that escaped through the outer circle.
 
 **By final distance from circles**:
 ```glsl
@@ -505,7 +648,9 @@ float d = min(d1, min(d2, d3));
 vec3 color = vec3(smoothstep(0.0, 0.05, d));
 ```
 
-Each gives a different view of the fractal structure. The iteration count shows the "depth" of the orbit, the last circle shows the basin of attraction, and the distance shows the geometric structure of the nested circles.
+This highlights the circle boundaries themselves, making the geometric structure more apparent.
+
+Each coloring reveals different aspects of the fractal. Try combining them—for example, color by iteration count but modulate brightness by distance to circles.
 
 ### Putting It All Together
 
@@ -514,85 +659,202 @@ Here's a complete Apollonian gasket renderer:
 ```glsl
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    // [Coordinate setup, resulting in p]
+    // Coordinate setup
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - 0.5;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
     
-    // Setup the three circles
-    Circle c1, c2, c3;
-    setupApollonianCircles(c1, c2, c3);
+    // Setup the four circles
+    Circle c1, c2, c3, outer;
+    setupApollonianCircles(c1, c2, c3, outer);
     
     // Iterate
     int maxIter = 50;
     int finalIter, lastCircle;
-    vec2 final_p = iterateApollonian(p, c1, c2, c3, maxIter, finalIter, lastCircle);
+    vec2 final_p = iterateApollonian(p, c1, c2, c3, outer, maxIter, finalIter, lastCircle);
     
     // Color by iteration count with palette
     float t = float(finalIter) / float(maxIter);
     vec3 color = palette(t);
     
-    // Draw the three circles themselves for reference
+    // Draw all four circles for reference
     float d1 = abs(length(p - c1.center) - c1.radius);
     float d2 = abs(length(p - c2.center) - c2.radius);
     float d3 = abs(length(p - c3.center) - c3.radius);
-    float d = min(d1, min(d2, d3));
+    float d_outer = abs(length(p - outer.center) - outer.radius);
+    float d = min(min(d1, min(d2, d3)), d_outer);
     
-    if(d < 0.02) color = vec3(1.0);  // White circles
+    if(d < 0.02) color = vec3(1.0);  // White circle outlines
     
     fragColor = vec4(color, 1.0);
 }
 ```
 
-You should see a beautiful nested pattern of circles! Zoom in (by scaling `p` differently) to see the fractal self-similarity—no matter how far you zoom, you'll keep finding more nested circles.
+You should see a beautiful nested pattern of circles! The fractal structure is immediately apparent—circles within circles within circles, filling every gap with smaller circles.
+
+Zoom in (by scaling `p` differently in the coordinate setup) to see the self-similarity. No matter how far you zoom, you'll keep finding the same pattern repeated at smaller scales. This is true fractality—infinite detail that never runs out.
 
 ::: {.callout-note}
-## The mathematics of Apollonian gaskets
+## Computational Efficiency
 
-The Apollonian gasket has deep connections to number theory and hyperbolic geometry. If you choose the initial circles carefully (with integer curvatures), all the nested circles will also have integer curvatures—this is the content of the "Descartes Circle Theorem."
+Despite the complexity of the output, this algorithm is remarkably efficient. Each iteration just checks three distances (cheap) and potentially does one inversion (also cheap—just a few arithmetic operations). With 50 iterations, we're doing maybe 150 distance checks and 50 inversions per pixel.
 
-The pattern is also related to hyperbolic tilings, which we'll explore tomorrow. The inversions we're doing here are actually isometries (distance-preserving maps) of hyperbolic space! So in some sense, we're already working in non-Euclidean geometry without realizing it.
+Compare this to raymarching (Day 4), where we might do hundreds of distance evaluations per pixel! The Apollonian gasket is very GPU-friendly.
+
+The key is that we terminate early—most pixels escape in just a few iterations. Only points near the fractal boundary require many iterations. This is similar to the Mandelbrot set: most of the computational work focuses on the interesting regions (the boundary), while simple regions (deep inside or far outside) are handled quickly.
 :::
+
+### Historical Context and Connections
+
+The Apollonian gasket connects several mathematical threads across millennia:
+
+**Ancient roots:** Apollonius of Perga (~200 BCE) studied the problem of constructing circles tangent to three given circles (the "Problem of Apollonius"). He found geometric constructions but couldn't have imagined the infinite fractal structure we're visualizing.
+
+**Renaissance mathematics:** René Descartes (1643) discovered the circle theorem bearing his name, giving an algebraic formula for tangent circles. This turned Apollonius's geometric problem into arithmetic.
+
+**19th century:** The connection to projective geometry and circle inversions was developed. Mathematicians realized that packing problems could be studied through group theory—the inversions form a discrete subgroup of the group of Möbius transformations.
+
+**20th century:** With computers, the fractal nature became visible. The Apollonian gasket was recognized as a limit set of a Kleinian group—a group of isometries of hyperbolic space. This connects to tomorrow's material: the inversions we're doing are actually hyperbolic isometries! In the Poincaré disk model (which we'll see tomorrow), these inversions are reflections through hyperbolic geodesics.
+
+The gasket also has connections to number theory: if the initial circles have integer curvatures, all circles in the packing do too (by Descartes' theorem). This has led to deep questions about the distribution of integers in these packings, which remain active research areas today.
 
 ---
 
 ## Summary
 
-Today we've explored two powerful iterative processes:
+Today we've explored two powerful iterative processes that generate fractals:
 
-1. **Complex dynamics**: The Mandelbrot set emerges from iterating $z \mapsto z^2 + c$
-   - Implemented complex arithmetic in GLSL
-   - Escape-time algorithms and smooth coloring
-   - The power of simple quadratic iteration
+1. **Complex dynamics**: The Mandelbrot and Julia sets emerge from iterating $z \mapsto z^2 + c$
+   - Implemented complex arithmetic in GLSL efficiently
+   - Learned escape-time algorithms and the crucial escape radius theorem
+   - Developed smooth coloring techniques for anti-aliased rendering
+   - Understood the parameter space (Mandelbrot) vs dynamical space (Julia) distinction
+   - Saw how 1980s computational power revolutionized a 1918 theory
 
 2. **Geometric dynamics**: The Apollonian gasket emerges from iterating circle inversions
-   - Circle inversion as a conformal transformation
-   - Structs for organizing geometric data
-   - Iterated inversions creating fractal patterns
+   - Circle inversion as a conformal transformation preserving angles
+   - Used structs to organize geometric data cleanly
+   - Applied Descartes Circle Theorem to understand tangent circle configurations
+   - Iterated inversions through three circles to create fractal patterns
+   - Connected ancient Greek geometry to modern fractal theory
 
-Both show how incredibly simple rules—a quadratic map, a geometric transformation—can generate infinite complexity through iteration. This is one of the core insights of fractal geometry and dynamical systems!
+Both processes show how incredibly simple rules—a quadratic map, a geometric transformation—generate infinite complexity through iteration. The key in both cases is **conformality**: angle-preserving maps create geometrically coherent fractals. This is one of the core insights of fractal geometry and dynamical systems.
+
+The computational perspective is also crucial: both algorithms are embarrassingly parallel, making them perfect for GPU rendering. Each pixel's calculation is independent, and we can terminate early when orbits escape. The result is real-time rendering of infinitely detailed mathematical objects.
+
+Tomorrow we'll push geometric iteration further, moving from Euclidean to hyperbolic geometry. The circle inversions we've learned today are actually hyperbolic isometries—transformations that preserve distances in hyperbolic space. We'll explore the upper half-plane and Poincaré disk models, create $(2,3,7)$ and $(2,3,\infty)$ triangle tilings, and see how the same algorithmic ideas (iterated geometric transformations) work in non-Euclidean geometry. The results will be even more intricate because hyperbolic space has "more room" than Euclidean space—triangles can have angle sums less than $\pi$, allowing denser tilings and more complex fractal structures.
 
 ---
 
 ## Homework
 
-### Required: Julia Sets
+### Required: Julia Set Explorer
 
-The Julia set is the natural companion to the Mandelbrot set. Instead of varying $c$ and fixing $z_0 = 0$, we fix $c$ and vary $z_0$!
+Implement a Julia set renderer starting from the Mandelbrot code. The algorithm is nearly identical—you just need to swap what's fixed and what varies!
 
-**The setup:** For a fixed complex number $c$, the Julia set $J_c$ is the set of initial conditions $z_0$ for which the iteration $z_{n+1} = z_n^2 + c$ remains bounded.
+**Requirements:**
 
-**Implementation:**
+1. Start from the Mandelbrot implementation
+2. Fix `c` to a constant value (see suggestions below)
+3. Initialize `z` from the pixel position instead of zero
+4. Iterate $z_{n+1} = z_n^2 + c$ exactly as before
+5. Use the same escape criterion and coloring
+
+**Suggested structure:**
+
 ```glsl
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    // [Coordinate setup, resulting in p]
-    
-    // The initial z is now the pixel position!
-    vec2 z = p;
+    // Coordinate setup
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - 0.5;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 3.0;  // Scale for Julia set viewing
     
     // Fix c to an interesting value
-    vec2 c = vec2(-0.7, 0.27015);  // Classic Julia set parameter
+    vec2 c = vec2(-0.7, 0.27015);  // Classic Julia set
     
-    // Iterate z_{n+1} = z_n² + c
-    int max_iter = 100;
+    // Initialize z from pixel position (this is the key change!)
+    vec2 z = p;  // z_0 = pixel position
+    
+    // [Rest of iteration exactly like Mandelbrot]
+}
+```
+
+**Interesting parameters to try:**
+- `vec2(-0.7, 0.27015)` — classic Julia set, intricate tendrils
+- `vec2(-0.4, 0.6)` — dendrite-like fractal trees  
+- `vec2(0.285, 0.01)` — beautiful spiral patterns
+- `vec2(-0.8, 0.156)` — highly filamentary structure
+- `vec2(-0.70176, -0.3842)` — "San Marco dragon"
+- `vec2(-0.835, -0.2321)` — another classic
+- `vec2(-0.7269, 0.1889)` — "Douady's rabbit" (famous example)
+
+**Extension Options (pick one or both):**
+
+**Option A: Animated Parameter Space**
+
+Make $c$ depend on time to watch the Julia set morph:
+
+```glsl
+float angle = iTime * 0.3;
+float radius = 0.7885;  // Distance from origin in parameter space
+vec2 c = vec2(radius * cos(angle), radius * sin(angle));
+```
+
+Watch how the Julia set changes topology as you trace a circle in the complex plane! You'll see it transition from connected to disconnected, develop tendrils, and create organic shapes.
+
+**Option B: Mouse-Controlled Exploration**
+
+Tie $c$ to mouse position for interactive exploration:
+
+```glsl
+vec2 mouse_uv = (iMouse.xy / iResolution.xy) - 0.5;
+mouse_uv.x *= iResolution.x / iResolution.y;
+vec2 c = mouse_uv * 3.0;  // Scale to cover interesting parameter range
+```
+
+Now you can explore parameter space by moving the mouse! This really helps build intuition for how $c$ affects the Julia set. Try finding the boundary of the Mandelbrot set—parameters right at the edge produce the most intricate Julia sets.
+
+::: {.callout-tip}
+## Understanding Connected vs Disconnected
+
+As you explore parameter space, pay attention to whether the Julia set appears as a single connected structure or as disconnected dust. Values of $c$ inside the Mandelbrot set give connected Julia sets, while values outside give disconnected ones. The most beautiful Julia sets often come from values right near the boundary of $\mathcal{M}$!
+:::
+
+---
+
+### Optional #1: Grid of Julia Sets
+
+Create a grid where each cell shows the Julia set for that value of $c$, revealing the Mandelbrot set as an emergent pattern!
+
+**The idea:** The Mandelbrot set is a map of Julia set topology. If we draw a grid of Julia sets for different values of $c$, we should see the Mandelbrot set emerge in the overall pattern—cells with connected Julia sets (solid regions) correspond to points in $\mathcal{M}$, while cells with disconnected Julia sets (dust) are outside.
+
+**Implementation strategy:**
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // Coordinate setup
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - 0.5;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
+    
+    // Divide screen into grid cells
+    float grid_size = 8.0;  // 8×8 grid of Julia sets
+    vec2 cell_id = floor(p * grid_size / 4.0);
+    vec2 cell_p = fract(p * grid_size / 4.0) - 0.5;
+    cell_p *= 4.0;  // Local coordinates within cell
+    
+    // Map cell_id to parameter c
+    vec2 c = (cell_id / grid_size) * 4.0 - vec2(2.5, 2.0);
+    c.x -= 0.5;  // Center on interesting region of Mandelbrot set
+    
+    // Run Julia set iteration with z = cell_p, fixed c
+    vec2 z = cell_p;
+    int max_iter = 50;
     int iter;
     
     for(iter = 0; iter < max_iter; iter++) {
@@ -600,78 +862,11 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
         z = cmul(z, z) + c;
     }
     
-    // Color based on escape time
-    float t = float(iter) / float(max_iter);
-    vec3 color = palette(t);
-    
-    fragColor = vec4(color, 1.0);
-}
-```
-
-**Exploration—pick one:**
-
-**Option A: Animated parameter space**
-
-Animate $c$ to explore how the Julia set morphs:
-```glsl
-float angle = iTime * 0.3;
-float radius = 0.7885;  // Radius in parameter space
-vec2 c = vec2(radius * cos(angle), radius * sin(angle));
-```
-
-Watch how the Julia set changes as you trace a circle in the complex plane! You'll see it morph from connected to disconnected, develop tendrils, and create beautiful organic shapes.
-
-**Option B: Mouse-controlled exploration**
-
-Tie $c$ to the mouse position:
-```glsl
-vec2 mouse_uv = (iMouse.xy / iResolution.xy) - 0.5;
-mouse_uv.x *= iResolution.x / iResolution.y;
-vec2 c = mouse_uv * 3.0;
-```
-
-Now you can explore parameter space interactively! Move the mouse around to see different Julia sets. This really helps build intuition for how the Julia set depends on $c$.
-
-**Interesting values to try:**
-- `vec2(-0.4, 0.6)` - dendrite-like fractal trees
-- `vec2(0.285, 0.01)` - beautiful spiral patterns  
-- `vec2(-0.8, 0.156)` - intricate filaments
-- `vec2(-0.7269, 0.1889)` - "Douady's rabbit" (famous Julia set)
-- `vec2(-0.835, -0.2321)` - another classic
-- `vec2(-0.70176, -0.3842)` - "San Marco dragon"
-
-### Optional #1: Grid of Julia Sets
-
-Here's a beautiful connection: create a grid where each cell shows the Julia set for that value of $c$, and watch the Mandelbrot set emerge!
-
-**The idea:** The Mandelbrot set is a map of Julia set topology—points in $\mathcal{M}$ have connected Julia sets, points outside have disconnected Julia sets. If we draw a grid of Julia sets, we should see this pattern!
-
-**Implementation strategy:**
-```glsl
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    // [Coordinate setup]
-    
-    // Divide screen into grid cells
-    float grid_size = 8.0;  // 8x8 grid
-    vec2 cell_id = floor(p * grid_size / 4.0);
-    vec2 cell_p = fract(p * grid_size / 4.0) - 0.5;
-    cell_p *= 4.0;  // Local coordinates within cell
-    
-    // Map cell_id to parameter c
-    vec2 c = (cell_id / grid_size) * 4.0 - vec2(2.5, 2.0);
-    c.x -= 0.5;  // Center on interesting region
-    
-    // Run Julia set iteration with z = cell_p, fixed c
-    vec2 z = cell_p;
-    int max_iter = 50;
-    // [iterate as in Julia set code]
-    
     // Color
     float t = float(iter) / float(max_iter);
     vec3 color = palette(t);
     
-    // Optional: draw grid lines
+    // Optional: draw grid lines to separate cells
     vec2 grid_edge = abs(fract(p * grid_size / 4.0) - 0.5);
     if(max(grid_edge.x, grid_edge.y) > 0.48) color = vec3(0.0);
     
@@ -679,57 +874,100 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 }
 ```
 
-You should see a grid of tiny Julia sets, and if you look carefully, you'll notice that the overall pattern resembles the Mandelbrot set! The cells with connected Julia sets (where you see solid regions) correspond to points in the Mandelbrot set, while cells with disconnected Julia sets (dust-like patterns) are outside.
+You should see a grid of tiny Julia sets! If you look carefully at the overall pattern, you'll notice it resembles the Mandelbrot set—cells with connected Julia sets (solid colored regions) correspond to points inside $\mathcal{M}$, while cells with disconnected Julia sets (fine dust patterns) are outside.
 
-This is one of the most beautiful connections in complex dynamics—the Mandelbrot set is literally a map showing which parameters give connected Julia sets!
+This is one of the most beautiful visualizations in complex dynamics—the Mandelbrot set literally encodes the topology of all Julia sets!
+
+**Variations to try:**
+- Adjust `grid_size` (larger for more detail, smaller for clearer overview)
+- Change the parameter space region being sampled
+- Color cells based on whether the Julia set appears connected (black) or disconnected (white)—you'll get a pixelated approximation of the Mandelbrot set!
+
+---
 
 ### Optional #2: Other Iterated Inversions
 
-Explore variations on the Apollonian gasket theme! The key is to set up circles in interesting configurations and iterate inversions.
-
-**Simple variations:**
+Explore variations on the Apollonian gasket theme! The key is setting up circles in interesting configurations and iterating inversions.
 
 **Different circle arrangements:**
-- Four circles in a square configuration
-- Five circles in a pentagonal arrangement  
-- Nested circles (one large, several small inside)
-- Randomly placed circles (use a hash function to generate positions)
 
-**Non-uniform radii:**
+**Four circles in a square:**
 ```glsl
-// Make circles pulse
+void setupSquareCircles(out Circle c1, out Circle c2, out Circle c3, out Circle c4) {
+    float r = 0.5;
+    float d = 1.5;  // Distance from center
+    c1 = Circle(vec2(d, 0.0), r);
+    c2 = Circle(vec2(0.0, d), r);
+    c3 = Circle(vec2(-d, 0.0), r);
+    c4 = Circle(vec2(0.0, -d), r);
+}
+```
+
+Modify the iteration loop to check four circles instead of three!
+
+**Nested circles:**
+```glsl
+// One large circle containing several smaller ones
+c1 = Circle(vec2(0.0, 0.0), 2.0);  // Large outer circle
+c2 = Circle(vec2(-0.5, 0.0), 0.4);  // Small inner circles
+c3 = Circle(vec2(0.5, 0.0), 0.4);
+```
+
+**Animated radii:**
+
+Make the circles pulse:
+```glsl
 c1.radius = 0.5 + 0.2 * sin(iTime);
 c2.radius = 0.5 + 0.2 * sin(iTime + 2.0 * 3.14159 / 3.0);
 c3.radius = 0.5 + 0.2 * sin(iTime + 4.0 * 3.14159 / 3.0);
 ```
 
+Watch the fractal breathe!
+
 **Alternating inversion patterns:**
 
-Instead of inverting through whichever circle contains the point, try alternating in a fixed pattern:
+Instead of inverting through whichever circle contains the point, try a fixed cycling pattern:
+
 ```glsl
 // Cycle through circles in order
 int circle_index = i % 3;
-if(circle_index == 0) p = invertCircle(p, c1.center, c1.radius);
-else if(circle_index == 1) p = invertCircle(p, c2.center, c2.radius);
-else p = invertCircle(p, c3.center, c3.radius);
+if(circle_index == 0) {
+    p = invertCircle(p, c1.center, c1.radius);
+} else if(circle_index == 1) {
+    p = invertCircle(p, c2.center, c2.radius);
+} else {
+    p = invertCircle(p, c3.center, c3.radius);
+}
 ```
 
-This creates very different patterns—more regular and less "space-filling" than the gasket, but with interesting self-similarity.
+This creates very different patterns—more regular and less space-filling than the gasket, but with interesting self-similarity.
 
-**Challenge:** Can you create a configuration that tiles the plane with circular patterns? What about one that creates spiraling structures?
+**Challenge problems:**
+- Can you create a configuration that tiles the plane with circular patterns?
+- What about spiraling structures?
+- Can you make a fractal that's asymmetric (not rotationally symmetric)?
+- Try combining inversion with other transformations (rotation, scaling)
+
+The key is experimentation—try different setups and see what emerges!
 
 ---
 
 ## Looking Ahead
 
-Tomorrow we'll continue with geometric tilings! We'll start in Euclidean space with triangle tilings using reflections, then move to **hyperbolic geometry**. The circle inversions you've learned today are actually hyperbolic isometries—so we're already doing non-Euclidean geometry without realizing it!
+Tomorrow we continue with geometric transformations, but move from Euclidean to **hyperbolic geometry**. The circle inversions you've learned today are actually hyperbolic isometries—transformations that preserve distances in hyperbolic space!
 
-We'll explore multiple models of the hyperbolic plane (upper half-plane, Poincaré disk) and create beautiful tilings with $(2,3,\infty)$ triangles. The same algorithmic ideas (iterated geometric transformations) work in hyperbolic space, but the results are even more intricate because hyperbolic space has "more room" than Euclidean space.
+We'll explore:
+- **Multiple models** of the hyperbolic plane (upper half-plane, Poincaré disk)
+- **Geodesics** (straight lines in hyperbolic geometry—they look like circles in our Euclidean view!)
+- **Triangle tilings** with $(2,3,7)$ and $(2,3,\infty)$ symmetry groups
+- **Why hyperbolic space is different**: triangles with angle sum less than $\pi$, exponential growth of area
+
+The same algorithmic ideas we've used today (iterated geometric transformations, escape-time coloring, distance-based rendering) will work in hyperbolic space. But the results will be even more intricate because hyperbolic space has "more room" than Euclidean space—allowing denser tilings and more complex fractal structures.
 
 Make sure you're comfortable with:
-- Iteration and escape-time algorithms (we'll use similar ideas for tiling)
-- Circle inversion (this becomes reflection in hyperbolic geodesics!)
-- Structs for organizing data
-- Coloring strategies based on orbit behavior
+- **Iteration and escape-time algorithms** (we'll use similar ideas for tiling)
+- **Circle inversion** (this becomes reflection through hyperbolic geodesics!)
+- **Structs** for organizing geometric data
+- **Coloring strategies** based on orbit behavior
 
 See you tomorrow!

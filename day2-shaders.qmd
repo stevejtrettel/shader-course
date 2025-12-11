@@ -1,0 +1,788 @@
+# Appendix: Complete Shader Code for Day 2
+
+This appendix provides complete, standalone Shadertoy code for each shader program presented in Day 2. Each listing includes all necessary helper functions and can be copied directly into Shadertoy (https://www.shadertoy.com/new) and run immediately.
+
+---
+
+## A1. Basic Mandelbrot Set (Grayscale)
+
+This is the simplest Mandelbrot renderer, showing just the escape-time iteration count in grayscale.
+
+```glsl
+// Complex number operations
+float cabs2(vec2 z) {
+    return dot(z, z);
+}
+
+vec2 cmul(vec2 z, vec2 w) {
+    return vec2(
+        z.x * w.x - z.y * w.y,
+        z.x * w.y + z.y * w.x
+    );
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // Coordinate setup
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - 0.5;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    // Scale to view the Mandelbrot set
+    vec2 c = uv * 3.5;
+    c.x -= 0.5;
+    
+    // Mandelbrot iteration
+    vec2 z = vec2(0.0, 0.0);
+    int max_iter = 100;
+    int iter;
+    
+    for(iter = 0; iter < max_iter; iter++) {
+        if(cabs2(z) > 4.0) break;
+        z = cmul(z, z) + c;
+    }
+    
+    // Grayscale coloring
+    float t = float(iter) / float(max_iter);
+    vec3 color = vec3(t);
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## A2. Mandelbrot Set with Smooth Coloring
+
+This adds smooth coloring and a cosine-based color palette for much better visual quality.
+
+```glsl
+// Complex number operations
+float cabs2(vec2 z) {
+    return dot(z, z);
+}
+
+vec2 cmul(vec2 z, vec2 w) {
+    return vec2(
+        z.x * w.x - z.y * w.y,
+        z.x * w.y + z.y * w.x
+    );
+}
+
+// Cosine-based color palette
+vec3 palette(float t) {
+    vec3 a = vec3(0.5, 0.5, 0.5);
+    vec3 b = vec3(0.5, 0.5, 0.5);
+    vec3 c = vec3(1.0, 1.0, 1.0);
+    vec3 d = vec3(0.0, 0.33, 0.67);
+    
+    return a + b * cos(6.28318 * (c * t + d));
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // Coordinate setup
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - 0.5;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    // Scale to view the Mandelbrot set
+    vec2 c = uv * 3.5;
+    c.x -= 0.5;
+    
+    // Mandelbrot iteration
+    vec2 z = vec2(0.0, 0.0);
+    int max_iter = 100;
+    int iter;
+    
+    for(iter = 0; iter < max_iter; iter++) {
+        if(cabs2(z) > 4.0) break;
+        z = cmul(z, z) + c;
+    }
+    
+    // Smooth coloring
+    vec3 color;
+    if(iter < max_iter) {
+        // Smooth iteration count
+        float log_zn = log(cabs2(z)) / 2.0;
+        float nu = log(log_zn / log(2.0)) / log(2.0);
+        float smooth_iter = float(iter) + 1.0 - nu;
+        
+        float t = smooth_iter / float(max_iter);
+        color = palette(t);
+    } else {
+        // Inside the set: black
+        color = vec3(0.0);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## A3. Julia Set Explorer
+
+Template for Julia set implementation. Students fill in the iteration code based on Mandelbrot.
+
+```glsl
+// Complex number operations
+float cabs2(vec2 z) {
+    return dot(z, z);
+}
+
+vec2 cmul(vec2 z, vec2 w) {
+    return vec2(
+        z.x * w.x - z.y * w.y,
+        z.x * w.y + z.y * w.x
+    );
+}
+
+// Cosine-based color palette
+vec3 palette(float t) {
+    vec3 a = vec3(0.5, 0.5, 0.5);
+    vec3 b = vec3(0.5, 0.5, 0.5);
+    vec3 c = vec3(1.0, 1.0, 1.0);
+    vec3 d = vec3(0.0, 0.33, 0.67);
+    
+    return a + b * cos(6.28318 * (c * t + d));
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // Coordinate setup
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - 0.5;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 3.0;
+    
+    // Fix c to an interesting value
+    vec2 c = vec2(-0.7, 0.27015);
+    
+    // HOMEWORK: Initialize z from pixel position
+    // HOMEWORK: Iterate z_{n+1} = z_n^2 + c
+    // HOMEWORK: Use smooth coloring like Mandelbrot
+    
+    // Placeholder color (replace with your implementation)
+    vec3 color = vec3(0.5);
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+### A3b. Julia Set (Complete Solution)
+
+Here's a complete working Julia set for reference:
+
+```glsl
+// Complex number operations
+float cabs2(vec2 z) {
+    return dot(z, z);
+}
+
+vec2 cmul(vec2 z, vec2 w) {
+    return vec2(
+        z.x * w.x - z.y * w.y,
+        z.x * w.y + z.y * w.x
+    );
+}
+
+// Cosine-based color palette
+vec3 palette(float t) {
+    vec3 a = vec3(0.5, 0.5, 0.5);
+    vec3 b = vec3(0.5, 0.5, 0.5);
+    vec3 c = vec3(1.0, 1.0, 1.0);
+    vec3 d = vec3(0.0, 0.33, 0.67);
+    
+    return a + b * cos(6.28318 * (c * t + d));
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // Coordinate setup
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - 0.5;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 3.0;
+    
+    // Fix c to an interesting value
+    vec2 c = vec2(-0.7, 0.27015);
+    
+    // Initialize z from pixel position (key difference from Mandelbrot!)
+    vec2 z = p;
+    
+    // Julia set iteration
+    int max_iter = 100;
+    int iter;
+    
+    for(iter = 0; iter < max_iter; iter++) {
+        if(cabs2(z) > 4.0) break;
+        z = cmul(z, z) + c;
+    }
+    
+    // Smooth coloring
+    vec3 color;
+    if(iter < max_iter) {
+        float log_zn = log(cabs2(z)) / 2.0;
+        float nu = log(log_zn / log(2.0)) / log(2.0);
+        float smooth_iter = float(iter) + 1.0 - nu;
+        
+        float t = smooth_iter / float(max_iter);
+        color = palette(t);
+    } else {
+        color = vec3(0.0);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+### A3c. Julia Set with Mouse Control
+
+For interactive exploration of parameter space:
+
+```glsl
+// Complex number operations
+float cabs2(vec2 z) {
+    return dot(z, z);
+}
+
+vec2 cmul(vec2 z, vec2 w) {
+    return vec2(
+        z.x * w.x - z.y * w.y,
+        z.x * w.y + z.y * w.x
+    );
+}
+
+// Cosine-based color palette
+vec3 palette(float t) {
+    vec3 a = vec3(0.5, 0.5, 0.5);
+    vec3 b = vec3(0.5, 0.5, 0.5);
+    vec3 c = vec3(1.0, 1.0, 1.0);
+    vec3 d = vec3(0.0, 0.33, 0.67);
+    
+    return a + b * cos(6.28318 * (c * t + d));
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // Coordinate setup
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - 0.5;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 3.0;
+    
+    // c controlled by mouse position
+    vec2 mouse_uv = (iMouse.xy / iResolution.xy) - 0.5;
+    mouse_uv.x *= iResolution.x / iResolution.y;
+    vec2 c = mouse_uv * 3.0;
+    
+    // Fallback if mouse hasn't been clicked
+    if(iMouse.z < 0.5) {
+        c = vec2(-0.7, 0.27015);
+    }
+    
+    // Initialize z from pixel position
+    vec2 z = p;
+    
+    // Julia set iteration
+    int max_iter = 100;
+    int iter;
+    
+    for(iter = 0; iter < max_iter; iter++) {
+        if(cabs2(z) > 4.0) break;
+        z = cmul(z, z) + c;
+    }
+    
+    // Smooth coloring
+    vec3 color;
+    if(iter < max_iter) {
+        float log_zn = log(cabs2(z)) / 2.0;
+        float nu = log(log_zn / log(2.0)) / log(2.0);
+        float smooth_iter = float(iter) + 1.0 - nu;
+        
+        float t = smooth_iter / float(max_iter);
+        color = palette(t);
+    } else {
+        color = vec3(0.0);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+### A3d. Julia Set with Animation
+
+Animating through parameter space:
+
+```glsl
+// Complex number operations
+float cabs2(vec2 z) {
+    return dot(z, z);
+}
+
+vec2 cmul(vec2 z, vec2 w) {
+    return vec2(
+        z.x * w.x - z.y * w.y,
+        z.x * w.y + z.y * w.x
+    );
+}
+
+// Cosine-based color palette
+vec3 palette(float t) {
+    vec3 a = vec3(0.5, 0.5, 0.5);
+    vec3 b = vec3(0.5, 0.5, 0.5);
+    vec3 c = vec3(1.0, 1.0, 1.0);
+    vec3 d = vec3(0.0, 0.33, 0.67);
+    
+    return a + b * cos(6.28318 * (c * t + d));
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // Coordinate setup
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - 0.5;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 3.0;
+    
+    // Animate c around a circle in parameter space
+    float angle = iTime * 0.3;
+    float radius = 0.7885;
+    vec2 c = vec2(radius * cos(angle), radius * sin(angle));
+    
+    // Initialize z from pixel position
+    vec2 z = p;
+    
+    // Julia set iteration
+    int max_iter = 100;
+    int iter;
+    
+    for(iter = 0; iter < max_iter; iter++) {
+        if(cabs2(z) > 4.0) break;
+        z = cmul(z, z) + c;
+    }
+    
+    // Smooth coloring
+    vec3 color;
+    if(iter < max_iter) {
+        float log_zn = log(cabs2(z)) / 2.0;
+        float nu = log(log_zn / log(2.0)) / log(2.0);
+        float smooth_iter = float(iter) + 1.0 - nu;
+        
+        float t = smooth_iter / float(max_iter);
+        color = palette(t);
+    } else {
+        color = vec3(0.0);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## A4. Circle Inversion Visualization
+
+Visualizes circle inversion by showing how it deforms a grid.
+
+```glsl
+// Circle inversion function
+vec2 invertCircle(vec2 p, vec2 center, float radius) {
+    vec2 diff = p - center;
+    float r2 = dot(diff, diff);
+    
+    // Handle center (would be division by zero)
+    if(r2 < 0.0001) return vec2(1000.0);
+    
+    return center + (radius * radius) * diff / r2;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // Coordinate setup
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - 0.5;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
+    
+    // Inversion circle
+    vec2 circleCenter = vec2(0.0, 0.0);
+    float circleRadius = 1.0;
+    
+    // Apply inversion
+    vec2 p_inverted = invertCircle(p, circleCenter, circleRadius);
+    
+    // Draw a grid in the inverted space
+    vec2 grid = fract(p_inverted * 2.0);
+    float gridLine = step(0.95, max(grid.x, grid.y));
+    
+    vec3 color = vec3(gridLine);
+    
+    // Draw the inversion circle itself (for reference)
+    float circDist = abs(length(p) - circleRadius);
+    if(circDist < 0.05) color = vec3(1.0, 0.0, 0.0);
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## A5. Apollonian Gasket
+
+Complete Apollonian gasket implementation with iteration coloring.
+
+```glsl
+// Circle struct
+struct Circle {
+    vec2 center;
+    float radius;
+};
+
+// Circle inversion
+vec2 invertCircle(vec2 p, vec2 center, float radius) {
+    vec2 diff = p - center;
+    float r2 = dot(diff, diff);
+    
+    if(r2 < 0.0001) return vec2(1000.0);
+    
+    return center + (radius * radius) * diff / r2;
+}
+
+// Setup four mutually tangent circles (three inner + one outer)
+void setupApollonianCircles(out Circle c1, out Circle c2, out Circle c3, out Circle outer) {
+    float r = 0.5;  // Radius of each inner circle
+    // For three circles to be mutually tangent: distance between centers = 2r
+    // Centers form equilateral triangle with circumradius = 2r/sqrt(3)
+    float d = 2.0 * r / sqrt(3.0);  // ≈ 0.577 for r = 0.5
+    
+    // Three inner circles
+    c1 = Circle(vec2(0.0, d), r);
+    c2 = Circle(vec2(-d * 0.866, -d * 0.5), r);  // 0.866 ≈ sqrt(3)/2
+    c3 = Circle(vec2(d * 0.866, -d * 0.5), r);
+    
+    // Outer circle tangent to all three, centered at origin
+    float R = d + r;  // ≈ 1.077 for r = 0.5
+    outer = Circle(vec2(0.0, 0.0), R);
+}
+
+// Iterate inversions through four circles (three inner + one outer)
+vec2 iterateApollonian(vec2 p, Circle c1, Circle c2, Circle c3, Circle outer,
+                       int maxIter, out int finalIter, out int lastCircle) {
+    for(int i = 0; i < maxIter; i++) {
+        bool moved = false;
+        
+        // Check the three inner circles
+        if(length(p - c1.center) < c1.radius) {
+            p = invertCircle(p, c1.center, c1.radius);
+            lastCircle = 0;
+            moved = true;
+        } 
+        else if(length(p - c2.center) < c2.radius) {
+            p = invertCircle(p, c2.center, c2.radius);
+            lastCircle = 1;
+            moved = true;
+        }
+        else if(length(p - c3.center) < c3.radius) {
+            p = invertCircle(p, c3.center, c3.radius);
+            lastCircle = 2;
+            moved = true;
+        }
+        // Check if outside the outer circle
+        else if(length(p - outer.center) > outer.radius) {
+            p = invertCircle(p, outer.center, outer.radius);
+            lastCircle = 3;
+            moved = true;
+        }
+        
+        if(!moved) {
+            finalIter = i;
+            return p;
+        }
+    }
+    
+    finalIter = maxIter;
+    return p;
+}
+
+// Cosine-based color palette
+vec3 palette(float t) {
+    vec3 a = vec3(0.5, 0.5, 0.5);
+    vec3 b = vec3(0.5, 0.5, 0.5);
+    vec3 c = vec3(1.0, 1.0, 1.0);
+    vec3 d = vec3(0.0, 0.33, 0.67);
+    
+    return a + b * cos(6.28318 * (c * t + d));
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // Coordinate setup
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - 0.5;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
+    
+    // Setup circles
+    Circle c1, c2, c3, outer;
+    setupApollonianCircles(c1, c2, c3, outer);
+    
+    // Iterate
+    int maxIter = 50;
+    int finalIter, lastCircle;
+    vec2 final_p = iterateApollonian(p, c1, c2, c3, outer, maxIter, finalIter, lastCircle);
+    
+    // Color by iteration count
+    float t = float(finalIter) / float(maxIter);
+    vec3 color = palette(t);
+    
+    // Draw all four circles for reference
+    float d1 = abs(length(p - c1.center) - c1.radius);
+    float d2 = abs(length(p - c2.center) - c2.radius);
+    float d3 = abs(length(p - c3.center) - c3.radius);
+    float d_outer = abs(length(p - outer.center) - outer.radius);
+    float d = min(min(d1, min(d2, d3)), d_outer);
+    
+    if(d < 0.02) color = vec3(1.0);
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+### A5b. Apollonian Gasket (Basin Coloring)
+
+Alternative coloring showing which circle's basin each point falls into:
+
+```glsl
+// Circle struct
+struct Circle {
+    vec2 center;
+    float radius;
+};
+
+// Circle inversion
+vec2 invertCircle(vec2 p, vec2 center, float radius) {
+    vec2 diff = p - center;
+    float r2 = dot(diff, diff);
+    
+    if(r2 < 0.0001) return vec2(1000.0);
+    
+    return center + (radius * radius) * diff / r2;
+}
+
+// Setup four mutually tangent circles (three inner + one outer)
+void setupApollonianCircles(out Circle c1, out Circle c2, out Circle c3, out Circle outer) {
+    float r = 0.5;  // Radius of each inner circle
+    // For three circles to be mutually tangent: distance between centers = 2r
+    // Centers form equilateral triangle with circumradius = 2r/sqrt(3)
+    float d = 2.0 * r / sqrt(3.0);  // ≈ 0.577 for r = 0.5
+    
+    // Three inner circles
+    c1 = Circle(vec2(0.0, d), r);
+    c2 = Circle(vec2(-d * 0.866, -d * 0.5), r);  // 0.866 ≈ sqrt(3)/2
+    c3 = Circle(vec2(d * 0.866, -d * 0.5), r);
+    
+    // Outer circle tangent to all three, centered at origin
+    float R = d + r;  // ≈ 1.077 for r = 0.5
+    outer = Circle(vec2(0.0, 0.0), R);
+}
+
+// Iterate inversions through four circles (three inner + one outer)
+vec2 iterateApollonian(vec2 p, Circle c1, Circle c2, Circle c3, Circle outer,
+                       int maxIter, out int finalIter, out int lastCircle) {
+    for(int i = 0; i < maxIter; i++) {
+        bool moved = false;
+        
+        // Check the three inner circles
+        if(length(p - c1.center) < c1.radius) {
+            p = invertCircle(p, c1.center, c1.radius);
+            lastCircle = 0;
+            moved = true;
+        } 
+        else if(length(p - c2.center) < c2.radius) {
+            p = invertCircle(p, c2.center, c2.radius);
+            lastCircle = 1;
+            moved = true;
+        }
+        else if(length(p - c3.center) < c3.radius) {
+            p = invertCircle(p, c3.center, c3.radius);
+            lastCircle = 2;
+            moved = true;
+        }
+        // Check if outside the outer circle
+        else if(length(p - outer.center) > outer.radius) {
+            p = invertCircle(p, outer.center, outer.radius);
+            lastCircle = 3;
+            moved = true;
+        }
+        
+        if(!moved) {
+            finalIter = i;
+            return p;
+        }
+    }
+    
+    finalIter = maxIter;
+    return p;
+}
+
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // Coordinate setup
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - 0.5;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
+    
+    // Setup circles
+    Circle c1, c2, c3, outer;
+    setupApollonianCircles(c1, c2, c3, outer);
+    
+    // Iterate
+    int maxIter = 50;
+    int finalIter, lastCircle;
+    vec2 final_p = iterateApollonian(p, c1, c2, c3, outer, maxIter, finalIter, lastCircle);
+    
+    // Color by which circle we last hit
+    vec3 colors[4];
+    colors[0] = vec3(1.0, 0.0, 0.0);  // Circle 1: Red
+    colors[1] = vec3(0.0, 1.0, 0.0);  // Circle 2: Green
+    colors[2] = vec3(0.0, 0.0, 1.0);  // Circle 3: Blue
+    colors[3] = vec3(1.0, 1.0, 0.0);  // Outer circle: Yellow
+    
+    vec3 color = colors[lastCircle];
+    
+    // Draw all four circles for reference
+    float d1 = abs(length(p - c1.center) - c1.radius);
+    float d2 = abs(length(p - c2.center) - c2.radius);
+    float d3 = abs(length(p - c3.center) - c3.radius);
+    float d_outer = abs(length(p - outer.center) - outer.radius);
+    float d = min(min(d1, min(d2, d3)), d_outer);
+    
+    if(d < 0.02) color = vec3(1.0);
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## A6. Grid of Julia Sets (Optional Homework)
+
+Shows many Julia sets in a grid, revealing the Mandelbrot set structure.
+
+```glsl
+// Complex number operations
+float cabs2(vec2 z) {
+    return dot(z, z);
+}
+
+vec2 cmul(vec2 z, vec2 w) {
+    return vec2(
+        z.x * w.x - z.y * w.y,
+        z.x * w.y + z.y * w.x
+    );
+}
+
+// Cosine-based color palette
+vec3 palette(float t) {
+    vec3 a = vec3(0.5, 0.5, 0.5);
+    vec3 b = vec3(0.5, 0.5, 0.5);
+    vec3 c = vec3(1.0, 1.0, 1.0);
+    vec3 d = vec3(0.0, 0.33, 0.67);
+    
+    return a + b * cos(6.28318 * (c * t + d));
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // Coordinate setup
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv ;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
+    
+    // Divide screen into grid cells
+    float grid_size = 50.0;  // 8×8 grid
+    vec2 cell_id = floor(p * grid_size / 4.0);
+    vec2 cell_p = fract(p * grid_size / 4.0) - 0.5;
+    cell_p *= 4.0;  // Local coordinates within cell
+    
+    // Map cell_id to parameter c
+    vec2 c = (cell_id / grid_size) * 3.0 - vec2(2.5, 1.5);
+    c.x -= 0.5;  // Center on Mandelbrot set
+    
+    // Run Julia set iteration
+    vec2 z = cell_p;
+    int max_iter = 50;
+    int iter;
+    
+    for(iter = 0; iter < max_iter; iter++) {
+        if(cabs2(z) > 4.0) break;
+        z = cmul(z, z) + c;
+    }
+    
+    // Color
+    float t = float(iter) / float(max_iter);
+    vec3 color = vec3(t);
+    
+    // Draw grid lines
+    vec2 grid_edge = abs(fract(p * grid_size / 4.0) - 0.5);
+    if(max(grid_edge.x, grid_edge.y) > 0.48) color = vec3(0.0);
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## Notes on Using These Shaders
+
+### Getting Started
+1. Go to https://www.shadertoy.com/new
+2. Delete the default code
+3. Copy and paste any of the above listings
+4. Click the play button (▶) or press Alt+Enter
+
+### Modifying Parameters
+
+Each shader has parameters you can adjust at the top of `mainImage()`:
+
+**Mandelbrot/Julia:**
+- `max_iter` - More iterations reveal finer detail (try 200)
+- Color scale factor in `uv * 3.5` - Zoom in/out
+- Offset `c.x -= 0.5` - Pan the view
+
+**Julia specific:**
+- `vec2 c = ...` - Change the parameter to see different Julia sets
+- Try values from the homework section
+
+**Circle Inversion:**
+- `circleCenter` - Move the inversion circle
+- `circleRadius` - Change the size
+- Grid frequency in `p_inverted * 2.0` - Denser or sparser grid
+
+**Apollonian Gasket:**
+- `maxIter` - More iterations show deeper nesting
+- `R` and `r` in setup function - Change circle sizes
+- Color palette parameters in `palette()` function
+
+### Performance Tips
+
+If a shader runs slowly:
+- Reduce `max_iter` (try 50 instead of 100)
+- Lower the resolution (bottom right resolution dropdown in Shadertoy)
+- Some computers may struggle with smooth coloring - remove it for speed
+
+### Exploring Further
+
+All of these shaders are starting points! Try:
+- Combining techniques (Julia set with Apollonian coloring scheme)
+- Animating parameters with `iTime`
+- Adding mouse interaction with `iMouse`
+- Creating your own color palettes
+- Experimenting with different circle configurations
+
+The goal is to understand how simple iterative processes create complex fractals, and how to implement them efficiently on the GPU!
