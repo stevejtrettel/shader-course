@@ -10,7 +10,7 @@ book:
   author: "Steve Trettel"
   date: today
   date-format: "MMMM YYYY"
-  cover-image: cover.png
+  cover-image: images/cover.png
 
   chapters:
     - index.qmd
