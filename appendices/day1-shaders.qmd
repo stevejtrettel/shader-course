@@ -628,6 +628,74 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
 ---
 
+## A24. Lemniscate of Bernoulli (Naive Threshold)
+
+Drawing a lemniscate using naive `|F| < thickness`. Notice the non-uniform visual thickness—especially near the origin where the curve self-intersects and the gradient approaches zero.
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // Coordinate setup
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - 0.5;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
+
+    // Lemniscate of Bernoulli: (x² + y²)² = a²(x² - y²)
+    float a = 1.0;
+    float r2 = dot(p, p);
+    float F = r2 * r2 - a * a * (p.x * p.x - p.y * p.y);
+
+    // Naive threshold - thickness varies!
+    float thickness = 0.15;
+    vec3 color = (abs(F) < thickness) ? vec3(1.0, 1.0, 0.0) : vec3(0.1, 0.1, 0.3);
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## A25. Lemniscate of Bernoulli (Gradient-Corrected)
+
+Same curve, but now we divide by the gradient magnitude to approximate the signed distance function. This gives uniform visual thickness even near the singular point at the origin.
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // Coordinate setup
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - 0.5;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
+
+    // Lemniscate of Bernoulli: (x² + y²)² = a²(x² - y²)
+    float a = 1.0;
+    float r2 = dot(p, p);
+    float F = r2 * r2 - a * a * (p.x * p.x - p.y * p.y);
+
+    // Compute gradient analytically:
+    // ∂F/∂x = 4x(x² + y²) - 2a²x = 2x(2r² - a²)
+    // ∂F/∂y = 4y(x² + y²) + 2a²y = 2y(2r² + a²)
+    vec2 grad = vec2(
+        2.0 * p.x * (2.0 * r2 - a * a),
+        2.0 * p.y * (2.0 * r2 + a * a)
+    );
+
+    // Approximate signed distance: |F| / |∇F|
+    float gradLen = length(grad);
+    float dist = abs(F) / max(gradLen, 0.01);  // avoid division by zero
+
+    // Uniform thickness
+    float thickness = 0.05;
+    vec3 color = (dist < thickness) ? vec3(1.0, 1.0, 0.0) : vec3(0.1, 0.1, 0.3);
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
 ## Notes on Using These Shaders
 
 ### Getting Started
