@@ -12,10 +12,10 @@ No prior experience with shaders or GLSL is required—only a strong foundation 
 Here are some examples of things we will make:
 
 
-![](img/mandelbrot.png)
+![](images/mandelbrot.png)
 
-![](img/hyperbolic.png)
+![](images/hyperbolic.png)
 
-![](img/cubic.png)
+![](images/cubic.png)
 
 

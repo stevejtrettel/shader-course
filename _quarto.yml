@@ -10,42 +10,47 @@ book:
   author: "Steve Trettel"
   date: today
   date-format: "MMMM YYYY"
-  
+  cover-image: images/cover.png
+
   chapters:
     - index.qmd
     - outline.qmd
-    - day1.qmd
-    - day2.qmd
-    - day3.qmd
-    - day4.qmd
-    - day5a.qmd  # Advanced Raymarching option
-    - day5b.qmd  # Buffers/PDEs option
+    - lectures/day1.qmd
+    - lectures/day2.qmd
+    - lectures/day3.qmd
+    - lectures/day4.qmd
+    - lectures/day5a.qmd  # Advanced Raymarching option
+    - lectures/day5b.qmd  # Buffers/PDEs option
     # - resources.qmd
-  
+
   appendices:
-    - day1-shaders.qmd
-    - day2-shaders.qmd
-    - day3-shaders.qmd
-    - glsl-reference.qmd
-    # - shadertoy-tips.qmd
-    # - debug-reference.qmd
-    # - folding-fractals.qmd
-    # - schottky.qmd
+    - appendices/day1-shaders.qmd
+    - appendices/day2-shaders.qmd
+    - appendices/day3-shaders.qmd
+    - appendices/glsl-reference.qmd
+    # - appendices/shadertoy-tips.qmd
+    # - appendices/debug-reference.qmd
+    # - appendices/folding-fractals.qmd
+    # - appendices/schottky.qmd
 
   sidebar:
     style: "docked"
-    collapse-level: 1
-    
-  repo-url: https://github.com/yourusername/shader-course
+    collapse-level: 2
+
+  search: true
+  reader-mode: true
+
+  # TODO: Update with your actual repo URL
+  repo-url: https://github.com/stevejtrettel/shader-course
   downloads: [pdf]
 
 bibliography: references.bib
 
 format:
   html:
-    theme: 
+    theme:
       light: [cosmo, custom.scss]
-      dark: [cosmo, custom-dark.scss]
+      dark: [cosmo, custom.scss]
     code-copy: true
     code-overflow: wrap
     code-tools: true
@@ -54,7 +59,8 @@ format:
     number-sections: true
     number-depth: 2
     link-external-newwindow: true
-    
+    smooth-scroll: true
+
   pdf:
     documentclass: scrbook
     papersize: letter
@@ -69,8 +75,8 @@ format:
         \usepackage{fancyhdr}
         \pagestyle{fancy}
 
-# Syntax highlighting for GLSL
-highlight-style: github
+# Syntax highlighting - "arrow" works well for both light and dark modes
+highlight-style: arrow
 
 # Execution options
 execute:
