@@ -1,6 +1,8 @@
 project:
   type: book
   output-dir: _book
+  resources:
+    - demos/**
 
 book:
   title: "GPU-Accelerated Mathematical Illustration"

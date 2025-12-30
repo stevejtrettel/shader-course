@@ -1,0 +1,6 @@
+title: Shader Demo
+author: Steve Trettel
+version: 1.0.0
+contributes:
+  shortcodes:
+    - shader-demo.lua

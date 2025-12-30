@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.6.40">
+<meta name="generator" content="quarto-1.8.26">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -21,8 +21,9 @@ ul.task-list li input[type="checkbox"] {
   vertical-align: middle;
 }
 /* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -33,7 +34,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -66,17 +67,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta name="quarto:offset" content="./">
 <link href="./day4.html" rel="next">
 <link href="./day2.html" rel="prev">
-<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-86daaaaad7353f9cc0c554efc1dd6d94.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-f8dc6eab18fde03278982b0b35885446.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-597958c53c93a607afca12fd375c57ed.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-7ac2f9da8c2617a4fdd15004b4601015.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-597958c53c93a607afca12fd375c57ed.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-ed04f5f1653af6df52378e13bfdac05e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-d37bfdfd9a2222927534875c15a9020f.min.css" rel="prefetch" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-e192c2ce351653e2d082fb362f7b7010.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-716a622b51d344c68734a98b9754e0e5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-e192c2ce351653e2d082fb362f7b7010.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -119,7 +124,7 @@ const typesetMath = (el) => {
     var macros = [];
     for (var i = 0; i < mathElements.length; i++) {
       var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
         window.katex.render(texText.data, mathElements[i], {
           displayMode: mathElements[i].classList.contains('display'),
           throwOnError: false,
@@ -137,7 +142,169 @@ window.Quarto = {
 
 </head>
 
-<body class="nav-sidebar docked">
+<body class="nav-sidebar docked quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -305,6 +472,7 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
+
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <div class="quarto-title-block"><div><h1 class="title"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Day 3: Geometric Tilings in Euclidean and Hyperbolic Space</span></h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
@@ -335,7 +503,7 @@ window.Quarto = {
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Roadmap for Today
+<span class="screen-reader-only">Note</span>Roadmap for Today
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -358,7 +526,7 @@ Roadmap for Today
 - Repeat until the point stops moving</p>
 <p>For a vertical line at <span class="math inline">\(x = c\)</span>, reflection just flips the <span class="math inline">\(x\)</span>-coordinate: <span class="math inline">\((x, y) \mapsto (2c - x, y)\)</span>.</p>
 <p>Here’s a complete shader:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">mainImage</span><span class="op">(</span><span class="dt">out</span> <span class="dt">vec4</span> fragColor<span class="op">,</span> <span class="dt">in</span> <span class="dt">vec2</span> fragCoord<span class="op">)</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">mainImage</span><span class="op">(</span><span class="dt">out</span> <span class="dt">vec4</span> fragColor<span class="op">,</span> <span class="dt">in</span> <span class="dt">vec2</span> fragCoord<span class="op">)</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Standard coordinate setup</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> uv <span class="op">=</span> fragCoord <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">xy</span><span class="op">;</span></span>
@@ -382,7 +550,7 @@ Roadmap for Today
 <span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
 <span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>You should see the yellow circle repeat infinitely across the screen! We only drew it once, but the folding algorithm tiles it everywhere.</p>
 <p><strong>What’s happening geometrically?</strong> Every point on the screen gets mapped back to the fundamental domain <span class="math inline">\([0,1]\)</span>. Points that were in reflected copies of the domain get folded back through a sequence of reflections. Since we draw the same pattern in the fundamental domain, all the reflected copies show the same pattern.</p>
 <hr>
@@ -390,7 +558,7 @@ Roadmap for Today
 <section id="square-tiling" class="level4">
 <h4 class="anchored" data-anchor-id="square-tiling">Square Tiling</h4>
 <p>Let’s extend to two dimensions. Now we have four boundaries: <span class="math inline">\(x = 0\)</span>, <span class="math inline">\(x = 1\)</span>, <span class="math inline">\(y = 0\)</span>, and <span class="math inline">\(y = 1\)</span>. Same algorithm, just more boundaries to check:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">mainImage</span><span class="op">(</span><span class="dt">out</span> <span class="dt">vec4</span> fragColor<span class="op">,</span> <span class="dt">in</span> <span class="dt">vec2</span> fragCoord<span class="op">)</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">mainImage</span><span class="op">(</span><span class="dt">out</span> <span class="dt">vec4</span> fragColor<span class="op">,</span> <span class="dt">in</span> <span class="dt">vec2</span> fragCoord<span class="op">)</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Coordinate setup</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> uv <span class="op">=</span> fragCoord <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">xy</span><span class="op">;</span></span>
@@ -416,14 +584,14 @@ Roadmap for Today
 <span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
 <span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Perfect! A full 2D tiling.</p>
 <hr>
 </section>
 <section id="square-tiling-with-fold-count" class="level4">
 <h4 class="anchored" data-anchor-id="square-tiling-with-fold-count">Square Tiling with Fold Count</h4>
 <p>Let’s track how many reflections were needed. This helps us understand the geometry and creates beautiful visualizations:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">mainImage</span><span class="op">(</span><span class="dt">out</span> <span class="dt">vec4</span> fragColor<span class="op">,</span> <span class="dt">in</span> <span class="dt">vec2</span> fragCoord<span class="op">)</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">mainImage</span><span class="op">(</span><span class="dt">out</span> <span class="dt">vec4</span> fragColor<span class="op">,</span> <span class="dt">in</span> <span class="dt">vec2</span> fragCoord<span class="op">)</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Coordinate setup</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> uv <span class="op">=</span> fragCoord <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">xy</span><span class="op">;</span></span>
@@ -457,7 +625,7 @@ Roadmap for Today
 <span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
 <span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>    fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Beautiful! The color gradient shows how many reflections were needed—points near the fundamental domain require few iterations, while points far away need many.</p>
 <p>Notice the convergence check: we save the old position and check if the point stopped moving. When no boundary causes a reflection, the point has reached the fundamental domain and we can stop.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
@@ -466,7 +634,7 @@ Roadmap for Today
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Computational Efficiency: Iteration Count
+<span class="screen-reader-only">Tip</span>Computational Efficiency: Iteration Count
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -484,17 +652,17 @@ Computational Efficiency: Iteration Count
 <h4 class="anchored" data-anchor-id="what-is-a-half-space">What is a Half-Space?</h4>
 <p>A <strong>half-space</strong> is one side of a line. Any line <span class="math inline">\(ax + by = c\)</span> divides the plane into two regions: - Points where <span class="math inline">\(ax + by &lt; c\)</span> - Points where <span class="math inline">\(ax + by &gt; c\)</span></p>
 <p>We’ll encode a half-space by storing the line parameters and which side we want:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> HalfSpace <span class="op">{</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> HalfSpace <span class="op">{</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> a<span class="op">,</span> b<span class="op">,</span> c<span class="op">;</span>  <span class="co">// Line parameters: ax + by = c</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> side<span class="op">;</span>     <span class="co">// +1 or -1 for which side</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>The <code>side</code> parameter determines which inequality we want: - <code>side = -1.0</code> means we want <span class="math inline">\(ax + by &gt; c\)</span> (equivalently, <span class="math inline">\((ax + by - c) \cdot (-1) &lt; 0\)</span>) - <code>side = 1.0</code> means we want <span class="math inline">\(ax + by &lt; c\)</span> (equivalently, <span class="math inline">\((ax + by - c) \cdot (1) &lt; 0\)</span>)</p>
 <p>This might seem redundant—we could always use <span class="math inline">\(ax + by &lt; c\)</span> and just flip the signs of <span class="math inline">\(a, b, c\)</span> to get the other side. But having an explicit <code>side</code> parameter makes the code clearer and will be essential in hyperbolic geometry where sign-flipping doesn’t work as cleanly.</p>
 </section>
 <section id="visualizing-half-spaces" class="level4">
 <h4 class="anchored" data-anchor-id="visualizing-half-spaces">Visualizing Half-Spaces</h4>
 <p>Before we implement reflections, let’s visualize what a half-space is. Here’s a shader that colors one side of a line:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> HalfSpace <span class="op">{</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> HalfSpace <span class="op">{</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> a<span class="op">,</span> b<span class="op">,</span> c<span class="op">;</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> side<span class="op">;</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span>
@@ -519,7 +687,7 @@ Computational Efficiency: Iteration Count
 <span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span> color <span class="op">=</span> <span class="fu">inside</span><span class="op">(</span>p<span class="op">,</span> hs<span class="op">)</span> <span class="op">?</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.3</span><span class="op">,</span> <span class="fl">0.5</span><span class="op">,</span> <span class="fl">0.7</span><span class="op">)</span> <span class="op">:</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.1</span><span class="op">,</span> <span class="fl">0.1</span><span class="op">,</span> <span class="fl">0.2</span><span class="op">);</span></span>
 <span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>    fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>You should see the left side of the line colored blue, the right side dark. Try changing the half-space parameters to see how it affects the coloring!</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -527,17 +695,17 @@ Computational Efficiency: Iteration Count
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Exercise: Drawing the Boundary Line
+<span class="screen-reader-only">Tip</span>Exercise: Drawing the Boundary Line
 </div>
 </div>
 <div class="callout-body-container callout-body">
 <p>Want to see where the line is? Add this distance function:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">distToHalfSpace</span><span class="op">(</span><span class="dt">vec2</span> p<span class="op">,</span> HalfSpace hs<span class="op">)</span> <span class="op">{</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">distToHalfSpace</span><span class="op">(</span><span class="dt">vec2</span> p<span class="op">,</span> HalfSpace hs<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">abs</span><span class="op">(</span>hs<span class="op">.</span><span class="fu">a</span> <span class="op">*</span> p<span class="op">.</span><span class="fu">x</span> <span class="op">+</span> hs<span class="op">.</span><span class="fu">b</span> <span class="op">*</span> p<span class="op">.</span><span class="fu">y</span> <span class="op">-</span> hs<span class="op">.</span><span class="fu">c</span><span class="op">)</span> <span class="op">/</span> <span class="bu">length</span><span class="op">(</span><span class="dt">vec2</span><span class="op">(</span>hs<span class="op">.</span><span class="fu">a</span><span class="op">,</span> hs<span class="op">.</span><span class="fu">b</span><span class="op">));</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Then draw the line:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> d <span class="op">=</span> <span class="fu">distToHalfSpace</span><span class="op">(</span>p<span class="op">,</span> hs<span class="op">);</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span><span class="op">(</span>d <span class="op">&lt;</span> <span class="fl">0.02</span><span class="op">)</span> color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">);</span>  <span class="co">// White boundary</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> d <span class="op">=</span> <span class="fu">distToHalfSpace</span><span class="op">(</span>p<span class="op">,</span> hs<span class="op">);</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span><span class="op">(</span>d <span class="op">&lt;</span> <span class="fl">0.02</span><span class="op">)</span> color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">);</span>  <span class="co">// White boundary</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>This computes the perpendicular distance from the point to the line, then colors points near the line white. See Appendix E4b for the complete implementation!</p>
 </div>
 </div>
@@ -545,7 +713,7 @@ Exercise: Drawing the Boundary Line
 <section id="intersecting-half-spaces-making-a-square" class="level4">
 <h4 class="anchored" data-anchor-id="intersecting-half-spaces-making-a-square">Intersecting Half-Spaces: Making a Square</h4>
 <p>Now let’s intersect four half-spaces to create a square region. We’ll use <strong>additive coloring</strong>—each half-space we’re inside adds to the color, so the interior (inside all four) will be brightest:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> HalfSpace <span class="op">{</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> HalfSpace <span class="op">{</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> a<span class="op">,</span> b<span class="op">,</span> c<span class="op">;</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> side<span class="op">;</span></span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span>
@@ -578,7 +746,7 @@ Exercise: Drawing the Boundary Line
 <span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>    <span class="kw">if</span><span class="op">(</span><span class="fu">inside</span><span class="op">(</span>p<span class="op">,</span> top<span class="op">))</span>    color <span class="op">+=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.1</span><span class="op">,</span> <span class="fl">0.15</span><span class="op">,</span> <span class="fl">0.2</span><span class="op">);</span></span>
 <span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>    fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
-<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>You should see the square region brightest (inside all four half-spaces), with regions inside fewer half-spaces progressively darker. This additive approach makes it easy to see how the regions overlap!</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -586,7 +754,7 @@ Exercise: Drawing the Boundary Line
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Exercise: Improved Visualization
+<span class="screen-reader-only">Tip</span>Exercise: Improved Visualization
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -594,18 +762,18 @@ Exercise: Improved Visualization
 <ol type="1">
 <li><strong>Binary coloring</strong> (inside domain or not):</li>
 </ol>
-<div class="sourceCode" id="cb9"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="dt">bool</span> in_square <span class="op">=</span> <span class="fu">inside</span><span class="op">(</span>p<span class="op">,</span> left<span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="fu">inside</span><span class="op">(</span>p<span class="op">,</span> right<span class="op">)</span> <span class="op">&amp;&amp;</span> </span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="dt">bool</span> in_square <span class="op">=</span> <span class="fu">inside</span><span class="op">(</span>p<span class="op">,</span> left<span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="fu">inside</span><span class="op">(</span>p<span class="op">,</span> right<span class="op">)</span> <span class="op">&amp;&amp;</span> </span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">inside</span><span class="op">(</span>p<span class="op">,</span> bottom<span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="fu">inside</span><span class="op">(</span>p<span class="op">,</span> top<span class="op">);</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> color <span class="op">=</span> in_square <span class="op">?</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.4</span><span class="op">,</span> <span class="fl">0.6</span><span class="op">,</span> <span class="fl">0.8</span><span class="op">)</span> <span class="op">:</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.1</span><span class="op">,</span> <span class="fl">0.1</span><span class="op">,</span> <span class="fl">0.2</span><span class="op">);</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> color <span class="op">=</span> in_square <span class="op">?</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.4</span><span class="op">,</span> <span class="fl">0.6</span><span class="op">,</span> <span class="fl">0.8</span><span class="op">)</span> <span class="op">:</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.1</span><span class="op">,</span> <span class="fl">0.1</span><span class="op">,</span> <span class="fl">0.2</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <ol start="2" type="1">
 <li><p><strong>Draw boundaries</strong> using the distance function from earlier</p></li>
 <li><p><strong>Create an <code>insideDomain()</code> function</strong>:</p></li>
 </ol>
-<div class="sourceCode" id="cb10"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="dt">bool</span> <span class="fu">insideDomain</span><span class="op">(</span><span class="dt">vec2</span> p<span class="op">,</span> HalfSpace hs1<span class="op">,</span> HalfSpace hs2<span class="op">,</span> </span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="dt">bool</span> <span class="fu">insideDomain</span><span class="op">(</span><span class="dt">vec2</span> p<span class="op">,</span> HalfSpace hs1<span class="op">,</span> HalfSpace hs2<span class="op">,</span> </span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>                  HalfSpace hs3<span class="op">,</span> HalfSpace hs4<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="fu">inside</span><span class="op">(</span>p<span class="op">,</span> hs1<span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="fu">inside</span><span class="op">(</span>p<span class="op">,</span> hs2<span class="op">)</span> <span class="op">&amp;&amp;</span> </span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>           <span class="fu">inside</span><span class="op">(</span>p<span class="op">,</span> hs3<span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="fu">inside</span><span class="op">(</span>p<span class="op">,</span> hs4<span class="op">);</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>See Appendix E5b for complete enhanced versions!</p>
 </div>
 </div>
@@ -613,7 +781,7 @@ Exercise: Improved Visualization
 <section id="three-half-spaces-make-a-triangle" class="level4">
 <h4 class="anchored" data-anchor-id="three-half-spaces-make-a-triangle">Three Half-Spaces Make a Triangle</h4>
 <p>Let’s visualize three half-spaces defining a triangle:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> HalfSpace <span class="op">{</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> HalfSpace <span class="op">{</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> a<span class="op">,</span> b<span class="op">,</span> c<span class="op">;</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> side<span class="op">;</span></span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span>
@@ -644,7 +812,7 @@ Exercise: Improved Visualization
 <span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>    <span class="kw">if</span><span class="op">(</span><span class="fu">inside</span><span class="op">(</span>p<span class="op">,</span> hs3<span class="op">))</span> color <span class="op">+=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.15</span><span class="op">,</span> <span class="fl">0.2</span><span class="op">,</span> <span class="fl">0.25</span><span class="op">);</span></span>
 <span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>    fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
-<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>You should see a triangle region where all three half-spaces overlap! The additive coloring helps visualize the structure.</p>
 <hr>
 </section>
@@ -656,7 +824,7 @@ Exercise: Improved Visualization
 <p><span class="math display">\[d = \frac{ax + by - c}{\sqrt{a^2 + b^2}}\]</span></p>
 <p>This is a standard result from linear algebra! The signed distance tells us how far we are from the line (positive on one side, negative on the other), and we move twice that distance in the normal direction to get the reflection.</p>
 <p>Our <code>reflectInto</code> function checks if we’re on the correct side and only reflects if necessary—it <strong>extends</strong> our <code>inside()</code> test by conditionally reflecting:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="fu">reflectInto</span><span class="op">(</span><span class="dt">vec2</span> p<span class="op">,</span> HalfSpace hs<span class="op">)</span> <span class="op">{</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="fu">reflectInto</span><span class="op">(</span><span class="dt">vec2</span> p<span class="op">,</span> HalfSpace hs<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Compute which side of the line we're on</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> value <span class="op">=</span> hs<span class="op">.</span><span class="fu">a</span> <span class="op">*</span> p<span class="op">.</span><span class="fu">x</span> <span class="op">+</span> hs<span class="op">.</span><span class="fu">b</span> <span class="op">*</span> p<span class="op">.</span><span class="fu">y</span><span class="op">;</span></span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    </span>
@@ -672,7 +840,7 @@ Exercise: Improved Visualization
 <span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> signedDist <span class="op">=</span> <span class="op">(</span>value <span class="op">-</span> hs<span class="op">.</span><span class="fu">c</span><span class="op">)</span> <span class="op">/</span> norm<span class="op">;</span></span>
 <span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> p <span class="op">-</span> <span class="fl">2.0</span> <span class="op">*</span> signedDist <span class="op">*</span> normal<span class="op">;</span></span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>This function encapsulates the entire pattern: check if we’re on the correct side (the <code>inside()</code> test), and only reflect if we’re not. So <code>reflectInto()</code> extends and renames our visualization function to also perform the reflection!</p>
 <hr>
 </section>
@@ -686,7 +854,7 @@ Exercise: Improved Visualization
 <li><strong>Bottom and top</strong>: Similarly for <span class="math inline">\(y\)</span></li>
 </ul>
 <p>Complete shader:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> HalfSpace <span class="op">{</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> HalfSpace <span class="op">{</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> a<span class="op">,</span> b<span class="op">,</span> c<span class="op">;</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> side<span class="op">;</span></span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span>
@@ -745,7 +913,7 @@ Exercise: Improved Visualization
 <span id="cb13-57"><a href="#cb13-57" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
 <span id="cb13-58"><a href="#cb13-58" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb13-59"><a href="#cb13-59" aria-hidden="true" tabindex="-1"></a>    fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
-<span id="cb13-60"><a href="#cb13-60" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb13-60"><a href="#cb13-60" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>This looks identical to our earlier version, but now our code is flexible. The beauty: <strong>changing from a square to a triangle only requires changing the half-space definitions!</strong></p>
 <hr>
 </section>
@@ -765,12 +933,12 @@ Exercise: Improved Visualization
 <li>Test origin: if <span class="math inline">\((n_x \cdot 0 + n_y \cdot 0 - c) &lt; 0\)</span>, then <code>side = -1.0</code>, else <code>side = 1.0</code></li>
 </ol>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Derivation of Triangle Half-Space Parameters
+<span class="screen-reader-only">Note</span>Derivation of Triangle Half-Space Parameters
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
@@ -801,7 +969,7 @@ Derivation of Triangle Half-Space Parameters
 <section id="triangle-tiling-shader" class="level4">
 <h4 class="anchored" data-anchor-id="triangle-tiling-shader">Triangle Tiling Shader</h4>
 <p>Now we can implement the tiling by copying our reflection shader and just changing the half-spaces:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> HalfSpace <span class="op">{</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> HalfSpace <span class="op">{</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> a<span class="op">,</span> b<span class="op">,</span> c<span class="op">;</span></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> side<span class="op">;</span></span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span>
@@ -857,7 +1025,7 @@ Derivation of Triangle Half-Space Parameters
 <span id="cb14-54"><a href="#cb14-54" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
 <span id="cb14-55"><a href="#cb14-55" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb14-56"><a href="#cb14-56" aria-hidden="true" tabindex="-1"></a>    fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
-<span id="cb14-57"><a href="#cb14-57" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb14-57"><a href="#cb14-57" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Beautiful! You should see an infinite triangle tiling. The alternating colors show which triangles are orientation-preserving vs orientation-reversing reflections of the fundamental domain.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -865,13 +1033,13 @@ Derivation of Triangle Half-Space Parameters
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Exercise: Visualizing Triangle Structure
+<span class="screen-reader-only">Tip</span>Exercise: Visualizing Triangle Structure
 </div>
 </div>
 <div class="callout-body-container callout-body">
 <p>Want to see the edges and vertices of your triangles? This requires computing distances to half-spaces and vertices.</p>
 <p><strong>For edges</strong> (drawing the boundaries):</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">distToHalfSpace</span><span class="op">(</span><span class="dt">vec2</span> p<span class="op">,</span> HalfSpace hs<span class="op">)</span> <span class="op">{</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">distToHalfSpace</span><span class="op">(</span><span class="dt">vec2</span> p<span class="op">,</span> HalfSpace hs<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">abs</span><span class="op">(</span>hs<span class="op">.</span><span class="fu">a</span> <span class="op">*</span> p<span class="op">.</span><span class="fu">x</span> <span class="op">+</span> hs<span class="op">.</span><span class="fu">b</span> <span class="op">*</span> p<span class="op">.</span><span class="fu">y</span> <span class="op">-</span> hs<span class="op">.</span><span class="fu">c</span><span class="op">)</span> <span class="op">/</span> <span class="bu">length</span><span class="op">(</span><span class="dt">vec2</span><span class="op">(</span>hs<span class="op">.</span><span class="fu">a</span><span class="op">,</span> hs<span class="op">.</span><span class="fu">b</span><span class="op">));</span></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
 <span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -881,9 +1049,9 @@ Exercise: Visualizing Triangle Structure
 <span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> d3 <span class="op">=</span> <span class="fu">distToHalfSpace</span><span class="op">(</span>p<span class="op">,</span> hs3<span class="op">);</span></span>
 <span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> border <span class="op">=</span> <span class="bu">min</span><span class="op">(</span>d1<span class="op">,</span> <span class="bu">min</span><span class="op">(</span>d2<span class="op">,</span> d3<span class="op">));</span></span>
 <span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span><span class="op">(</span>border <span class="op">&lt;</span> <span class="fl">0.02</span><span class="op">)</span> color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">);</span>  <span class="co">// White edges</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span><span class="op">(</span>border <span class="op">&lt;</span> <span class="fl">0.02</span><span class="op">)</span> color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">);</span>  <span class="co">// White edges</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><strong>For vertices</strong> (marking the corners):</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Define vertices</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Define vertices</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> v0 <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span><span class="fl">0.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> v1 <span class="op">=</span> <span class="dt">vec2</span><span class="op">(-</span><span class="fl">0.866</span><span class="op">,</span> <span class="op">-</span><span class="fl">0.5</span><span class="op">);</span></span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> v2 <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span><span class="fl">0.866</span><span class="op">,</span> <span class="op">-</span><span class="fl">0.5</span><span class="op">);</span></span>
@@ -894,7 +1062,7 @@ Exercise: Visualizing Triangle Structure
 <span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> dv2 <span class="op">=</span> <span class="bu">length</span><span class="op">(</span>p <span class="op">-</span> v2<span class="op">);</span></span>
 <span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> vertex_dist <span class="op">=</span> <span class="bu">min</span><span class="op">(</span>dv0<span class="op">,</span> <span class="bu">min</span><span class="op">(</span>dv1<span class="op">,</span> dv2<span class="op">));</span></span>
 <span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span><span class="op">(</span>vertex_dist <span class="op">&lt;</span> <span class="fl">0.05</span><span class="op">)</span> color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">);</span>  <span class="co">// Red vertices</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span><span class="op">(</span>vertex_dist <span class="op">&lt;</span> <span class="fl">0.05</span><span class="op">)</span> color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">);</span>  <span class="co">// Red vertices</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>See Appendix E9 for the complete enhanced version!</p>
 </div>
 </div>
@@ -936,7 +1104,7 @@ Exercise: Visualizing Triangle Structure
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-The Pattern Across Days
+<span class="screen-reader-only">Important</span>The Pattern Across Days
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -1025,7 +1193,7 @@ The Pattern Across Days
 <h4 class="anchored" data-anchor-id="visualizing-hyperbolic-distance">Visualizing Hyperbolic Distance</h4>
 <p>Let’s make this concrete with an interactive shader. We’ll start with Euclidean distance, then switch to hyperbolic to see the difference.</p>
 <p><strong>Euclidean distance circles:</strong></p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">mainImage</span><span class="op">(</span><span class="dt">out</span> <span class="dt">vec4</span> fragColor<span class="op">,</span> <span class="dt">in</span> <span class="dt">vec2</span> fragCoord<span class="op">)</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">mainImage</span><span class="op">(</span><span class="dt">out</span> <span class="dt">vec4</span> fragColor<span class="op">,</span> <span class="dt">in</span> <span class="dt">vec2</span> fragCoord<span class="op">)</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Coordinate setup</span></span>
 <span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> uv <span class="op">=</span> fragCoord <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">xy</span><span class="op">;</span></span>
@@ -1068,10 +1236,10 @@ The Pattern Across Days
 <span id="cb17-41"><a href="#cb17-41" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
 <span id="cb17-42"><a href="#cb17-42" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb17-43"><a href="#cb17-43" aria-hidden="true" tabindex="-1"></a>    fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
-<span id="cb17-44"><a href="#cb17-44" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb17-44"><a href="#cb17-44" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Click and drag around—the circle stays the same size everywhere. This is Euclidean distance: uniform across the plane. Notice how we draw the boundary: we draw a filled circle at radius <span class="math inline">\(r + \epsilon\)</span> (outer edge), then draw another filled circle at radius <span class="math inline">\(r - \epsilon\)</span> (inner edge) in a different color. The ring between them is our boundary!</p>
 <p><strong>Hyperbolic distance circles:</strong></p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">hyperbolicDistance</span><span class="op">(</span><span class="dt">vec2</span> z1<span class="op">,</span> <span class="dt">vec2</span> z2<span class="op">)</span> <span class="op">{</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">hyperbolicDistance</span><span class="op">(</span><span class="dt">vec2</span> z1<span class="op">,</span> <span class="dt">vec2</span> z2<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> diff <span class="op">=</span> z1 <span class="op">-</span> z2<span class="op">;</span></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> diff2 <span class="op">=</span> <span class="bu">dot</span><span class="op">(</span>diff<span class="op">,</span> diff<span class="op">);</span></span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> denom <span class="op">=</span> <span class="fl">2.0</span> <span class="op">*</span> z1<span class="op">.</span><span class="fu">y</span> <span class="op">*</span> z2<span class="op">.</span><span class="fu">y</span><span class="op">;</span></span>
@@ -1122,7 +1290,7 @@ The Pattern Across Days
 <span id="cb18-49"><a href="#cb18-49" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
 <span id="cb18-50"><a href="#cb18-50" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb18-51"><a href="#cb18-51" aria-hidden="true" tabindex="-1"></a>    fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
-<span id="cb18-52"><a href="#cb18-52" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb18-52"><a href="#cb18-52" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Now drag the center around! Notice how the “circle” changes shape as you move it. Near the bottom (<span class="math inline">\(y \to 0\)</span>), the circle appears huge Euclidean-wise—that’s because we’re near the boundary where hyperbolic distances blow up. Higher up (<span class="math inline">\(y\)</span> large), the circle appears smaller.</p>
 <p>This visualization makes the <span class="math inline">\(1/y^2\)</span> conformal factor visceral: <strong>hyperbolic space is compressed near the boundary</strong>.</p>
 <hr>
@@ -1158,7 +1326,7 @@ The Pattern Across Days
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Connection to Day 2: Circle Inversion is a Hyperbolic Isometry!
+<span class="screen-reader-only">Important</span>Connection to Day 2: Circle Inversion is a Hyperbolic Isometry!
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -1171,7 +1339,7 @@ Connection to Day 2: Circle Inversion is a Hyperbolic Isometry!
 <section id="implementing-reflections" class="level4">
 <h4 class="anchored" data-anchor-id="implementing-reflections">Implementing Reflections</h4>
 <p>For <strong>vertical lines</strong> (like <span class="math inline">\(x = c\)</span>), reflection is simple—flip the <span class="math inline">\(x\)</span>-coordinate:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="fu">reflectIntoVertical</span><span class="op">(</span><span class="dt">vec2</span> z<span class="op">,</span> <span class="dt">float</span> x_pos<span class="op">,</span> <span class="dt">float</span> side<span class="op">)</span> <span class="op">{</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="fu">reflectIntoVertical</span><span class="op">(</span><span class="dt">vec2</span> z<span class="op">,</span> <span class="dt">float</span> x_pos<span class="op">,</span> <span class="dt">float</span> side<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Check if we're on the correct side</span></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">if</span><span class="op">((</span>z<span class="op">.</span><span class="fu">x</span> <span class="op">-</span> x_pos<span class="op">)</span> <span class="op">*</span> side <span class="op">&lt;</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">{</span></span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>        <span class="kw">return</span> z<span class="op">;</span>  <span class="co">// Already on correct side</span></span>
@@ -1180,9 +1348,9 @@ Connection to Day 2: Circle Inversion is a Hyperbolic Isometry!
 <span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Reflect: (x,y) ↦ (2c - x, y)</span></span>
 <span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    z<span class="op">.</span><span class="fu">x</span> <span class="op">=</span> <span class="fl">2.0</span> <span class="op">*</span> x_pos <span class="op">-</span> z<span class="op">.</span><span class="fu">x</span><span class="op">;</span></span>
 <span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> z<span class="op">;</span></span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>For <strong>semicircles</strong> (geodesics from point <span class="math inline">\(p\)</span> to point <span class="math inline">\(q\)</span> on the real axis), we use circle inversion. The semicircle has center <span class="math inline">\((c, 0)\)</span> where <span class="math inline">\(c = (p+q)/2\)</span> and radius <span class="math inline">\(R = |p-q|/2\)</span>:</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="fu">reflectIntoCircular</span><span class="op">(</span><span class="dt">vec2</span> z<span class="op">,</span> <span class="dt">float</span> p<span class="op">,</span> <span class="dt">float</span> q<span class="op">,</span> <span class="dt">float</span> side<span class="op">)</span> <span class="op">{</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="fu">reflectIntoCircular</span><span class="op">(</span><span class="dt">vec2</span> z<span class="op">,</span> <span class="dt">float</span> p<span class="op">,</span> <span class="dt">float</span> q<span class="op">,</span> <span class="dt">float</span> side<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> center <span class="op">=</span> <span class="op">(</span>p <span class="op">+</span> q<span class="op">)</span> <span class="op">/</span> <span class="fl">2.0</span><span class="op">;</span></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> radius <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span>p <span class="op">-</span> q<span class="op">)</span> <span class="op">/</span> <span class="fl">2.0</span><span class="op">;</span></span>
 <span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    </span>
@@ -1197,7 +1365,7 @@ Connection to Day 2: Circle Inversion is a Hyperbolic Isometry!
 <span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Circle inversion (from Day 2!)</span></span>
 <span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> inverted <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span>center<span class="op">,</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span>radius <span class="op">*</span> radius<span class="op">)</span> <span class="op">*</span> rel <span class="op">/</span> dist2<span class="op">;</span></span>
 <span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> inverted<span class="op">;</span></span>
-<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Note: We’re inverting through a circle in the Euclidean sense (using Euclidean distance <code>dist2</code>), but this operation is actually a hyperbolic isometry! The magic is that circle inversion’s conformal properties exactly match the hyperbolic metric’s requirements.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -1205,7 +1373,7 @@ Connection to Day 2: Circle Inversion is a Hyperbolic Isometry!
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Why Two Types of Reflections?
+<span class="screen-reader-only">Note</span>Why Two Types of Reflections?
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -1230,7 +1398,7 @@ Why Two Types of Reflections?
 <section id="implementation" class="level4">
 <h4 class="anchored" data-anchor-id="implementation">Implementation</h4>
 <p>Here’s the complete shader:</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="fu">reflectIntoVertical</span><span class="op">(</span><span class="dt">vec2</span> z<span class="op">,</span> <span class="dt">float</span> x_pos<span class="op">,</span> <span class="dt">float</span> side<span class="op">)</span> <span class="op">{</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="fu">reflectIntoVertical</span><span class="op">(</span><span class="dt">vec2</span> z<span class="op">,</span> <span class="dt">float</span> x_pos<span class="op">,</span> <span class="dt">float</span> side<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">if</span><span class="op">((</span>z<span class="op">.</span><span class="fu">x</span> <span class="op">-</span> x_pos<span class="op">)</span> <span class="op">*</span> side <span class="op">&lt;</span> <span class="fl">0.0</span><span class="op">)</span> <span class="kw">return</span> z<span class="op">;</span></span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    z<span class="op">.</span><span class="fu">x</span> <span class="op">=</span> <span class="fl">2.0</span> <span class="op">*</span> x_pos <span class="op">-</span> z<span class="op">.</span><span class="fu">x</span><span class="op">;</span></span>
 <span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> z<span class="op">;</span></span>
@@ -1290,7 +1458,7 @@ Why Two Types of Reflections?
 <span id="cb21-58"><a href="#cb21-58" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
 <span id="cb21-59"><a href="#cb21-59" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb21-60"><a href="#cb21-60" aria-hidden="true" tabindex="-1"></a>    fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
-<span id="cb21-61"><a href="#cb21-61" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb21-61"><a href="#cb21-61" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>You should see a beautiful hyperbolic tiling! Notice how the triangles appear to get smaller near the bottom of the screen (approaching the real axis <span class="math inline">\(y = 0\)</span>)—they’re all the same hyperbolic size, but Euclidean distances compress due to the <span class="math inline">\(1/y^2\)</span> metric.</p>
 <p>The alternating colors show which tiles are orientation-preserving vs orientation-reversing reflections of the fundamental domain.</p>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -1299,19 +1467,19 @@ Why Two Types of Reflections?
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Compare to Euclidean
+<span class="screen-reader-only">Note</span>Compare to Euclidean
 </div>
 </div>
 <div class="callout-body-container callout-body">
 <p>Look at the structure of this shader compared to the Euclidean triangle tiling:</p>
 <p><strong>Euclidean:</strong></p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> <span class="fu">reflectInto</span><span class="op">(</span>p<span class="op">,</span> hs1<span class="op">);</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> <span class="fu">reflectInto</span><span class="op">(</span>p<span class="op">,</span> hs1<span class="op">);</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> <span class="fu">reflectInto</span><span class="op">(</span>p<span class="op">,</span> hs2<span class="op">);</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> <span class="fu">reflectInto</span><span class="op">(</span>p<span class="op">,</span> hs3<span class="op">);</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> <span class="fu">reflectInto</span><span class="op">(</span>p<span class="op">,</span> hs3<span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><strong>Hyperbolic:</strong></p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>z <span class="op">=</span> <span class="fu">reflectIntoVertical</span><span class="op">(</span>z<span class="op">,</span> <span class="op">-</span><span class="fl">1.0</span><span class="op">,</span> <span class="op">-</span><span class="fl">1.0</span><span class="op">);</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>z <span class="op">=</span> <span class="fu">reflectIntoVertical</span><span class="op">(</span>z<span class="op">,</span> <span class="op">-</span><span class="fl">1.0</span><span class="op">,</span> <span class="op">-</span><span class="fl">1.0</span><span class="op">);</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>z <span class="op">=</span> <span class="fu">reflectIntoVertical</span><span class="op">(</span>z<span class="op">,</span> <span class="fl">1.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>z <span class="op">=</span> <span class="fu">reflectIntoCircular</span><span class="op">(</span>z<span class="op">,</span> <span class="op">-</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>z <span class="op">=</span> <span class="fu">reflectIntoCircular</span><span class="op">(</span>z<span class="op">,</span> <span class="op">-</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>The algorithm is identical! We just have two types of reflection operations instead of one. This is the power of recognizing the pattern.</p>
 </div>
 </div>
@@ -1321,7 +1489,7 @@ Compare to Euclidean
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Computational Analysis
+<span class="screen-reader-only">Tip</span>Computational Analysis
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -1338,37 +1506,37 @@ Computational Analysis
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Exercise: Visualizing Hyperbolic Triangle Structure
+<span class="screen-reader-only">Tip</span>Exercise: Visualizing Hyperbolic Triangle Structure
 </div>
 </div>
 <div class="callout-body-container callout-body">
 <p>Want to see the edges and vertices of your hyperbolic triangles? This requires computing hyperbolic distances.</p>
 <p><strong>For hyperbolic distance:</strong></p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">hyperbolicDistance</span><span class="op">(</span><span class="dt">vec2</span> z1<span class="op">,</span> <span class="dt">vec2</span> z2<span class="op">)</span> <span class="op">{</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">hyperbolicDistance</span><span class="op">(</span><span class="dt">vec2</span> z1<span class="op">,</span> <span class="dt">vec2</span> z2<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> diff <span class="op">=</span> z1 <span class="op">-</span> z2<span class="op">;</span></span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> diff2 <span class="op">=</span> <span class="bu">dot</span><span class="op">(</span>diff<span class="op">,</span> diff<span class="op">);</span></span>
 <span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> denom <span class="op">=</span> <span class="fl">2.0</span> <span class="op">*</span> z1<span class="op">.</span><span class="fu">y</span> <span class="op">*</span> z2<span class="op">.</span><span class="fu">y</span><span class="op">;</span></span>
 <span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> arg <span class="op">=</span> <span class="fl">1.0</span> <span class="op">+</span> diff2 <span class="op">/</span> denom<span class="op">;</span></span>
 <span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">log</span><span class="op">(</span>arg <span class="op">+</span> <span class="bu">sqrt</span><span class="op">(</span>arg <span class="op">*</span> arg <span class="op">-</span> <span class="fl">1.0</span><span class="op">));</span></span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><strong>For drawing edges</strong> (vertical lines):</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Distance to vertical line x = c</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Distance to vertical line x = c</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> distToVertical <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span>z<span class="op">.</span><span class="fu">x</span> <span class="op">-</span> c<span class="op">);</span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span><span class="op">(</span>distToVertical <span class="op">&lt;</span> <span class="fl">0.02</span><span class="op">)</span> color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">);</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span><span class="op">(</span>distToVertical <span class="op">&lt;</span> <span class="fl">0.02</span><span class="op">)</span> color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><strong>For drawing edges</strong> (semicircular geodesics):</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Distance to semicircle from p to q</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Distance to semicircle from p to q</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> center <span class="op">=</span> <span class="op">(</span>p <span class="op">+</span> q<span class="op">)</span> <span class="op">/</span> <span class="fl">2.0</span><span class="op">;</span></span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> radius <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span>p <span class="op">-</span> q<span class="op">)</span> <span class="op">/</span> <span class="fl">2.0</span><span class="op">;</span></span>
 <span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> distToCircle <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span><span class="bu">length</span><span class="op">(</span>z <span class="op">-</span> <span class="dt">vec2</span><span class="op">(</span>center<span class="op">,</span> <span class="fl">0.0</span><span class="op">))</span> <span class="op">-</span> radius<span class="op">);</span></span>
 <span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="co">// Only draw if above real axis</span></span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span><span class="op">(</span>z<span class="op">.</span><span class="fu">y</span> <span class="op">&gt;</span> <span class="fl">0.0</span> <span class="op">&amp;&amp;</span> distToCircle <span class="op">&lt;</span> <span class="fl">0.02</span><span class="op">)</span> color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">);</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span><span class="op">(</span>z<span class="op">.</span><span class="fu">y</span> <span class="op">&gt;</span> <span class="fl">0.0</span> <span class="op">&amp;&amp;</span> distToCircle <span class="op">&lt;</span> <span class="fl">0.02</span><span class="op">)</span> color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><strong>For vertices</strong>:</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Check hyperbolic distance to vertices after folding</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Check hyperbolic distance to vertices after folding</span></span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> v1 <span class="op">=</span> <span class="dt">vec2</span><span class="op">(-</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.01</span><span class="op">);</span>  <span class="co">// Left vertex (slightly above axis)</span></span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> v2 <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.01</span><span class="op">);</span>   <span class="co">// Right vertex</span></span>
 <span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span><span class="op">(</span><span class="fu">hyperbolicDistance</span><span class="op">(</span>z<span class="op">,</span> v1<span class="op">)</span> <span class="op">&lt;</span> <span class="fl">0.1</span> <span class="op">||</span> <span class="fu">hyperbolicDistance</span><span class="op">(</span>z<span class="op">,</span> v2<span class="op">)</span> <span class="op">&lt;</span> <span class="fl">0.1</span><span class="op">)</span> <span class="op">{</span></span>
 <span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">);</span>  <span class="co">// Red vertices</span></span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>See Appendix H5 for the complete enhanced implementation!</p>
 </div>
 </div>
@@ -1393,7 +1561,7 @@ Exercise: Visualizing Hyperbolic Triangle Structure
 <p>This maps: - Upper half-plane <span class="math inline">\(\{z : \operatorname{Im}(z) &gt; 0\}\)</span> → Poincaré disk <span class="math inline">\(\{w : |w| &lt; 1\}\)</span> - Real axis <span class="math inline">\(\{z : \operatorname{Im}(z) = 0\}\)</span> → Unit circle <span class="math inline">\(\{w : |w| = 1\}\)</span> - Point <span class="math inline">\(i\)</span> in the upper half-plane → origin <span class="math inline">\(0\)</span> in the disk</p>
 <p>The inverse transform is: <span class="math display">\[z = i\frac{1 + w}{1 - w}\]</span></p>
 <p>Here’s the implementation:</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="fu">cmul</span><span class="op">(</span><span class="dt">vec2</span> a<span class="op">,</span> <span class="dt">vec2</span> b<span class="op">)</span> <span class="op">{</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="fu">cmul</span><span class="op">(</span><span class="dt">vec2</span> a<span class="op">,</span> <span class="dt">vec2</span> b<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="dt">vec2</span><span class="op">(</span>a<span class="op">.</span><span class="fu">x</span> <span class="op">*</span> b<span class="op">.</span><span class="fu">x</span> <span class="op">-</span> a<span class="op">.</span><span class="fu">y</span> <span class="op">*</span> b<span class="op">.</span><span class="fu">y</span><span class="op">,</span> a<span class="op">.</span><span class="fu">x</span> <span class="op">*</span> b<span class="op">.</span><span class="fu">y</span> <span class="op">+</span> a<span class="op">.</span><span class="fu">y</span> <span class="op">*</span> b<span class="op">.</span><span class="fu">x</span><span class="op">);</span></span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
 <span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -1413,9 +1581,9 @@ Exercise: Visualizing Hyperbolic Triangle Structure
 <span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> i <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span><span class="fl">0.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
 <span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> one <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">);</span></span>
 <span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="fu">cmul</span><span class="op">(</span>i<span class="op">,</span> <span class="fu">cdiv</span><span class="op">(</span>one <span class="op">+</span> w<span class="op">,</span> one <span class="op">-</span> w<span class="op">));</span></span>
-<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>To display your tiling in the Poincaré disk:</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">mainImage</span><span class="op">(</span><span class="dt">out</span> <span class="dt">vec4</span> fragColor<span class="op">,</span> <span class="dt">in</span> <span class="dt">vec2</span> fragCoord<span class="op">)</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">mainImage</span><span class="op">(</span><span class="dt">out</span> <span class="dt">vec4</span> fragColor<span class="op">,</span> <span class="dt">in</span> <span class="dt">vec2</span> fragCoord<span class="op">)</span></span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Coordinate setup for disk</span></span>
 <span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> uv <span class="op">=</span> fragCoord <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">xy</span><span class="op">;</span></span>
@@ -1430,24 +1598,24 @@ Exercise: Visualizing Hyperbolic Triangle Structure
 <span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Color and render</span></span>
 <span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>    fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
-<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="the-klein-model" class="level4">
 <h4 class="anchored" data-anchor-id="the-klein-model">The Klein Model</h4>
 <p>The <strong>Klein model</strong> (also called the <strong>Beltrami-Klein model</strong> or <strong>projective disk model</strong>) is another disk representation. Its defining feature: <strong>geodesics are Euclidean straight lines</strong>! This makes some geometric properties clearer but sacrifices the conformal property—angles are distorted.</p>
 <p>Converting from Poincaré disk to Klein disk:</p>
 <p><span class="math display">\[\text{Klein}(w) = \frac{2w}{1 + |w|^2}\]</span></p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="fu">poincareToKlein</span><span class="op">(</span><span class="dt">vec2</span> w<span class="op">)</span> <span class="op">{</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="fu">poincareToKlein</span><span class="op">(</span><span class="dt">vec2</span> w<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> denom <span class="op">=</span> <span class="fl">1.0</span> <span class="op">+</span> <span class="bu">dot</span><span class="op">(</span>w<span class="op">,</span> w<span class="op">);</span></span>
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="fl">2.0</span> <span class="op">*</span> w <span class="op">/</span> denom<span class="op">;</span></span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>The inverse:</p>
 <p><span class="math display">\[w = \frac{\text{Klein}(w)}{1 + \sqrt{1 - |\text{Klein}(w)|^2}}\]</span></p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="fu">kleinToPoincare</span><span class="op">(</span><span class="dt">vec2</span> k<span class="op">)</span> <span class="op">{</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb31"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="fu">kleinToPoincare</span><span class="op">(</span><span class="dt">vec2</span> k<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> k2 <span class="op">=</span> <span class="bu">dot</span><span class="op">(</span>k<span class="op">,</span> k<span class="op">);</span></span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> denom <span class="op">=</span> <span class="fl">1.0</span> <span class="op">+</span> <span class="bu">sqrt</span><span class="op">(</span><span class="fl">1.0</span> <span class="op">-</span> k2<span class="op">);</span></span>
 <span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> k <span class="op">/</span> denom<span class="op">;</span></span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><strong>Advantages of Klein</strong>: - Geodesics are straight lines (simplest to compute) - Great for understanding incidence relationships</p>
 <p><strong>Disadvantages</strong>: - Not conformal—angles are distorted - Harder to see hyperbolic distances</p>
 <hr>
@@ -1578,436 +1746,312 @@ Exercise: Visualizing Hyperbolic Triangle Structure
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
-window.document.addEventListener("DOMContentLoaded", function (event) {
-  const toggleBodyColorMode = (bsSheetEl) => {
-    const mode = bsSheetEl.getAttribute("data-mode");
-    const bodyEl = window.document.querySelector("body");
-    if (mode === "dark") {
-      bodyEl.classList.add("quarto-dark");
-      bodyEl.classList.remove("quarto-light");
-    } else {
-      bodyEl.classList.add("quarto-light");
-      bodyEl.classList.remove("quarto-dark");
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
     }
-  }
-  const toggleBodyColorPrimary = () => {
-    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
-    if (bsSheetEl) {
-      toggleBodyColorMode(bsSheetEl);
-    }
-  }
-  toggleBodyColorPrimary();  
-  const disableStylesheet = (stylesheets) => {
-    for (let i=0; i < stylesheets.length; i++) {
-      const stylesheet = stylesheets[i];
-      stylesheet.rel = 'prefetch';
-    }
-  }
-  const enableStylesheet = (stylesheets) => {
-    for (let i=0; i < stylesheets.length; i++) {
-      const stylesheet = stylesheets[i];
-      stylesheet.rel = 'stylesheet';
-    }
-  }
-  const manageTransitions = (selector, allowTransitions) => {
-    const els = window.document.querySelectorAll(selector);
-    for (let i=0; i < els.length; i++) {
-      const el = els[i];
-      if (allowTransitions) {
-        el.classList.remove('notransition');
-      } else {
-        el.classList.add('notransition');
-      }
-    }
-  }
-  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
-    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
-    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
-    let newTheme = '';
-    if(darkModeDefault) {
-      newTheme = isAlternate ? baseTheme : alternateTheme;
-    } else {
-      newTheme = isAlternate ? alternateTheme : baseTheme;
-    }
-    const changeGiscusTheme = () => {
-      // From: https://github.com/giscus/giscus/issues/336
-      const sendMessage = (message) => {
-        const iframe = document.querySelector('iframe.giscus-frame');
-        if (!iframe) return;
-        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
-      }
-      sendMessage({
-        setConfig: {
-          theme: newTheme
-        }
-      });
-    }
-    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
-    if (isGiscussLoaded) {
-      changeGiscusTheme();
-    }
-  }
-  const toggleColorMode = (alternate) => {
-    // Switch the stylesheets
-    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
-    manageTransitions('#quarto-margin-sidebar .nav-link', false);
-    if (alternate) {
-      enableStylesheet(alternateStylesheets);
-      for (const sheetNode of alternateStylesheets) {
-        if (sheetNode.id === "quarto-bootstrap") {
-          toggleBodyColorMode(sheetNode);
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
         }
       }
-    } else {
-      disableStylesheet(alternateStylesheets);
-      toggleBodyColorPrimary();
-    }
-    manageTransitions('#quarto-margin-sidebar .nav-link', true);
-    // Switch the toggles
-    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
-    for (let i=0; i < toggles.length; i++) {
-      const toggle = toggles[i];
-      if (toggle) {
-        if (alternate) {
-          toggle.classList.add("alternate");     
-        } else {
-          toggle.classList.remove("alternate");
-        }
-      }
-    }
-    // Hack to workaround the fact that safari doesn't
-    // properly recolor the scrollbar when toggling (#1455)
-    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
-      manageTransitions("body", false);
-      window.scrollTo(0, 1);
-      setTimeout(() => {
-        window.scrollTo(0, 0);
-        manageTransitions("body", true);
-      }, 40);  
-    }
-  }
-  const isFileUrl = () => { 
-    return window.location.protocol === 'file:';
-  }
-  const hasAlternateSentinel = () => {  
-    let styleSentinel = getColorSchemeSentinel();
-    if (styleSentinel !== null) {
-      return styleSentinel === "alternate";
-    } else {
       return false;
     }
-  }
-  const setStyleSentinel = (alternate) => {
-    const value = alternate ? "alternate" : "default";
-    if (!isFileUrl()) {
-      window.localStorage.setItem("quarto-color-scheme", value);
-    } else {
-      localAlternateSentinel = value;
-    }
-  }
-  const getColorSchemeSentinel = () => {
-    if (!isFileUrl()) {
-      const storageValue = window.localStorage.getItem("quarto-color-scheme");
-      return storageValue != null ? storageValue : localAlternateSentinel;
-    } else {
-      return localAlternateSentinel;
-    }
-  }
-  const darkModeDefault = false;
-  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
-  // Dark / light mode switch
-  window.quartoToggleColorScheme = () => {
-    // Read the current dark / light value 
-    let toAlternate = !hasAlternateSentinel();
-    toggleColorMode(toAlternate);
-    setStyleSentinel(toAlternate);
-    toggleGiscusIfUsed(toAlternate, darkModeDefault);
-  };
-  // Ensure there is a toggle, if there isn't float one in the top right
-  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
-    const a = window.document.createElement('a');
-    a.classList.add('top-right');
-    a.classList.add('quarto-color-scheme-toggle');
-    a.href = "";
-    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
-    const i = window.document.createElement("i");
-    i.classList.add('bi');
-    a.appendChild(i);
-    window.document.body.appendChild(a);
-  }
-  // Switch to dark mode if need be
-  if (hasAlternateSentinel()) {
-    toggleColorMode(true);
-  } else {
-    toggleColorMode(false);
-  }
-  const icon = "";
-  const anchorJS = new window.AnchorJS();
-  anchorJS.options = {
-    placement: 'right',
-    icon: icon
-  };
-  anchorJS.add('.anchored');
-  const isCodeAnnotation = (el) => {
-    for (const clz of el.classList) {
-      if (clz.startsWith('code-annotation-')) {                     
-        return true;
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
       }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
     }
-    return false;
-  }
-  const onCopySuccess = function(e) {
-    // button target
-    const button = e.trigger;
-    // don't keep focus
-    button.blur();
-    // flash "checked"
-    button.classList.add('code-copy-button-checked');
-    var currentTitle = button.getAttribute("title");
-    button.setAttribute("title", "Copied!");
-    let tooltip;
-    if (window.bootstrap) {
-      button.setAttribute("data-bs-toggle", "tooltip");
-      button.setAttribute("data-bs-placement", "left");
-      button.setAttribute("data-bs-title", "Copied!");
-      tooltip = new bootstrap.Tooltip(button, 
-        { trigger: "manual", 
-          customClass: "code-copy-button-tooltip",
-          offset: [0, -8]});
-      tooltip.show();    
-    }
-    setTimeout(function() {
-      if (tooltip) {
-        tooltip.hide();
-        button.removeAttribute("data-bs-title");
-        button.removeAttribute("data-bs-toggle");
-        button.removeAttribute("data-bs-placement");
-      }
-      button.setAttribute("title", currentTitle);
-      button.classList.remove('code-copy-button-checked');
-    }, 1000);
-    // clear code selection
-    e.clearSelection();
-  }
-  const getTextToCopy = function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
       for (const childEl of codeEl.children) {
         if (isCodeAnnotation(childEl)) {
           childEl.remove();
         }
       }
       return codeEl.innerText;
-  }
-  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
-    text: getTextToCopy
-  });
-  clipboard.on('success', onCopySuccess);
-  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
-      text: getTextToCopy,
-      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
     });
-    clipboardModal.on('success', onCopySuccess);
-  }
-  const viewSource = window.document.getElementById('quarto-view-source') ||
-                     window.document.getElementById('quarto-code-tools-source');
-  if (viewSource) {
-    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
-    viewSource.addEventListener("click", function(e) {
-      if (sourceUrl) {
-        // rstudio viewer pane
-        if (/\bcapabilities=\b/.test(window.location)) {
-          window.open(sourceUrl);
-        } else {
-          window.location.href = sourceUrl;
-        }
-      } else {
-        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
-        modal.show();
-      }
-      return false;
-    });
-  }
-  function toggleCodeHandler(show) {
-    return function(e) {
-      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
-      for (let i=0; i<detailsSrc.length; i++) {
-        const details = detailsSrc[i].parentElement;
-        if (show) {
-          details.open = true;
-        } else {
-          details.removeAttribute("open");
-        }
-      }
-      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
-      const fromCls = show ? "hidden" : "unhidden";
-      const toCls = show ? "unhidden" : "hidden";
-      for (let i=0; i<cellCodeDivs.length; i++) {
-        const codeDiv = cellCodeDivs[i];
-        if (codeDiv.classList.contains(fromCls)) {
-          codeDiv.classList.remove(fromCls);
-          codeDiv.classList.add(toCls);
-        } 
-      }
-      return false;
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
     }
-  }
-  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
-  if (hideAllCode) {
-    hideAllCode.addEventListener("click", toggleCodeHandler(false));
-  }
-  const showAllCode = window.document.getElementById("quarto-show-all-code");
-  if (showAllCode) {
-    showAllCode.addEventListener("click", toggleCodeHandler(true));
-  }
-    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-    var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
-    var isInternal = (href) => {
-        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
-    }
-    // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
-    for (var i=0; i<links.length; i++) {
-      const link = links[i];
-      if (!isInternal(link.href)) {
-        // undo the damage that might have been done by quarto-nav.js in the case of
-        // links that we want to consider external
-        if (link.dataset.originalHref !== undefined) {
-          link.href = link.dataset.originalHref;
-        }
-          // target, if specified
-          link.setAttribute("target", "_blank");
-          if (link.getAttribute("rel") === null) {
-            link.setAttribute("rel", "noopener");
-          }
-      }
-    }
-  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
-    const config = {
-      allowHTML: true,
-      maxWidth: 500,
-      delay: 100,
-      arrow: false,
-      appendTo: function(el) {
-          return el.parentElement;
-      },
-      interactive: true,
-      interactiveBorder: 10,
-      theme: 'quarto',
-      placement: 'bottom-start',
-    };
-    if (contentFn) {
-      config.content = contentFn;
-    }
-    if (onTriggerFn) {
-      config.onTrigger = onTriggerFn;
-    }
-    if (onUntriggerFn) {
-      config.onUntrigger = onUntriggerFn;
-    }
-    window.tippy(el, config); 
-  }
-  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
-  for (var i=0; i<noterefs.length; i++) {
-    const ref = noterefs[i];
-    tippyHover(ref, function() {
-      // use id or data attribute instead here
-      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
-      try { href = new URL(href).hash; } catch {}
-      const id = href.replace(/^#\/?/, "");
-      const note = window.document.getElementById(id);
-      if (note) {
-        return note.innerHTML;
-      } else {
-        return "";
-      }
-    });
-  }
-  const xrefs = window.document.querySelectorAll('a.quarto-xref');
-  const processXRef = (id, note) => {
-    // Strip column container classes
-    const stripColumnClz = (el) => {
-      el.classList.remove("page-full", "page-columns");
-      if (el.children) {
-        for (const child of el.children) {
-          stripColumnClz(child);
-        }
-      }
-    }
-    stripColumnClz(note)
-    if (id === null || id.startsWith('sec-')) {
-      // Special case sections, only their first couple elements
-      const container = document.createElement("div");
-      if (note.children && note.children.length > 2) {
-        container.appendChild(note.children[0].cloneNode(true));
-        for (let i = 1; i < note.children.length; i++) {
-          const child = note.children[i];
-          if (child.tagName === "P" && child.innerText === "") {
-            continue;
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
           } else {
-            container.appendChild(child.cloneNode(true));
-            break;
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
           }
         }
-        if (window.Quarto?.typesetMath) {
-          window.Quarto.typesetMath(container);
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
         }
-        return container.innerHTML
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
       } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
         if (window.Quarto?.typesetMath) {
           window.Quarto.typesetMath(note);
         }
-        return note.innerHTML;
-      }
-    } else {
-      // Remove any anchor links if they are present
-      const anchorLink = note.querySelector('a.anchorjs-link');
-      if (anchorLink) {
-        anchorLink.remove();
-      }
-      if (window.Quarto?.typesetMath) {
-        window.Quarto.typesetMath(note);
-      }
-      if (note.classList.contains("callout")) {
-        return note.outerHTML;
-      } else {
-        return note.innerHTML;
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
       }
     }
-  }
-  for (var i=0; i<xrefs.length; i++) {
-    const xref = xrefs[i];
-    tippyHover(xref, undefined, function(instance) {
-      instance.disable();
-      let url = xref.getAttribute('href');
-      let hash = undefined; 
-      if (url.startsWith('#')) {
-        hash = url;
-      } else {
-        try { hash = new URL(url).hash; } catch {}
-      }
-      if (hash) {
-        const id = hash.replace(/^#\/?/, "");
-        const note = window.document.getElementById(id);
-        if (note !== null) {
-          try {
-            const html = processXRef(id, note.cloneNode(true));
-            instance.setContent(html);
-          } finally {
-            instance.enable();
-            instance.show();
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
           }
         } else {
-          // See if we can fetch this
-          fetch(url.split('#')[0])
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
           .then(res => res.text())
           .then(html => {
             const parser = new DOMParser();
             const htmlDoc = parser.parseFromString(html, "text/html");
-            const note = htmlDoc.getElementById(id);
+            const note = htmlDoc.querySelector('main.content');
             if (note !== null) {
-              const html = processXRef(id, note);
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
               instance.setContent(html);
             } 
           }).finally(() => {
@@ -2015,185 +2059,161 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             instance.show();
           });
         }
-      } else {
-        // See if we can fetch a full url (with no hash to target)
-        // This is a special case and we should probably do some content thinning / targeting
-        fetch(url)
-        .then(res => res.text())
-        .then(html => {
-          const parser = new DOMParser();
-          const htmlDoc = parser.parseFromString(html, "text/html");
-          const note = htmlDoc.querySelector('main.content');
-          if (note !== null) {
-            // This should only happen for chapter cross references
-            // (since there is no id in the URL)
-            // remove the first header
-            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
-              note.children[0].remove();
-            }
-            const html = processXRef(null, note);
-            instance.setContent(html);
-          } 
-        }).finally(() => {
-          instance.enable();
-          instance.show();
-        });
-      }
-    }, function(instance) {
-    });
-  }
-      let selectedAnnoteEl;
-      const selectorForAnnotation = ( cell, annotation) => {
-        let cellAttr = 'data-code-cell="' + cell + '"';
-        let lineAttr = 'data-code-annotation="' +  annotation + '"';
-        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
-        return selector;
-      }
-      const selectCodeLines = (annoteEl) => {
-        const doc = window.document;
-        const targetCell = annoteEl.getAttribute("data-target-cell");
-        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
-        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
-        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
-        const lineIds = lines.map((line) => {
-          return targetCell + "-" + line;
-        })
-        let top = null;
-        let height = null;
-        let parent = null;
-        if (lineIds.length > 0) {
-            //compute the position of the single el (top and bottom and make a div)
-            const el = window.document.getElementById(lineIds[0]);
-            top = el.offsetTop;
-            height = el.offsetHeight;
-            parent = el.parentElement.parentElement;
-          if (lineIds.length > 1) {
-            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
-            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
-            height = bottom - top;
-          }
-          if (top !== null && height !== null && parent !== null) {
-            // cook up a div (if necessary) and position it 
-            let div = window.document.getElementById("code-annotation-line-highlight");
-            if (div === null) {
-              div = window.document.createElement("div");
-              div.setAttribute("id", "code-annotation-line-highlight");
-              div.style.position = 'absolute';
-              parent.appendChild(div);
-            }
-            div.style.top = top - 2 + "px";
-            div.style.height = height + 4 + "px";
-            div.style.left = 0;
-            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
-            if (gutterDiv === null) {
-              gutterDiv = window.document.createElement("div");
-              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
-              gutterDiv.style.position = 'absolute';
-              const codeCell = window.document.getElementById(targetCell);
-              const gutter = codeCell.querySelector('.code-annotation-gutter');
-              gutter.appendChild(gutterDiv);
-            }
-            gutterDiv.style.top = top - 2 + "px";
-            gutterDiv.style.height = height + 4 + "px";
-          }
-          selectedAnnoteEl = annoteEl;
-        }
-      };
-      const unselectCodeLines = () => {
-        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
-        elementsIds.forEach((elId) => {
-          const div = window.document.getElementById(elId);
-          if (div) {
-            div.remove();
-          }
-        });
-        selectedAnnoteEl = undefined;
-      };
-        // Handle positioning of the toggle
-    window.addEventListener(
-      "resize",
-      throttle(() => {
-        elRect = undefined;
-        if (selectedAnnoteEl) {
-          selectCodeLines(selectedAnnoteEl);
-        }
-      }, 10)
-    );
-    function throttle(fn, ms) {
-    let throttle = false;
-    let timer;
-      return (...args) => {
-        if(!throttle) { // first call gets through
-            fn.apply(this, args);
-            throttle = true;
-        } else { // all the others get throttled
-            if(timer) clearTimeout(timer); // cancel #2
-            timer = setTimeout(() => {
-              fn.apply(this, args);
-              timer = throttle = false;
-            }, ms);
-        }
-      };
-    }
-      // Attach click handler to the DT
-      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
-      for (const annoteDlNode of annoteDls) {
-        annoteDlNode.addEventListener('click', (event) => {
-          const clickedEl = event.target;
-          if (clickedEl !== selectedAnnoteEl) {
-            unselectCodeLines();
-            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
-            if (activeEl) {
-              activeEl.classList.remove('code-annotation-active');
-            }
-            selectCodeLines(clickedEl);
-            clickedEl.classList.add('code-annotation-active');
-          } else {
-            // Unselect the line
-            unselectCodeLines();
-            clickedEl.classList.remove('code-annotation-active');
-          }
-        });
-      }
-  const findCites = (el) => {
-    const parentEl = el.parentElement;
-    if (parentEl) {
-      const cites = parentEl.dataset.cites;
-      if (cites) {
-        return {
-          el,
-          cites: cites.split(' ')
-        };
-      } else {
-        return findCites(el.parentElement)
-      }
-    } else {
-      return undefined;
-    }
-  };
-  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
-  for (var i=0; i<bibliorefs.length; i++) {
-    const ref = bibliorefs[i];
-    const citeInfo = findCites(ref);
-    if (citeInfo) {
-      tippyHover(citeInfo.el, function() {
-        var popup = window.document.createElement('div');
-        citeInfo.cites.forEach(function(cite) {
-          var citeDiv = window.document.createElement('div');
-          citeDiv.classList.add('hanging-indent');
-          citeDiv.classList.add('csl-entry');
-          var biblioDiv = window.document.getElementById('ref-' + cite);
-          if (biblioDiv) {
-            citeDiv.innerHTML = biblioDiv.innerHTML;
-          }
-          popup.appendChild(citeDiv);
-        });
-        return popup.innerHTML;
+      }, function(instance) {
       });
     }
-  }
-});
-</script>
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
       <a href="./day2.html" class="pagination-link" aria-label="Day 2: Complex Dynamics and Iterated Inversions">
@@ -2206,7 +2226,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>
   </div>
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="sourceCode" id="cb32" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># Day 3: Geometric Tilings in Euclidean and Hyperbolic Space</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># Day 3: Geometric Tilings in Euclidean and Hyperbolic Space</span></span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="fu">## Overview</span></span>
 <span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -3716,7 +3736,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb32-1508"><a href="#cb32-1508" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb32-1509"><a href="#cb32-1509" aria-hidden="true" tabindex="-1"></a>The common thread: **group actions on geometric spaces**. Iteratively applying transformations to reach a desired region, whether it's the fundamental domain of a tiling or the gap structure of a fractal.</span>
 <span id="cb32-1510"><a href="#cb32-1510" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-1511"><a href="#cb32-1511" aria-hidden="true" tabindex="-1"></a>The techniques you've learned—GPU parallelism, iterative algorithms, group theory, geometric transformations—apply across a huge landscape of mathematical visualization!</span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
+<span id="cb32-1511"><a href="#cb32-1511" aria-hidden="true" tabindex="-1"></a>The techniques you've learned—GPU parallelism, iterative algorithms, group theory, geometric transformations—apply across a huge landscape of mathematical visualization!</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 
