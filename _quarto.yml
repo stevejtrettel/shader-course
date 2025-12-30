@@ -79,6 +79,15 @@ format:
       text: |
         \usepackage{fancyhdr}
         \pagestyle{fancy}
+        \usepackage{tcolorbox}
+        \tcbuselibrary{breakable}
+
+        % Define colors matching HTML callout styles
+        \definecolor{noteblue}{HTML}{347dec}
+        \definecolor{tipgreen}{HTML}{28a745}
+        \definecolor{importantorange}{HTML}{fd7e14}
+        \definecolor{warningyellow}{HTML}{ffc107}
+        \definecolor{cautionred}{HTML}{dc3545}
 
 # Syntax highlighting - "arrow" works well for both light and dark modes
 highlight-style: arrow
