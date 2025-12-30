@@ -430,6 +430,8 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     // TODO: Draw x-axis (|y| < thickness)
     // TODO: Draw y-axis (|x| < thickness)
     // TODO: Draw parabola (|y - (ax² + bx + c)| < thickness)
+
+    //ToDO: DRAW circles around the roots
     
     fragColor = vec4(color, 1.0);
 }
