@@ -1,17 +1,17 @@
 /*-- scss:defaults --*/
 
 // Import Google Fonts
-// Crimson Pro (similar to Libertinus), Source Sans 3, JetBrains Mono
-@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400;1,600&family=Source+Sans+3:ital,wght@0,400;0,600;1,400;1,600&family=JetBrains+Mono:wght@400;600&display=swap');
+// Source Serif 4 for accents, Source Sans 3 for body, JetBrains Mono for code
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Source+Serif+4:ital,wght@0,600;0,700;1,600&family=JetBrains+Mono:wght@400;600&display=swap');
 
 // Font family variables
 $font-family-sans-serif: "Source Sans 3", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-$font-family-serif: "Crimson Pro", Georgia, "Times New Roman", serif;
+$font-family-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
 $font-family-monospace: "JetBrains Mono", SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-// Use serif for body text (more book-like)
-$font-family-base: $font-family-serif;
-$headings-font-family: $font-family-sans-serif;
+// Use sans-serif for body (cleaner for web), serif for headings (elegant accent)
+$font-family-base: $font-family-sans-serif;
+$headings-font-family: $font-family-serif;
 
 /*-- scss:rules --*/
 
