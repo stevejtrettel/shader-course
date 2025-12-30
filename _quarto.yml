@@ -38,7 +38,6 @@ book:
     collapse-level: 2
 
   search: true
-  reader-mode: true
 
   # TODO: Update with your actual repo URL
   repo-url: https://github.com/stevejtrettel/shader-course
@@ -53,7 +52,6 @@ format:
       dark: [darkly, custom.scss]
     code-copy: true
     code-overflow: wrap
-    code-tools: true
     toc: true
     toc-depth: 3
     number-sections: true
@@ -63,13 +61,20 @@ format:
 
   pdf:
     documentclass: scrbook
-    papersize: letter
+    fontfamily: libertinus
+    fontsize: 10pt
     toc: true
     toc-depth: 2
     number-sections: true
     colorlinks: true
+    fig-width: 5.25  # 75% of text width (7in text width * 0.75)
+    keep-tex: true
     geometry:
-      - margin=1in
+      - letterpaper
+      - left=1.5in
+      - right=1.5in
+      - top=1.25in
+      - bottom=1.25in
     include-in-header:
       text: |
         \usepackage{fancyhdr}
