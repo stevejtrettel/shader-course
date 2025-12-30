@@ -50,7 +50,7 @@ format:
   html:
     theme:
       light: [cosmo, custom.scss]
-      dark: [cosmo, custom.scss]
+      dark: [darkly, custom.scss]
     code-copy: true
     code-overflow: wrap
     code-tools: true
