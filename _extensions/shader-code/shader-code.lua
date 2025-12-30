@@ -43,26 +43,24 @@ return {
 
     if #files == 0 then
       -- No files found - return error message
-      return pandoc.Para({
-        pandoc.Strong({pandoc.Str("Error: ")}),
+      return pandoc.Para(pandoc.Inlines({
+        pandoc.Strong(pandoc.Inlines({pandoc.Str("Error: ")})),
         pandoc.Str("No GLSL files found in " .. demo_path)
-      })
+      }))
     end
 
     -- Single file case - just a code block
     if #files == 1 then
-      local blocks = {}
-
-      -- Add code block
       local code_block = pandoc.CodeBlock(files[1].content, {class = "glsl"})
-      table.insert(blocks, code_block)
 
-      -- Add caption if provided
       if caption ~= "" then
-        table.insert(blocks, pandoc.Para({pandoc.Emph({pandoc.Str(caption)})}))
+        return pandoc.Blocks({
+          code_block,
+          pandoc.Para(pandoc.Inlines({pandoc.Emph(pandoc.Inlines({pandoc.Str(caption)}))}))
+        })
+      else
+        return code_block
       end
-
-      return blocks
     end
 
     -- Multiple files case
@@ -72,7 +70,7 @@ return {
 
       for _, file in ipairs(files) do
         -- Tab header
-        table.insert(tab_content, pandoc.Header(3, file.name))
+        table.insert(tab_content, pandoc.Header(3, pandoc.Inlines({pandoc.Str(file.name)})))
         -- Tab content (code block)
         table.insert(tab_content, pandoc.CodeBlock(file.content, {class = "glsl"}))
       end
@@ -80,31 +78,31 @@ return {
       -- Wrap in panel-tabset div
       local tabset = pandoc.Div(tab_content, {class = "panel-tabset"})
 
-      local blocks = {tabset}
-
-      -- Add caption if provided
       if caption ~= "" then
-        table.insert(blocks, pandoc.Para({pandoc.Emph({pandoc.Str(caption)})}))
+        return pandoc.Blocks({
+          tabset,
+          pandoc.Para(pandoc.Inlines({pandoc.Emph(pandoc.Inlines({pandoc.Str(caption)}))}))
+        })
+      else
+        return tabset
       end
-
-      return blocks
     else
       -- PDF: Sequential code blocks with headers
       local blocks = {}
 
-      for i, file in ipairs(files) do
+      for _, file in ipairs(files) do
         -- Add header for each buffer
-        table.insert(blocks, pandoc.Header(4, file.name))
+        table.insert(blocks, pandoc.Header(4, pandoc.Inlines({pandoc.Str(file.name)})))
         -- Add code block
         table.insert(blocks, pandoc.CodeBlock(file.content, {class = "glsl"}))
       end
 
       -- Add caption if provided
       if caption ~= "" then
-        table.insert(blocks, pandoc.Para({pandoc.Emph({pandoc.Str(caption)})}))
+        table.insert(blocks, pandoc.Para(pandoc.Inlines({pandoc.Emph(pandoc.Inlines({pandoc.Str(caption)}))})))
       end
 
-      return blocks
+      return pandoc.Blocks(blocks)
     end
   end
 }
