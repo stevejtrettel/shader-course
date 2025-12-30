@@ -298,36 +298,6 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Day 1: Introduction to Shader Programming</span></span></a>
   </div>
 </li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./lectures/day2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Day 2: Complex Dynamics and Iterated Inversions</span></span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./lectures/day3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Day 3: Geometric Tilings in Euclidean and Hyperbolic Space</span></span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./lectures/day4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Day 4: Introduction to 3D Rendering</span></span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./lectures/day5a.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Day 5a</span></span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./lectures/day5b.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Day 5bs</span></span></a>
-  </div>
-</li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
@@ -340,25 +310,13 @@ ul.task-list li input[type="checkbox"] {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./appendices/day1-shaders.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix: Complete Shader Code for Day 1</span></span></a>
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix: Day 1 Shader Code</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./appendices/day2-shaders.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix: Complete Shader Code for Day 2</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./appendices/day3-shaders.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix: Complete Shader Code for Day 3</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./appendices/glsl-reference.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">GLSL</span></span></a>
+  <a href="./appendices/day1-solutions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix: Day 1 Homework Solutions</span></span></a>
   </div>
 </li>
       </ul>
@@ -418,20 +376,34 @@ ul.task-list li input[type="checkbox"] {
 <h1 class="unnumbered">About</h1><p><img src="images/cover.png" title="GPU-Accelerated Mathematical Illustration" class="quarto-cover-image nolightbox img-fluid"></p>
 <p>This mini-course introduces shader programming as a tool for mathematical illustration and exploration. Shaders are programs that run in parallel on the GPU, making them exceptionally fast for visualization tasks. We’ll learn to write code that “reads like mathematics” using Shadertoy, a beginner-friendly web-based platform that handles all the low-level programming complexities.</p>
 <figure class="shader-demo figure">
-  <div id="demo-pt" style="width: 100%; height: ;"></div>
+  <div id="demo-day1-circle-curve" style="width: 100%; height: ;"></div>
   <script type="module">
-    import { embed } from '/demos/pt/embed.js';
-    await embed({ container: '#demo-pt' });
+    import { embed } from '/demos/day1/circle-curve/embed.js';
+    await embed({ container: '#demo-day1-circle-curve' });
   </script>
   
 </figure>
 
 <p>We’ll progress from 2D foundations (curves, tilings, fractals) to 3D rendering via raymarching. Along the way, we will implement classic examples like the Mandelbrot set, hyperbolic tessellations, and implicit surface renderers. The final day will explore either advanced geometric techniques (domain operations, 3D fractals) or temporal simulation methods (PDEs, buffer-based dynamics), depending on the group’s interests.</p>
-<!--  -->
+<p><strong>[Error]</strong> No GLSL files found in demos/day1/circle-curve</p>
 <p>No prior experience with shaders or GLSL is required—only a strong foundation in undergraduate mathematics and willingness to work hard and experiment with code through daily homework exercises. Here are some examples of things we will make:</p>
+<p>The code</p>
+<p><strong>[Error]</strong> No GLSL files found in demos/day1/half-space</p>
+<p>and the demo</p>
+<figure class="shader-demo figure">
+  <div id="demo-day1-half-space" style="width: 100%; height: ;"></div>
+  <script type="module">
+    import { embed } from '/demos/day1/half-space/embed.js';
+    await embed({ container: '#demo-day1-half-space' });
+  </script>
+  
+</figure>
+
+<p>and a still pic for testing</p>
 <p><img src="images/mandelbrot.png" class="img-fluid"></p>
-<p><img src="images/hyperbolic.png" class="img-fluid"></p>
-<p><img src="images/cubic.png" class="img-fluid"></p>
+<!-- ![](images/hyperbolic.png)
+
+![](images/cubic.png) -->
 
 
 </section>

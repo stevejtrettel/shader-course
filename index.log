@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.21.0 (TeX Live 2025)  (format=lualatex 2025.3.8)  29 DEC 2025 23:42
+This is LuaHBTeX, Version 1.21.0 (TeX Live 2025)  (format=lualatex 2025.3.8)  30 DEC 2025 13:36
  restricted system commands enabled.
 **index.tex
 (./index.tex
@@ -2617,7 +2617,7 @@ Class scrbook Warning: Usage of package `fancyhdr' together
 (scrbook)              `\addtokomafont' for the page style elements need
 (scrbook)              explicite user intervention to work.
 (scrbook)              Nevertheless, using requested
-(scrbook)              package `fancyhdr' on input line 151.
+(scrbook)              package `fancyhdr' on input line 155.
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty
 Package: fancyhdr 2025/02/07 v5.2 Extensive control of page headers and footers
@@ -2637,7 +2637,75 @@ Package: fancyhdr 2025/02/07 v5.2 Extensive control of page headers and footers
 \f@nch@widthC=\skip92
 \f@nch@widthR=\skip93
 \@temptokenb=\toks31
-) (/usr/local/texlive/2025/texmf-dist/tex/latex/tcolorbox/tcolorbox.sty
+)
+luaotfload | cache : Lookup cache loaded from /Users/strettel/Library/texlive/20
+25/texmf-var/luatex-cache/generic/names/luaotfload-lookup-cache.luc.
+
+Package fontspec Info: 
+(fontspec)             JetBrains Mono-Regular scale = 0.7799966153325436.
+
+
+Package fontspec Info: 
+(fontspec)             JetBrains Mono-Regular scale = 0.85.
+
+
+Package fontspec Info: 
+(fontspec)             JetBrains Mono-Regular scale = 0.7799966153325436.
+
+
+Package fontspec Info: 
+(fontspec)             JetBrains Mono-Regular scale = 0.85.
+
+
+Package fontspec Info: 
+(fontspec)             JetBrains Mono-Bold scale = 0.7799966153325436.
+
+
+Package fontspec Info: 
+(fontspec)             JetBrains Mono-Bold scale = 0.85.
+
+
+Package fontspec Info: 
+(fontspec)             JetBrains Mono-Italic scale = 0.7799966153325436.
+
+
+Package fontspec Info: 
+(fontspec)             JetBrains Mono-Italic scale = 0.85.
+
+
+Package fontspec Info: 
+(fontspec)             JetBrains Mono-BoldItalic scale = 0.7799966153325436.
+
+
+Package fontspec Info: 
+(fontspec)             JetBrains Mono-BoldItalic scale = 0.85.
+
+
+Package fontspec Info: 
+(fontspec)             Font family 'JetBrainsMono(0)' created for font
+(fontspec)             'JetBrains Mono' with options
+(fontspec)             [Scale=MatchLowercase,WordSpace={1,0,0},HyphenChar=None,
+PunctuationSpace=WordSpace,Scale=0.85,UprightFont
+(fontspec)             = *-Regular,BoldFont = *-Bold,ItalicFont =
+(fontspec)             *-Italic,BoldItalicFont = *-BoldItalic].
+(fontspec)              
+(fontspec)              This font family consists of the following NFSS
+(fontspec)             series/shapes:
+(fontspec)              
+(fontspec)             - 'normal' (m/n) with NFSS spec.:
+(fontspec)             <->s*[0.85]"name:JetBrains
+(fontspec)             Mono-Regular:mode=node;script=latn;language=dflt;"
+(fontspec)             - 'bold' (b/n) with NFSS spec.:
+(fontspec)             <->s*[0.85]"name:JetBrains
+(fontspec)             Mono-Bold:mode=node;script=latn;language=dflt;"
+(fontspec)             - 'italic' (m/it) with NFSS spec.:
+(fontspec)             <->s*[0.85]"name:JetBrains
+(fontspec)             Mono-Italic:mode=node;script=latn;language=dflt;"
+(fontspec)             - 'bold italic' (b/it) with NFSS spec.:
+(fontspec)             <->s*[0.85]"name:JetBrains
+(fontspec)             Mono-BoldItalic:mode=node;script=latn;language=dflt;"
+
+(/usr/local/texlive/2025/texmf-dist/tex/latex/tcolorbox/tcolorbox.sty
 Package: tcolorbox 2024/10/22 version 6.4.1 text color boxes
 (/usr/local/texlive/2025/texmf-dist/tex/latex/pgf/frontendlayer/tikz.sty (/usr/
 local/texlive/2025/texmf-dist/tex/latex/pgf/basiclayer/pgf.sty (/usr/local/texl
@@ -2935,7 +3003,22 @@ Package: trimspaces 2009/09/17 v1.1 Trim spaces around a token list
 \tcb@temp=\box85
 \tcb@temp=\box86
 \tcb@temp=\box87
-) (/usr/local/texlive/2025/texmf-dist/tex/latex/tcolorbox/tcbbreakable.code.tex
+(/usr/local/texlive/2025/texmf-dist/tex/latex/tcolorbox/tcbskins.code.tex
+Library (tcolorbox): 'tcbskins.code.tex' version '6.4.1'
+(/usr/local/texlive/2025/texmf-dist/tex/latex/tikzfill/tikzfill.image.sty
+Package: tikzfill.image 2023/08/08 v1.0.1 Image filling library for TikZ
+(/usr/local/texlive/2025/texmf-dist/tex/latex/tikzfill/tikzfill-common.sty
+Package: tikzfill-common 2023/08/08 v1.0.1 Auxiliary code for tikzfill
+)
+(/usr/local/texlive/2025/texmf-dist/tex/latex/tikzfill/tikzlibraryfill.image.co
+de.tex
+File: tikzlibraryfill.image.code.tex 2023/08/08 v1.0.1 Image filling library
+\l__tikzfill_img_box=\box88
+))
+(/usr/local/texlive/2025/texmf-dist/tex/latex/tcolorbox/tcbskinsjigsaw.code.tex
+Library (tcolorbox): 'tcbskinsjigsaw.code.tex' version '6.4.1'
+)) (/usr/local/texlive/2025/texmf-dist/tex/latex/tcolorbox/tcbbreakable.code.te
+x
 Library (tcolorbox): 'tcbbreakable.code.tex' version '6.4.1'
 (/usr/local/texlive/2025/texmf-dist/tex/latex/pdfcol/pdfcol.sty
 Package: pdfcol 2022-09-21 v1.7 Handle new color stacks for pdfTeX (HO)
@@ -2945,10 +3028,10 @@ Package: ltxcmds 2023-12-04 v1.26 LaTeX kernel commands for general use (HO)
 Package: infwarerr 2019/12/03 v1.5 Providing info/warning/error messages (HO)
 ))
 Package pdfcol Info: New color stack `tcb@breakable' = 1 on input line 23.
-\tcb@testbox=\box88
-\tcb@totalupperbox=\box89
-\tcb@totallowerbox=\box90
-) (/usr/local/texlive/2025/texmf-dist/tex/latex/fontawesome5/fontawesome5.sty
+\tcb@testbox=\box89
+\tcb@totalupperbox=\box90
+\tcb@totallowerbox=\box91
+)) (/usr/local/texlive/2025/texmf-dist/tex/latex/fontawesome5/fontawesome5.sty
 Package: fontawesome5 2022/05/02 v5.15.4 Font Awesome 5
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/fontawesome5/fontawesome5-utex-he
@@ -3115,9 +3198,9 @@ Package caption Info: KOMA-Script scrextend package detected.
 Package: float 2001/11/08 v1.3d Float enhancements (AL)
 \c@float@type=\count358
 \float@exts=\toks47
-\float@box=\box91
+\float@box=\box92
 \@float@everytoks=\toks48
-\@floatcapt=\box92
+\@floatcapt=\box93
 )
 \@float@every@codelisting=\toks49
 \c@codelisting=\count359
@@ -3130,45 +3213,45 @@ Package caption Info: New subtype `subtable' on input line 238.
 ) (/usr/local/texlive/2025/texmf-dist/tex/latex/xurl/xurl.sty
 Package: xurl 2022/01/09 v 0.10 modify URL breaks
 )
-Package hyperref Info: Option `colorlinks' set `true' on input line 232.
+Package hyperref Info: Option `colorlinks' set `true' on input line 253.
 No file index.aux.
 
 \openout1 = index.aux
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 245.
-LaTeX Font Info:    ... okay on input line 245.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 245.
-LaTeX Font Info:    ... okay on input line 245.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 245.
-LaTeX Font Info:    ... okay on input line 245.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 245.
-LaTeX Font Info:    ... okay on input line 245.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 245.
-LaTeX Font Info:    ... okay on input line 245.
-LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 245.
-LaTeX Font Info:    ... okay on input line 245.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 245.
-LaTeX Font Info:    ... okay on input line 245.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 245.
-LaTeX Font Info:    ... okay on input line 245.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 245.
-LaTeX Font Info:    ... okay on input line 245.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 245.
-LaTeX Font Info:    ... okay on input line 245.
-Package scrbase Info: activating english \partname on input line 245.
-Package scrbase Info: activating english \chaptername on input line 245.
-Package scrbase Info: activating english \appendixname on input line 245.
-Package scrbase Info: activating english \figurename on input line 245.
-Package scrbase Info: activating english \tablename on input line 245.
-Package scrbase Info: activating english \contentsname on input line 245.
-Package scrbase Info: activating english \listfigurename on input line 245.
-Package scrbase Info: activating english \listtablename on input line 245.
-Package scrbase Info: activating english \bibname on input line 245.
-Package scrbase Info: activating english \indexname on input line 245.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 266.
+LaTeX Font Info:    ... okay on input line 266.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 266.
+LaTeX Font Info:    ... okay on input line 266.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 266.
+LaTeX Font Info:    ... okay on input line 266.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 266.
+LaTeX Font Info:    ... okay on input line 266.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 266.
+LaTeX Font Info:    ... okay on input line 266.
+LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 266.
+LaTeX Font Info:    ... okay on input line 266.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 266.
+LaTeX Font Info:    ... okay on input line 266.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 266.
+LaTeX Font Info:    ... okay on input line 266.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 266.
+LaTeX Font Info:    ... okay on input line 266.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 266.
+LaTeX Font Info:    ... okay on input line 266.
+Package scrbase Info: activating english \partname on input line 266.
+Package scrbase Info: activating english \chaptername on input line 266.
+Package scrbase Info: activating english \appendixname on input line 266.
+Package scrbase Info: activating english \figurename on input line 266.
+Package scrbase Info: activating english \tablename on input line 266.
+Package scrbase Info: activating english \contentsname on input line 266.
+Package scrbase Info: activating english \listfigurename on input line 266.
+Package scrbase Info: activating english \listtablename on input line 266.
+Package scrbase Info: activating english \bibname on input line 266.
+Package scrbase Info: activating english \indexname on input line 266.
 (/usr/local/texlive/2025/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count362
 \scratchdimen=\dimen308
-\scratchbox=\box93
+\scratchbox=\box94
 \nofMPsegments=\count363
 \nofMParguments=\count364
 \everyMPshowfont=\toks50
@@ -3219,20 +3302,20 @@ e
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-LaTeX Info: Redefining \microtypecontext on input line 245.
-Package microtype Info: Applying patch `item' on input line 245.
-Package microtype Info: Applying patch `toc' on input line 245.
-Package microtype Info: Applying patch `eqnum' on input line 245.
-Package microtype Info: Applying patch `footnote' on input line 245.
-Package microtype Info: Applying patch `verbatim' on input line 245.
-LaTeX Info: Redefining \microtypesetup on input line 245.
+LaTeX Info: Redefining \microtypecontext on input line 266.
+Package microtype Info: Applying patch `item' on input line 266.
+Package microtype Info: Applying patch `toc' on input line 266.
+Package microtype Info: Applying patch `eqnum' on input line 266.
+Package microtype Info: Applying patch `footnote' on input line 266.
+Package microtype Info: Applying patch `verbatim' on input line 266.
+LaTeX Info: Redefining \microtypesetup on input line 266.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using protrusion set `basicmath'.
 Package microtype Info: Automatic font expansion enabled (level 2),
 (microtype)             stretch: 20, shrink: 20, step: 1, non-selected.
 Package microtype Info: Using default expansion set `alltext-nott'.
-LaTeX Info: Redefining \showhyphens on input line 245.
+LaTeX Info: Redefining \showhyphens on input line 266.
 Package microtype Info: No adjustment of tracking.
 Package microtype Info: No adjustment of spacing.
 Package microtype Info: No adjustment of kerning.
@@ -3240,36 +3323,36 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `LibertinusSerif' (encoding: TU).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
-Package hyperref Info: Link coloring ON on input line 245.
+Package hyperref Info: Link coloring ON on input line 266.
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: float package is loaded.
 Package caption Info: End \AtBeginDocument code.
 LaTeX Font Info:    Font shape `TU/LibertinusSans(0)/m/n' will be
-(Font)              scaled to size 10.0pt on input line 248.
+(Font)              scaled to size 10.0pt on input line 269.
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `LibertinusSans' (encoding: TU).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 LaTeX Font Info:    Font shape `TU/LibertinusSans(0)/b/n' will be
-(Font)              scaled to size 10.0pt on input line 248.
+(Font)              scaled to size 10.0pt on input line 269.
 LaTeX Font Info:    Font shape `TU/LibertinusSans(0)/b/n' will be
-(Font)              scaled to size 20.74pt on input line 248.
+(Font)              scaled to size 20.74pt on input line 269.
 LaTeX Font Info:    Font shape `TU/LibertinusSans(0)/b/n' will be
-(Font)              scaled to size 12.0pt on input line 248.
+(Font)              scaled to size 12.0pt on input line 269.
 LaTeX Font Info:    Font shape `TU/LibertinusSerif(0)/m/n' will be
-(Font)              scaled to size 14.4pt on input line 248.
+(Font)              scaled to size 14.4pt on input line 269.
 LaTeX Font Info:    Font shape `TU/LibertinusMath-Regular.otf(1)/m/n' will be
-(Font)              scaled to size 14.4pt on input line 248.
+(Font)              scaled to size 14.4pt on input line 269.
 LaTeX Font Info:    Font shape `TU/LibertinusMath-Regular.otf(1)/m/n' will be
-(Font)              scaled to size 7.0pt on input line 248.
+(Font)              scaled to size 7.0pt on input line 269.
 LaTeX Font Info:    Font shape `TU/LibertinusMath-Regular.otf(2)/m/n' will be
-(Font)              scaled to size 14.4pt on input line 248.
+(Font)              scaled to size 14.4pt on input line 269.
 LaTeX Font Info:    Font shape `TU/LibertinusMath-Regular.otf(2)/m/n' will be
-(Font)              scaled to size 7.0pt on input line 248.
+(Font)              scaled to size 7.0pt on input line 269.
 LaTeX Font Info:    Font shape `TU/LibertinusMath-Regular.otf(3)/m/n' will be
-(Font)              scaled to size 14.4pt on input line 248.
+(Font)              scaled to size 14.4pt on input line 269.
 LaTeX Font Info:    Font shape `TU/LibertinusMath-Regular.otf(3)/m/n' will be
-(Font)              scaled to size 7.0pt on input line 248.
+(Font)              scaled to size 7.0pt on input line 269.
 (/usr/local/texlive/2025/texmf-dist/tex/latex/microtype/mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 ) (/usr/local/texlive/2025/texmf-dist/tex/latex/microtype/mt-msb.cfg
@@ -3288,8 +3371,8 @@ File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 
 
 ]
-Package tocbasic Info: character protrusion at toc deactivated on input line 25
-3.
+Package tocbasic Info: character protrusion at toc deactivated on input line 27
+4.
 No file index.toc.
 \tf@toc=\write5
 
@@ -3302,116 +3385,30 @@ No file index.toc.
 
 
 ]
-<./demos/pt/screenshot.png, id=27, 798.985pt x 598.235pt>
-File: ./demos/pt/screenshot.png Graphic file (type png)
-<use ./demos/pt/screenshot.png>
-Package luatex.def Info: ./demos/pt/screenshot.png  used on input line 271.
-(luatex.def)             Requested size: 798.98305pt x 598.23354pt.
 
-Overfull \hbox (9.99492pt too wide) in paragraph at lines 271--272
-[][] 
- []
-
-<images/mandelbrot.png, id=28, 985.6825pt x 806.01125pt>
-File: images/mandelbrot.png Graphic file (type png)
-<use images/mandelbrot.png>
-Package luatex.def Info: images/mandelbrot.png  used on input line 286.
-(luatex.def)             Requested size: 985.68008pt x 806.00928pt.
-
-Overfull \hbox (9.99963pt too wide) in paragraph at lines 286--287
-[][] 
- []
-
-<images/hyperbolic.png, id=29, 1444.39626pt x 989.6975pt>
-File: images/hyperbolic.png Graphic file (type png)
-<use images/hyperbolic.png>
-Package luatex.def Info: images/hyperbolic.png  used on input line 288.
-(luatex.def)             Requested size: 1444.39273pt x 989.69508pt.
+LaTeX Warning: File `./demos/day1/circle-curve/screenshot.png' not found on inp
+ut line 292.
 
 
-[1
+! Package luatex.def Error: File `./demos/day1/circle-curve/screenshot.png' not
+ found: using draft setting.
 
-
-<./demos/pt/screenshot.png>]
-Overfull \hbox (10.00069pt too wide) in paragraph at lines 288--289
-[][] 
- []
-
-<images/cubic.png, id=36, 1438.37375pt x 900.86563pt>
-File: images/cubic.png Graphic file (type png)
-<use images/cubic.png>
-Package luatex.def Info: images/cubic.png  used on input line 290.
-(luatex.def)             Requested size: 1438.37025pt x 900.86343pt.
-
-Overfull \hbox (9.98944pt too wide) in paragraph at lines 290--291
-[][] 
- []
-
-
-
-LaTeX Font Info:    Font shape `TU/LibertinusSerif(0)/m/sl' will be
-(Font)              scaled to size 10.0pt on input line 294.
-[2<./images/mandelbrot.png><./images/hyperbolic.png>]
-
-[3<./images/cubic.png>]
-
-[4
-
-
-]
-LaTeX Font Info:    Font shape `TU/LibertinusSans(0)/b/n' will be
-(Font)              scaled to size 14.4pt on input line 299.
-LaTeX Font Info:    Font shape `TU/LibertinusSerif(0)/b/n' will be
-(Font)              scaled to size 10.0pt on input line 311.
-LaTeX Font Info:    Font shape `TU/LibertinusMono(0)/m/n' will be
-(Font)              scaled to size 8.66669pt on input line 364.
-
-
-[5]
-
-[6]
-LaTeX Font Info:    Font shape `TU/LibertinusSerif(0)/m/n' will be
-(Font)              scaled to size 8.0pt on input line 514.
-LaTeX Font Info:    Font shape `TU/LibertinusSerif(0)/m/n' will be
-(Font)              scaled to size 6.0pt on input line 514.
-
-
-[7]
-
-[8]
-
-[9]
-
-[10
-Missing character: There is no α (U+03B1) in font "[LibertinusMono-Regular.otf]
-:mode=node;script=latn;language=dflt;extend=0.9;+tnum; +lnum;"!
-]
-
-[11]
-
-[12]
-chapter 1.
-
-! Package pgfkeys Error: I do not know the key '/tcb/enhanced jigsaw' and I am 
-going to ignore it. Perhaps you misspelled it.
-
-See the pgfkeys package documentation for explanation.
+See the luatex.def package documentation for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.1030 ...out-note-color-frame, arc=.35mm, left=2mm]
+l.292 ...{./demos/day1/circle-curve/screenshot.png}}
                                                   
 
 Here is how much of LuaTeX's memory you used:
- 42497 strings out of 475506
+ 43475 strings out of 475506
  100000,1977958 words of node,token memory allocated
- 5976 words of node memory still in use:
-   33 hlist, 4 vlist, 4 rule, 6 mark, 49 disc, 5 local_par, 1 dir, 108 glue, 49 
-kern, 21 penalty, 4 margin_kern, 459 glyph, 57 attribute, 70 glue_spec, 57 attri
-bute_list, 2 if_stack, 8 write, 2 pdf_dest, 8 pdf_colorstack nodes
-   avail lists: 1:1,2:898,3:303,4:182,5:348,6:88,7:4174,8:17,9:463,10:9,11:360,1
-2:1
- 64631 multiletter control sequences out of 65536+600000
- 106 fonts using 32701907 bytes
- 108i,12n,143p,10918b,1126s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 4590 words of node memory still in use:
+   11 hlist, 4 vlist, 2 rule, 4 mark, 40 disc, 2 local_par, 2 dir, 74 glue, 29 k
+ern, 10 penalty, 3 margin_kern, 384 glyph, 30 attribute, 67 glue_spec, 30 attrib
+ute_list, 1 temp, 7 if_stack, 4 write, 1 pdf_dest, 3 pdf_colorstack nodes
+   avail lists: 1:1,2:64,3:25,4:27,5:55,6:10,7:104,8:2,9:94,10:9,11:8,12:1
+ 65638 multiletter control sequences out of 65536+600000
+ 106 fonts using 32109495 bytes
+ 108i,7n,143p,10918b,1118s stack positions out of 10000i,1000n,20000p,200000b,200000s
 !  ==> Fatal error occurred, no output PDF file produced!

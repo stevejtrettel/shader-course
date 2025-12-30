@@ -1,0 +1,32 @@
+% preamble.tex
+% LaTeX preamble for GPU-Accelerated Mathematical Illustration
+
+% Headers and footers
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+
+
+
+% Use JetBrains Mono for monospace/code instead of Libertinus Mono
+\usepackage{fontspec}
+\setmonofont{JetBrains Mono}[
+  Scale=0.85,
+  UprightFont = *-Regular,
+  BoldFont = *-Bold,
+  ItalicFont = *-Italic,
+  BoldItalicFont = *-BoldItalic
+]
+
+
+
+
+% % Colored boxes for callouts
+% % Note: 'most' loads all common libraries including skins, breakable, etc.
+% \usepackage[most]{tcolorbox}
+
+% % Define colors matching HTML callout styles
+% \definecolor{noteblue}{HTML}{347dec}
+% \definecolor{tipgreen}{HTML}{28a745}
+% \definecolor{importantorange}{HTML}{fd7e14}
+% \definecolor{warningyellow}{HTML}{ffc107}
+% \definecolor{cautionred}{HTML}{dc3545}

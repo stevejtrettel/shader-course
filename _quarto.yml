@@ -16,18 +16,18 @@ book:
     - index.qmd
     - outline.qmd
     - lectures/day1.qmd
-    - lectures/day2.qmd
-    - lectures/day3.qmd
-    - lectures/day4.qmd
-    - lectures/day5a.qmd  # Advanced Raymarching option
-    - lectures/day5b.qmd  # Buffers/PDEs option
+    # - lectures/day2.qmd
+    # - lectures/day3.qmd
+    # - lectures/day4.qmd
+    # - lectures/day5.qmd 
     # - resources.qmd
 
   appendices:
     - appendices/day1-shaders.qmd
-    - appendices/day2-shaders.qmd
-    - appendices/day3-shaders.qmd
-    - appendices/glsl-reference.qmd
+    - appendices/day1-solutions.qmd
+    # - appendices/day2-shaders.qmd
+    # - appendices/day3-shaders.qmd
+    # - appendices/glsl-reference.qmd
     # - appendices/shadertoy-tips.qmd
     # - appendices/debug-reference.qmd
     # - appendices/folding-fractals.qmd
@@ -60,6 +60,7 @@ format:
     smooth-scroll: true
 
   pdf:
+    pdf-engine: lualatex
     documentclass: scrbook
     fontfamily: libertinus
     fontsize: 10pt
@@ -69,25 +70,14 @@ format:
     colorlinks: true
     fig-width: 5.25  # 75% of text width (7in text width * 0.75)
     keep-tex: true
+    callout-appearance: simple
     geometry:
       - letterpaper
       - left=1.5in
       - right=1.5in
       - top=1.25in
       - bottom=1.25in
-    include-in-header:
-      text: |
-        \usepackage{fancyhdr}
-        \pagestyle{fancy}
-        \usepackage{tcolorbox}
-        \tcbuselibrary{breakable}
-
-        % Define colors matching HTML callout styles
-        \definecolor{noteblue}{HTML}{347dec}
-        \definecolor{tipgreen}{HTML}{28a745}
-        \definecolor{importantorange}{HTML}{fd7e14}
-        \definecolor{warningyellow}{HTML}{ffc107}
-        \definecolor{cautionred}{HTML}{dc3545}
+    include-in-header: preamble.tex
 
 # Syntax highlighting - "arrow" works well for both light and dark modes
 highlight-style: arrow
