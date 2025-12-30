@@ -24,14 +24,14 @@ book:
     # - resources.qmd
 
   appendices:
-    - day1-shaders.qmd
-    - day2-shaders.qmd
-    - day3-shaders.qmd
-    - glsl-reference.qmd
-    # - shadertoy-tips.qmd
-    # - debug-reference.qmd
-    # - folding-fractals.qmd
-    # - schottky.qmd
+    - appendices/day1-shaders.qmd
+    - appendices/day2-shaders.qmd
+    - appendices/day3-shaders.qmd
+    - appendices/glsl-reference.qmd
+    # - appendices/shadertoy-tips.qmd
+    # - appendices/debug-reference.qmd
+    # - appendices/folding-fractals.qmd
+    # - appendices/schottky.qmd
 
   sidebar:
     style: "docked"
