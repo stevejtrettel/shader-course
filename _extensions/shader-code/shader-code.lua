@@ -42,67 +42,74 @@ return {
     local files = find_glsl_files(demo_path)
 
     if #files == 0 then
-      -- No files found - return error message
-      return pandoc.Para(pandoc.Inlines({
-        pandoc.Strong(pandoc.Inlines({pandoc.Str("Error: ")})),
-        pandoc.Str("No GLSL files found in " .. demo_path)
-      }))
+      -- No files found - return error message as raw HTML/text
+      if quarto.doc.is_format("html") then
+        return pandoc.RawBlock("html", "<p><strong>Error:</strong> No GLSL files found in " .. demo_path .. "</p>")
+      else
+        return pandoc.RawBlock("latex", "\\textbf{Error:} No GLSL files found in " .. demo_path)
+      end
     end
 
     -- Single file case - just a code block
     if #files == 1 then
-      local code_block = pandoc.CodeBlock(files[1].content, {class = "glsl"})
-
+      local code = files[1].content
       if caption ~= "" then
-        return pandoc.Blocks({
-          code_block,
-          pandoc.Para(pandoc.Inlines({pandoc.Emph(pandoc.Inlines({pandoc.Str(caption)}))}))
-        })
+        if quarto.doc.is_format("html") then
+          return pandoc.RawBlock("html", string.format([[
+<figure class="shader-code">
+<pre><code class="language-glsl">%s</code></pre>
+<figcaption>%s</figcaption>
+</figure>
+]], code, caption))
+        else
+          return pandoc.CodeBlock(code, {class = "glsl"})
+        end
       else
-        return code_block
+        return pandoc.CodeBlock(code, {class = "glsl"})
       end
     end
 
     -- Multiple files case
     if quarto.doc.is_format("html") then
-      -- HTML: Create tabbed display using Quarto's panel-tabset
-      local tab_content = {}
+      -- HTML: Create tabbed display
+      local html = '<div class="panel-tabset">\n'
 
       for _, file in ipairs(files) do
-        -- Tab header
-        table.insert(tab_content, pandoc.Header(3, pandoc.Inlines({pandoc.Str(file.name)})))
-        -- Tab content (code block)
-        table.insert(tab_content, pandoc.CodeBlock(file.content, {class = "glsl"}))
+        html = html .. string.format([[
+### %s
+
+```glsl
+%s
+```
+
+]], file.name, file.content)
       end
 
-      -- Wrap in panel-tabset div
-      local tabset = pandoc.Div(tab_content, {class = "panel-tabset"})
+      html = html .. '</div>'
 
       if caption ~= "" then
-        return pandoc.Blocks({
-          tabset,
-          pandoc.Para(pandoc.Inlines({pandoc.Emph(pandoc.Inlines({pandoc.Str(caption)}))}))
-        })
-      else
-        return tabset
+        html = html .. string.format('<p><em>%s</em></p>', caption)
       end
+
+      -- Return as markdown to be processed by Quarto
+      return pandoc.RawBlock("markdown", html)
     else
       -- PDF: Sequential code blocks with headers
-      local blocks = {}
+      local latex = ""
 
       for _, file in ipairs(files) do
-        -- Add header for each buffer
-        table.insert(blocks, pandoc.Header(4, pandoc.Inlines({pandoc.Str(file.name)})))
-        -- Add code block
+        latex = latex .. string.format("\\paragraph{%s}\n\n", file.name)
+        -- Use a simple verbatim for now
+      end
+
+      -- For PDF, build blocks manually
+      local blocks = {}
+      for _, file in ipairs(files) do
+        table.insert(blocks, pandoc.Header(4, {pandoc.Str(file.name)}))
         table.insert(blocks, pandoc.CodeBlock(file.content, {class = "glsl"}))
       end
 
-      -- Add caption if provided
-      if caption ~= "" then
-        table.insert(blocks, pandoc.Para(pandoc.Inlines({pandoc.Emph(pandoc.Inlines({pandoc.Str(caption)}))})))
-      end
-
-      return pandoc.Blocks(blocks)
+      return blocks
     end
   end
 }
