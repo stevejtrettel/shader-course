@@ -15,12 +15,12 @@ book:
   chapters:
     - index.qmd
     - outline.qmd
-    - day1.qmd
-    - day2.qmd
-    - day3.qmd
-    - day4.qmd
-    - day5a.qmd  # Advanced Raymarching option
-    - day5b.qmd  # Buffers/PDEs option
+    - lectures/day1.qmd
+    - lectures/day2.qmd
+    - lectures/day3.qmd
+    - lectures/day4.qmd
+    - lectures/day5a.qmd  # Advanced Raymarching option
+    - lectures/day5b.qmd  # Buffers/PDEs option
     # - resources.qmd
 
   appendices:
