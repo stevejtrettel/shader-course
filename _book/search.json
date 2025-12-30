@@ -875,5 +875,49 @@
       "Appendices",
       "<span class='chapter-number'>C</span>  <span class='chapter-title'>Appendix: Complete Shader Code for Day 3</span>"
     ]
+  },
+  {
+    "objectID": "appendices/day1-shaders.html#a24.-lemniscate-of-bernoulli-naive-threshold",
+    "href": "appendices/day1-shaders.html#a24.-lemniscate-of-bernoulli-naive-threshold",
+    "title": "Appendix A — Appendix: Complete Shader Code for Day 1",
+    "section": "A.24 A24. Lemniscate of Bernoulli (Naive Threshold)",
+    "text": "A.24 A24. Lemniscate of Bernoulli (Naive Threshold)\nDrawing a lemniscate using naive |F| &lt; thickness. Notice the non-uniform visual thickness—especially near the origin where the curve self-intersects and the gradient approaches zero.\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    // Coordinate setup\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - 0.5;\n    uv.x *= iResolution.x / iResolution.y;\n    vec2 p = uv * 4.0;\n\n    // Lemniscate of Bernoulli: (x² + y²)² = a²(x² - y²)\n    float a = 1.0;\n    float r2 = dot(p, p);\n    float F = r2 * r2 - a * a * (p.x * p.x - p.y * p.y);\n\n    // Naive threshold - thickness varies!\n    float thickness = 0.15;\n    vec3 color = (abs(F) &lt; thickness) ? vec3(1.0, 1.0, 0.0) : vec3(0.1, 0.1, 0.3);\n\n    fragColor = vec4(color, 1.0);\n}",
+    "crumbs": [
+      "Appendices",
+      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Appendix: Complete Shader Code for Day 1</span>"
+    ]
+  },
+  {
+    "objectID": "appendices/day1-shaders.html#a25.-lemniscate-of-bernoulli-gradient-corrected",
+    "href": "appendices/day1-shaders.html#a25.-lemniscate-of-bernoulli-gradient-corrected",
+    "title": "Appendix A — Appendix: Complete Shader Code for Day 1",
+    "section": "A.25 A25. Lemniscate of Bernoulli (Gradient-Corrected)",
+    "text": "A.25 A25. Lemniscate of Bernoulli (Gradient-Corrected)\nSame curve, but now we divide by the gradient magnitude to approximate the signed distance function. This gives uniform visual thickness even near the singular point at the origin.\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    // Coordinate setup\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - 0.5;\n    uv.x *= iResolution.x / iResolution.y;\n    vec2 p = uv * 4.0;\n\n    // Lemniscate of Bernoulli: (x² + y²)² = a²(x² - y²)\n    float a = 1.0;\n    float r2 = dot(p, p);\n    float F = r2 * r2 - a * a * (p.x * p.x - p.y * p.y);\n\n    // Compute gradient analytically:\n    // ∂F/∂x = 4x(x² + y²) - 2a²x = 2x(2r² - a²)\n    // ∂F/∂y = 4y(x² + y²) + 2a²y = 2y(2r² + a²)\n    vec2 grad = vec2(\n        2.0 * p.x * (2.0 * r2 - a * a),\n        2.0 * p.y * (2.0 * r2 + a * a)\n    );\n\n    // Approximate signed distance: |F| / |∇F|\n    float gradLen = length(grad);\n    float dist = abs(F) / max(gradLen, 0.01);  // avoid division by zero\n\n    // Uniform thickness\n    float thickness = 0.05;\n    vec3 color = (dist &lt; thickness) ? vec3(1.0, 1.0, 0.0) : vec3(0.1, 0.1, 0.3);\n\n    fragColor = vec4(color, 1.0);\n}",
+    "crumbs": [
+      "Appendices",
+      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Appendix: Complete Shader Code for Day 1</span>"
+    ]
+  },
+  {
+    "objectID": "appendices/day1-shaders.html#a26.-cassini-ovals-animated",
+    "href": "appendices/day1-shaders.html#a26.-cassini-ovals-animated",
+    "title": "Appendix A — Appendix: Complete Shader Code for Day 1",
+    "section": "A.26 A26. Cassini Ovals (Animated)",
+    "text": "A.26 A26. Cassini Ovals (Animated)\nCassini ovals are curves defined by the product of distances from two foci being constant. The implicit form is \\((x^2 + y^2)^2 - 2c^2(x^2 - y^2) = a^4 - c^4\\). By animating the parameter \\(a\\), we see the phase transition: two separate loops when \\(a &lt; c\\), a lemniscate when \\(a = c\\), and a single oval when \\(a &gt; c\\).\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    // Coordinate setup\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - 0.5;\n    uv.x *= iResolution.x / iResolution.y;\n    vec2 p = uv * 4.0;\n\n    // Cassini oval parameters\n    float c = 1.0;  // half-distance between foci\n    float a = 0.8 + 0.4 * sin(iTime * 0.5);  // animate through phase transition\n\n    // Implicit equation: (x² + y²)² - 2c²(x² - y²) = a⁴ - c⁴\n    float r2 = dot(p, p);\n    float c2 = c * c;\n    float a4 = a * a * a * a;\n    float c4 = c2 * c2;\n    float F = r2 * r2 - 2.0 * c2 * (p.x * p.x - p.y * p.y) - (a4 - c4);\n\n    // Gradient: ∂F/∂x = 4x(r²) - 4c²x = 4x(r² - c²)\n    //           ∂F/∂y = 4y(r²) + 4c²y = 4y(r² + c²)\n    vec2 grad = vec2(\n        4.0 * p.x * (r2 - c2),\n        4.0 * p.y * (r2 + c2)\n    );\n\n    // Approximate signed distance\n    float gradLen = length(grad);\n    float dist = abs(F) / max(gradLen, 0.01);\n\n    // Draw curve with uniform thickness\n    float thickness = 0.05;\n    vec3 color = (dist &lt; thickness) ? vec3(1.0, 1.0, 0.0) : vec3(0.1, 0.1, 0.3);\n\n    fragColor = vec4(color, 1.0);\n}",
+    "crumbs": [
+      "Appendices",
+      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Appendix: Complete Shader Code for Day 1</span>"
+    ]
+  },
+  {
+    "objectID": "appendices/day1-shaders.html#a27.-elliptic-curves-animated",
+    "href": "appendices/day1-shaders.html#a27.-elliptic-curves-animated",
+    "title": "Appendix A — Appendix: Complete Shader Code for Day 1",
+    "section": "A.27 A27. Elliptic Curves (Animated)",
+    "text": "A.27 A27. Elliptic Curves (Animated)\nElliptic curves in Weierstrass form: \\(y^2 = x^3 + ax + b\\). The discriminant \\(\\Delta = 4a^3 + 27b^2\\) determines smoothness. We animate along a circle in \\((a,b)\\) parameter space of radius \\(\\sqrt{13}\\), which passes through the singular points \\((-3, \\pm 2)\\) where the curve develops a node (self-intersection).\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    // Coordinate setup\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - 0.5;\n    uv.x *= iResolution.x / iResolution.y;\n    vec2 p = uv * 4.0;\n\n    // Circle in (a,b) parameter space passing through singularities at (-3, ±2)\n    float r = sqrt(13.0);\n    float a = r * cos(iTime * 0.3);\n    float b = r * sin(iTime * 0.3);\n\n    // Elliptic curve: y² = x³ + ax + b\n    // Implicit form: F = y² - x³ - ax - b = 0\n    float F = p.y * p.y - p.x * p.x * p.x - a * p.x - b;\n\n    // Gradient: ∂F/∂x = -3x² - a, ∂F/∂y = 2y\n    vec2 grad = vec2(-3.0 * p.x * p.x - a, 2.0 * p.y);\n\n    float gradLen = length(grad);\n    float dist = abs(F) / max(gradLen, 0.01);\n\n    float thickness = 0.05;\n    vec3 color = (dist &lt; thickness) ? vec3(1.0, 1.0, 0.0) : vec3(0.1, 0.1, 0.3);\n\n    fragColor = vec4(color, 1.0);\n}",
+    "crumbs": [
+      "Appendices",
+      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Appendix: Complete Shader Code for Day 1</span>"
+    ]
   }
 ]
