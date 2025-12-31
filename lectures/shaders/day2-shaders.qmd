@@ -1,0 +1,775 @@
+# Appendix: Day 2 Shader Code
+
+Complete, standalone code for each shader referenced in Day 2. Each listing can be copied directly into [Shadertoy](https://www.shadertoy.com/new) and run immediately.
+
+
+## Common Functions
+
+These helper functions are used throughout Day 2:
+
+```glsl
+vec2 cmul(vec2 z, vec2 w) {
+    return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);
+}
+
+float cabs2(vec2 z) {
+    return dot(z, z);
+}
+
+vec3 palette(float t) {
+    vec3 a = vec3(0.5, 0.5, 0.5);
+    vec3 b = vec3(0.5, 0.5, 0.5);
+    vec3 c = vec3(1.0, 1.0, 1.0);
+    vec3 d = vec3(0.00, 0.33, 0.67);
+    return a + b * cos(6.28318 * (c * t + d));
+}
+```
+
+
+## A1. mandelbrot-zoom
+
+Animated zoom into the Mandelbrot set with smooth coloring.
+
+```glsl
+vec2 cmul(vec2 z, vec2 w) {
+    return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);
+}
+
+float cabs2(vec2 z) {
+    return dot(z, z);
+}
+
+vec3 palette(float t) {
+    vec3 a = vec3(0.5, 0.5, 0.5);
+    vec3 b = vec3(0.5, 0.5, 0.5);
+    vec3 c = vec3(1.0, 1.0, 1.0);
+    vec3 d = vec3(0.00, 0.33, 0.67);
+    return a + b * cos(6.28318 * (c * t + d));
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    
+    // Zoom into the seahorse valley
+    vec2 center = vec2(-0.745, 0.186);
+    float zoom = pow(1.5, mod(iTime, 30.0));  // resets every 30s
+    
+    vec2 c = center + uv * 4.0 / zoom;
+    
+    vec2 z = vec2(0.0, 0.0);
+    int max_iter = 200;
+    int iter;
+    
+    for (iter = 0; iter < max_iter; iter++) {
+        if (cabs2(z) > 4.0) break;
+        z = cmul(z, z) + c;
+    }
+    
+    vec3 color;
+    if (iter == max_iter) {
+        color = vec3(0.0);
+    } else {
+        // Smooth coloring
+        float log_zn = log(cabs2(z)) / 2.0;
+        float nu = log(log_zn / log(2.0)) / log(2.0);
+        float smooth_iter = float(iter) + 1.0 - nu;
+        float t = smooth_iter / float(max_iter);
+        color = palette(t * 4.0);  // multiply for more color variation
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+## A2. mandelbrot-bw
+
+Black and white Mandelbrot set.
+
+```glsl
+vec2 cmul(vec2 z, vec2 w) {
+    return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);
+}
+
+float cabs2(vec2 z) {
+    return dot(z, z);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    
+    vec2 c = uv * 4.0;
+    c.x -= 0.5;
+    
+    vec2 z = vec2(0.0, 0.0);
+    int max_iter = 100;
+    int iter;
+    
+    for (iter = 0; iter < max_iter; iter++) {
+        if (cabs2(z) > 4.0) break;
+        z = cmul(z, z) + c;
+    }
+    
+    vec3 color;
+    if (iter == max_iter) {
+        color = vec3(0.0);
+    } else {
+        color = vec3(1.0);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+## A3. mandelbrot-gray
+
+Mandelbrot set with grayscale iteration coloring.
+
+```glsl
+vec2 cmul(vec2 z, vec2 w) {
+    return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);
+}
+
+float cabs2(vec2 z) {
+    return dot(z, z);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    
+    vec2 c = uv * 4.0;
+    c.x -= 0.5;
+    
+    vec2 z = vec2(0.0, 0.0);
+    int max_iter = 100;
+    int iter;
+    
+    for (iter = 0; iter < max_iter; iter++) {
+        if (cabs2(z) > 4.0) break;
+        z = cmul(z, z) + c;
+    }
+    
+    vec3 color;
+    if (iter == max_iter) {
+        color = vec3(0.0);
+    } else {
+        float t = float(iter) / float(max_iter);
+        color = vec3(t);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+## A4. mandelbrot-color
+
+Mandelbrot set with cosine palette coloring.
+
+```glsl
+vec2 cmul(vec2 z, vec2 w) {
+    return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);
+}
+
+float cabs2(vec2 z) {
+    return dot(z, z);
+}
+
+vec3 palette(float t) {
+    vec3 a = vec3(0.5, 0.5, 0.5);
+    vec3 b = vec3(0.5, 0.5, 0.5);
+    vec3 c = vec3(1.0, 1.0, 1.0);
+    vec3 d = vec3(0.00, 0.33, 0.67);
+    return a + b * cos(6.28318 * (c * t + d));
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    
+    vec2 c = uv * 4.0;
+    c.x -= 0.5;
+    
+    vec2 z = vec2(0.0, 0.0);
+    int max_iter = 100;
+    int iter;
+    
+    for (iter = 0; iter < max_iter; iter++) {
+        if (cabs2(z) > 4.0) break;
+        z = cmul(z, z) + c;
+    }
+    
+    vec3 color;
+    if (iter == max_iter) {
+        color = vec3(0.0);
+    } else {
+        float t = float(iter) / float(max_iter);
+        color = palette(t);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+## A5. julia-static
+
+Julia set with fixed parameter (black and white).
+
+```glsl
+vec2 cmul(vec2 z, vec2 w) {
+    return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);
+}
+
+float cabs2(vec2 z) {
+    return dot(z, z);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
+    
+    // Fixed parameter - try different values!
+    vec2 c = vec2(-0.7, 0.27015);
+    
+    // z starts at pixel position
+    vec2 z = p;
+    
+    int max_iter = 100;
+    int iter;
+    
+    for (iter = 0; iter < max_iter; iter++) {
+        if (cabs2(z) > 4.0) break;
+        z = cmul(z, z) + c;
+    }
+    
+    vec3 color;
+    if (iter == max_iter) {
+        color = vec3(0.0);  // In the set: black
+    } else {
+        color = vec3(1.0);  // Escaped: white
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+## A6. julia-explorer
+
+Interactive Julia set explorer: gray Mandelbrot as parameter space background, black Julia set overlaid, red dot shows current c.
+
+```glsl
+vec2 cmul(vec2 z, vec2 w) {
+    return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);
+}
+
+float cabs2(vec2 z) {
+    return dot(z, z);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
+    
+    // Get c from mouse position
+    vec2 mouse_uv = iMouse.xy / iResolution.xy;
+    mouse_uv = mouse_uv - vec2(0.5, 0.5);
+    mouse_uv.x *= iResolution.x / iResolution.y;
+    vec2 c = mouse_uv * 4.0;
+    c.x -= 0.5;
+    
+    // Default to interesting value if no mouse
+    if (iMouse.x < 1.0) {
+        c = vec2(-0.7, 0.27015);
+    }
+    
+    // Mandelbrot iteration (for background)
+    vec2 mc = p;
+    mc.x -= 0.5;
+    vec2 mz = vec2(0.0);
+    int m_iter;
+    for (m_iter = 0; m_iter < 100; m_iter++) {
+        if (cabs2(mz) > 4.0) break;
+        mz = cmul(mz, mz) + mc;
+    }
+    
+    // Julia iteration (for foreground)
+    vec2 jz = p;
+    int j_iter;
+    for (j_iter = 0; j_iter < 100; j_iter++) {
+        if (cabs2(jz) > 4.0) break;
+        jz = cmul(jz, jz) + c;
+    }
+    
+    // Color: light background, Mandelbrot in gray, Julia in black
+    vec3 color = vec3(0.9);  // light background (escaped both)
+    if (m_iter == 100) {
+        color = vec3(0.6);  // Mandelbrot set in gray
+    }
+    if (j_iter == 100) {
+        color = vec3(0.0);  // Julia set in black
+    }
+    
+    // Draw red dot at c position (in Mandelbrot coordinates)
+    vec2 c_pos = c;
+    c_pos.x += 0.5;  // undo the offset we applied to c
+    if (length(p - c_pos) < 0.05) {
+        color = vec3(1.0, 0.0, 0.0);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+## A7. burning-ship
+
+The Burning Ship fractal.
+
+```glsl
+vec2 cmul(vec2 z, vec2 w) {
+    return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // Scale coordinates - the 0.1/iResolution.y factor and offset
+    // center the view on the "ship"
+    vec2 c = 0.1 * fragCoord / iResolution.y + vec2(1.66, -0.02);
+    
+    vec2 z = vec2(0.0);
+    int max_iter = 100;
+    int iter;
+    
+    for (iter = 0; iter < max_iter; iter++) {
+        if (dot(z, z) > 1000.0) break;
+        
+        // Complex square
+        z = cmul(z, z);
+        
+        // Burning Ship: take abs of imaginary part
+        z.y = abs(z.y);
+        
+        // Subtract c (equivalent to z² + c with sign conventions)
+        z = z - c;
+    }
+    
+    vec3 color;
+    if (iter == max_iter) {
+        color = vec3(0.0);  // Inside: black
+    } else {
+        color = vec3(1.0);  // Escaped: white
+        
+        // For smooth coloring, try:
+        // float s = float(iter) - log2(log2(dot(z, z))) + 3.0;
+        // float t = s / float(max_iter);
+        // color = vec3(t);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+## A8. mandelbrot-cubic
+
+Cubic Mandelbrot set: $z^3 + c$.
+
+```glsl
+vec2 cmul(vec2 z, vec2 w) {
+    return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);
+}
+
+vec2 ccube(vec2 z) {
+    float a = z.x, b = z.y;
+    return vec2(a*a*a - 3.0*a*b*b, 3.0*a*a*b - b*b*b);
+}
+
+float cabs2(vec2 z) {
+    return dot(z, z);
+}
+
+vec3 palette(float t) {
+    vec3 a = vec3(0.5, 0.5, 0.5);
+    vec3 b = vec3(0.5, 0.5, 0.5);
+    vec3 c = vec3(1.0, 1.0, 1.0);
+    vec3 d = vec3(0.30, 0.20, 0.20);
+    return a + b * cos(6.28318 * (c * t + d));
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    
+    vec2 c = uv * 3.0;
+    
+    vec2 z = vec2(0.0, 0.0);
+    int max_iter = 100;
+    int iter;
+    
+    for (iter = 0; iter < max_iter; iter++) {
+        if (cabs2(z) > 4.0) break;
+        z = ccube(z) + c;
+    }
+    
+    vec3 color;
+    if (iter == max_iter) {
+        color = vec3(0.0);
+    } else {
+        float t = float(iter) / float(max_iter);
+        color = palette(t);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+## A9. inversion-toggle
+
+Circle inversion visualization with toggling.
+
+```glsl
+vec2 invert(vec2 p) {
+    return p / dot(p, p);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
+    
+    vec2 p_inv = invert(p);
+    
+    // Toggle between original and inverted every second
+    float time = fract(iTime * 0.5);
+    vec2 q;
+    if (time < 0.5) {
+        q = p;
+    } else {
+        q = p_inv;
+    }
+    
+    vec3 color = vec3(0.1, 0.1, 0.15);
+    
+    // Draw the unit circle
+    float d_unit = abs(length(p) - 1.0);
+    if (d_unit < 0.02) color = vec3(0.5, 0.5, 0.5);
+    
+    // Draw a vertical line at x = 2
+    if (abs(q.x - 2.0) < 0.02) color = vec3(1.0, 1.0, 0.0);
+    
+    // Draw a horizontal line at y = 1.5
+    if (abs(q.y - 1.5) < 0.02) color = vec3(1.0, 1.0, 0.0);
+    
+    // Draw a circle centered at (2, 0) with radius 0.5
+    float d_circle = abs(length(q - vec2(2.0, 0.0)) - 0.5);
+    if (d_circle < 0.02) color = vec3(1.0, 1.0, 0.0);
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+## A10. inversion-grid
+
+Circle inversion of a grid.
+
+```glsl
+vec2 invert(vec2 p) {
+    return p / dot(p, p);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
+    
+    vec2 p_inv = invert(p);
+    
+    // Toggle
+    float time = fract(iTime * 0.5);
+    vec2 q;
+    if (time < 0.5) {
+        q = p;
+    } else {
+        q = p_inv;
+    }
+    
+    vec3 color = vec3(0.1, 0.1, 0.15);
+    
+    // Draw the unit circle
+    float d_unit = abs(length(p) - 1.0);
+    if (d_unit < 0.02) color = vec3(0.5, 0.5, 0.5);
+    
+    // Draw a grid using mod
+    vec2 grid = mod(q, 0.5);
+    if (grid.x < 0.02 || grid.y < 0.02) color = vec3(1.0, 1.0, 0.0);
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+## A11. inversion-moving
+
+Inversion through a moving circle.
+
+```glsl
+struct Circle {
+    vec2 center;
+    float radius;
+};
+
+vec2 invert(vec2 p, Circle c) {
+    vec2 d = p - c.center;
+    return c.center + c.radius * c.radius * d / dot(d, d);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
+    
+    // Animate the inversion circle
+    Circle inv_circle;
+    inv_circle.center = vec2(sin(iTime) * 0.5, cos(iTime * 0.7) * 0.5);
+    inv_circle.radius = 1.0 + 0.3 * sin(iTime * 1.3);
+    
+    vec2 p_inv = invert(p, inv_circle);
+    
+    vec3 color = vec3(0.1, 0.1, 0.15);
+    
+    // Draw the inversion circle
+    float d_inv = abs(length(p - inv_circle.center) - inv_circle.radius);
+    if (d_inv < 0.02) color = vec3(0.5, 0.5, 0.5);
+    
+    // Draw a grid in the inverted space
+    vec2 grid = mod(p_inv, 0.5);
+    if (grid.x < 0.02 || grid.y < 0.02) color = vec3(1.0, 1.0, 0.0);
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+## A12. apollonian-setup
+
+The four mutually tangent circles (no iteration).
+
+```glsl
+struct Circle {
+    vec2 center;
+    float radius;
+};
+
+float distToCircle(vec2 p, Circle c) {
+    return abs(length(p - c.center) - c.radius);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 6.0;
+    
+    // Three mutually tangent inner circles plus outer circle
+    // For three circles of radius r centered at vertices of equilateral triangle:
+    // - Side length of triangle = 2r (so circles touch)
+    // - Circumradius of triangle = 2r / sqrt(3)
+    // - Outer circle radius = circumradius + r
+    
+    float r = 1.0;
+    float triSide = 2.0 * r;  // distance between inner circle centers
+    float circumradius = triSide / sqrt(3.0);  // distance from origin to inner centers
+    
+    // Inner circles at vertices of equilateral triangle
+    Circle c1 = Circle(vec2(0.0, circumradius), r);
+    Circle c2 = Circle(vec2(-circumradius * 0.866, -circumradius * 0.5), r);
+    Circle c3 = Circle(vec2(circumradius * 0.866, -circumradius * 0.5), r);
+    
+    // Outer circle tangent to all three from outside
+    Circle outer = Circle(vec2(0.0, 0.0), circumradius + r);
+    
+    vec3 color = vec3(0.1, 0.1, 0.15);
+    
+    // Draw all four circles
+    if (distToCircle(p, c1) < 0.03) color = vec3(1.0, 0.3, 0.3);
+    if (distToCircle(p, c2) < 0.03) color = vec3(0.3, 1.0, 0.3);
+    if (distToCircle(p, c3) < 0.03) color = vec3(0.3, 0.3, 1.0);
+    if (distToCircle(p, outer) < 0.03) color = vec3(1.0, 1.0, 1.0);
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+## A13. apollonian-iterated
+
+Full Apollonian gasket with iteration.
+
+```glsl
+struct Circle {
+    vec2 center;
+    float radius;
+};
+
+vec2 invert(vec2 p, Circle c) {
+    vec2 d = p - c.center;
+    return c.center + c.radius * c.radius * d / dot(d, d);
+}
+
+float distToCircle(vec2 p, Circle c) {
+    return abs(length(p - c.center) - c.radius);
+}
+
+bool isInside(vec2 p, Circle c) {
+    return length(p - c.center) < c.radius;
+}
+
+vec3 palette(float t) {
+    vec3 a = vec3(0.5, 0.5, 0.5);
+    vec3 b = vec3(0.5, 0.5, 0.5);
+    vec3 c = vec3(1.0, 1.0, 1.0);
+    vec3 d = vec3(0.00, 0.33, 0.67);
+    return a + b * cos(6.28318 * (c * t + d));
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 6.0;
+    
+    // Setup circles with correct geometry
+    float r = 1.0;
+    float triSide = 2.0 * r;
+    float circumradius = triSide / sqrt(3.0);
+    
+    Circle c1 = Circle(vec2(0.0, circumradius), r);
+    Circle c2 = Circle(vec2(-circumradius * 0.866, -circumradius * 0.5), r);
+    Circle c3 = Circle(vec2(circumradius * 0.866, -circumradius * 0.5), r);
+    Circle outer = Circle(vec2(0.0, 0.0), circumradius + r);
+    
+    // Iterate inversions
+    int max_iter = 50;
+    int iter;
+    
+    for (iter = 0; iter < max_iter; iter++) {
+        if (isInside(p, c1)) {
+            p = invert(p, c1);
+        } else if (isInside(p, c2)) {
+            p = invert(p, c2);
+        } else if (isInside(p, c3)) {
+            p = invert(p, c3);
+        } else if (!isInside(p, outer)) {
+            p = invert(p, outer);
+        } else {
+            break;
+        }
+    }
+    
+    // Color by iteration count
+    float t = float(iter) / float(max_iter);
+    vec3 color = palette(t);
+    
+    // Draw circle boundaries
+    float dMin = min(min(distToCircle(p, c1), distToCircle(p, c2)), 
+                     min(distToCircle(p, c3), distToCircle(p, outer)));
+    if (dMin < 0.02) color = vec3(1.0);
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+## A14. apollonian-final
+
+Apollonian gasket with coloring emphasizing the limit set.
+
+```glsl
+struct Circle {
+    vec2 center;
+    float radius;
+};
+
+vec2 invert(vec2 p, Circle c) {
+    vec2 d = p - c.center;
+    return c.center + c.radius * c.radius * d / dot(d, d);
+}
+
+bool isInside(vec2 p, Circle c) {
+    return length(p - c.center) < c.radius;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 6.0;
+    
+    // Setup circles with correct geometry
+    float r = 1.0;
+    float triSide = 2.0 * r;
+    float circumradius = triSide / sqrt(3.0);
+    
+    Circle c1 = Circle(vec2(0.0, circumradius), r);
+    Circle c2 = Circle(vec2(-circumradius * 0.866, -circumradius * 0.5), r);
+    Circle c3 = Circle(vec2(circumradius * 0.866, -circumradius * 0.5), r);
+    Circle outer = Circle(vec2(0.0, 0.0), circumradius + r);
+    
+    // Iterate inversions
+    int max_iter = 100;
+    int iter;
+    
+    for (iter = 0; iter < max_iter; iter++) {
+        if (isInside(p, c1)) {
+            p = invert(p, c1);
+        } else if (isInside(p, c2)) {
+            p = invert(p, c2);
+        } else if (isInside(p, c3)) {
+            p = invert(p, c3);
+        } else if (!isInside(p, outer)) {
+            p = invert(p, outer);
+        } else {
+            break;
+        }
+    }
+    
+    // Color by iteration count, emphasizing the limit set
+    float t = float(iter) / float(max_iter);
+    vec3 color = 30.0 * vec3(pow(t, 2.0));
+    
+    fragColor = vec4(color, 1.0);
+}
+```

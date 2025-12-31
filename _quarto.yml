@@ -14,17 +14,14 @@ book:
 
   chapters:
     - index.qmd
-    - outline.qmd
+    # - outline.qmd
     - lectures/day1.qmd
-    # - lectures/day2.qmd
-    # - lectures/day3.qmd
-    # - lectures/day4.qmd
-    # - lectures/day5.qmd 
+    - lectures/day2.qmd
     # - resources.qmd
 
-  appendices:
-    - appendices/day1-shaders.qmd
-    - appendices/day1-solutions.qmd
+  #appendices:
+    #- appendices/day1-shaders.qmd
+    #- appendices/day1-solutions.qmd
     # - appendices/day2-shaders.qmd
     # - appendices/day3-shaders.qmd
     # - appendices/glsl-reference.qmd

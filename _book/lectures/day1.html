@@ -65,8 +65,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../appendices/day1-shaders.html" rel="next">
-<link href="../outline.html" rel="prev">
+<link href="../lectures/day2.html" rel="next">
+<link href="../index.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
@@ -352,39 +352,16 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../outline.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Outline</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../lectures/day1.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Day 1: Introduction to Shader Programming</span></span></a>
   </div>
 </li>
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
- <span class="menu-text">Appendices</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
+        <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../appendices/day1-shaders.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix: Day 1 Shader Code</span></span></a>
+  <a href="../lectures/day2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Day 2: Complex Dynamics and Circle Inversion</span></span></a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../appendices/day1-solutions.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix: Day 1 Homework Solutions</span></span></a>
-  </div>
-</li>
-      </ul>
-  </li>
     </ul>
     </div>
 </nav>
@@ -478,14 +455,10 @@ window.Quarto = {
 <section id="overview" class="level2" data-number="1.1">
 <h2 data-number="1.1" class="anchored" data-anchor-id="overview"><span class="header-section-number">1.1</span> Overview</h2>
 <p>By the end of today, you’ll be able to create this:</p>
-<figure class="shader-demo figure">
-  <div id="demo-day1-elliptic-family" style="width: 100%; height: ;"></div>
-  <script type="module">
-    import { embed } from '/demos/day1/elliptic-family/embed.js';
-    await embed({ container: '#demo-day1-elliptic-family' });
-  </script>
-  
-</figure>
+<div class="callout callout-warning">
+  <div class="callout-header">Missing Demo</div>
+  <div class="callout-body">Shader demo <code>day1/elliptic-family</code> not found.</div>
+</div>
 
 <p>A family of elliptic curves <span class="math inline">\(y^2 = x^3 + ax + b\)</span>, drawn for several values of <span class="math inline">\(a\)</span> simultaneously, with <span class="math inline">\(b\)</span> varying across the screen. The curves shift in brightness to show the family structure, and you can watch singularities appear and disappear along the discriminant locus.</p>
 <p>This image is computed in real time, every pixel evaluated independently on the GPU. To get here, we’ll learn:</p>
@@ -549,14 +522,10 @@ window.Quarto = {
 <section id="hello-world-a-solid-color" class="level3">
 <h3 class="anchored" data-anchor-id="hello-world-a-solid-color">Hello World: A Solid Color</h3>
 <p>The simplest shader: make every pixel red.</p>
-<figure class="shader-demo figure">
-  <div id="demo-day1-red" style="width: 100%; height: ;"></div>
-  <script type="module">
-    import { embed } from '/demos/day1/red/embed.js';
-    await embed({ container: '#demo-day1-red' });
-  </script>
-  
-</figure>
+<div class="callout callout-warning">
+  <div class="callout-header">Missing Demo</div>
+  <div class="callout-body">Shader demo <code>day1/red</code> not found.</div>
+</div>
 
 <p>The <code>vec4(1.0, 0.0, 0.0, 1.0)</code> constructs a 4-component vector: red=1, green=0, blue=0, alpha=1. Every pixel receives the same color, so the screen fills with red.</p>
 </section>
@@ -625,14 +594,10 @@ window.Quarto = {
 <section id="animation-using-itime" class="level3">
 <h3 class="anchored" data-anchor-id="animation-using-itime">Animation: Using iTime</h3>
 <p>Let’s make the red channel pulse:</p>
-<figure class="shader-demo figure">
-  <div id="demo-day1-red-pulsing" style="width: 100%; height: ;"></div>
-  <script type="module">
-    import { embed } from '/demos/day1/red-pulsing/embed.js';
-    await embed({ container: '#demo-day1-red-pulsing' });
-  </script>
-  
-</figure>
+<div class="callout callout-warning">
+  <div class="callout-header">Missing Demo</div>
+  <div class="callout-body">Shader demo <code>day1/red-pulsing</code> not found.</div>
+</div>
 
 <p>Since <code>sin(iTime)</code> oscillates between -1 and 1, the expression <code>0.5 + 0.5 * sin(iTime)</code> oscillates between 0 and 1. The screen pulses from black to red.</p>
 <p>This is our first <em>animated</em> shader—the output depends on time.</p>
@@ -662,14 +627,10 @@ window.Quarto = {
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> uv <span class="op">=</span> fragCoord <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">xy</span><span class="op">;</span></span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>uv<span class="op">.</span><span class="fu">x</span><span class="op">,</span> uv<span class="op">.</span><span class="fu">y</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<figure class="shader-demo figure">
-  <div id="demo-day1-coordinates" style="width: 100%; height: ;"></div>
-  <script type="module">
-    import { embed } from '/demos/day1/coordinates/embed.js';
-    await embed({ container: '#demo-day1-coordinates' });
-  </script>
-  
-</figure>
+<div class="callout callout-warning">
+  <div class="callout-header">Missing Demo</div>
+  <div class="callout-body">Shader demo <code>day1/coordinates</code> not found.</div>
+</div>
 
 <p>Black at bottom-left (0,0), red at bottom-right (1,0), green at top-left (0,1), yellow at top-right (1,1).</p>
 </section>
@@ -719,14 +680,10 @@ window.Quarto = {
 <span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
 <span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<figure class="shader-demo figure">
-  <div id="demo-day1-half-plane" style="width: 100%; height: ;"></div>
-  <script type="module">
-    import { embed } from '/demos/day1/half-plane/embed.js';
-    await embed({ container: '#demo-day1-half-plane' });
-  </script>
-  
-</figure>
+<div class="callout callout-warning">
+  <div class="callout-header">Missing Demo</div>
+  <div class="callout-body">Shader demo <code>day1/half-plane</code> not found.</div>
+</div>
 
 <p>To color left versus right instead, use <code>p.x</code> in place of <code>p.y</code>.</p>
 <p>More generally, a line in the plane has the form <span class="math inline">\(ax + by + c = 0\)</span>. This divides the plane into two half-planes: where <span class="math inline">\(ax + by + c &lt; 0\)</span> and where <span class="math inline">\(ax + by + c &gt; 0\)</span>.</p>
@@ -745,14 +702,10 @@ window.Quarto = {
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> a <span class="op">=</span> <span class="bu">cos</span><span class="op">(</span>iTime<span class="op">);</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> b <span class="op">=</span> <span class="bu">sin</span><span class="op">(</span>iTime<span class="op">);</span></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> c <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="bu">sin</span><span class="op">(</span>iTime <span class="op">*</span> <span class="fl">0.7</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<figure class="shader-demo figure">
-  <div id="demo-day1-half-plane-animated" style="width: 100%; height: ;"></div>
-  <script type="module">
-    import { embed } from '/demos/day1/half-plane-animated/embed.js';
-    await embed({ container: '#demo-day1-half-plane-animated' });
-  </script>
-  
-</figure>
+<div class="callout callout-warning">
+  <div class="callout-header">Missing Demo</div>
+  <div class="callout-body">Shader demo <code>day1/half-plane-animated</code> not found.</div>
+</div>
 
 </section>
 <section id="circles" class="level3">
@@ -771,14 +724,10 @@ window.Quarto = {
 <span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
 <span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<figure class="shader-demo figure">
-  <div id="demo-day1-circle" style="width: 100%; height: ;"></div>
-  <script type="module">
-    import { embed } from '/demos/day1/circle/embed.js';
-    await embed({ container: '#demo-day1-circle' });
-  </script>
-  
-</figure>
+<div class="callout callout-warning">
+  <div class="callout-header">Missing Demo</div>
+  <div class="callout-body">Shader demo <code>day1/circle</code> not found.</div>
+</div>
 
 <p>Try commenting out the aspect ratio correction (<code>uv.x *= ...</code>) to see the distortion—the circle becomes an ellipse.</p>
 <p>To center the circle at a point <span class="math inline">\(c\)</span> instead of the origin, compute distance from <span class="math inline">\(c\)</span>:</p>
@@ -804,14 +753,10 @@ window.Quarto = {
 <span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
 <span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<figure class="shader-demo figure">
-  <div id="demo-day1-circle-ring" style="width: 100%; height: ;"></div>
-  <script type="module">
-    import { embed } from '/demos/day1/circle-ring/embed.js';
-    await embed({ container: '#demo-day1-circle-ring' });
-  </script>
-  
-</figure>
+<div class="callout callout-warning">
+  <div class="callout-header">Missing Demo</div>
+  <div class="callout-body">Shader demo <code>day1/circle-ring</code> not found.</div>
+</div>
 
 </section>
 </section>
@@ -833,14 +778,10 @@ window.Quarto = {
 <span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
 <span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<figure class="shader-demo figure">
-  <div id="demo-day1-parabola" style="width: 100%; height: ;"></div>
-  <script type="module">
-    import { embed } from '/demos/day1/parabola/embed.js';
-    await embed({ container: '#demo-day1-parabola' });
-  </script>
-  
-</figure>
+<div class="callout callout-warning">
+  <div class="callout-header">Missing Demo</div>
+  <div class="callout-body">Shader demo <code>day1/parabola</code> not found.</div>
+</div>
 
 </section>
 <section id="more-examples" class="level3">
@@ -859,14 +800,10 @@ window.Quarto = {
 <section id="the-thickness-problem" class="level3">
 <h3 class="anchored" data-anchor-id="the-thickness-problem">The Thickness Problem</h3>
 <p>Look carefully at the parabola. The rendered thickness isn’t uniform—it’s thinner where the curve is steep, thicker where it’s flat. The problem gets worse with more complicated curves, especially those with singularities. Here’s the lemniscate:</p>
-<figure class="shader-demo figure">
-  <div id="demo-day1-lemniscate-naive" style="width: 100%; height: ;"></div>
-  <script type="module">
-    import { embed } from '/demos/day1/lemniscate-naive/embed.js';
-    await embed({ container: '#demo-day1-lemniscate-naive' });
-  </script>
-  
-</figure>
+<div class="callout callout-warning">
+  <div class="callout-header">Missing Demo</div>
+  <div class="callout-body">Shader demo <code>day1/lemniscate-naive</code> not found.</div>
+</div>
 
 <p>Notice how the thickness blows up near the origin, where the curve crosses itself.</p>
 <p>Why does this happen? The set <span class="math inline">\(|F| &lt; \varepsilon\)</span> contains all points within <span class="math inline">\(\varepsilon\)</span> of zero <em>in the <span class="math inline">\(F\)</span> direction</em>. But <span class="math inline">\(F\)</span> doesn’t measure distance to the curve—it’s just some function that happens to be zero on the curve. Where <span class="math inline">\(|\nabla F|\)</span> is large, <span class="math inline">\(F\)</span> changes rapidly, so the band <span class="math inline">\(|F| &lt; \varepsilon\)</span> is narrow. Where <span class="math inline">\(|\nabla F|\)</span> is small, <span class="math inline">\(F\)</span> changes slowly, so the band is wide. At the singular point, <span class="math inline">\(\nabla F = 0\)</span>, and the band becomes infinitely wide.</p>
@@ -901,14 +838,10 @@ window.Quarto = {
 <span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
 <span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<figure class="shader-demo figure">
-  <div id="demo-day1-lemniscate-gradient" style="width: 100%; height: ;"></div>
-  <script type="module">
-    import { embed } from '/demos/day1/lemniscate-gradient/embed.js';
-    await embed({ container: '#demo-day1-lemniscate-gradient' });
-  </script>
-  
-</figure>
+<div class="callout callout-warning">
+  <div class="callout-header">Missing Demo</div>
+  <div class="callout-body">Shader demo <code>day1/lemniscate-gradient</code> not found.</div>
+</div>
 
 <p>Compare with the naive version above to see the difference in thickness uniformity.</p>
 </section>
@@ -916,14 +849,10 @@ window.Quarto = {
 <h3 class="anchored" data-anchor-id="animated-curve-families">Animated Curve Families</h3>
 <p>The lemniscate is part of a one-parameter family called the Cassini ovals, defined by the product of distances from two foci being constant: <span class="math display">\[(x^2 + y^2)^2 - 2c^2(x^2 - y^2) = a^4 - c^4\]</span></p>
 <p>As the parameter <span class="math inline">\(a\)</span> varies relative to the fixed focal distance <span class="math inline">\(c\)</span>, the topology changes: two separate loops when <span class="math inline">\(a &lt; c\)</span>, a lemniscate when <span class="math inline">\(a = c\)</span>, a single oval when <span class="math inline">\(a &gt; c\)</span>.</p>
-<figure class="shader-demo figure">
-  <div id="demo-day1-lemniscate-animated" style="width: 100%; height: ;"></div>
-  <script type="module">
-    import { embed } from '/demos/day1/lemniscate-animated/embed.js';
-    await embed({ container: '#demo-day1-lemniscate-animated' });
-  </script>
-  
-</figure>
+<div class="callout callout-warning">
+  <div class="callout-header">Missing Demo</div>
+  <div class="callout-body">Shader demo <code>day1/lemniscate-animated</code> not found.</div>
+</div>
 
 </section>
 </section>
@@ -966,14 +895,10 @@ window.Quarto = {
 <span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
 <span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a>fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<figure class="shader-demo figure">
-  <div id="demo-day1-circle-mouse" style="width: 100%; height: ;"></div>
-  <script type="module">
-    import { embed } from '/demos/day1/circle-mouse/embed.js';
-    await embed({ container: '#demo-day1-circle-mouse' });
-  </script>
-  
-</figure>
+<div class="callout callout-warning">
+  <div class="callout-header">Missing Demo</div>
+  <div class="callout-body">Shader demo <code>day1/circle-mouse</code> not found.</div>
+</div>
 
 <p>Click and drag to move the circle.</p>
 </section>
@@ -1024,14 +949,10 @@ window.Quarto = {
 <span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
 <span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a>fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<figure class="shader-demo figure">
-  <div id="demo-day1-sun-earth" style="width: 100%; height: ;"></div>
-  <script type="module">
-    import { embed } from '/demos/day1/sun-earth/embed.js';
-    await embed({ container: '#demo-day1-sun-earth' });
-  </script>
-  
-</figure>
+<div class="callout callout-warning">
+  <div class="callout-header">Missing Demo</div>
+  <div class="callout-body">Shader demo <code>day1/sun-earth</code> not found.</div>
+</div>
 
 <p>Drag to move the sun; the earth follows in orbit. (Exercise: add a moon orbiting the earth!)</p>
 </section>
@@ -1062,14 +983,10 @@ window.Quarto = {
 <span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
 <span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<figure class="shader-demo figure">
-  <div id="demo-day1-folium-mouse" style="width: 100%; height: ;"></div>
-  <script type="module">
-    import { embed } from '/demos/day1/folium-mouse/embed.js';
-    await embed({ container: '#demo-day1-folium-mouse' });
-  </script>
-  
-</figure>
+<div class="callout callout-warning">
+  <div class="callout-header">Missing Demo</div>
+  <div class="callout-body">Shader demo <code>day1/folium-mouse</code> not found.</div>
+</div>
 
 <p>Drag left and right to sweep through the level sets and watch the curve topology change.</p>
 </section>
@@ -1149,15 +1066,7 @@ window.Quarto = {
 <span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
 <span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>    color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.1</span><span class="op">,</span> <span class="fl">0.1</span><span class="op">,</span> <span class="fl">0.3</span><span class="op">);</span></span>
 <span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<figure class="shader-demo figure">
-  <div id="demo-day1-grid-circles" style="width: 100%; height: ;"></div>
-  <script type="module">
-    import { embed } from '/demos/day1/grid-circles/embed.js';
-    await embed({ container: '#demo-day1-grid-circles' });
-  </script>
-  
-</figure>
-
+<!--  -->
 <p>Try changing <code>N</code> to get more or fewer columns. The cells stay square regardless of screen shape.</p>
 </section>
 <section id="part-4-varying-by-cell" class="level4">
@@ -1694,13 +1603,13 @@ window.Quarto = {
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../outline.html" class="pagination-link" aria-label="Outline">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Outline</span>
+      <a href="../index.html" class="pagination-link" aria-label="About">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">About</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../appendices/day1-shaders.html" class="pagination-link" aria-label="Appendix: Day 1 Shader Code">
-        <span class="nav-page-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix: Day 1 Shader Code</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../lectures/day2.html" class="pagination-link" aria-label="Day 2: Complex Dynamics and Circle Inversion">
+        <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Day 2: Complex Dynamics and Circle Inversion</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

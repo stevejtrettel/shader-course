@@ -733,7 +733,7 @@ if (d < r) {
 }
 ```
 
-{{< shader-demo day1/grid-circles >}}
+<!-- {{< shader-demo day1/grid-circles >}} -->
 
 Try changing `N` to get more or fewer columns. The cells stay square regardless of screen shape.
 
