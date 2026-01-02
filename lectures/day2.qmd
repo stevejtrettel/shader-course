@@ -1,12 +1,11 @@
-# Day 2: Complex Dynamics and Circle Inversion
+# Day 2: Dynamics
 
 ## Overview
 
-By the end of today, you'll understand how simple iteration rules generate infinite complexity—and have the tools to render it in real time.
+Today we'll learn how to do per-pixel computation in shaders, to quickly produce images of compelx mathematical objects.  In the homework today, you'll create your own version of the classic mandelbrot fractal zoom:
 
 {{< shader-demo day2/mandelbrot-zoom >}}
 
-A zoom into the Mandelbrot set, colored by escape time. The entire structure emerges from iterating one formula: $z \mapsto z^2 + c$.
 
 Today we explore two kinds of iterative systems:
 
@@ -111,8 +110,6 @@ We need two facts that make efficient rendering possible.
 **Fact 1.** The Mandelbrot set is contained in the disk of radius 2. That is, if $|c| > 2$, then $c \notin \mathcal{M}$.
 
 *Proof.* [TODO] $\square$
-
-This tells us what region to display: we only need to look at $|c| \leq 2$.
 
 **Fact 2.** If $|c| \leq 2$ and $|z_n| > 2$ for some $n$, then the orbit escapes to infinity (so $c \notin \mathcal{M}$).
 
@@ -284,59 +281,23 @@ Different values of $c$ produce dramatically different Julia sets. In the exerci
 
 {{< shader-demo day2/julia-explorer >}}
 
-### The Burning Ship
-
-The **Burning Ship fractal** modifies the Mandelbrot iteration by taking the absolute value of the imaginary part after each squaring:
-
-$$z_{n+1} = (\text{Re}(z_n^2) + i|\text{Im}(z_n^2)|) + c$$
-
-In code:
-
-```glsl
-// Inside the loop:
-z = cmul(z, z);
-z.y = abs(z.y);  // Take absolute value of imaginary part
-z = z + c;
-```
-
-{{< shader-demo day2/burning-ship >}}
-
-The absolute value breaks the symmetry, creating an asymmetric fractal that (with some imagination) resembles a burning ship.
-
-### Higher Powers
+### Others
 
 The Mandelbrot set uses $z^2 + c$. What about $z^3 + c$? Or $z^4 + c$?
 
-For $z^3$, we need to implement cubing:
+For $z^3$, we can compose our existing `cmul` function:
 
 ```glsl
 vec2 ccube(vec2 z) {
-    // z³ = z · z · z
-    return cmul(cmul(z, z), z);
+    return cmul(cmul(z, z), z);  // z · z · z
 }
 ```
-
-Or we can derive it directly: $(a + bi)^3 = a^3 + 3a^2(bi) + 3a(bi)^2 + (bi)^3 = (a^3 - 3ab^2) + (3a^2b - b^3)i$
-
-```glsl
-vec2 ccube(vec2 z) {
-    float a = z.x, b = z.y;
-    return vec2(
-        a*a*a - 3.0*a*b*b,
-        3.0*a*a*b - b*b*b
-    );
-}
-```
-
-Then the iteration becomes:
-
-```glsl
-z = ccube(z) + c;
-```
-
-{{< shader-demo day2/mandelbrot-cubic >}}
-
 Higher powers give higher-order rotational symmetry: $z^3 + c$ has 3-fold symmetry, $z^4 + c$ has 4-fold symmetry, and so on.
+
+For some more variety, the **Burning Ship fractal** modifies the Mandelbrot iteration by taking the absolute value of the imaginary part after each squaring:
+
+$$z_{n+1} = (\text{Re}(z_n^2) + i|\text{Im}(z_n^2)|) + c$$
+
 
 ### The Pattern
 
@@ -379,10 +340,6 @@ vec2 invert(vec2 p) {
 To see what inversion does, let's draw some shapes and their images. We'll draw the unit circle (gray), plus a vertical line and a circle (yellow). To make it clearer, we'll toggle between showing the original shapes and their inversions:
 
 ```glsl
-vec2 invert(vec2 p) {
-    return p / dot(p, p);
-}
-
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
     vec2 uv = fragCoord / iResolution.xy;
@@ -457,7 +414,7 @@ if (grid.x < 0.02 || grid.y < 0.02) color = vec3(1.0, 1.0, 0.0);
 
 (If you did the grid project from Day 1, this is familiar!)
 
-We can run the same shader as before, just replacing the individual shapes with this grid:
+Using the same toggle shader structure as before, just replacing the individual shapes with this grid:
 
 {{< shader-demo day2/inversion-grid >}}
 
@@ -522,46 +479,16 @@ Much cleaner! And when we're working with multiple circles, we can pass them aro
 
 ### Demo: Moving Circle
 
-Let's animate a circle moving around and watch how the inversion changes:
+Let's animate a circle moving around and watch how the inversion changes. The key new elements are animating the circle's center and radius:
 
 ```glsl
-struct Circle {
-    vec2 center;
-    float radius;
-};
+// Animate the inversion circle
+Circle inv_circle;
+inv_circle.center = vec2(sin(iTime) * 0.5, cos(iTime * 0.7) * 0.5);
+inv_circle.radius = 1.0 + 0.3 * sin(iTime * 1.3);
 
-vec2 invert(vec2 p, Circle c) {
-    vec2 d = p - c.center;
-    return c.center + c.radius * c.radius * d / dot(d, d);
-}
-
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    vec2 uv = fragCoord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
-    vec2 p = uv * 4.0;
-    
-    // Animate the inversion circle
-    Circle inv_circle;
-    inv_circle.center = vec2(sin(iTime) * 0.5, cos(iTime * 0.7) * 0.5);
-    inv_circle.radius = 1.0 + 0.3 * sin(iTime * 1.3);
-    
-    // Compute inversion
-    vec2 p_inv = invert(p, inv_circle);
-    
-    vec3 color = vec3(0.1, 0.1, 0.15);
-    
-    // Draw the inversion circle
-    float d_inv = abs(length(p - inv_circle.center) - inv_circle.radius);
-    if (d_inv < 0.02) color = vec3(0.5, 0.5, 0.5);
-    
-    // Draw a grid in the inverted space
-    vec2 grid = mod(p_inv, 0.5);
-    if (grid.x < 0.02 || grid.y < 0.02) color = vec3(1.0, 1.0, 0.0);
-    
-    fragColor = vec4(color, 1.0);
-}
+// Compute inversion
+vec2 p_inv = invert(p, inv_circle);
 ```
 
 {{< shader-demo day2/inversion-moving >}}
@@ -573,7 +500,6 @@ As the circle moves and breathes, the inverted grid warps and flows.
 
 The Apollonian gasket is a classical fractal arising from circle packing. It's named after Apollonius of Perga (~200 BCE), who studied the problem of finding circles tangent to three given circles.
 
-{{< shader-demo day2/apollonian-final >}}
 
 ### The Setup
 
@@ -582,11 +508,6 @@ Start with four mutually tangent circles: three "inner" circles that touch each 
 Let's define these circles using our `Circle` struct. We'll place three circles of radius $r$ with centers forming an equilateral triangle, all tangent to each other and to an outer circle:
 
 ```glsl
-struct Circle {
-    vec2 center;
-    float radius;
-};
-
 // Three inner circles, mutually tangent, plus outer circle
 // For circles of radius r to be mutually tangent, their centers
 // must be 2r apart. This forms an equilateral triangle with side 2r.
@@ -613,33 +534,13 @@ This returns the distance from `p` to the circle's boundary—zero on the circle
 Let's draw our starting configuration:
 
 ```glsl
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    vec2 uv = fragCoord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
-    vec2 p = uv * 6.0;
-    
-    // Define circles
-    float r = 1.0;
-    float triSide = 2.0 * r;
-    float circumradius = triSide / sqrt(3.0);
-    
-    Circle c1 = Circle(vec2(0.0, circumradius), r);
-    Circle c2 = Circle(vec2(-circumradius * 0.866, -circumradius * 0.5), r);
-    Circle c3 = Circle(vec2(circumradius * 0.866, -circumradius * 0.5), r);
-    Circle outer = Circle(vec2(0.0, 0.0), circumradius + r);
-    
-    vec3 color = vec3(0.1, 0.1, 0.15);
-    
-    // Draw all four circles
-    if (distToCircle(p, c1) < 0.03) color = vec3(1.0, 0.3, 0.3);
-    if (distToCircle(p, c2) < 0.03) color = vec3(0.3, 1.0, 0.3);
-    if (distToCircle(p, c3) < 0.03) color = vec3(0.3, 0.3, 1.0);
-    if (distToCircle(p, outer) < 0.03) color = vec3(1.0, 1.0, 1.0);
-    
-    fragColor = vec4(color, 1.0);
-}
+vec3 color = vec3(0.1, 0.1, 0.15);
+
+// Draw all four circles
+if (distToCircle(p, c1) < 0.03) color = vec3(1.0, 0.3, 0.3);
+if (distToCircle(p, c2) < 0.03) color = vec3(0.3, 1.0, 0.3);
+if (distToCircle(p, c3) < 0.03) color = vec3(0.3, 0.3, 1.0);
+if (distToCircle(p, outer) < 0.03) color = vec3(1.0, 1.0, 1.0);
 ```
 
 {{< shader-demo day2/apollonian-setup >}}
@@ -696,7 +597,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     uv.x *= iResolution.x / iResolution.y;
     vec2 p = uv * 6.0;
     
-    // Define circles
+    // Setup circles with correct geometry
     float r = 1.0;
     float triSide = 2.0 * r;
     float circumradius = triSide / sqrt(3.0);
@@ -764,8 +665,7 @@ The squaring suppresses points that escape quickly, while the factor of 30 boost
 **C2. Cubic Mandelbrot.** Change the iteration from $z^2 + c$ to $z^3 + c$. You'll need to implement complex cubing:
 ```glsl
 vec2 ccube(vec2 z) {
-    float a = z.x, b = z.y;
-    return vec2(a*a*a - 3.0*a*b*b, 3.0*a*a*b - b*b*b);
+    return cmul(cmul(z, z), z);
 }
 ```
 What symmetry do you observe?
@@ -852,8 +752,6 @@ Experiment with different configurations:
 - Rendering Mandelbrot in one region
 - Reading click position from `iMouse`
 - Rendering Julia for that `c` in another region (or blended on top)
-
-{{< shader-demo day2/julia-explorer >}}
 
 **H2. Newton Fractal.** The Newton fractal comes from applying Newton's method to find roots of a polynomial. For $f(z) = z^3 - 1$, Newton's iteration is:
 $$z_{n+1} = z_n - \frac{f(z_n)}{f'(z_n)} = z_n - \frac{z_n^3 - 1}{3z_n^2} = \frac{2z_n^3 + 1}{3z_n^2}$$

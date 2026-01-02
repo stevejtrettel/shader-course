@@ -1,8 +1,8 @@
-# Day 1: Introduction to Shader Programming
+# Day 1: Introduction
 
 ## Overview
 
-By the end of today, you'll be able to create this:
+By the end of today, you'll be able to create things like this:
 
 {{< shader-demo day1/elliptic-family >}}
 

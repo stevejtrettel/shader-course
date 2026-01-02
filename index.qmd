@@ -8,20 +8,3 @@ We'll progress from 2D foundations (curves, tilings, fractals) to 3D rendering v
 
 No prior experience with shaders or GLSL is required—only a strong foundation in undergraduate mathematics and willingness to work hard and experiment with code through daily homework exercises.
 Here are some examples of things we will make:
-
-The code
-
-
-and the demo
-
-
-and a still pic for testing
-
-
-![](images/mandelbrot.png)
-
-<!-- ![](images/hyperbolic.png)
-
-![](images/cubic.png) -->
-
-

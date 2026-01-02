@@ -5,10 +5,7 @@ return {
     local caption = pandoc.utils.stringify(kwargs["caption"] or "")
     
     local base_path = "/demos/" .. name
-    
-    -- Check if the demo exists
-    local embed_file = "demos/" .. name .. "/embed.js"
-    local screenshot_file = "demos/" .. name .. "/screenshot.png"
+    local project_dir = quarto.project.directory or "."
     
     local function file_exists(path)
       local f = io.open(path, "r")
@@ -19,8 +16,10 @@ return {
       return false
     end
     
+    local embed_file = project_dir .. "/demos/" .. name .. "/embed.js"
+    local screenshot_file = project_dir .. "/demos/" .. name .. "/screenshot.png"
+    
     if quarto.doc.is_format("html") then
-      -- Check for embed.js
       if not file_exists(embed_file) then
         return pandoc.RawBlock("html", string.format([[
 <div class="callout callout-warning">
@@ -44,7 +43,6 @@ return {
 ]], id, height, base_path, id, 
         caption ~= "" and string.format("<figcaption>%s</figcaption>", caption) or ""))
     else
-      -- Check for screenshot
       if not file_exists(screenshot_file) then
         return pandoc.RawBlock("latex", string.format([[
 \begin{tcolorbox}[colback=yellow!10, colframe=yellow!50!black, title=Missing Demo]

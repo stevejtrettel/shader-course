@@ -8,14 +8,25 @@ Complete, standalone code for each shader referenced in Day 2. Each listing can 
 These helper functions are used throughout Day 2:
 
 ```glsl
+// Normalize screen coordinates to centered, aspect-corrected space
+vec2 normalize_coord(vec2 fragCoord) {
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    return uv * 4.0;
+}
+
+// Complex multiplication: (a + bi)(c + di)
 vec2 cmul(vec2 z, vec2 w) {
     return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);
 }
 
+// Squared magnitude of complex number (avoids sqrt)
 float cabs2(vec2 z) {
     return dot(z, z);
 }
 
+// Cosine palette for smooth coloring
 vec3 palette(float t) {
     vec3 a = vec3(0.5, 0.5, 0.5);
     vec3 b = vec3(0.5, 0.5, 0.5);
@@ -47,17 +58,21 @@ vec3 palette(float t) {
     return a + b * cos(6.28318 * (c * t + d));
 }
 
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
+vec2 normalize_coord(vec2 fragCoord) {
     vec2 uv = fragCoord / iResolution.xy;
     uv = uv - vec2(0.5, 0.5);
     uv.x *= iResolution.x / iResolution.y;
+    float zoom = pow(1.5, mod(iTime, 30.0));
+    return uv * 4.0 / zoom;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 p = normalize_coord(fragCoord);
     
     // Zoom into the seahorse valley
     vec2 center = vec2(-0.745, 0.186);
-    float zoom = pow(1.5, mod(iTime, 30.0));  // resets every 30s
-    
-    vec2 c = center + uv * 4.0 / zoom;
+    vec2 c = center + p;
     
     vec2 z = vec2(0.0, 0.0);
     int max_iter = 200;
@@ -77,7 +92,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
         float nu = log(log_zn / log(2.0)) / log(2.0);
         float smooth_iter = float(iter) + 1.0 - nu;
         float t = smooth_iter / float(max_iter);
-        color = palette(t * 4.0);  // multiply for more color variation
+        color = palette(t * 4.0);
     }
     
     fragColor = vec4(color, 1.0);
@@ -98,14 +113,19 @@ float cabs2(vec2 z) {
     return dot(z, z);
 }
 
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
+vec2 normalize_coord(vec2 fragCoord) {
     vec2 uv = fragCoord / iResolution.xy;
     uv = uv - vec2(0.5, 0.5);
     uv.x *= iResolution.x / iResolution.y;
+    return uv * 4.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 p = normalize_coord(fragCoord);
     
-    vec2 c = uv * 4.0;
-    c.x -= 0.5;
+    vec2 c = p;
+    c.x -= 0.5;  // shift left to center the interesting part
     
     vec2 z = vec2(0.0, 0.0);
     int max_iter = 100;
@@ -141,13 +161,18 @@ float cabs2(vec2 z) {
     return dot(z, z);
 }
 
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
+vec2 normalize_coord(vec2 fragCoord) {
     vec2 uv = fragCoord / iResolution.xy;
     uv = uv - vec2(0.5, 0.5);
     uv.x *= iResolution.x / iResolution.y;
+    return uv * 4.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 p = normalize_coord(fragCoord);
     
-    vec2 c = uv * 4.0;
+    vec2 c = p;
     c.x -= 0.5;
     
     vec2 z = vec2(0.0, 0.0);
@@ -193,13 +218,18 @@ vec3 palette(float t) {
     return a + b * cos(6.28318 * (c * t + d));
 }
 
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
+vec2 normalize_coord(vec2 fragCoord) {
     vec2 uv = fragCoord / iResolution.xy;
     uv = uv - vec2(0.5, 0.5);
     uv.x *= iResolution.x / iResolution.y;
+    return uv * 4.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 p = normalize_coord(fragCoord);
     
-    vec2 c = uv * 4.0;
+    vec2 c = p;
     c.x -= 0.5;
     
     vec2 z = vec2(0.0, 0.0);
@@ -237,12 +267,16 @@ float cabs2(vec2 z) {
     return dot(z, z);
 }
 
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
+vec2 normalize_coord(vec2 fragCoord) {
     vec2 uv = fragCoord / iResolution.xy;
     uv = uv - vec2(0.5, 0.5);
     uv.x *= iResolution.x / iResolution.y;
-    vec2 p = uv * 4.0;
+    return uv * 4.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 p = normalize_coord(fragCoord);
     
     // Fixed parameter - try different values!
     vec2 c = vec2(-0.7, 0.27015);
@@ -283,18 +317,19 @@ float cabs2(vec2 z) {
     return dot(z, z);
 }
 
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
+vec2 normalize_coord(vec2 fragCoord) {
     vec2 uv = fragCoord / iResolution.xy;
     uv = uv - vec2(0.5, 0.5);
     uv.x *= iResolution.x / iResolution.y;
-    vec2 p = uv * 4.0;
+    return uv * 4.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 p = normalize_coord(fragCoord);
     
     // Get c from mouse position
-    vec2 mouse_uv = iMouse.xy / iResolution.xy;
-    mouse_uv = mouse_uv - vec2(0.5, 0.5);
-    mouse_uv.x *= iResolution.x / iResolution.y;
-    vec2 c = mouse_uv * 4.0;
+    vec2 c = normalize_coord(iMouse.xy);
     c.x -= 0.5;
     
     // Default to interesting value if no mouse
@@ -341,127 +376,25 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 ```
 
 
-## A7. burning-ship
-
-The Burning Ship fractal.
-
-```glsl
-vec2 cmul(vec2 z, vec2 w) {
-    return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);
-}
-
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    // Scale coordinates - the 0.1/iResolution.y factor and offset
-    // center the view on the "ship"
-    vec2 c = 0.1 * fragCoord / iResolution.y + vec2(1.66, -0.02);
-    
-    vec2 z = vec2(0.0);
-    int max_iter = 100;
-    int iter;
-    
-    for (iter = 0; iter < max_iter; iter++) {
-        if (dot(z, z) > 1000.0) break;
-        
-        // Complex square
-        z = cmul(z, z);
-        
-        // Burning Ship: take abs of imaginary part
-        z.y = abs(z.y);
-        
-        // Subtract c (equivalent to z² + c with sign conventions)
-        z = z - c;
-    }
-    
-    vec3 color;
-    if (iter == max_iter) {
-        color = vec3(0.0);  // Inside: black
-    } else {
-        color = vec3(1.0);  // Escaped: white
-        
-        // For smooth coloring, try:
-        // float s = float(iter) - log2(log2(dot(z, z))) + 3.0;
-        // float t = s / float(max_iter);
-        // color = vec3(t);
-    }
-    
-    fragColor = vec4(color, 1.0);
-}
-```
-
-
-## A8. mandelbrot-cubic
-
-Cubic Mandelbrot set: $z^3 + c$.
-
-```glsl
-vec2 cmul(vec2 z, vec2 w) {
-    return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);
-}
-
-vec2 ccube(vec2 z) {
-    float a = z.x, b = z.y;
-    return vec2(a*a*a - 3.0*a*b*b, 3.0*a*a*b - b*b*b);
-}
-
-float cabs2(vec2 z) {
-    return dot(z, z);
-}
-
-vec3 palette(float t) {
-    vec3 a = vec3(0.5, 0.5, 0.5);
-    vec3 b = vec3(0.5, 0.5, 0.5);
-    vec3 c = vec3(1.0, 1.0, 1.0);
-    vec3 d = vec3(0.30, 0.20, 0.20);
-    return a + b * cos(6.28318 * (c * t + d));
-}
-
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    vec2 uv = fragCoord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
-    
-    vec2 c = uv * 3.0;
-    
-    vec2 z = vec2(0.0, 0.0);
-    int max_iter = 100;
-    int iter;
-    
-    for (iter = 0; iter < max_iter; iter++) {
-        if (cabs2(z) > 4.0) break;
-        z = ccube(z) + c;
-    }
-    
-    vec3 color;
-    if (iter == max_iter) {
-        color = vec3(0.0);
-    } else {
-        float t = float(iter) / float(max_iter);
-        color = palette(t);
-    }
-    
-    fragColor = vec4(color, 1.0);
-}
-```
-
-
-## A9. inversion-toggle
+## A7. inversion-toggle
 
 Circle inversion visualization with toggling.
 
 ```glsl
+vec2 normalize_coord(vec2 fragCoord) {
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    return uv * 4.0;
+}
+
 vec2 invert(vec2 p) {
     return p / dot(p, p);
 }
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    vec2 uv = fragCoord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
-    vec2 p = uv * 4.0;
-    
+    vec2 p = normalize_coord(fragCoord);
     vec2 p_inv = invert(p);
     
     // Toggle between original and inverted every second
@@ -494,22 +427,25 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 ```
 
 
-## A10. inversion-grid
+## A8. inversion-grid
 
 Circle inversion of a grid.
 
 ```glsl
+vec2 normalize_coord(vec2 fragCoord) {
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    return uv * 4.0;
+}
+
 vec2 invert(vec2 p) {
     return p / dot(p, p);
 }
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    vec2 uv = fragCoord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
-    vec2 p = uv * 4.0;
-    
+    vec2 p = normalize_coord(fragCoord);
     vec2 p_inv = invert(p);
     
     // Toggle
@@ -536,11 +472,18 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 ```
 
 
-## A11. inversion-moving
+## A9. inversion-moving
 
 Inversion through a moving circle.
 
 ```glsl
+vec2 normalize_coord(vec2 fragCoord) {
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    return uv * 4.0;
+}
+
 struct Circle {
     vec2 center;
     float radius;
@@ -553,10 +496,7 @@ vec2 invert(vec2 p, Circle c) {
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    vec2 uv = fragCoord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
-    vec2 p = uv * 4.0;
+    vec2 p = normalize_coord(fragCoord);
     
     // Animate the inversion circle
     Circle inv_circle;
@@ -580,11 +520,18 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 ```
 
 
-## A12. apollonian-setup
+## A10. apollonian-setup
 
 The four mutually tangent circles (no iteration).
 
 ```glsl
+vec2 normalize_coord(vec2 fragCoord) {
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    return uv * 6.0;
+}
+
 struct Circle {
     vec2 center;
     float radius;
@@ -596,10 +543,7 @@ float distToCircle(vec2 p, Circle c) {
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    vec2 uv = fragCoord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
-    vec2 p = uv * 6.0;
+    vec2 p = normalize_coord(fragCoord);
     
     // Three mutually tangent inner circles plus outer circle
     // For three circles of radius r centered at vertices of equilateral triangle:
@@ -608,8 +552,8 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     // - Outer circle radius = circumradius + r
     
     float r = 1.0;
-    float triSide = 2.0 * r;  // distance between inner circle centers
-    float circumradius = triSide / sqrt(3.0);  // distance from origin to inner centers
+    float triSide = 2.0 * r;
+    float circumradius = triSide / sqrt(3.0);
     
     // Inner circles at vertices of equilateral triangle
     Circle c1 = Circle(vec2(0.0, circumradius), r);
@@ -632,11 +576,18 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 ```
 
 
-## A13. apollonian-iterated
+## A11. apollonian-iterated
 
 Full Apollonian gasket with iteration.
 
 ```glsl
+vec2 normalize_coord(vec2 fragCoord) {
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    return uv * 6.0;
+}
+
 struct Circle {
     vec2 center;
     float radius;
@@ -665,10 +616,7 @@ vec3 palette(float t) {
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    vec2 uv = fragCoord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
-    vec2 p = uv * 6.0;
+    vec2 p = normalize_coord(fragCoord);
     
     // Setup circles with correct geometry
     float r = 1.0;
@@ -712,11 +660,18 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 ```
 
 
-## A14. apollonian-final
+## A12. apollonian-final
 
 Apollonian gasket with coloring emphasizing the limit set.
 
 ```glsl
+vec2 normalize_coord(vec2 fragCoord) {
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    return uv * 6.0;
+}
+
 struct Circle {
     vec2 center;
     float radius;
@@ -733,10 +688,7 @@ bool isInside(vec2 p, Circle c) {
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    vec2 uv = fragCoord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
-    vec2 p = uv * 6.0;
+    vec2 p = normalize_coord(fragCoord);
     
     // Setup circles with correct geometry
     float r = 1.0;
