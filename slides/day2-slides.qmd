@@ -1,0 +1,56 @@
+---
+title: "Day 2"
+format: revealjs
+---
+
+# Day 2: Dynamics & Iteration
+
+## Complex Numbers in GLSL
+
+GLSL doesn't have native complex numbers, but `vec2` works perfectly:
+
+```glsl
+// Complex multiplication
+vec2 cmul(vec2 a, vec2 b) {
+    return vec2(
+        a.x * b.x - a.y * b.y,
+        a.x * b.y + a.y * b.x
+    );
+}
+```
+
+## The Mandelbrot Set
+
+Iterate $z_{n+1} = z_n^2 + c$ and check for escape:
+
+```glsl
+int mandelbrot(vec2 c, int maxIter) {
+    vec2 z = vec2(0.0);
+    for (int i = 0; i < maxIter; i++) {
+        z = cmul(z, z) + c;
+        if (dot(z, z) > 4.0) return i;
+    }
+    return maxIter;
+}
+```
+
+## Mandelbrot Visualization
+
+{{< shader-demo day2/mandelbrot-color >}}
+
+## Julia Sets
+
+Same iteration, different perspective:
+
+- **Mandelbrot**: vary $c$, start at $z_0 = 0$
+- **Julia**: fix $c$, vary starting $z_0$
+
+{{< shader-demo day2/julia-explorer >}}
+
+## Circle Inversion
+
+Inversion through a circle of radius $r$:
+
+$$z \mapsto \frac{r^2}{\bar{z}}$$
+
+{{< shader-demo day2/inversion-grid >}}

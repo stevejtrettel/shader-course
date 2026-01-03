@@ -1,0 +1,52 @@
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "GPU-Accelerated Mathematical Illustration"
+  repo-url: https://github.com/stevejtrettel/shader-course
+
+  sidebar:
+    style: docked
+    collapse-level: 2
+    contents:
+      - index.qmd
+      - section: "Day 1: Introduction"
+        contents:
+          - text: "Lecture Notes"
+            href: lectures/day1.qmd
+          - text: "Slides"
+            href: slides/day1-slides.html
+      - section: "Day 2: Dynamics"
+        contents:
+          - text: "Lecture Notes"
+            href: lectures/day2.qmd
+          - text: "Slides"
+            href: slides/day2-slides.html
+      - section: "Day 3: Tilings"
+        contents:
+          - text: "Lecture Notes"
+            href: lectures/day3.qmd
+          - text: "Slides"
+            href: slides/day3-slides.html
+      - section: "Appendices"
+        contents:
+          - lectures/shaders/day1-shaders.qmd
+          - lectures/shaders/day2-shaders.qmd
+          - lectures/shaders/day3-shaders.qmd
+      - text: "Download PDF"
+        href: GPU-Accelerated-Mathematical-Illustration.pdf
+
+format:
+  html:
+    theme:
+      light: [cosmo, custom.scss]
+      dark: [darkly, custom.scss]
+    code-copy: true
+    code-overflow: wrap
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    number-depth: 2
+    link-external-newwindow: true
+    smooth-scroll: true
