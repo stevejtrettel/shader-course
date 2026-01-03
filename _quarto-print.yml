@@ -24,6 +24,7 @@ book:
 
 format:
   pdf:
+    output-file: "GPU-Accelerated-Mathematical-Illustration.pdf"
     pdf-engine: lualatex
     documentclass: scrbook
     fontfamily: libertinus
