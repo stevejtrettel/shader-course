@@ -7,4 +7,4 @@
   package = "@quarto/netlify-plugin-quarto"
 
   [plugins.inputs]
-    cmd = "render && quarto render --profile print && cp _book/*.pdf _site/"
+    cmd = "render"
