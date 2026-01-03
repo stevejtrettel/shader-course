@@ -1,0 +1,34 @@
+book:
+  chapters:
+    - index.qmd
+    - part: "Lectures"
+      chapters:
+        - lectures/day1.qmd
+        - lectures/day2.qmd
+        - lectures/day3.qmd
+
+  appendices:
+    - lectures/shaders/day1-shaders.qmd
+    - lectures/shaders/day2-shaders.qmd
+    - lectures/shaders/day3-shaders.qmd
+
+format:
+  pdf:
+    pdf-engine: lualatex
+    documentclass: scrbook
+    fontfamily: libertinus
+    fontsize: 10pt
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    colorlinks: true
+    fig-width: 5.25
+    keep-tex: true
+    callout-appearance: simple
+    geometry:
+      - letterpaper
+      - left=1.5in
+      - right=1.5in
+      - top=1.25in
+      - bottom=1.25in
+    include-in-header: preamble.tex

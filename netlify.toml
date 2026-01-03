@@ -1,0 +1,7 @@
+[build]
+  command = "quarto render && quarto render --profile print"
+  publish = "_book"
+
+[build.environment]
+  # Netlify will need Quarto installed
+  # You may need to add a runtime.txt or use a Quarto build plugin

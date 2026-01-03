@@ -1,0 +1,10 @@
+---
+title: "Day 2"
+format: revealjs
+---
+
+# Day 2: Dynamics
+
+## Welcome
+
+Your slides here...

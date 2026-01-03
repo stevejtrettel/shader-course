@@ -1,0 +1,10 @@
+---
+title: "Day 1"
+format: revealjs
+---
+
+# Day 1: Introduction
+
+## Welcome
+
+Your slides here...
