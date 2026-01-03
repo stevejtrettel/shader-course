@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Steve Trettel">
+
+<title>notes – GPU-Accelerated Mathematical Illustration</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e62aa0a8c28b52a0e19b1cebeabd7fd3.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-f0463eacbf7faa50df92658b97a72515.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e62aa0a8c28b52a0e19b1cebeabd7fd3.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-d72af2198ff6241fba5e91235accbade.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-9ba55aa6988265aad246d48a0606a5a7.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-d72af2198ff6241fba5e91235accbade.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../lectures/day1/notes.html">Day 1: Introduction</a></li><li class="breadcrumb-item"><a href="../../lectures/day1/notes.html">Lecture Notes</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">GPU-Accelerated Mathematical Illustration</a> 
+        <div class="sidebar-tools-main">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">About</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Day 1: Introduction</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/day1/notes.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Lecture Notes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/day1/slides.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Slides</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/day1/shaders.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Shader Code</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Day 2: Dynamics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/day2/notes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lecture Notes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/day2/slides.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Slides</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/day2/shaders.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Shader Code</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Day 3: Tilings</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/day3/notes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lecture Notes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/day3/slides.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Slides</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/day3/shaders.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Shader Code</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Day 4: Ray Marching</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/day4/notes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lecture Notes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/day4/slides.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Slides</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/day4/shaders.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Shader Code</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../GPU-Accelerated-Mathematical-Illustration.pdf" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Download PDF</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#day-1-introduction" id="toc-day-1-introduction" class="nav-link active" data-scroll-target="#day-1-introduction"><span class="header-section-number">1</span> Day 1: Introduction</a>
+  <ul class="collapse">
+  <li><a href="#overview" id="toc-overview" class="nav-link" data-scroll-target="#overview"><span class="header-section-number">1.1</span> Overview</a></li>
+  <li><a href="#what-is-a-shader" id="toc-what-is-a-shader" class="nav-link" data-scroll-target="#what-is-a-shader"><span class="header-section-number">1.2</span> What is a Shader?</a>
+  <ul class="collapse">
+  <li><a href="#parallelism" id="toc-parallelism" class="nav-link" data-scroll-target="#parallelism">Parallelism</a></li>
+  <li><a href="#why-shadertoy" id="toc-why-shadertoy" class="nav-link" data-scroll-target="#why-shadertoy">Why Shadertoy?</a></li>
+  </ul></li>
+  <li><a href="#first-shaders-colors-and-syntax" id="toc-first-shaders-colors-and-syntax" class="nav-link" data-scroll-target="#first-shaders-colors-and-syntax"><span class="header-section-number">1.3</span> First Shaders: Colors and Syntax</a>
+  <ul class="collapse">
+  <li><a href="#the-mainimage-function" id="toc-the-mainimage-function" class="nav-link" data-scroll-target="#the-mainimage-function">The mainImage Function</a></li>
+  <li><a href="#hello-world-a-solid-color" id="toc-hello-world-a-solid-color" class="nav-link" data-scroll-target="#hello-world-a-solid-color">Hello World: A Solid Color</a></li>
+  <li><a href="#glsl-syntax-essentials" id="toc-glsl-syntax-essentials" class="nav-link" data-scroll-target="#glsl-syntax-essentials">GLSL Syntax Essentials</a></li>
+  <li><a href="#uniforms-global-inputs" id="toc-uniforms-global-inputs" class="nav-link" data-scroll-target="#uniforms-global-inputs">Uniforms: Global Inputs</a></li>
+  <li><a href="#animation-using-itime" id="toc-animation-using-itime" class="nav-link" data-scroll-target="#animation-using-itime">Animation: Using iTime</a></li>
+  </ul></li>
+  <li><a href="#coordinate-systems" id="toc-coordinate-systems" class="nav-link" data-scroll-target="#coordinate-systems"><span class="header-section-number">1.4</span> Coordinate Systems</a>
+  <ul class="collapse">
+  <li><a href="#pixel-coordinates" id="toc-pixel-coordinates" class="nav-link" data-scroll-target="#pixel-coordinates">Pixel Coordinates</a></li>
+  <li><a href="#step-1-normalize-to-012" id="toc-step-1-normalize-to-012" class="nav-link" data-scroll-target="#step-1-normalize-to-012">Step 1: Normalize to <span class="math inline">\([0,1]^2\)</span></a></li>
+  <li><a href="#step-2-center-the-origin" id="toc-step-2-center-the-origin" class="nav-link" data-scroll-target="#step-2-center-the-origin">Step 2: Center the Origin</a></li>
+  <li><a href="#step-3-aspect-ratio-correction" id="toc-step-3-aspect-ratio-correction" class="nav-link" data-scroll-target="#step-3-aspect-ratio-correction">Step 3: Aspect Ratio Correction</a></li>
+  <li><a href="#step-4-scale-to-a-useful-range" id="toc-step-4-scale-to-a-useful-range" class="nav-link" data-scroll-target="#step-4-scale-to-a-useful-range">Step 4: Scale to a Useful Range</a></li>
+  <li><a href="#the-standard-boilerplate" id="toc-the-standard-boilerplate" class="nav-link" data-scroll-target="#the-standard-boilerplate">The Standard Boilerplate</a></li>
+  </ul></li>
+  <li><a href="#drawing-with-distance" id="toc-drawing-with-distance" class="nav-link" data-scroll-target="#drawing-with-distance"><span class="header-section-number">1.5</span> Drawing with Distance</a>
+  <ul class="collapse">
+  <li><a href="#half-planes" id="toc-half-planes" class="nav-link" data-scroll-target="#half-planes">Half-Planes</a></li>
+  <li><a href="#circles" id="toc-circles" class="nav-link" data-scroll-target="#circles">Circles</a></li>
+  <li><a href="#drawing-a-ring" id="toc-drawing-a-ring" class="nav-link" data-scroll-target="#drawing-a-ring">Drawing a Ring</a></li>
+  </ul></li>
+  <li><a href="#implicit-curves" id="toc-implicit-curves" class="nav-link" data-scroll-target="#implicit-curves"><span class="header-section-number">1.6</span> Implicit Curves</a>
+  <ul class="collapse">
+  <li><a href="#a-first-example-the-parabola" id="toc-a-first-example-the-parabola" class="nav-link" data-scroll-target="#a-first-example-the-parabola">A First Example: The Parabola</a></li>
+  <li><a href="#more-examples" id="toc-more-examples" class="nav-link" data-scroll-target="#more-examples">More Examples</a></li>
+  <li><a href="#the-thickness-problem" id="toc-the-thickness-problem" class="nav-link" data-scroll-target="#the-thickness-problem">The Thickness Problem</a></li>
+  <li><a href="#why-circles-worked" id="toc-why-circles-worked" class="nav-link" data-scroll-target="#why-circles-worked">Why Circles Worked</a></li>
+  <li><a href="#gradient-correction" id="toc-gradient-correction" class="nav-link" data-scroll-target="#gradient-correction">Gradient Correction</a></li>
+  <li><a href="#animated-curve-families" id="toc-animated-curve-families" class="nav-link" data-scroll-target="#animated-curve-families">Animated Curve Families</a></li>
+  </ul></li>
+  <li><a href="#interactivity-and-abstraction" id="toc-interactivity-and-abstraction" class="nav-link" data-scroll-target="#interactivity-and-abstraction"><span class="header-section-number">1.7</span> Interactivity and Abstraction</a>
+  <ul class="collapse">
+  <li><a href="#the-imouse-uniform" id="toc-the-imouse-uniform" class="nav-link" data-scroll-target="#the-imouse-uniform">The iMouse Uniform</a></li>
+  <li><a href="#dragging-a-circle" id="toc-dragging-a-circle" class="nav-link" data-scroll-target="#dragging-a-circle">Dragging a Circle</a></li>
+  <li><a href="#writing-a-helper-function" id="toc-writing-a-helper-function" class="nav-link" data-scroll-target="#writing-a-helper-function">Writing a Helper Function</a></li>
+  <li><a href="#combining-imouse-and-itime-sun-and-earth" id="toc-combining-imouse-and-itime-sun-and-earth" class="nav-link" data-scroll-target="#combining-imouse-and-itime-sun-and-earth">Combining iMouse and iTime: Sun and Earth</a></li>
+  <li><a href="#mouse-as-parameter" id="toc-mouse-as-parameter" class="nav-link" data-scroll-target="#mouse-as-parameter">Mouse as Parameter</a></li>
+  </ul></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">1.8</span> Exercises</a>
+  <ul class="collapse">
+  <li><a href="#checkpoints" id="toc-checkpoints" class="nav-link" data-scroll-target="#checkpoints">Checkpoints</a></li>
+  <li><a href="#explorations" id="toc-explorations" class="nav-link" data-scroll-target="#explorations">Explorations</a></li>
+  <li><a href="#challenges" id="toc-challenges" class="nav-link" data-scroll-target="#challenges">Challenges</a></li>
+  <li><a href="#project-grid-patterns" id="toc-project-grid-patterns" class="nav-link" data-scroll-target="#project-grid-patterns">Project: Grid Patterns</a></li>
+  <li><a href="#project-fourier-epicycles" id="toc-project-fourier-epicycles" class="nav-link" data-scroll-target="#project-fourier-epicycles">Project: Fourier Epicycles</a></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../lectures/day1/notes.html">Day 1: Introduction</a></li><li class="breadcrumb-item"><a href="../../lectures/day1/notes.html">Lecture Notes</a></li></ol></nav>
+<div class="quarto-title">
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Steve Trettel </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">January 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="day-1-introduction" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Day 1: Introduction</h1>
+<section id="overview" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="overview"><span class="header-section-number">1.1</span> Overview</h2>
+<p>By the end of today, you’ll be able to create things like this:</p>
+<figure class="shader-demo figure">
+  <div id="demo-day1-elliptic-family" style="width: 100%; height: ;"></div>
+  <script type="module">
+    import { embed } from '/demos/day1/elliptic-family/embed.js';
+    await embed({ container: '#demo-day1-elliptic-family' });
+  </script>
+  
+</figure>
+
+<p>A family of elliptic curves <span class="math inline">\(y^2 = x^3 + ax + b\)</span>, drawn for several values of <span class="math inline">\(a\)</span> simultaneously, with <span class="math inline">\(b\)</span> varying across the screen. The curves shift in brightness to show the family structure, and you can watch singularities appear and disappear along the discriminant locus.</p>
+<p>This image is computed in real time, every pixel evaluated independently on the GPU. To get here, we’ll learn:</p>
+<ul>
+<li>What a shader is: a function from coordinates to colors, evaluated in parallel</li>
+<li>How to set up a coordinate system for mathematical visualization</li>
+<li>How to draw shapes using distance functions</li>
+<li>How to render implicit curves <span class="math inline">\(F(x,y) = 0\)</span> with uniform thickness</li>
+<li>How to add interactivity with mouse input</li>
+</ul>
+<p>Let’s begin.</p>
+</section>
+<section id="what-is-a-shader" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="what-is-a-shader"><span class="header-section-number">1.2</span> What is a Shader?</h2>
+<p>We want to draw images on a screen.</p>
+<p>Mathematically, an image is a function from a region <span class="math inline">\(S \subset \mathbb{R}^2\)</span> to the space of visible colors <span class="math inline">\(\mathcal{C}\)</span>. This color space is three-dimensional, spanned by the responses of the three types of cone cells in our eyes. A convenient basis, roughly aligned with these responses, is red, green, and blue.</p>
+<p>To realize this on a computer, we discretize. A screen is a grid of <em>pixels</em>: <span class="math inline">\(X\)</span> pixels wide, <span class="math inline">\(Y\)</span> pixels tall. Each pixel is a point in the integer lattice <span class="math display">\[\{0, 1, \ldots, X-1\} \times \{0, 1, \ldots, Y-1\}.\]</span></p>
+<p>Colors are represented as RGB triples: red, green, and blue intensities, each in <span class="math inline">\([0,1]\)</span>. The constraint to <span class="math inline">\([0,1]\)</span> reflects physical reality—a pixel has a maximum brightness it can display. (We can’t draw the sun.) So an image is a function <span class="math display">\[f\colon \{0,\ldots,X-1\} \times \{0,\ldots,Y-1\} \to [0,1]^3\]</span> <span class="math display">\[(i,j) \mapsto (r,g,b).\]</span></p>
+<p>In practice, we add a fourth component: <em>alpha</em>, representing transparency. This matters when compositing multiple layers (we won’t use it in this course, but the machinery expects it). So our shader computes <span class="math display">\[f\colon (i,j) \mapsto (r,g,b,1).\]</span></p>
+<p>This is what a shader is. You write a function that takes pixel coordinates and returns an RGBA color. The GPU evaluates your function at every pixel to produce the image.</p>
+<section id="parallelism" class="level3">
+<h3 class="anchored" data-anchor-id="parallelism">Parallelism</h3>
+<p>A 1920×1080 display has over two million pixels. How do we evaluate <span class="math inline">\(f\)</span> at all of them fast enough to animate at 60 frames per second?</p>
+<p>The answer is parallelism. A GPU contains thousands of cores, and it evaluates <span class="math inline">\(f\)</span> at all pixels <em>simultaneously</em>. There’s no loop over pixels in your code—you write <span class="math inline">\(f\)</span>, and the hardware handles the rest.</p>
+<p>The tradeoff: each pixel’s computation must be <em>independent</em>. Pixel <span class="math inline">\((100, 200)\)</span> cannot ask what color pixel <span class="math inline">\((100, 199)\)</span> received. Every pixel sees the same global inputs—coordinates, time, mouse position—and must determine its color from those alone. Learning to think within this constraint is what shader programming is about.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Why “shader”?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The name comes from 3D graphics, where these programs computed <em>shading</em>—how light interacts with surfaces. It stuck even though we now use shaders for fractals, simulations, and mathematical visualization.</p>
+</div>
+</div>
+</section>
+<section id="why-shadertoy" class="level3">
+<h3 class="anchored" data-anchor-id="why-shadertoy">Why Shadertoy?</h3>
+<p>Shader programming normally requires substantial setup: OpenGL contexts, buffer management, compilation, render loops. <a href="https://www.shadertoy.com">Shadertoy</a> abstracts all of this—you write one function, press play, and see results. We’ll use it throughout the course.</p>
+</section>
+</section>
+<section id="first-shaders-colors-and-syntax" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="first-shaders-colors-and-syntax"><span class="header-section-number">1.3</span> First Shaders: Colors and Syntax</h2>
+<section id="the-mainimage-function" class="level3">
+<h3 class="anchored" data-anchor-id="the-mainimage-function">The mainImage Function</h3>
+<p>In Shadertoy, your shader is a function called <code>mainImage</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">mainImage</span><span class="op">(</span><span class="dt">out</span> <span class="dt">vec4</span> fragColor<span class="op">,</span> <span class="dt">in</span> <span class="dt">vec2</span> fragCoord<span class="op">)</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// your code here</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This function is called once per pixel, every frame. The inputs and outputs:</p>
+<ul>
+<li><code>fragCoord</code> — the pixel coordinates, passed <em>in</em> to your function</li>
+<li><code>fragColor</code> — the RGBA color, which you write <em>out</em></li>
+</ul>
+<p>The <code>in</code> and <code>out</code> keywords are explicit about data flow: <code>fragCoord</code> is read-only input, <code>fragColor</code> is where you write your result. The function returns <code>void</code> because the output goes through <code>fragColor</code>, not a return value.</p>
+</section>
+<section id="hello-world-a-solid-color" class="level3">
+<h3 class="anchored" data-anchor-id="hello-world-a-solid-color">Hello World: A Solid Color</h3>
+<p>The simplest shader: make every pixel red.</p>
+<figure class="shader-demo figure">
+  <div id="demo-day1-red" style="width: 100%; height: ;"></div>
+  <script type="module">
+    import { embed } from '/demos/day1/red/embed.js';
+    await embed({ container: '#demo-day1-red' });
+  </script>
+  
+</figure>
+
+<p>The <code>vec4(1.0, 0.0, 0.0, 1.0)</code> constructs a 4-component vector: red=1, green=0, blue=0, alpha=1. Every pixel receives the same color, so the screen fills with red.</p>
+</section>
+<section id="glsl-syntax-essentials" class="level3">
+<h3 class="anchored" data-anchor-id="glsl-syntax-essentials">GLSL Syntax Essentials</h3>
+<p>GLSL (OpenGL Shading Language) will feel familiar if you’ve seen C-like syntax, but a few things are worth noting upfront.</p>
+<p><strong>Semicolons</strong> are required at the end of each statement.</p>
+<p><strong>Floats must include a decimal point.</strong> Write <code>1.0</code>, not <code>1</code>. The integer <code>1</code> and the float <code>1.0</code> are different types, and GLSL is strict about this.</p>
+<p><strong>Vector types</strong> are built in: <code>vec2</code>, <code>vec3</code>, <code>vec4</code> for 2, 3, and 4 component vectors. Construct them with:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> p <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span><span class="fl">3.0</span><span class="op">,</span> <span class="fl">4.0</span><span class="op">);</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.5</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">);</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="dt">vec4</span> rgba <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Arithmetic is component-wise.</strong> Adding two vectors adds their components:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">2.0</span><span class="op">)</span> <span class="op">+</span> <span class="dt">vec2</span><span class="op">(</span><span class="fl">3.0</span><span class="op">,</span> <span class="fl">4.0</span><span class="op">)</span>  <span class="co">// = vec2(4.0, 6.0)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Scalar-vector operations</strong> apply the scalar to each component:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fl">2.0</span> <span class="op">*</span> <span class="dt">vec2</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">3.0</span><span class="op">)</span>  <span class="co">// = vec2(2.0, 6.0)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Accessing components</strong> uses <code>.x</code>, <code>.y</code>, <code>.z</code>, <code>.w</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> p <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span><span class="fl">3.0</span><span class="op">,</span> <span class="fl">4.0</span><span class="op">);</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> a <span class="op">=</span> p<span class="op">.</span><span class="fu">x</span><span class="op">;</span>  <span class="co">// 3.0</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> b <span class="op">=</span> p<span class="op">.</span><span class="fu">y</span><span class="op">;</span>  <span class="co">// 4.0</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>For colors, <code>.r</code>, <code>.g</code>, <code>.b</code>, <code>.a</code> are synonyms—<code>color.r</code> is the same as <code>color.x</code>.</p>
+<p><strong>Common math functions</strong> work as expected: <code>sin</code>, <code>cos</code>, <code>abs</code>, <code>min</code>, <code>max</code>, <code>sqrt</code>, <code>pow</code>. These operate on floats, and apply component-wise to vectors:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">sin</span><span class="op">(</span><span class="dt">vec2</span><span class="op">(</span><span class="fl">0.0</span><span class="op">,</span> <span class="fl">3.14159</span><span class="op">))</span>  <span class="co">// = vec2(0.0, ~0.0)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>For loops</strong> work as you’d expect:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> <span class="dv">5</span><span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">// body executes with i = 0, 1, 2, 3, 4</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The loop variable is an <code>int</code>. Note that some older GPUs require the loop bounds to be constants known at compile time—you can’t always loop up to a variable. We’ll use loops extensively starting tomorrow.</p>
+</section>
+<section id="uniforms-global-inputs" class="level3">
+<h3 class="anchored" data-anchor-id="uniforms-global-inputs">Uniforms: Global Inputs</h3>
+<p>Shadertoy provides <em>uniforms</em>—global values that are constant across all pixels. Unlike <code>fragCoord</code>, which takes a different value at each pixel, a uniform has the same value everywhere. They’re how external information (time, screen size, mouse position) gets into your shader.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 32%">
+<col style="width: 21%">
+<col style="width: 46%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Uniform</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>iResolution</code></td>
+<td><code>vec3</code></td>
+<td>Viewport size: <code>(width, height, pixel_aspect_ratio)</code></td>
+</tr>
+<tr class="even">
+<td><code>iTime</code></td>
+<td><code>float</code></td>
+<td>Seconds since the shader started</td>
+</tr>
+<tr class="odd">
+<td><code>iMouse</code></td>
+<td><code>vec4</code></td>
+<td>Mouse position and click state</td>
+</tr>
+</tbody>
+</table>
+<p>We’ll use <code>iResolution</code> constantly (for coordinate transforms) and <code>iTime</code> for animation.</p>
+</section>
+<section id="animation-using-itime" class="level3">
+<h3 class="anchored" data-anchor-id="animation-using-itime">Animation: Using iTime</h3>
+<p>Let’s make the red channel pulse:</p>
+<figure class="shader-demo figure">
+  <div id="demo-day1-red-pulsing" style="width: 100%; height: ;"></div>
+  <script type="module">
+    import { embed } from '/demos/day1/red-pulsing/embed.js';
+    await embed({ container: '#demo-day1-red-pulsing' });
+  </script>
+  
+</figure>
+
+<p>Since <code>sin(iTime)</code> oscillates between -1 and 1, the expression <code>0.5 + 0.5 * sin(iTime)</code> oscillates between 0 and 1. The screen pulses from black to red.</p>
+<p>This is our first <em>animated</em> shader—the output depends on time.</p>
+</section>
+</section>
+<section id="coordinate-systems" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="coordinate-systems"><span class="header-section-number">1.4</span> Coordinate Systems</h2>
+<section id="pixel-coordinates" class="level3">
+<h3 class="anchored" data-anchor-id="pixel-coordinates">Pixel Coordinates</h3>
+<p>The input <code>fragCoord</code> gives the pixel coordinates of the current pixel. The coordinate system:</p>
+<ul>
+<li>Origin at the <strong>bottom-left</strong> corner</li>
+<li><code>fragCoord.x</code> increases to the right</li>
+<li><code>fragCoord.y</code> increases upward</li>
+<li>Ranges from <span class="math inline">\((0, 0)\)</span> to <span class="math inline">\((X, Y)\)</span> where <span class="math inline">\(X \times Y\)</span> is the screen resolution</li>
+</ul>
+<p>This is workable, but inconvenient for mathematics. We’d prefer coordinates centered at the origin with a reasonable scale. Let’s build up a transformation step by step.</p>
+</section>
+<section id="step-1-normalize-to-012" class="level3">
+<h3 class="anchored" data-anchor-id="step-1-normalize-to-012">Step 1: Normalize to <span class="math inline">\([0,1]^2\)</span></h3>
+<p>Divide by the resolution to map pixel coordinates to the unit square:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> uv <span class="op">=</span> fragCoord <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">xy</span><span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Now <code>uv</code> ranges from <span class="math inline">\((0,0)\)</span> at bottom-left to <span class="math inline">\((1,1)\)</span> at top-right.</p>
+<p>Since both coordinates are in <span class="math inline">\([0,1]\)</span>, we can visualize them directly as color:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">mainImage</span><span class="op">(</span><span class="dt">out</span> <span class="dt">vec4</span> fragColor<span class="op">,</span> <span class="dt">in</span> <span class="dt">vec2</span> fragCoord<span class="op">)</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> uv <span class="op">=</span> fragCoord <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">xy</span><span class="op">;</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>uv<span class="op">.</span><span class="fu">x</span><span class="op">,</span> uv<span class="op">.</span><span class="fu">y</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<figure class="shader-demo figure">
+  <div id="demo-day1-coordinates" style="width: 100%; height: ;"></div>
+  <script type="module">
+    import { embed } from '/demos/day1/coordinates/embed.js';
+    await embed({ container: '#demo-day1-coordinates' });
+  </script>
+  
+</figure>
+
+<p>Black at bottom-left (0,0), red at bottom-right (1,0), green at top-left (0,1), yellow at top-right (1,1).</p>
+</section>
+<section id="step-2-center-the-origin" class="level3">
+<h3 class="anchored" data-anchor-id="step-2-center-the-origin">Step 2: Center the Origin</h3>
+<p>Subtract <span class="math inline">\((0.5, 0.5)\)</span> to center the origin:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>uv <span class="op">=</span> uv <span class="op">-</span> <span class="dt">vec2</span><span class="op">(</span><span class="fl">0.5</span><span class="op">,</span> <span class="fl">0.5</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Now <code>uv</code> ranges from <span class="math inline">\((-0.5, -0.5)\)</span> to <span class="math inline">\((0.5, 0.5)\)</span>, with <span class="math inline">\((0,0)\)</span> at the screen center.</p>
+</section>
+<section id="step-3-aspect-ratio-correction" class="level3">
+<h3 class="anchored" data-anchor-id="step-3-aspect-ratio-correction">Step 3: Aspect Ratio Correction</h3>
+<p>We’ve mapped a rectangle of pixels (<span class="math inline">\(X \times Y\)</span>) to the square <span class="math inline">\([-0.5, 0.5]^2\)</span>. This is an affine transformation, not a similarity—it distorts shapes. A circle in our coordinates would render as an ellipse on screen.</p>
+<p>To fix this, we scale the <span class="math inline">\(x\)</span>-coordinate by the aspect ratio:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>uv<span class="op">.</span><span class="fu">x</span> <span class="op">*=</span> iResolution<span class="op">.</span><span class="fu">x</span> <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">y</span><span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Now a circle in our coordinates appears as a circle on screen. (When we draw shapes later, try commenting out this line to see the distortion.)</p>
+</section>
+<section id="step-4-scale-to-a-useful-range" class="level3">
+<h3 class="anchored" data-anchor-id="step-4-scale-to-a-useful-range">Step 4: Scale to a Useful Range</h3>
+<p>Finally, scale to a convenient window:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> p <span class="op">=</span> uv <span class="op">*</span> <span class="fl">4.0</span><span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>With a scale factor of 4, our coordinates range roughly from <span class="math inline">\(-2\)</span> to <span class="math inline">\(2\)</span>—a good default for visualizing mathematical objects.</p>
+</section>
+<section id="the-standard-boilerplate" class="level3">
+<h3 class="anchored" data-anchor-id="the-standard-boilerplate">The Standard Boilerplate</h3>
+<p>Putting it together, here’s the coordinate setup we’ll use throughout the course:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> uv <span class="op">=</span> fragCoord <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">xy</span><span class="op">;</span>   <span class="co">// normalize to [0,1]</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>uv <span class="op">=</span> uv <span class="op">-</span> <span class="dt">vec2</span><span class="op">(</span><span class="fl">0.5</span><span class="op">,</span> <span class="fl">0.5</span><span class="op">);</span>               <span class="co">// center origin</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>uv<span class="op">.</span><span class="fu">x</span> <span class="op">*=</span> iResolution<span class="op">.</span><span class="fu">x</span> <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">y</span><span class="op">;</span>  <span class="co">// aspect correction</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> p <span class="op">=</span> uv <span class="op">*</span> <span class="fl">4.0</span><span class="op">;</span>                      <span class="co">// scale</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>From here on, <code>p</code> is our mathematical coordinate, centered at the origin, aspect-corrected, with a reasonable range.</p>
+</section>
+</section>
+<section id="drawing-with-distance" class="level2" data-number="1.5">
+<h2 data-number="1.5" class="anchored" data-anchor-id="drawing-with-distance"><span class="header-section-number">1.5</span> Drawing with Distance</h2>
+<p>So far we’ve colored every pixel the same, or colored based on position as a gradient. Now we want to <em>draw</em>: to render a shape on screen.</p>
+<p>What does it mean to draw a shape? For a simple filled region, we need a rule that tells us, for each pixel: are you inside the shape or not? When inside, we do one thing (say, color yellow). When outside, we do another (color blue). The boundary of the shape is where we switch.</p>
+<section id="half-planes" class="level3">
+<h3 class="anchored" data-anchor-id="half-planes">Half-Planes</h3>
+<p>The simplest shape is a half-plane. Consider the rule: is the <span class="math inline">\(y\)</span>-coordinate greater than 0? This divides the plane into two regions—above and below the <span class="math inline">\(x\)</span>-axis.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> L <span class="op">=</span> p<span class="op">.</span><span class="fu">y</span><span class="op">;</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> color<span class="op">;</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> <span class="op">(</span>L <span class="op">&lt;</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">);</span>  <span class="co">// red below</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span>  <span class="co">// blue above</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<figure class="shader-demo figure">
+  <div id="demo-day1-half-plane" style="width: 100%; height: ;"></div>
+  <script type="module">
+    import { embed } from '/demos/day1/half-plane/embed.js';
+    await embed({ container: '#demo-day1-half-plane' });
+  </script>
+  
+</figure>
+
+<p>To color left versus right instead, use <code>p.x</code> in place of <code>p.y</code>.</p>
+<p>More generally, a line in the plane has the form <span class="math inline">\(ax + by + c = 0\)</span>. This divides the plane into two half-planes: where <span class="math inline">\(ax + by + c &lt; 0\)</span> and where <span class="math inline">\(ax + by + c &gt; 0\)</span>.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> a <span class="op">=</span> <span class="fl">1.0</span><span class="op">,</span> b <span class="op">=</span> <span class="fl">1.0</span><span class="op">,</span> c <span class="op">=</span> <span class="fl">0.0</span><span class="op">;</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> L <span class="op">=</span> a <span class="op">*</span> p<span class="op">.</span><span class="fu">x</span> <span class="op">+</span> b <span class="op">*</span> p<span class="op">.</span><span class="fu">y</span> <span class="op">+</span> c<span class="op">;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> color<span class="op">;</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> <span class="op">(</span>L <span class="op">&lt;</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">);</span>  <span class="co">// red</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span>  <span class="co">// blue</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Recall that <span class="math inline">\((a, b)\)</span> is the normal vector to the line, and <span class="math inline">\(c\)</span> is an offset. Since these are just variables, we can animate them to move the line around:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> a <span class="op">=</span> <span class="bu">cos</span><span class="op">(</span>iTime<span class="op">);</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> b <span class="op">=</span> <span class="bu">sin</span><span class="op">(</span>iTime<span class="op">);</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> c <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="bu">sin</span><span class="op">(</span>iTime <span class="op">*</span> <span class="fl">0.7</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<figure class="shader-demo figure">
+  <div id="demo-day1-half-plane-animated" style="width: 100%; height: ;"></div>
+  <script type="module">
+    import { embed } from '/demos/day1/half-plane-animated/embed.js';
+    await embed({ container: '#demo-day1-half-plane-animated' });
+  </script>
+  
+</figure>
+
+</section>
+<section id="circles" class="level3">
+<h3 class="anchored" data-anchor-id="circles">Circles</h3>
+<p>Now consider the function <span class="math inline">\(d(p) = |p|\)</span>, the distance from the origin. Geometrically, the graph of this function is a cone—zero at the origin, increasing linearly in all directions.</p>
+<p>To draw a filled disk of radius <span class="math inline">\(r\)</span>, we could threshold on <span class="math inline">\(d &lt; r\)</span> versus <span class="math inline">\(d \geq r\)</span>. But it’s cleaner to define <span class="math inline">\(f(p) = |p| - r\)</span>. This function is negative inside the circle (where <span class="math inline">\(d &lt; r\)</span>) and positive outside (where <span class="math inline">\(d &gt; r\)</span>). The circle itself is the level set <span class="math inline">\(f = 0\)</span>.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> d <span class="op">=</span> <span class="bu">length</span><span class="op">(</span>p<span class="op">);</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> r <span class="op">=</span> <span class="fl">1.0</span><span class="op">;</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> f <span class="op">=</span> d <span class="op">-</span> r<span class="op">;</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> color<span class="op">;</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> <span class="op">(</span>f <span class="op">&lt;</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">);</span>  <span class="co">// yellow inside</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.1</span><span class="op">,</span> <span class="fl">0.1</span><span class="op">,</span> <span class="fl">0.3</span><span class="op">);</span>  <span class="co">// dark blue outside</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<figure class="shader-demo figure">
+  <div id="demo-day1-circle" style="width: 100%; height: ;"></div>
+  <script type="module">
+    import { embed } from '/demos/day1/circle/embed.js';
+    await embed({ container: '#demo-day1-circle' });
+  </script>
+  
+</figure>
+
+<p>Try commenting out the aspect ratio correction (<code>uv.x *= ...</code>) to see the distortion—the circle becomes an ellipse.</p>
+<p>To center the circle at a point <span class="math inline">\(c\)</span> instead of the origin, compute distance from <span class="math inline">\(c\)</span>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> center <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.5</span><span class="op">);</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> d <span class="op">=</span> <span class="bu">length</span><span class="op">(</span>p <span class="op">-</span> center<span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Since <code>center</code> and <code>r</code> are variables, you can animate them with <code>iTime</code> to create moving, pulsing circles.</p>
+</section>
+<section id="drawing-a-ring" class="level3">
+<h3 class="anchored" data-anchor-id="drawing-a-ring">Drawing a Ring</h3>
+<p>Our function <span class="math inline">\(f = d - r\)</span> is negative inside the circle and positive outside. To draw a filled disk, we colored based on the sign of <span class="math inline">\(f\)</span>.</p>
+<p>But what if we want just the boundary—a ring of some thickness? We want to color one way when <span class="math inline">\(f\)</span> is small in absolute value (near the circle), and a different way when <span class="math inline">\(|f|\)</span> is large (far from the circle).</p>
+<p>So we look at <span class="math inline">\(|f| = |d - r|\)</span> and ask: is this less than some threshold <span class="math inline">\(\varepsilon\)</span>, or greater? Equivalently, is <span class="math inline">\(|d - r| - \varepsilon\)</span> negative or positive?</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> d <span class="op">=</span> <span class="bu">length</span><span class="op">(</span>p<span class="op">);</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> r <span class="op">=</span> <span class="fl">1.0</span><span class="op">;</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> eps <span class="op">=</span> <span class="fl">0.1</span><span class="op">;</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> f <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span>d <span class="op">-</span> r<span class="op">)</span> <span class="op">-</span> eps<span class="op">;</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> color<span class="op">;</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> <span class="op">(</span>f <span class="op">&lt;</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span>  <span class="co">// white ring</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>    color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.1</span><span class="op">,</span> <span class="fl">0.1</span><span class="op">,</span> <span class="fl">0.3</span><span class="op">);</span>  <span class="co">// dark background</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<figure class="shader-demo figure">
+  <div id="demo-day1-circle-ring" style="width: 100%; height: ;"></div>
+  <script type="module">
+    import { embed } from '/demos/day1/circle-ring/embed.js';
+    await embed({ container: '#demo-day1-circle-ring' });
+  </script>
+  
+</figure>
+
+</section>
+</section>
+<section id="implicit-curves" class="level2" data-number="1.6">
+<h2 data-number="1.6" class="anchored" data-anchor-id="implicit-curves"><span class="header-section-number">1.6</span> Implicit Curves</h2>
+<p>We’ve drawn circles using the distance function <span class="math inline">\(|p| - r\)</span>. But circles are just one example of curves defined by an equation. Any equation <span class="math inline">\(F(x,y) = 0\)</span> defines a curve—the set of points satisfying that equation. We can draw it the same way: threshold on <span class="math inline">\(|F|\)</span>.</p>
+<section id="a-first-example-the-parabola" class="level3">
+<h3 class="anchored" data-anchor-id="a-first-example-the-parabola">A First Example: The Parabola</h3>
+<p>Consider <span class="math inline">\(F(x,y) = y - x^2\)</span>. The curve <span class="math inline">\(F = 0\)</span> is the parabola <span class="math inline">\(y = x^2\)</span>. Points where <span class="math inline">\(F &lt; 0\)</span> lie below the parabola; points where <span class="math inline">\(F &gt; 0\)</span> lie above.</p>
+<p>To draw the curve itself, we color pixels where <span class="math inline">\(|F|\)</span> is small:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> F <span class="op">=</span> p<span class="op">.</span><span class="fu">y</span> <span class="op">-</span> p<span class="op">.</span><span class="fu">x</span> <span class="op">*</span> p<span class="op">.</span><span class="fu">x</span><span class="op">;</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> eps <span class="op">=</span> <span class="fl">0.1</span><span class="op">;</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> color<span class="op">;</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> <span class="op">(</span><span class="bu">abs</span><span class="op">(</span>F<span class="op">)</span> <span class="op">&lt;</span> eps<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">);</span>  <span class="co">// yellow curve</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.1</span><span class="op">,</span> <span class="fl">0.1</span><span class="op">,</span> <span class="fl">0.3</span><span class="op">);</span>  <span class="co">// dark background</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<figure class="shader-demo figure">
+  <div id="demo-day1-parabola" style="width: 100%; height: ;"></div>
+  <script type="module">
+    import { embed } from '/demos/day1/parabola/embed.js';
+    await embed({ container: '#demo-day1-parabola' });
+  </script>
+  
+</figure>
+
+</section>
+<section id="more-examples" class="level3">
+<h3 class="anchored" data-anchor-id="more-examples">More Examples</h3>
+<p>An ellipse: <span class="math inline">\(F(x,y) = \frac{x^2}{a^2} + \frac{y^2}{b^2} - 1\)</span></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> a <span class="op">=</span> <span class="fl">2.0</span><span class="op">,</span> b <span class="op">=</span> <span class="fl">1.0</span><span class="op">;</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> F <span class="op">=</span> <span class="op">(</span>p<span class="op">.</span><span class="fu">x</span><span class="op">*</span>p<span class="op">.</span><span class="fu">x</span><span class="op">)/(</span>a<span class="op">*</span>a<span class="op">)</span> <span class="op">+</span> <span class="op">(</span>p<span class="op">.</span><span class="fu">y</span><span class="op">*</span>p<span class="op">.</span><span class="fu">y</span><span class="op">)/(</span>b<span class="op">*</span>b<span class="op">)</span> <span class="op">-</span> <span class="fl">1.0</span><span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>A hyperbola: <span class="math inline">\(F(x,y) = \frac{x^2}{a^2} - \frac{y^2}{b^2} - 1\)</span></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> a <span class="op">=</span> <span class="fl">1.0</span><span class="op">,</span> b <span class="op">=</span> <span class="fl">1.0</span><span class="op">;</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> F <span class="op">=</span> <span class="op">(</span>p<span class="op">.</span><span class="fu">x</span><span class="op">*</span>p<span class="op">.</span><span class="fu">x</span><span class="op">)/(</span>a<span class="op">*</span>a<span class="op">)</span> <span class="op">-</span> <span class="op">(</span>p<span class="op">.</span><span class="fu">y</span><span class="op">*</span>p<span class="op">.</span><span class="fu">y</span><span class="op">)/(</span>b<span class="op">*</span>b<span class="op">)</span> <span class="op">-</span> <span class="fl">1.0</span><span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The lemniscate of Bernoulli: <span class="math inline">\((x^2 + y^2)^2 = a^2(x^2 - y^2)\)</span>, or <span class="math inline">\(F = (x^2+y^2)^2 - a^2(x^2 - y^2)\)</span></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> a <span class="op">=</span> <span class="fl">1.5</span><span class="op">;</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> r2 <span class="op">=</span> <span class="bu">dot</span><span class="op">(</span>p<span class="op">,</span> p<span class="op">);</span>  <span class="co">// x² + y²</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> F <span class="op">=</span> r2 <span class="op">*</span> r2 <span class="op">-</span> a <span class="op">*</span> a <span class="op">*</span> <span class="op">(</span>p<span class="op">.</span><span class="fu">x</span> <span class="op">*</span> p<span class="op">.</span><span class="fu">x</span> <span class="op">-</span> p<span class="op">.</span><span class="fu">y</span> <span class="op">*</span> p<span class="op">.</span><span class="fu">y</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="the-thickness-problem" class="level3">
+<h3 class="anchored" data-anchor-id="the-thickness-problem">The Thickness Problem</h3>
+<p>Look carefully at the parabola. The rendered thickness isn’t uniform—it’s thinner where the curve is steep, thicker where it’s flat. The problem gets worse with more complicated curves, especially those with singularities. Here’s the lemniscate:</p>
+<figure class="shader-demo figure">
+  <div id="demo-day1-lemniscate-naive" style="width: 100%; height: ;"></div>
+  <script type="module">
+    import { embed } from '/demos/day1/lemniscate-naive/embed.js';
+    await embed({ container: '#demo-day1-lemniscate-naive' });
+  </script>
+  
+</figure>
+
+<p>Notice how the thickness blows up near the origin, where the curve crosses itself.</p>
+<p>Why does this happen? The set <span class="math inline">\(|F| &lt; \varepsilon\)</span> contains all points within <span class="math inline">\(\varepsilon\)</span> of zero <em>in the <span class="math inline">\(F\)</span> direction</em>. But <span class="math inline">\(F\)</span> doesn’t measure distance to the curve—it’s just some function that happens to be zero on the curve. Where <span class="math inline">\(|\nabla F|\)</span> is large, <span class="math inline">\(F\)</span> changes rapidly, so the band <span class="math inline">\(|F| &lt; \varepsilon\)</span> is narrow. Where <span class="math inline">\(|\nabla F|\)</span> is small, <span class="math inline">\(F\)</span> changes slowly, so the band is wide. At the singular point, <span class="math inline">\(\nabla F = 0\)</span>, and the band becomes infinitely wide.</p>
+</section>
+<section id="why-circles-worked" class="level3">
+<h3 class="anchored" data-anchor-id="why-circles-worked">Why Circles Worked</h3>
+<p>For the circle, we used <span class="math inline">\(f(p) = |p| - r\)</span>. This is the <em>signed distance function</em>: it measures actual geometric distance to the curve. The gradient of a distance function has magnitude 1 everywhere (it points toward or away from the curve at unit rate). So <span class="math inline">\(|f| &lt; \varepsilon\)</span> really does capture points within distance <span class="math inline">\(\varepsilon\)</span>, giving uniform thickness.</p>
+<p>This is a fact from differential geometry: <span class="math inline">\(|\nabla d| = 1\)</span> for a distance function <span class="math inline">\(d\)</span>. When we use an arbitrary implicit equation <span class="math inline">\(F = 0\)</span>, we lose this property.</p>
+</section>
+<section id="gradient-correction" class="level3">
+<h3 class="anchored" data-anchor-id="gradient-correction">Gradient Correction</h3>
+<p>We can fix the non-uniform thickness by dividing by the gradient magnitude. Instead of thresholding <span class="math inline">\(|F| &lt; \varepsilon\)</span>, we threshold <span class="math display">\[\frac{|F|}{|\nabla F|} &lt; \varepsilon.\]</span></p>
+<p>This approximates the signed distance to the curve. The intuition: <span class="math inline">\(|F|/|\nabla F|\)</span> estimates how far you’d need to travel (in the direction <span class="math inline">\(F\)</span> changes fastest) to reach the curve.</p>
+<p>For the lemniscate, we compute the gradient analytically: <span class="math display">\[\nabla F = \bigl(4x(x^2+y^2) - 2a^2 x,\; 4y(x^2+y^2) + 2a^2 y\bigr)\]</span></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> a <span class="op">=</span> <span class="fl">1.5</span><span class="op">;</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> r2 <span class="op">=</span> <span class="bu">dot</span><span class="op">(</span>p<span class="op">,</span> p<span class="op">);</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> F <span class="op">=</span> r2 <span class="op">*</span> r2 <span class="op">-</span> a <span class="op">*</span> a <span class="op">*</span> <span class="op">(</span>p<span class="op">.</span><span class="fu">x</span> <span class="op">*</span> p<span class="op">.</span><span class="fu">x</span> <span class="op">-</span> p<span class="op">.</span><span class="fu">y</span> <span class="op">*</span> p<span class="op">.</span><span class="fu">y</span><span class="op">);</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> grad <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    <span class="fl">4.0</span> <span class="op">*</span> p<span class="op">.</span><span class="fu">x</span> <span class="op">*</span> r2 <span class="op">-</span> <span class="fl">2.0</span> <span class="op">*</span> a <span class="op">*</span> a <span class="op">*</span> p<span class="op">.</span><span class="fu">x</span><span class="op">,</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    <span class="fl">4.0</span> <span class="op">*</span> p<span class="op">.</span><span class="fu">y</span> <span class="op">*</span> r2 <span class="op">+</span> <span class="fl">2.0</span> <span class="op">*</span> a <span class="op">*</span> a <span class="op">*</span> p<span class="op">.</span><span class="fu">y</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="op">);</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> dist <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span>F<span class="op">)</span> <span class="op">/</span> <span class="bu">max</span><span class="op">(</span><span class="bu">length</span><span class="op">(</span>grad<span class="op">),</span> <span class="fl">0.01</span><span class="op">);</span>  <span class="co">// avoid division by zero</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> eps <span class="op">=</span> <span class="fl">0.05</span><span class="op">;</span></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> color<span class="op">;</span></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> <span class="op">(</span>dist <span class="op">&lt;</span> eps<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>    color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">);</span></span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>    color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.1</span><span class="op">,</span> <span class="fl">0.1</span><span class="op">,</span> <span class="fl">0.3</span><span class="op">);</span></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<figure class="shader-demo figure">
+  <div id="demo-day1-lemniscate-gradient" style="width: 100%; height: ;"></div>
+  <script type="module">
+    import { embed } from '/demos/day1/lemniscate-gradient/embed.js';
+    await embed({ container: '#demo-day1-lemniscate-gradient' });
+  </script>
+  
+</figure>
+
+<p>Compare with the naive version above to see the difference in thickness uniformity.</p>
+</section>
+<section id="animated-curve-families" class="level3">
+<h3 class="anchored" data-anchor-id="animated-curve-families">Animated Curve Families</h3>
+<p>The lemniscate is part of a one-parameter family called the Cassini ovals, defined by the product of distances from two foci being constant: <span class="math display">\[(x^2 + y^2)^2 - 2c^2(x^2 - y^2) = a^4 - c^4\]</span></p>
+<p>As the parameter <span class="math inline">\(a\)</span> varies relative to the fixed focal distance <span class="math inline">\(c\)</span>, the topology changes: two separate loops when <span class="math inline">\(a &lt; c\)</span>, a lemniscate when <span class="math inline">\(a = c\)</span>, a single oval when <span class="math inline">\(a &gt; c\)</span>.</p>
+<figure class="shader-demo figure">
+  <div id="demo-day1-lemniscate-animated" style="width: 100%; height: ;"></div>
+  <script type="module">
+    import { embed } from '/demos/day1/lemniscate-animated/embed.js';
+    await embed({ container: '#demo-day1-lemniscate-animated' });
+  </script>
+  
+</figure>
+
+</section>
+</section>
+<section id="interactivity-and-abstraction" class="level2" data-number="1.7">
+<h2 data-number="1.7" class="anchored" data-anchor-id="interactivity-and-abstraction"><span class="header-section-number">1.7</span> Interactivity and Abstraction</h2>
+<p>So far our shaders respond to time (<code>iTime</code>) but not to user input. Shadertoy provides <code>iMouse</code> for mouse interaction.</p>
+<section id="the-imouse-uniform" class="level3">
+<h3 class="anchored" data-anchor-id="the-imouse-uniform">The iMouse Uniform</h3>
+<p><code>iMouse</code> is a <code>vec4</code>:</p>
+<ul>
+<li><code>iMouse.xy</code> — current mouse position (in pixels)</li>
+<li><code>iMouse.zw</code> — position where the mouse was last clicked</li>
+</ul>
+<p>For now we’ll focus on <code>iMouse.xy</code>.</p>
+</section>
+<section id="dragging-a-circle" class="level3">
+<h3 class="anchored" data-anchor-id="dragging-a-circle">Dragging a Circle</h3>
+<p>Let’s draw a circle centered at the mouse position. Since <code>iMouse.xy</code> is in pixel coordinates, we need to normalize it the same way we normalize <code>fragCoord</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Normalize fragment coordinate</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> uv <span class="op">=</span> fragCoord <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">xy</span><span class="op">;</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>uv <span class="op">=</span> uv <span class="op">-</span> <span class="dt">vec2</span><span class="op">(</span><span class="fl">0.5</span><span class="op">,</span> <span class="fl">0.5</span><span class="op">);</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>uv<span class="op">.</span><span class="fu">x</span> <span class="op">*=</span> iResolution<span class="op">.</span><span class="fu">x</span> <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">y</span><span class="op">;</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> p <span class="op">=</span> uv <span class="op">*</span> <span class="fl">4.0</span><span class="op">;</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="co">// Normalize mouse coordinate the same way</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> mouse <span class="op">=</span> iMouse<span class="op">.</span><span class="fu">xy</span> <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">xy</span><span class="op">;</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>mouse <span class="op">=</span> mouse <span class="op">-</span> <span class="dt">vec2</span><span class="op">(</span><span class="fl">0.5</span><span class="op">,</span> <span class="fl">0.5</span><span class="op">);</span></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>mouse<span class="op">.</span><span class="fu">x</span> <span class="op">*=</span> iResolution<span class="op">.</span><span class="fu">x</span> <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">y</span><span class="op">;</span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>mouse <span class="op">=</span> mouse <span class="op">*</span> <span class="fl">4.0</span><span class="op">;</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a><span class="co">// Circle centered at mouse</span></span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> d <span class="op">=</span> <span class="bu">length</span><span class="op">(</span>p <span class="op">-</span> mouse<span class="op">);</span></span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> r <span class="op">=</span> <span class="fl">0.5</span><span class="op">;</span></span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> color<span class="op">;</span></span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> <span class="op">(</span>d <span class="op">&lt;</span> r<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>    color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.9</span><span class="op">,</span> <span class="fl">0.2</span><span class="op">);</span>  <span class="co">// yellow</span></span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>    color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.1</span><span class="op">,</span> <span class="fl">0.1</span><span class="op">,</span> <span class="fl">0.3</span><span class="op">);</span></span>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a>fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<figure class="shader-demo figure">
+  <div id="demo-day1-circle-mouse" style="width: 100%; height: ;"></div>
+  <script type="module">
+    import { embed } from '/demos/day1/circle-mouse/embed.js';
+    await embed({ container: '#demo-day1-circle-mouse' });
+  </script>
+  
+</figure>
+
+<p>Click and drag to move the circle.</p>
+</section>
+<section id="writing-a-helper-function" class="level3">
+<h3 class="anchored" data-anchor-id="writing-a-helper-function">Writing a Helper Function</h3>
+<p>We just wrote the same four lines of coordinate normalization twice. This is a sign we should write a function.</p>
+<p>A GLSL function declares its return type, then the function name, then its parameters with their types:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="fu">normalize_coord</span><span class="op">(</span><span class="dt">vec2</span> coord<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> uv <span class="op">=</span> coord <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">xy</span><span class="op">;</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    uv <span class="op">=</span> uv <span class="op">-</span> <span class="dt">vec2</span><span class="op">(</span><span class="fl">0.5</span><span class="op">,</span> <span class="fl">0.5</span><span class="op">);</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    uv<span class="op">.</span><span class="fu">x</span> <span class="op">*=</span> iResolution<span class="op">.</span><span class="fu">x</span> <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">y</span><span class="op">;</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> uv <span class="op">*</span> <span class="fl">4.0</span><span class="op">;</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Functions must be defined before they’re used, so they go above <code>mainImage</code>. Here’s the overall structure:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="fu">normalize_coord</span><span class="op">(</span><span class="dt">vec2</span> coord<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">// normalization logic here</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">mainImage</span><span class="op">(</span><span class="dt">out</span> <span class="dt">vec4</span> fragColor<span class="op">,</span> <span class="dt">in</span> <span class="dt">vec2</span> fragCoord<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> p <span class="op">=</span> <span class="fu">normalize_coord</span><span class="op">(</span>fragCoord<span class="op">);</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> mouse <span class="op">=</span> <span class="fu">normalize_coord</span><span class="op">(</span>iMouse<span class="op">.</span><span class="fu">xy</span><span class="op">);</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">// code using p and mouse</span></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Now our shader is cleaner, and we won’t make mistakes copying the normalization code.</p>
+</section>
+<section id="combining-imouse-and-itime-sun-and-earth" class="level3">
+<h3 class="anchored" data-anchor-id="combining-imouse-and-itime-sun-and-earth">Combining iMouse and iTime: Sun and Earth</h3>
+<p>Let’s make a circle orbit around the mouse position:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> p <span class="op">=</span> <span class="fu">normalize_coord</span><span class="op">(</span>fragCoord<span class="op">);</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> sun <span class="op">=</span> <span class="fu">normalize_coord</span><span class="op">(</span>iMouse<span class="op">.</span><span class="fu">xy</span><span class="op">);</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Earth orbits the sun</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> orbit_radius <span class="op">=</span> <span class="fl">0.8</span><span class="op">;</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> earth <span class="op">=</span> sun <span class="op">+</span> orbit_radius <span class="op">*</span> <span class="dt">vec2</span><span class="op">(</span><span class="bu">cos</span><span class="op">(</span>iTime<span class="op">),</span> <span class="bu">sin</span><span class="op">(</span>iTime<span class="op">));</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="co">// Draw sun (larger, yellow)</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> d_sun <span class="op">=</span> <span class="bu">length</span><span class="op">(</span>p <span class="op">-</span> sun<span class="op">);</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="co">// Draw earth (smaller, blue)</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> d_earth <span class="op">=</span> <span class="bu">length</span><span class="op">(</span>p <span class="op">-</span> earth<span class="op">);</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.02</span><span class="op">,</span> <span class="fl">0.02</span><span class="op">,</span> <span class="fl">0.05</span><span class="op">);</span>  <span class="co">// dark background</span></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> <span class="op">(</span>d_sun <span class="op">&lt;</span> <span class="fl">0.3</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>    color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.9</span><span class="op">,</span> <span class="fl">0.2</span><span class="op">);</span>  <span class="co">// yellow sun</span></span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> <span class="op">(</span>d_earth <span class="op">&lt;</span> <span class="fl">0.15</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>    color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.2</span><span class="op">,</span> <span class="fl">0.5</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span>  <span class="co">// blue earth</span></span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a>fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<figure class="shader-demo figure">
+  <div id="demo-day1-sun-earth" style="width: 100%; height: ;"></div>
+  <script type="module">
+    import { embed } from '/demos/day1/sun-earth/embed.js';
+    await embed({ container: '#demo-day1-sun-earth' });
+  </script>
+  
+</figure>
+
+<p>Drag to move the sun; the earth follows in orbit. (Exercise: add a moon orbiting the earth!)</p>
+</section>
+<section id="mouse-as-parameter" class="level3">
+<h3 class="anchored" data-anchor-id="mouse-as-parameter">Mouse as Parameter</h3>
+<p>The mouse doesn’t have to control position—it can control any parameter. A useful pattern: map <code>iMouse.x</code> to a parameter range and drag across the screen to explore a family of curves.</p>
+<p>The folium of Descartes is the curve <span class="math inline">\(x^3 + y^3 = 3axy\)</span>. We can explore its level sets by drawing <span class="math inline">\(x^3 + y^3 - 3axy = c\)</span> for different values of <span class="math inline">\(c\)</span>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> p <span class="op">=</span> <span class="fu">normalize_coord</span><span class="op">(</span>fragCoord<span class="op">);</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="co">// Fixed parameter a</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> a <span class="op">=</span> <span class="fl">1.5</span><span class="op">;</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="co">// Map mouse x to level set value c in [-2, 2]</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> c <span class="op">=</span> <span class="bu">mix</span><span class="op">(-</span><span class="fl">2.0</span><span class="op">,</span> <span class="fl">2.0</span><span class="op">,</span> iMouse<span class="op">.</span><span class="fu">x</span> <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">x</span><span class="op">);</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a><span class="co">// Folium of Descartes: x³ + y³ - 3axy = c</span></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> F <span class="op">=</span> p<span class="op">.</span><span class="fu">x</span><span class="op">*</span>p<span class="op">.</span><span class="fu">x</span><span class="op">*</span>p<span class="op">.</span><span class="fu">x</span> <span class="op">+</span> p<span class="op">.</span><span class="fu">y</span><span class="op">*</span>p<span class="op">.</span><span class="fu">y</span><span class="op">*</span>p<span class="op">.</span><span class="fu">y</span> <span class="op">-</span> <span class="fl">3.0</span><span class="op">*</span>a<span class="op">*</span>p<span class="op">.</span><span class="fu">x</span><span class="op">*</span>p<span class="op">.</span><span class="fu">y</span> <span class="op">-</span> c<span class="op">;</span></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a><span class="co">// Gradient: ∇F = (3x² - 3ay, 3y² - 3ax)</span></span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> grad <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span><span class="fl">3.0</span><span class="op">*</span>p<span class="op">.</span><span class="fu">x</span><span class="op">*</span>p<span class="op">.</span><span class="fu">x</span> <span class="op">-</span> <span class="fl">3.0</span><span class="op">*</span>a<span class="op">*</span>p<span class="op">.</span><span class="fu">y</span><span class="op">,</span> <span class="fl">3.0</span><span class="op">*</span>p<span class="op">.</span><span class="fu">y</span><span class="op">*</span>p<span class="op">.</span><span class="fu">y</span> <span class="op">-</span> <span class="fl">3.0</span><span class="op">*</span>a<span class="op">*</span>p<span class="op">.</span><span class="fu">x</span><span class="op">);</span></span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> dist <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span>F<span class="op">)</span> <span class="op">/</span> <span class="bu">max</span><span class="op">(</span><span class="bu">length</span><span class="op">(</span>grad<span class="op">),</span> <span class="fl">0.01</span><span class="op">);</span></span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> color<span class="op">;</span></span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> <span class="op">(</span>dist <span class="op">&lt;</span> <span class="fl">0.05</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>    color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">);</span></span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>    color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.1</span><span class="op">,</span> <span class="fl">0.1</span><span class="op">,</span> <span class="fl">0.3</span><span class="op">);</span></span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<figure class="shader-demo figure">
+  <div id="demo-day1-folium-mouse" style="width: 100%; height: ;"></div>
+  <script type="module">
+    import { embed } from '/demos/day1/folium-mouse/embed.js';
+    await embed({ container: '#demo-day1-folium-mouse' });
+  </script>
+  
+</figure>
+
+<p>Drag left and right to sweep through the level sets and watch the curve topology change.</p>
+</section>
+</section>
+<section id="exercises" class="level2" data-number="1.8">
+<h2 data-number="1.8" class="anchored" data-anchor-id="exercises"><span class="header-section-number">1.8</span> Exercises</h2>
+<p>Homework is organized into four types:</p>
+<p><strong>Checkpoints</strong> — Short exercises to verify you understood the lecture material. Required for anyone new to shader programming.</p>
+<p><strong>Explorations</strong> — Open-ended problems that extend the lecture topics. Pick the ones that interest you. If you can do several of these, you’re right on track with the course.</p>
+<p><strong>Challenges</strong> — Problems that may require learning new concepts beyond what was covered in lecture. Attempt these if you skipped the checkpoints and found an exploration or two too easy.</p>
+<p><strong>Project</strong> — An extended project for someone familiar with shader basics, to make an artwork.</p>
+<hr>
+<section id="checkpoints" class="level3">
+<h3 class="anchored" data-anchor-id="checkpoints">Checkpoints</h3>
+<p><strong>C1. Solid Colors.</strong> Modify the red screen shader to display: (a) green, (b) cyan, (c) a color of your choice using all three RGB channels.</p>
+<p><strong>C2. Vertical Split.</strong> Modify the half-plane shader to divide the screen into left (red) and right (blue) instead of top and bottom.</p>
+<p><strong>C3. Off-Center Circle.</strong> Draw a filled circle of radius 0.5 centered at the point <span class="math inline">\((1, 1)\)</span> instead of the origin.</p>
+<p><strong>C4. Pulsing Circle.</strong> Make a circle whose radius oscillates between 0.5 and 1.5 over time using <code>iTime</code>.</p>
+<p><strong>C5. Ring Thickness.</strong> Draw a ring (circle outline) centered at the origin. Experiment with different values of <code>eps</code> to understand how it controls thickness.</p>
+<hr>
+</section>
+<section id="explorations" class="level3">
+<h3 class="anchored" data-anchor-id="explorations">Explorations</h3>
+<p><strong>E1. Concentric Rings.</strong> Draw several concentric rings (circles of different radii, all centered at the origin). Can you color alternate rings differently?</p>
+<p><strong>E2. Moon Orbit.</strong> Extend the sun-earth shader to add a moon that orbits the earth. The moon should be smaller than the earth and orbit faster.</p>
+<p><strong>E3. Your Favorite Curve.</strong> Pick an implicit curve from your mathematical experience (or find one online) and render it. Some suggestions: the cardioid <span class="math inline">\((x^2 + y^2 - ax)^2 = a^2(x^2 + y^2)\)</span>, the astroid <span class="math inline">\(x^{2/3} + y^{2/3} = a^{2/3}\)</span>, or a rose curve in implicit form. Apply gradient correction for uniform thickness.</p>
+<p><strong>E4. Curve Explorer.</strong> Take any one-parameter family of curves and build a mouse-controlled explorer (like the folium example). Map <code>iMouse.x</code> to the parameter and drag to explore the family.</p>
+<p><strong>E5. Two Circles.</strong> Draw two filled circles at different positions. What happens when they overlap? Can you make one “in front of” the other? Can you make the intersection a different color, like a Venn diagram?</p>
+<hr>
+</section>
+<section id="challenges" class="level3">
+<h3 class="anchored" data-anchor-id="challenges">Challenges</h3>
+<p><strong>H1. Parabola Graphing Calculator.</strong> Build an interactive graphing calculator for the parabola <span class="math inline">\(y = ax^2 + bx + c\)</span>. Requirements: - Draw coordinate axes (the lines <span class="math inline">\(x = 0\)</span> and <span class="math inline">\(y = 0\)</span>) - Draw the parabola using implicit curve techniques - Find the roots (where <span class="math inline">\(y = 0\)</span>) and draw small circles around them - Use mouse position to control two of the coefficients (e.g., <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span>, with <span class="math inline">\(c\)</span> fixed, or <span class="math inline">\(b\)</span> and <span class="math inline">\(c\)</span> with <span class="math inline">\(a\)</span> fixed)</p>
+<p>As you drag the mouse, the parabola should reshape and the root indicators should move (or appear/disappear as roots become real or complex).</p>
+<p><strong>H2. Elliptic Curve Explorer.</strong> Elliptic curves in Weierstrass form are <span class="math inline">\(y^2 = x^3 + ax + b\)</span>. Build a shader where the mouse position controls <span class="math inline">\((a, b)\)</span>. Use gradient correction for uniform thickness. The <em>discriminant</em> <span class="math inline">\(\Delta = 4a^3 + 27b^2\)</span> determines whether the curve is smooth (<span class="math inline">\(\Delta \neq 0\)</span>) or singular (<span class="math inline">\(\Delta = 0\)</span>). Can you display the current value of <span class="math inline">\(\Delta\)</span> somehow, or change the curve’s color when it becomes singular?</p>
+<p><strong>H3. Signed Distance Functions.</strong> For a filled circle, <span class="math inline">\(f(p) = |p| - r\)</span> is the <em>signed</em> distance function: negative inside, positive outside, with <span class="math inline">\(|f|\)</span> giving the actual distance to the boundary. What is the signed distance function for a half-plane? For an axis-aligned rectangle? Implement both and draw them with uniform-thickness boundaries. Note: when you have the true signed distance function, you don’t need the gradient correction trick—that’s the payoff for computing the right thing from the start!</p>
+<p><strong>H4. Smooth Blending.</strong> When two circles overlap, we currently just draw one on top of the other. Research <em>smooth minimum</em> functions (e.g., <code>smin</code>) that blend distance fields smoothly. Draw two circles that “melt together” where they meet.</p>
+<p><strong>H5. Inversion.</strong> Circle inversion is the map <span class="math inline">\(p \mapsto p / |p|^2\)</span>. Apply this transformation to your coordinate <span class="math inline">\(p\)</span> before drawing a shape. What happens to a line? What happens to a circle not passing through the origin? Experiment with different shapes.</p>
+<hr>
+</section>
+<section id="project-grid-patterns" class="level3">
+<h3 class="anchored" data-anchor-id="project-grid-patterns">Project: Grid Patterns</h3>
+<p>This extended project introduces a powerful technique—using modular arithmetic to repeat patterns across the plane. We’ll build up the machinery carefully, since we’ll use it again in Day 2 to create grids of Julia sets.</p>
+<section id="part-1-setting-up-a-grid-of-square-cells" class="level4">
+<h4 class="anchored" data-anchor-id="part-1-setting-up-a-grid-of-square-cells">Part 1: Setting Up a Grid of Square Cells</h4>
+<p>We want to tile the screen with square cells—say, 4 cells across. The challenge: the screen isn’t square, so we need to handle the aspect ratio.</p>
+<p>Let’s say we want <code>N</code> columns of cells. Each cell has width <span class="math inline">\(L = \text{screen\_width} / N\)</span> in pixels, and since cells are square, height <span class="math inline">\(L\)</span> as well. The number of rows depends on the screen’s aspect ratio.</p>
+<p>Working in our normalized coordinates (after aspect correction), the screen spans roughly <span class="math inline">\([-2 \cdot \text{aspect}, 2 \cdot \text{aspect}]\)</span> in <span class="math inline">\(x\)</span> and <span class="math inline">\([-2, 2]\)</span> in <span class="math inline">\(y\)</span>. If we want cells of side length <span class="math inline">\(L\)</span> in these coordinates:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> aspect <span class="op">=</span> iResolution<span class="op">.</span><span class="fu">x</span> <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">y</span><span class="op">;</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> N <span class="op">=</span> <span class="fl">5.0</span><span class="op">;</span>  <span class="co">// number of columns</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> L <span class="op">=</span> <span class="op">(</span><span class="fl">4.0</span> <span class="op">*</span> aspect<span class="op">)</span> <span class="op">/</span> N<span class="op">;</span>  <span class="co">// cell size in our coordinate system</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Now each cell is an <span class="math inline">\(L \times L\)</span> square.</p>
+</section>
+<section id="part-2-cell-coordinates-and-identity" class="level4">
+<h4 class="anchored" data-anchor-id="part-2-cell-coordinates-and-identity">Part 2: Cell Coordinates and Identity</h4>
+<p>For each pixel, we want two things:</p>
+<ol type="1">
+<li><strong>Which cell are we in?</strong> Integer coordinates <span class="math inline">\((i, j)\)</span> identifying the cell.</li>
+<li><strong>Where in the cell are we?</strong> Local coordinates ranging from <span class="math inline">\(-L/2\)</span> to <span class="math inline">\(L/2\)</span>, with <span class="math inline">\((0,0)\)</span> at the cell center.</li>
+</ol>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb31"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> cell_id <span class="op">=</span> <span class="bu">floor</span><span class="op">(</span>p <span class="op">/</span> L<span class="op">);</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> cell_p <span class="op">=</span> <span class="bu">mod</span><span class="op">(</span>p <span class="op">+</span> <span class="dt">vec2</span><span class="op">(</span>L<span class="op">/</span><span class="fl">2.0</span><span class="op">,</span> L<span class="op">/</span><span class="fl">2.0</span><span class="op">),</span> L<span class="op">)</span> <span class="op">-</span> <span class="dt">vec2</span><span class="op">(</span>L<span class="op">/</span><span class="fl">2.0</span><span class="op">,</span> L<span class="op">/</span><span class="fl">2.0</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The <code>cell_id</code> tells us which cell; the <code>cell_p</code> gives local coordinates within that cell.</p>
+<p>If we want local coordinates normalized to <span class="math inline">\([-1, 1]\)</span> (useful for drawing things at a standard scale), we can rescale:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> local <span class="op">=</span> cell_p <span class="op">/</span> <span class="op">(</span>L <span class="op">/</span> <span class="fl">2.0</span><span class="op">);</span>  <span class="co">// now in [-1, 1] x [-1, 1]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This is exactly the setup we’ll need for Day 2, where each cell will contain a Julia set with its own coordinate system.</p>
+</section>
+<section id="part-3-drawing-in-each-cell" class="level4">
+<h4 class="anchored" data-anchor-id="part-3-drawing-in-each-cell">Part 3: Drawing in Each Cell</h4>
+<p>Now draw something using the local coordinates. A filled circle at the center of each cell:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> d <span class="op">=</span> <span class="bu">length</span><span class="op">(</span>cell_p<span class="op">);</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> r <span class="op">=</span> L <span class="op">*</span> <span class="fl">0.4</span><span class="op">;</span>  <span class="co">// radius relative to cell size</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> color<span class="op">;</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> <span class="op">(</span>d <span class="op">&lt;</span> r<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>    color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">);</span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>    color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.1</span><span class="op">,</span> <span class="fl">0.1</span><span class="op">,</span> <span class="fl">0.3</span><span class="op">);</span></span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<!--  -->
+<p>Try changing <code>N</code> to get more or fewer columns. The cells stay square regardless of screen shape.</p>
+</section>
+<section id="part-4-varying-by-cell" class="level4">
+<h4 class="anchored" data-anchor-id="part-4-varying-by-cell">Part 4: Varying by Cell</h4>
+<p>The <code>cell_id</code> lets each cell behave differently. Some ideas:</p>
+<p><strong>Checkerboard background:</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb34"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> checker <span class="op">=</span> <span class="bu">mod</span><span class="op">(</span>cell_id<span class="op">.</span><span class="fu">x</span> <span class="op">+</span> cell_id<span class="op">.</span><span class="fu">y</span><span class="op">,</span> <span class="fl">2.0</span><span class="op">);</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> bg <span class="op">=</span> <span class="bu">mix</span><span class="op">(</span><span class="dt">vec3</span><span class="op">(</span><span class="fl">0.2</span><span class="op">,</span> <span class="fl">0.2</span><span class="op">,</span> <span class="fl">0.3</span><span class="op">),</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.3</span><span class="op">,</span> <span class="fl">0.2</span><span class="op">,</span> <span class="fl">0.2</span><span class="op">),</span> checker<span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Radius varying by cell:</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb35"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> r <span class="op">=</span> L <span class="op">*</span> <span class="op">(</span><span class="fl">0.2</span> <span class="op">+</span> <span class="fl">0.15</span> <span class="op">*</span> <span class="bu">mod</span><span class="op">(</span>cell_id<span class="op">.</span><span class="fu">x</span> <span class="op">+</span> cell_id<span class="op">.</span><span class="fu">y</span><span class="op">,</span> <span class="fl">3.0</span><span class="op">));</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Wave animation:</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb36"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> cell_dist <span class="op">=</span> <span class="bu">length</span><span class="op">(</span>cell_id<span class="op">);</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> r <span class="op">=</span> L <span class="op">*</span> <span class="op">(</span><span class="fl">0.3</span> <span class="op">+</span> <span class="fl">0.1</span> <span class="op">*</span> <span class="bu">sin</span><span class="op">(</span>iTime <span class="op">*</span> <span class="fl">2.0</span> <span class="op">-</span> cell_dist <span class="op">*</span> <span class="fl">0.5</span><span class="op">));</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="part-5-design-challenge" class="level4">
+<h4 class="anchored" data-anchor-id="part-5-design-challenge">Part 5: Design Challenge</h4>
+<p>Design a grid-based pattern that you find visually interesting. Some directions:</p>
+<p><strong>Connecting shapes:</strong> Draw shapes that connect across cell boundaries. Quarter-circles in each corner create a continuous network. What implicit curves tile seamlessly?</p>
+<p><strong>Alternating motifs:</strong> Use <code>cell_id</code> to alternate between different shapes—circles in some cells, rings in others, or different orientations.</p>
+<p><strong>Color fields:</strong> Map <code>cell_id</code> to colors using distance from origin, stripes, or a palette.</p>
+<p><strong>Phase shifts:</strong> Animate cells with different phase offsets to create waves or ripples.</p>
+<p><strong>Using local coordinates:</strong> Draw something more complex in each cell using the <span class="math inline">\([-1,1]\)</span> local coordinate system—perhaps a small implicit curve, or a pattern that changes based on <code>cell_id</code>.</p>
+<p>The goal is to produce an image you’d be happy to hang on a wall.</p>
+</section>
+</section>
+<section id="project-fourier-epicycles" class="level3">
+<h3 class="anchored" data-anchor-id="project-fourier-epicycles">Project: Fourier Epicycles</h3>
+<p>This project builds a visualization of Fourier series using epicycles—circles whose centers sit on the circumferences of other circles. This is how Ptolemy modeled planetary motion, and it turns out to be exactly how Fourier series work geometrically.</p>
+<section id="part-1-the-idea" class="level4">
+<h4 class="anchored" data-anchor-id="part-1-the-idea">Part 1: The Idea</h4>
+<p>Any periodic function can be written as a sum of sines and cosines. Geometrically, <span class="math inline">\(\sin(n\omega t)\)</span> and <span class="math inline">\(\cos(n\omega t)\)</span> describe a point moving around a circle of frequency <span class="math inline">\(n\omega\)</span>. Adding these components corresponds to stacking circles: each circle’s center rides on the previous circle’s edge.</p>
+<p>For example, the square wave has Fourier series: <span class="math display">\[f(t) = \sum_{n=1,3,5,...} \frac{1}{n} \sin(n\omega t)\]</span></p>
+<p>This means circles with: - Radii: <span class="math inline">\(1, \frac{1}{3}, \frac{1}{5}, \frac{1}{7}, ...\)</span> - Frequencies: <span class="math inline">\(\omega, 3\omega, 5\omega, 7\omega, ...\)</span></p>
+<p>The more terms we add, the closer the final point’s <span class="math inline">\(y\)</span>-coordinate approximates a square wave.</p>
+</section>
+<section id="part-2-drawing-circles" class="level4">
+<h4 class="anchored" data-anchor-id="part-2-drawing-circles">Part 2: Drawing Circles</h4>
+<p>Start by drawing a chain of circles. Each circle is centered at the current position, and the next position is computed by moving along the circle:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb37"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> pos <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span><span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">);</span>  <span class="co">// start at origin</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="kw">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> N<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> n <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> i <span class="op">+</span> <span class="dv">1</span><span class="op">;</span>  <span class="co">// 1, 3, 5, 7, ...</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> r <span class="op">=</span> scale <span class="op">/</span> <span class="dt">float</span><span class="op">(</span>n<span class="op">);</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> freq <span class="op">=</span> <span class="dt">float</span><span class="op">(</span>n<span class="op">)</span> <span class="op">*</span> omega<span class="op">;</span></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Draw circle at current position</span></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> d_circle <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span><span class="bu">length</span><span class="op">(</span>p <span class="op">-</span> pos<span class="op">)</span> <span class="op">-</span> r<span class="op">);</span></span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">if</span> <span class="op">(</span>d_circle <span class="op">&lt;</span> <span class="fl">0.02</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>        <span class="co">// color the circle</span></span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Move to next position</span></span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>    pos <span class="op">=</span> pos <span class="op">+</span> r <span class="op">*</span> <span class="dt">vec2</span><span class="op">(</span><span class="bu">cos</span><span class="op">(</span>freq <span class="op">*</span> iTime<span class="op">),</span> <span class="bu">sin</span><span class="op">(</span>freq <span class="op">*</span> iTime<span class="op">));</span></span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a><span class="co">// Draw final point</span></span>
+<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> d_point <span class="op">=</span> <span class="bu">length</span><span class="op">(</span>p <span class="op">-</span> pos<span class="op">);</span></span>
+<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> <span class="op">(</span>d_point <span class="op">&lt;</span> <span class="fl">0.08</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb37-21"><a href="#cb37-21" aria-hidden="true" tabindex="-1"></a>    <span class="co">// bright color</span></span>
+<span id="cb37-22"><a href="#cb37-22" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Try this with <code>N = 1</code>, then <code>N = 3</code>, then <code>N = 7</code>. Watch how more circles create more complex motion.</p>
+</section>
+<section id="part-3-the-line-segment-sdf" class="level4">
+<h4 class="anchored" data-anchor-id="part-3-the-line-segment-sdf">Part 3: The Line Segment SDF</h4>
+<p>To draw the arms connecting circle centers, we need the signed distance function for a line segment. Given endpoints <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span>, the distance from point <span class="math inline">\(p\)</span> to the segment is:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb38"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">sd_segment</span><span class="op">(</span><span class="dt">vec2</span> p<span class="op">,</span> <span class="dt">vec2</span> a<span class="op">,</span> <span class="dt">vec2</span> b<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> pa <span class="op">=</span> p <span class="op">-</span> a<span class="op">;</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> ba <span class="op">=</span> b <span class="op">-</span> a<span class="op">;</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> t <span class="op">=</span> <span class="bu">clamp</span><span class="op">(</span><span class="bu">dot</span><span class="op">(</span>pa<span class="op">,</span> ba<span class="op">)</span> <span class="op">/</span> <span class="bu">dot</span><span class="op">(</span>ba<span class="op">,</span> ba<span class="op">),</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">length</span><span class="op">(</span>pa <span class="op">-</span> ba <span class="op">*</span> t<span class="op">);</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The math: we project <span class="math inline">\(p - a\)</span> onto the line direction <span class="math inline">\(b - a\)</span>, clamp to <span class="math inline">\([0, 1]\)</span> to stay within the segment, then measure the distance to that closest point.</p>
+</section>
+<section id="part-4-connecting-the-arms" class="level4">
+<h4 class="anchored" data-anchor-id="part-4-connecting-the-arms">Part 4: Connecting the Arms</h4>
+<p>Now modify your loop to also draw line segments:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb39"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> pos <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span><span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">);</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="kw">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> N<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> n <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> i <span class="op">+</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> r <span class="op">=</span> scale <span class="op">/</span> <span class="dt">float</span><span class="op">(</span>n<span class="op">);</span></span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> freq <span class="op">=</span> <span class="dt">float</span><span class="op">(</span>n<span class="op">)</span> <span class="op">*</span> omega<span class="op">;</span></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> next_pos <span class="op">=</span> pos <span class="op">+</span> r <span class="op">*</span> <span class="dt">vec2</span><span class="op">(</span><span class="bu">cos</span><span class="op">(</span>freq <span class="op">*</span> iTime<span class="op">),</span> <span class="bu">sin</span><span class="op">(</span>freq <span class="op">*</span> iTime<span class="op">));</span></span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Draw circle</span></span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> d_circle <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span><span class="bu">length</span><span class="op">(</span>p <span class="op">-</span> pos<span class="op">)</span> <span class="op">-</span> r<span class="op">);</span></span>
+<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">if</span> <span class="op">(</span>d_circle <span class="op">&lt;</span> <span class="fl">0.02</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a>        <span class="co">// faint circle color</span></span>
+<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb39-16"><a href="#cb39-16" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Draw arm from pos to next_pos</span></span>
+<span id="cb39-17"><a href="#cb39-17" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> d_arm <span class="op">=</span> <span class="fu">sd_segment</span><span class="op">(</span>p<span class="op">,</span> pos<span class="op">,</span> next_pos<span class="op">);</span></span>
+<span id="cb39-18"><a href="#cb39-18" aria-hidden="true" tabindex="-1"></a>    <span class="kw">if</span> <span class="op">(</span>d_arm <span class="op">&lt;</span> <span class="fl">0.015</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb39-19"><a href="#cb39-19" aria-hidden="true" tabindex="-1"></a>        <span class="co">// arm color</span></span>
+<span id="cb39-20"><a href="#cb39-20" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb39-21"><a href="#cb39-21" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb39-22"><a href="#cb39-22" aria-hidden="true" tabindex="-1"></a>    pos <span class="op">=</span> next_pos<span class="op">;</span></span>
+<span id="cb39-23"><a href="#cb39-23" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="part-5-polish-and-explore" class="level4">
+<h4 class="anchored" data-anchor-id="part-5-polish-and-explore">Part 5: Polish and Explore</h4>
+<p>Now make it beautiful:</p>
+<p><strong>Fading circles:</strong> Later circles are smaller and less important. Fade their brightness:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb40"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> fade <span class="op">=</span> <span class="fl">1.0</span> <span class="op">-</span> <span class="dt">float</span><span class="op">(</span>i<span class="op">)</span> <span class="op">/</span> <span class="dt">float</span><span class="op">(</span>N<span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Color variation:</strong> Color circles differently based on their index, or based on their frequency.</p>
+<p><strong>Different waves:</strong> The square wave uses odd harmonics with <span class="math inline">\(1/n\)</span> coefficients. Try: - Triangle wave: odd harmonics with <span class="math inline">\(1/n^2\)</span> coefficients (alternating signs) - Sawtooth wave: all harmonics with <span class="math inline">\(1/n\)</span> coefficients</p>
+<p><strong>Mouse control:</strong> Map <code>iMouse.x</code> to the number of terms, so dragging adds or removes circles.</p>
+<p>The goal: create a mesmerizing animation that reveals the geometry hidden inside Fourier series.</p>
+
+
+</section>
+</section>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>
