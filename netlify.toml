@@ -1,7 +1,7 @@
 [build]
-  command = "quarto render && quarto render --profile print"
-  publish = "_book"
+  command = "quarto render && quarto render --profile print && cp _book/*.pdf _site/"
+  publish = "_site"
 
 [build.environment]
   # Netlify will need Quarto installed
-  # You may need to add a runtime.txt or use a Quarto build plugin
+  # See: https://quarto.org/docs/publishing/netlify.html

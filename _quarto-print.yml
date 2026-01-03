@@ -1,4 +1,12 @@
+project:
+  type: book
+  output-dir: _book
+
 book:
+  title: "GPU-Accelerated Mathematical Illustration"
+  subtitle: "An Introduction to Shader Programming"
+  cover-image: images/cover.png
+
   chapters:
     - index.qmd
     - part: "Lectures"

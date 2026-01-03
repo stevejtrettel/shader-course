@@ -1,6 +1,4 @@
 project:
-  type: book
-  output-dir: _book
   resources:
     - demos/**
 
@@ -8,21 +6,10 @@ profile:
   group:
     - [web, print]
 
-book:
-  title: "GPU-Accelerated Mathematical Illustration"
-  subtitle: "An Introduction to Shader Programming"
-  author: "Steve Trettel"
-  date: today
-  date-format: "MMMM YYYY"
-  cover-image: images/cover.png
-
-  sidebar:
-    style: "docked"
-    collapse-level: 2
-
-  search: true
-
-  repo-url: https://github.com/stevejtrettel/shader-course
+# Shared metadata
+author: "Steve Trettel"
+date: today
+date-format: "MMMM YYYY"
 
 bibliography: references.bib
 
