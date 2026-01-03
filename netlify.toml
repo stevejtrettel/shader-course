@@ -1,7 +1,9 @@
+# Netlify configuration for Quarto site
+
 [build]
   command = "quarto render && quarto render --profile print && cp _book/*.pdf _site/"
   publish = "_site"
 
-[build.environment]
-  # Netlify will need Quarto installed
-  # See: https://quarto.org/docs/publishing/netlify.html
+# Use the Quarto plugin to install Quarto automatically
+[[plugins]]
+  package = "@quarto/netlify-plugin-quarto"
