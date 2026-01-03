@@ -1,4 +1,4 @@
-# Appendix: Day 1 Shader Code
+# Day 1 Code
 
 This appendix provides complete, standalone code for each shader referenced in Day 1. Each listing can be copied directly into [Shadertoy](https://www.shadertoy.com/new) and run immediately.
 

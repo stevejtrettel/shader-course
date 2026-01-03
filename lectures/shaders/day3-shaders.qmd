@@ -1,4 +1,4 @@
-# Day 3: Complete Shader Code
+# Day 3 Code
 
 This document provides complete, standalone shader code for each demo in Day 3. Copy any of these directly into [Shadertoy](https://www.shadertoy.com/new) to run.
 

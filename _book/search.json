@@ -272,364 +272,364 @@
   {
     "objectID": "lectures/shaders/day1-shaders.html",
     "href": "lectures/shaders/day1-shaders.html",
-    "title": "Appendix A — Appendix: Day 1 Shader Code",
+    "title": "Appendix A — Day 1 Code",
     "section": "",
     "text": "A.1 A1. red\nThis appendix provides complete, standalone code for each shader referenced in Day 1. Each listing can be copied directly into Shadertoy and run immediately.\nThe simplest shader: every pixel is red.",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Appendix: Day 1 Shader Code</span>"
+      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Day 1 Code</span>"
     ]
   },
   {
     "objectID": "lectures/shaders/day1-shaders.html#a1.-red",
     "href": "lectures/shaders/day1-shaders.html#a1.-red",
-    "title": "Appendix A — Appendix: Day 1 Shader Code",
+    "title": "Appendix A — Day 1 Code",
     "section": "",
     "text": "void mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    fragColor = vec4(1.0, 0.0, 0.0, 1.0);\n}",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Appendix: Day 1 Shader Code</span>"
+      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Day 1 Code</span>"
     ]
   },
   {
     "objectID": "lectures/shaders/day1-shaders.html#a2.-red-pulsing",
     "href": "lectures/shaders/day1-shaders.html#a2.-red-pulsing",
-    "title": "Appendix A — Appendix: Day 1 Shader Code",
+    "title": "Appendix A — Day 1 Code",
     "section": "A.2 A2. red-pulsing",
     "text": "A.2 A2. red-pulsing\nRed channel oscillates with time.\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    float red = 0.5 + 0.5 * sin(iTime);\n    fragColor = vec4(red, 0.0, 0.0, 1.0);\n}",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Appendix: Day 1 Shader Code</span>"
+      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Day 1 Code</span>"
     ]
   },
   {
     "objectID": "lectures/shaders/day1-shaders.html#a3.-coordinates",
     "href": "lectures/shaders/day1-shaders.html#a3.-coordinates",
-    "title": "Appendix A — Appendix: Day 1 Shader Code",
+    "title": "Appendix A — Day 1 Code",
     "section": "A.3 A3. coordinates",
     "text": "A.3 A3. coordinates\nVisualizing the coordinate system as color.\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 uv = fragCoord / iResolution.xy;\n    fragColor = vec4(uv.x, uv.y, 0.0, 1.0);\n}",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Appendix: Day 1 Shader Code</span>"
+      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Day 1 Code</span>"
     ]
   },
   {
     "objectID": "lectures/shaders/day1-shaders.html#a4.-half-plane",
     "href": "lectures/shaders/day1-shaders.html#a4.-half-plane",
-    "title": "Appendix A — Appendix: Day 1 Shader Code",
+    "title": "Appendix A — Day 1 Code",
     "section": "A.4 A4. half-plane",
     "text": "A.4 A4. half-plane\nDividing the plane into two regions based on y-coordinate.\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    vec2 p = uv * 4.0;\n    \n    float L = p.y;\n    \n    vec3 color;\n    if (L &lt; 0.0) {\n        color = vec3(1.0, 0.0, 0.0);  // red below\n    } else {\n        color = vec3(0.0, 0.0, 1.0);  // blue above\n    }\n    \n    fragColor = vec4(color, 1.0);\n}",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Appendix: Day 1 Shader Code</span>"
+      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Day 1 Code</span>"
     ]
   },
   {
     "objectID": "lectures/shaders/day1-shaders.html#a5.-half-plane-animated",
     "href": "lectures/shaders/day1-shaders.html#a5.-half-plane-animated",
-    "title": "Appendix A — Appendix: Day 1 Shader Code",
+    "title": "Appendix A — Day 1 Code",
     "section": "A.5 A5. half-plane-animated",
     "text": "A.5 A5. half-plane-animated\nAnimated line dividing the plane, with rotating normal and shifting offset.\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    vec2 p = uv * 4.0;\n    \n    float a = cos(iTime);\n    float b = sin(iTime);\n    float c = 0.5 * sin(iTime * 0.7);\n    float L = a * p.x + b * p.y + c;\n    \n    vec3 color;\n    if (L &lt; 0.0) {\n        color = vec3(1.0, 0.0, 0.0);\n    } else {\n        color = vec3(0.0, 0.0, 1.0);\n    }\n    \n    fragColor = vec4(color, 1.0);\n}",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Appendix: Day 1 Shader Code</span>"
+      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Day 1 Code</span>"
     ]
   },
   {
     "objectID": "lectures/shaders/day1-shaders.html#a6.-circle",
     "href": "lectures/shaders/day1-shaders.html#a6.-circle",
-    "title": "Appendix A — Appendix: Day 1 Shader Code",
+    "title": "Appendix A — Day 1 Code",
     "section": "A.6 A6. circle",
     "text": "A.6 A6. circle\nFilled circle centered at the origin.\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    vec2 p = uv * 4.0;\n    \n    float d = length(p);\n    float r = 1.0;\n    float f = d - r;\n    \n    vec3 color;\n    if (f &lt; 0.0) {\n        color = vec3(1.0, 1.0, 0.0);  // yellow inside\n    } else {\n        color = vec3(0.1, 0.1, 0.3);  // dark blue outside\n    }\n    \n    fragColor = vec4(color, 1.0);\n}",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Appendix: Day 1 Shader Code</span>"
+      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Day 1 Code</span>"
     ]
   },
   {
     "objectID": "lectures/shaders/day1-shaders.html#a7.-circle-curve",
     "href": "lectures/shaders/day1-shaders.html#a7.-circle-curve",
-    "title": "Appendix A — Appendix: Day 1 Shader Code",
+    "title": "Appendix A — Day 1 Code",
     "section": "A.7 A7. circle-curve",
     "text": "A.7 A7. circle-curve\nCircle outline (ring) centered at the origin.\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    vec2 p = uv * 4.0;\n    \n    float d = length(p);\n    float r = 1.0;\n    float eps = 0.1;\n    float f = abs(d - r) - eps;\n    \n    vec3 color;\n    if (f &lt; 0.0) {\n        color = vec3(1.0, 1.0, 0.0);  // yellow ring\n    } else {\n        color = vec3(0.1, 0.1, 0.3);  // dark background\n    }\n    \n    fragColor = vec4(color, 1.0);\n}",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Appendix: Day 1 Shader Code</span>"
+      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Day 1 Code</span>"
     ]
   },
   {
     "objectID": "lectures/shaders/day1-shaders.html#a8.-parabola",
     "href": "lectures/shaders/day1-shaders.html#a8.-parabola",
-    "title": "Appendix A — Appendix: Day 1 Shader Code",
+    "title": "Appendix A — Day 1 Code",
     "section": "A.8 A8. parabola",
     "text": "A.8 A8. parabola\nThe parabola \\(y = x^2\\) rendered as an implicit curve.\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    vec2 p = uv * 4.0;\n    \n    float F = p.y - p.x * p.x;\n    float eps = 0.1;\n    \n    vec3 color;\n    if (abs(F) &lt; eps) {\n        color = vec3(1.0, 1.0, 0.0);  // yellow curve\n    } else {\n        color = vec3(0.1, 0.1, 0.3);  // dark background\n    }\n    \n    fragColor = vec4(color, 1.0);\n}",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Appendix: Day 1 Shader Code</span>"
+      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Day 1 Code</span>"
     ]
   },
   {
     "objectID": "lectures/shaders/day1-shaders.html#a9.-lemniscate-naive",
     "href": "lectures/shaders/day1-shaders.html#a9.-lemniscate-naive",
-    "title": "Appendix A — Appendix: Day 1 Shader Code",
+    "title": "Appendix A — Day 1 Code",
     "section": "A.9 A9. lemniscate-naive",
     "text": "A.9 A9. lemniscate-naive\nLemniscate of Bernoulli with naive thresholding (non-uniform thickness).\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    vec2 p = uv * 4.0;\n    \n    float a = 1.5;\n    float r2 = dot(p, p);\n    float F = r2 * r2 - a * a * (p.x * p.x - p.y * p.y);\n    \n    float eps = 0.15;\n    \n    vec3 color;\n    if (abs(F) &lt; eps) {\n        color = vec3(1.0, 1.0, 0.0);\n    } else {\n        color = vec3(0.1, 0.1, 0.3);\n    }\n    \n    fragColor = vec4(color, 1.0);\n}",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Appendix: Day 1 Shader Code</span>"
+      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Day 1 Code</span>"
     ]
   },
   {
     "objectID": "lectures/shaders/day1-shaders.html#a10.-lemniscate-gradient",
     "href": "lectures/shaders/day1-shaders.html#a10.-lemniscate-gradient",
-    "title": "Appendix A — Appendix: Day 1 Shader Code",
+    "title": "Appendix A — Day 1 Code",
     "section": "A.10 A10. lemniscate-gradient",
     "text": "A.10 A10. lemniscate-gradient\nLemniscate with gradient correction for uniform thickness.\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    vec2 p = uv * 4.0;\n    \n    float a = 1.5;\n    float r2 = dot(p, p);\n    float F = r2 * r2 - a * a * (p.x * p.x - p.y * p.y);\n    \n    vec2 grad = vec2(\n        4.0 * p.x * r2 - 2.0 * a * a * p.x,\n        4.0 * p.y * r2 + 2.0 * a * a * p.y\n    );\n    \n    float dist = abs(F) / max(length(grad), 0.01);\n    float eps = 0.05;\n    \n    vec3 color;\n    if (dist &lt; eps) {\n        color = vec3(1.0, 1.0, 0.0);\n    } else {\n        color = vec3(0.1, 0.1, 0.3);\n    }\n    \n    fragColor = vec4(color, 1.0);\n}",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Appendix: Day 1 Shader Code</span>"
+      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Day 1 Code</span>"
     ]
   },
   {
     "objectID": "lectures/shaders/day1-shaders.html#a11.-lemniscate-animated",
     "href": "lectures/shaders/day1-shaders.html#a11.-lemniscate-animated",
-    "title": "Appendix A — Appendix: Day 1 Shader Code",
+    "title": "Appendix A — Day 1 Code",
     "section": "A.11 A11. lemniscate-animated",
     "text": "A.11 A11. lemniscate-animated\nCassini ovals animated through the lemniscate transition.\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    vec2 p = uv * 4.0;\n    \n    // Cassini oval parameters\n    float c = 1.0;  // half-distance between foci\n    float a = 0.8 + 0.4 * sin(iTime * 0.5);  // animate through transition\n    \n    // Implicit equation: (x² + y²)² - 2c²(x² - y²) = a⁴ - c⁴\n    float r2 = dot(p, p);\n    float c2 = c * c;\n    float a4 = a * a * a * a;\n    float c4 = c2 * c2;\n    float F = r2 * r2 - 2.0 * c2 * (p.x * p.x - p.y * p.y) - (a4 - c4);\n    \n    // Gradient\n    vec2 grad = vec2(\n        4.0 * p.x * r2 - 4.0 * c2 * p.x,\n        4.0 * p.y * r2 + 4.0 * c2 * p.y\n    );\n    \n    float dist = abs(F) / max(length(grad), 0.01);\n    float eps = 0.05;\n    \n    vec3 color;\n    if (dist &lt; eps) {\n        color = vec3(1.0, 1.0, 0.0);\n    } else {\n        color = vec3(0.1, 0.1, 0.3);\n    }\n    \n    fragColor = vec4(color, 1.0);\n}",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Appendix: Day 1 Shader Code</span>"
+      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Day 1 Code</span>"
     ]
   },
   {
     "objectID": "lectures/shaders/day1-shaders.html#a12.-circle-mouse",
     "href": "lectures/shaders/day1-shaders.html#a12.-circle-mouse",
-    "title": "Appendix A — Appendix: Day 1 Shader Code",
+    "title": "Appendix A — Day 1 Code",
     "section": "A.12 A12. circle-mouse",
     "text": "A.12 A12. circle-mouse\nCircle that follows the mouse position.\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    // Normalize fragment coordinate\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    vec2 p = uv * 4.0;\n    \n    // Normalize mouse coordinate the same way\n    vec2 mouse = iMouse.xy / iResolution.xy;\n    mouse = mouse - vec2(0.5, 0.5);\n    mouse.x *= iResolution.x / iResolution.y;\n    mouse = mouse * 4.0;\n    \n    // Circle centered at mouse\n    float d = length(p - mouse);\n    float r = 0.5;\n    \n    vec3 color;\n    if (d &lt; r) {\n        color = vec3(1.0, 0.9, 0.2);\n    } else {\n        color = vec3(0.1, 0.1, 0.3);\n    }\n    \n    fragColor = vec4(color, 1.0);\n}",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Appendix: Day 1 Shader Code</span>"
+      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Day 1 Code</span>"
     ]
   },
   {
     "objectID": "lectures/shaders/day1-shaders.html#a13.-sun-earth",
     "href": "lectures/shaders/day1-shaders.html#a13.-sun-earth",
-    "title": "Appendix A — Appendix: Day 1 Shader Code",
+    "title": "Appendix A — Day 1 Code",
     "section": "A.13 A13. sun-earth",
     "text": "A.13 A13. sun-earth\nSun at mouse click position with orbiting earth.\nvec2 normalize_coord(vec2 coord) {\n    vec2 uv = coord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    return uv * 4.0;\n}\n\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 p = normalize_coord(fragCoord);\n    \n    // Use iMouse.zw (last click position) so sun stays put\n    vec2 sun = normalize_coord(iMouse.zw);\n    \n    // Earth orbits the sun\n    float orbit_radius = 0.8;\n    vec2 earth = sun + orbit_radius * vec2(cos(iTime), sin(iTime));\n    \n    // Draw sun (larger, yellow)\n    float d_sun = length(p - sun);\n    // Draw earth (smaller, blue)\n    float d_earth = length(p - earth);\n    \n    vec3 color = vec3(0.02, 0.02, 0.05);  // dark background\n    if (d_sun &lt; 0.3) {\n        color = vec3(1.0, 0.9, 0.2);  // yellow sun\n    }\n    if (d_earth &lt; 0.15) {\n        color = vec3(0.2, 0.5, 1.0);  // blue earth\n    }\n    \n    fragColor = vec4(color, 1.0);\n}",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Appendix: Day 1 Shader Code</span>"
+      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Day 1 Code</span>"
     ]
   },
   {
     "objectID": "lectures/shaders/day1-shaders.html#a14.-folium-mouse",
     "href": "lectures/shaders/day1-shaders.html#a14.-folium-mouse",
-    "title": "Appendix A — Appendix: Day 1 Shader Code",
+    "title": "Appendix A — Day 1 Code",
     "section": "A.14 A14. folium-mouse",
     "text": "A.14 A14. folium-mouse\nFolium of Descartes with mouse-controlled level set.\nvec2 normalize_coord(vec2 coord) {\n    vec2 uv = coord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    return uv * 4.0;\n}\n\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 p = normalize_coord(fragCoord);\n    \n    // Fixed parameter a\n    float a = 1.5;\n    \n    // Map mouse x to level set value c in [-2, 2]\n    float c = mix(-2.0, 2.0, iMouse.x / iResolution.x);\n    \n    // Folium of Descartes: x³ + y³ - 3axy = c\n    float F = p.x*p.x*p.x + p.y*p.y*p.y - 3.0*a*p.x*p.y - c;\n    \n    // Gradient: ∇F = (3x² - 3ay, 3y² - 3ax)\n    vec2 grad = vec2(3.0*p.x*p.x - 3.0*a*p.y, 3.0*p.y*p.y - 3.0*a*p.x);\n    float dist = abs(F) / max(length(grad), 0.01);\n    \n    vec3 color;\n    if (dist &lt; 0.05) {\n        color = vec3(1.0, 1.0, 0.0);\n    } else {\n        color = vec3(0.1, 0.1, 0.3);\n    }\n    \n    fragColor = vec4(color, 1.0);\n}",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Appendix: Day 1 Shader Code</span>"
+      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Day 1 Code</span>"
     ]
   },
   {
     "objectID": "lectures/shaders/day1-shaders.html#a15.-elliptic-family",
     "href": "lectures/shaders/day1-shaders.html#a15.-elliptic-family",
-    "title": "Appendix A — Appendix: Day 1 Shader Code",
+    "title": "Appendix A — Day 1 Code",
     "section": "A.15 A15. elliptic-family",
     "text": "A.15 A15. elliptic-family\nFamily of elliptic curves with mouse-controlled center parameters.\nvec2 normalize_coord(vec2 coord) {\n    vec2 uv = coord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    return uv * 4.0;\n}\n\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 p = normalize_coord(fragCoord);\n    \n    // Mouse controls the central (a, b) of our family\n    float a_center = mix(-3.0, 1.0, iMouse.x / iResolution.x);\n    float b_center = mix(-2.0, 2.0, iMouse.y / iResolution.y);\n    \n    vec3 color = vec3(0.05, 0.05, 0.1);  // dark background\n    \n    // Draw curves for a range of a values around a_center\n    for (float i = -3.0; i &lt;= 3.0; i += 1.0) {\n        float a = a_center + i * 0.5;  // more spacing\n        float b = b_center;\n        \n        // Elliptic curve: y² = x³ + ax + b\n        float F = p.y * p.y - p.x * p.x * p.x - a * p.x - b;\n        \n        // Gradient\n        vec2 grad = vec2(-3.0 * p.x * p.x - a, 2.0 * p.y);\n        float dist = abs(F) / max(length(grad), 0.01);\n        \n        // Brightness fades quickly: central curve bright, outer curves fade to background\n        float t = abs(i) / 3.0;  // 0 at center, 1 at edges\n        float brightness = 1.0 - t * t;  // quadratic falloff\n        \n        if (dist &lt; 0.03 && brightness &gt; 0.05) {\n            // Check discriminant for this specific curve\n            float disc = 4.0 * a * a * a + 27.0 * b * b;\n            if (abs(disc) &lt; 0.3) {\n                color = mix(color, vec3(1.0, 0.3, 0.3), brightness);  // red for singular\n            } else {\n                color = mix(color, vec3(1.0, 1.0, 0.5), brightness);  // yellow for smooth\n            }\n        }\n    }\n    \n    fragColor = vec4(color, 1.0);\n}",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Appendix: Day 1 Shader Code</span>"
+      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Day 1 Code</span>"
     ]
   },
   {
     "objectID": "lectures/shaders/day1-shaders.html#a16.-grid-circles",
     "href": "lectures/shaders/day1-shaders.html#a16.-grid-circles",
-    "title": "Appendix A — Appendix: Day 1 Shader Code",
+    "title": "Appendix A — Day 1 Code",
     "section": "A.16 A16. grid-circles",
     "text": "A.16 A16. grid-circles\nGrid of circles with square cells.\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    vec2 p = uv * 4.0;\n    \n    float aspect = iResolution.x / iResolution.y;\n    float N = 5.0;  // number of columns\n    float L = (4.0 * aspect) / N;  // cell size\n    \n    vec2 cell_id = floor(p / L);\n    vec2 cell_p = mod(p + vec2(L/2.0, L/2.0), L) - vec2(L/2.0, L/2.0);\n    \n    // Checkerboard background\n    float checker = mod(cell_id.x + cell_id.y, 2.0);\n    vec3 bg = mix(vec3(0.15, 0.15, 0.25), vec3(0.25, 0.15, 0.15), checker);\n    \n    // Circle in each cell\n    float d = length(cell_p);\n    float r = L * 0.35;\n    \n    vec3 color;\n    if (d &lt; r) {\n        color = vec3(1.0, 1.0, 0.0);\n    } else {\n        color = bg;\n    }\n    \n    fragColor = vec4(color, 1.0);\n}",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Appendix: Day 1 Shader Code</span>"
+      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Day 1 Code</span>"
     ]
   },
   {
     "objectID": "lectures/shaders/day1-shaders.html#notes",
     "href": "lectures/shaders/day1-shaders.html#notes",
-    "title": "Appendix A — Appendix: Day 1 Shader Code",
+    "title": "Appendix A — Day 1 Code",
     "section": "A.17 Notes",
     "text": "A.17 Notes\n\nCoordinate Setup\nMost shaders use this standard coordinate setup:\nvec2 uv = fragCoord / iResolution.xy;   // normalize to [0,1]\nuv = uv - vec2(0.5, 0.5);               // center origin\nuv.x *= iResolution.x / iResolution.y;  // aspect correction\nvec2 p = uv * 4.0;                      // scale to [-2, 2] range\n\n\nHelper Function\nFor shaders using mouse input, we define:\nvec2 normalize_coord(vec2 coord) {\n    vec2 uv = coord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    return uv * 4.0;\n}\n\n\nGradient Correction\nFor implicit curves \\(F(x,y) = 0\\) with uniform thickness:\nfloat dist = abs(F) / max(length(grad), 0.01);\nwhere grad is \\(\\nabla F\\) computed analytically.",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Appendix: Day 1 Shader Code</span>"
+      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Day 1 Code</span>"
     ]
   },
   {
     "objectID": "lectures/shaders/day2-shaders.html",
     "href": "lectures/shaders/day2-shaders.html",
-    "title": "Appendix B — Appendix: Day 2 Shader Code",
+    "title": "Appendix B — Day 2 Code",
     "section": "",
     "text": "B.1 Common Functions\nComplete, standalone code for each shader referenced in Day 2. Each listing can be copied directly into Shadertoy and run immediately.\nThese helper functions are used throughout Day 2:",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Appendix: Day 2 Shader Code</span>"
+      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Day 2 Code</span>"
     ]
   },
   {
     "objectID": "lectures/shaders/day2-shaders.html#common-functions",
     "href": "lectures/shaders/day2-shaders.html#common-functions",
-    "title": "Appendix B — Appendix: Day 2 Shader Code",
+    "title": "Appendix B — Day 2 Code",
     "section": "",
     "text": "// Normalize screen coordinates to centered, aspect-corrected space\nvec2 normalize_coord(vec2 fragCoord) {\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    return uv * 4.0;\n}\n\n// Complex multiplication: (a + bi)(c + di)\nvec2 cmul(vec2 z, vec2 w) {\n    return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);\n}\n\n// Squared magnitude of complex number (avoids sqrt)\nfloat cabs2(vec2 z) {\n    return dot(z, z);\n}\n\n// Cosine palette for smooth coloring\nvec3 palette(float t) {\n    vec3 a = vec3(0.5, 0.5, 0.5);\n    vec3 b = vec3(0.5, 0.5, 0.5);\n    vec3 c = vec3(1.0, 1.0, 1.0);\n    vec3 d = vec3(0.00, 0.33, 0.67);\n    return a + b * cos(6.28318 * (c * t + d));\n}",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Appendix: Day 2 Shader Code</span>"
+      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Day 2 Code</span>"
     ]
   },
   {
     "objectID": "lectures/shaders/day2-shaders.html#a1.-mandelbrot-zoom",
     "href": "lectures/shaders/day2-shaders.html#a1.-mandelbrot-zoom",
-    "title": "Appendix B — Appendix: Day 2 Shader Code",
+    "title": "Appendix B — Day 2 Code",
     "section": "B.2 A1. mandelbrot-zoom",
     "text": "B.2 A1. mandelbrot-zoom\nAnimated zoom into the Mandelbrot set with smooth coloring.\nvec2 cmul(vec2 z, vec2 w) {\n    return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);\n}\n\nfloat cabs2(vec2 z) {\n    return dot(z, z);\n}\n\nvec3 palette(float t) {\n    vec3 a = vec3(0.5, 0.5, 0.5);\n    vec3 b = vec3(0.5, 0.5, 0.5);\n    vec3 c = vec3(1.0, 1.0, 1.0);\n    vec3 d = vec3(0.00, 0.33, 0.67);\n    return a + b * cos(6.28318 * (c * t + d));\n}\n\nvec2 normalize_coord(vec2 fragCoord) {\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    float zoom = pow(1.5, mod(iTime, 30.0));\n    return uv * 4.0 / zoom;\n}\n\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 p = normalize_coord(fragCoord);\n    \n    // Zoom into the seahorse valley\n    vec2 center = vec2(-0.745, 0.186);\n    vec2 c = center + p;\n    \n    vec2 z = vec2(0.0, 0.0);\n    int max_iter = 200;\n    int iter;\n    \n    for (iter = 0; iter &lt; max_iter; iter++) {\n        if (cabs2(z) &gt; 4.0) break;\n        z = cmul(z, z) + c;\n    }\n    \n    vec3 color;\n    if (iter == max_iter) {\n        color = vec3(0.0);\n    } else {\n        // Smooth coloring\n        float log_zn = log(cabs2(z)) / 2.0;\n        float nu = log(log_zn / log(2.0)) / log(2.0);\n        float smooth_iter = float(iter) + 1.0 - nu;\n        float t = smooth_iter / float(max_iter);\n        color = palette(t * 4.0);\n    }\n    \n    fragColor = vec4(color, 1.0);\n}",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Appendix: Day 2 Shader Code</span>"
+      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Day 2 Code</span>"
     ]
   },
   {
     "objectID": "lectures/shaders/day2-shaders.html#a2.-mandelbrot-bw",
     "href": "lectures/shaders/day2-shaders.html#a2.-mandelbrot-bw",
-    "title": "Appendix B — Appendix: Day 2 Shader Code",
+    "title": "Appendix B — Day 2 Code",
     "section": "B.3 A2. mandelbrot-bw",
     "text": "B.3 A2. mandelbrot-bw\nBlack and white Mandelbrot set.\nvec2 cmul(vec2 z, vec2 w) {\n    return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);\n}\n\nfloat cabs2(vec2 z) {\n    return dot(z, z);\n}\n\nvec2 normalize_coord(vec2 fragCoord) {\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    return uv * 4.0;\n}\n\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 p = normalize_coord(fragCoord);\n    \n    vec2 c = p;\n    c.x -= 0.5;  // shift left to center the interesting part\n    \n    vec2 z = vec2(0.0, 0.0);\n    int max_iter = 100;\n    int iter;\n    \n    for (iter = 0; iter &lt; max_iter; iter++) {\n        if (cabs2(z) &gt; 4.0) break;\n        z = cmul(z, z) + c;\n    }\n    \n    vec3 color;\n    if (iter == max_iter) {\n        color = vec3(0.0);\n    } else {\n        color = vec3(1.0);\n    }\n    \n    fragColor = vec4(color, 1.0);\n}",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Appendix: Day 2 Shader Code</span>"
+      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Day 2 Code</span>"
     ]
   },
   {
     "objectID": "lectures/shaders/day2-shaders.html#a3.-mandelbrot-gray",
     "href": "lectures/shaders/day2-shaders.html#a3.-mandelbrot-gray",
-    "title": "Appendix B — Appendix: Day 2 Shader Code",
+    "title": "Appendix B — Day 2 Code",
     "section": "B.4 A3. mandelbrot-gray",
     "text": "B.4 A3. mandelbrot-gray\nMandelbrot set with grayscale iteration coloring.\nvec2 cmul(vec2 z, vec2 w) {\n    return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);\n}\n\nfloat cabs2(vec2 z) {\n    return dot(z, z);\n}\n\nvec2 normalize_coord(vec2 fragCoord) {\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    return uv * 4.0;\n}\n\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 p = normalize_coord(fragCoord);\n    \n    vec2 c = p;\n    c.x -= 0.5;\n    \n    vec2 z = vec2(0.0, 0.0);\n    int max_iter = 100;\n    int iter;\n    \n    for (iter = 0; iter &lt; max_iter; iter++) {\n        if (cabs2(z) &gt; 4.0) break;\n        z = cmul(z, z) + c;\n    }\n    \n    vec3 color;\n    if (iter == max_iter) {\n        color = vec3(0.0);\n    } else {\n        float t = float(iter) / float(max_iter);\n        color = vec3(t);\n    }\n    \n    fragColor = vec4(color, 1.0);\n}",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Appendix: Day 2 Shader Code</span>"
+      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Day 2 Code</span>"
     ]
   },
   {
     "objectID": "lectures/shaders/day2-shaders.html#a4.-mandelbrot-color",
     "href": "lectures/shaders/day2-shaders.html#a4.-mandelbrot-color",
-    "title": "Appendix B — Appendix: Day 2 Shader Code",
+    "title": "Appendix B — Day 2 Code",
     "section": "B.5 A4. mandelbrot-color",
     "text": "B.5 A4. mandelbrot-color\nMandelbrot set with cosine palette coloring.\nvec2 cmul(vec2 z, vec2 w) {\n    return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);\n}\n\nfloat cabs2(vec2 z) {\n    return dot(z, z);\n}\n\nvec3 palette(float t) {\n    vec3 a = vec3(0.5, 0.5, 0.5);\n    vec3 b = vec3(0.5, 0.5, 0.5);\n    vec3 c = vec3(1.0, 1.0, 1.0);\n    vec3 d = vec3(0.00, 0.33, 0.67);\n    return a + b * cos(6.28318 * (c * t + d));\n}\n\nvec2 normalize_coord(vec2 fragCoord) {\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    return uv * 4.0;\n}\n\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 p = normalize_coord(fragCoord);\n    \n    vec2 c = p;\n    c.x -= 0.5;\n    \n    vec2 z = vec2(0.0, 0.0);\n    int max_iter = 100;\n    int iter;\n    \n    for (iter = 0; iter &lt; max_iter; iter++) {\n        if (cabs2(z) &gt; 4.0) break;\n        z = cmul(z, z) + c;\n    }\n    \n    vec3 color;\n    if (iter == max_iter) {\n        color = vec3(0.0);\n    } else {\n        float t = float(iter) / float(max_iter);\n        color = palette(t);\n    }\n    \n    fragColor = vec4(color, 1.0);\n}",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Appendix: Day 2 Shader Code</span>"
+      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Day 2 Code</span>"
     ]
   },
   {
     "objectID": "lectures/shaders/day2-shaders.html#a5.-julia-static",
     "href": "lectures/shaders/day2-shaders.html#a5.-julia-static",
-    "title": "Appendix B — Appendix: Day 2 Shader Code",
+    "title": "Appendix B — Day 2 Code",
     "section": "B.6 A5. julia-static",
     "text": "B.6 A5. julia-static\nJulia set with fixed parameter (black and white).\nvec2 cmul(vec2 z, vec2 w) {\n    return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);\n}\n\nfloat cabs2(vec2 z) {\n    return dot(z, z);\n}\n\nvec2 normalize_coord(vec2 fragCoord) {\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    return uv * 4.0;\n}\n\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 p = normalize_coord(fragCoord);\n    \n    // Fixed parameter - try different values!\n    vec2 c = vec2(-0.7, 0.27015);\n    \n    // z starts at pixel position\n    vec2 z = p;\n    \n    int max_iter = 100;\n    int iter;\n    \n    for (iter = 0; iter &lt; max_iter; iter++) {\n        if (cabs2(z) &gt; 4.0) break;\n        z = cmul(z, z) + c;\n    }\n    \n    vec3 color;\n    if (iter == max_iter) {\n        color = vec3(0.0);  // In the set: black\n    } else {\n        color = vec3(1.0);  // Escaped: white\n    }\n    \n    fragColor = vec4(color, 1.0);\n}",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Appendix: Day 2 Shader Code</span>"
+      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Day 2 Code</span>"
     ]
   },
   {
     "objectID": "lectures/shaders/day2-shaders.html#a6.-julia-explorer",
     "href": "lectures/shaders/day2-shaders.html#a6.-julia-explorer",
-    "title": "Appendix B — Appendix: Day 2 Shader Code",
+    "title": "Appendix B — Day 2 Code",
     "section": "B.7 A6. julia-explorer",
     "text": "B.7 A6. julia-explorer\nInteractive Julia set explorer: gray Mandelbrot as parameter space background, black Julia set overlaid, red dot shows current c.\nvec2 cmul(vec2 z, vec2 w) {\n    return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);\n}\n\nfloat cabs2(vec2 z) {\n    return dot(z, z);\n}\n\nvec2 normalize_coord(vec2 fragCoord) {\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    return uv * 4.0;\n}\n\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 p = normalize_coord(fragCoord);\n    \n    // Get c from mouse position\n    vec2 c = normalize_coord(iMouse.xy);\n    c.x -= 0.5;\n    \n    // Default to interesting value if no mouse\n    if (iMouse.x &lt; 1.0) {\n        c = vec2(-0.7, 0.27015);\n    }\n    \n    // Mandelbrot iteration (for background)\n    vec2 mc = p;\n    mc.x -= 0.5;\n    vec2 mz = vec2(0.0);\n    int m_iter;\n    for (m_iter = 0; m_iter &lt; 100; m_iter++) {\n        if (cabs2(mz) &gt; 4.0) break;\n        mz = cmul(mz, mz) + mc;\n    }\n    \n    // Julia iteration (for foreground)\n    vec2 jz = p;\n    int j_iter;\n    for (j_iter = 0; j_iter &lt; 100; j_iter++) {\n        if (cabs2(jz) &gt; 4.0) break;\n        jz = cmul(jz, jz) + c;\n    }\n    \n    // Color: light background, Mandelbrot in gray, Julia in black\n    vec3 color = vec3(0.9);  // light background (escaped both)\n    if (m_iter == 100) {\n        color = vec3(0.6);  // Mandelbrot set in gray\n    }\n    if (j_iter == 100) {\n        color = vec3(0.0);  // Julia set in black\n    }\n    \n    // Draw red dot at c position (in Mandelbrot coordinates)\n    vec2 c_pos = c;\n    c_pos.x += 0.5;  // undo the offset we applied to c\n    if (length(p - c_pos) &lt; 0.05) {\n        color = vec3(1.0, 0.0, 0.0);\n    }\n    \n    fragColor = vec4(color, 1.0);\n}",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Appendix: Day 2 Shader Code</span>"
+      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Day 2 Code</span>"
     ]
   },
   {
     "objectID": "lectures/shaders/day2-shaders.html#a7.-inversion-toggle",
     "href": "lectures/shaders/day2-shaders.html#a7.-inversion-toggle",
-    "title": "Appendix B — Appendix: Day 2 Shader Code",
+    "title": "Appendix B — Day 2 Code",
     "section": "B.8 A7. inversion-toggle",
     "text": "B.8 A7. inversion-toggle\nCircle inversion visualization with toggling.\nvec2 normalize_coord(vec2 fragCoord) {\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    return uv * 4.0;\n}\n\nvec2 invert(vec2 p) {\n    return p / dot(p, p);\n}\n\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 p = normalize_coord(fragCoord);\n    vec2 p_inv = invert(p);\n    \n    // Toggle between original and inverted every second\n    float time = fract(iTime * 0.5);\n    vec2 q;\n    if (time &lt; 0.5) {\n        q = p;\n    } else {\n        q = p_inv;\n    }\n    \n    vec3 color = vec3(0.1, 0.1, 0.15);\n    \n    // Draw the unit circle\n    float d_unit = abs(length(p) - 1.0);\n    if (d_unit &lt; 0.02) color = vec3(0.5, 0.5, 0.5);\n    \n    // Draw a vertical line at x = 2\n    if (abs(q.x - 2.0) &lt; 0.02) color = vec3(1.0, 1.0, 0.0);\n    \n    // Draw a horizontal line at y = 1.5\n    if (abs(q.y - 1.5) &lt; 0.02) color = vec3(1.0, 1.0, 0.0);\n    \n    // Draw a circle centered at (2, 0) with radius 0.5\n    float d_circle = abs(length(q - vec2(2.0, 0.0)) - 0.5);\n    if (d_circle &lt; 0.02) color = vec3(1.0, 1.0, 0.0);\n    \n    fragColor = vec4(color, 1.0);\n}",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Appendix: Day 2 Shader Code</span>"
+      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Day 2 Code</span>"
     ]
   },
   {
     "objectID": "lectures/shaders/day2-shaders.html#a8.-inversion-grid",
     "href": "lectures/shaders/day2-shaders.html#a8.-inversion-grid",
-    "title": "Appendix B — Appendix: Day 2 Shader Code",
+    "title": "Appendix B — Day 2 Code",
     "section": "B.9 A8. inversion-grid",
     "text": "B.9 A8. inversion-grid\nCircle inversion of a grid.\nvec2 normalize_coord(vec2 fragCoord) {\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    return uv * 4.0;\n}\n\nvec2 invert(vec2 p) {\n    return p / dot(p, p);\n}\n\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 p = normalize_coord(fragCoord);\n    vec2 p_inv = invert(p);\n    \n    // Toggle\n    float time = fract(iTime * 0.5);\n    vec2 q;\n    if (time &lt; 0.5) {\n        q = p;\n    } else {\n        q = p_inv;\n    }\n    \n    vec3 color = vec3(0.1, 0.1, 0.15);\n    \n    // Draw the unit circle\n    float d_unit = abs(length(p) - 1.0);\n    if (d_unit &lt; 0.02) color = vec3(0.5, 0.5, 0.5);\n    \n    // Draw a grid using mod\n    vec2 grid = mod(q, 0.5);\n    if (grid.x &lt; 0.02 || grid.y &lt; 0.02) color = vec3(1.0, 1.0, 0.0);\n    \n    fragColor = vec4(color, 1.0);\n}",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Appendix: Day 2 Shader Code</span>"
+      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Day 2 Code</span>"
     ]
   },
   {
     "objectID": "lectures/shaders/day2-shaders.html#a9.-inversion-moving",
     "href": "lectures/shaders/day2-shaders.html#a9.-inversion-moving",
-    "title": "Appendix B — Appendix: Day 2 Shader Code",
+    "title": "Appendix B — Day 2 Code",
     "section": "B.10 A9. inversion-moving",
     "text": "B.10 A9. inversion-moving\nInversion through a moving circle.\nvec2 normalize_coord(vec2 fragCoord) {\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    return uv * 4.0;\n}\n\nstruct Circle {\n    vec2 center;\n    float radius;\n};\n\nvec2 invert(vec2 p, Circle c) {\n    vec2 d = p - c.center;\n    return c.center + c.radius * c.radius * d / dot(d, d);\n}\n\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 p = normalize_coord(fragCoord);\n    \n    // Animate the inversion circle\n    Circle inv_circle;\n    inv_circle.center = vec2(sin(iTime) * 0.5, cos(iTime * 0.7) * 0.5);\n    inv_circle.radius = 1.0 + 0.3 * sin(iTime * 1.3);\n    \n    vec2 p_inv = invert(p, inv_circle);\n    \n    vec3 color = vec3(0.1, 0.1, 0.15);\n    \n    // Draw the inversion circle\n    float d_inv = abs(length(p - inv_circle.center) - inv_circle.radius);\n    if (d_inv &lt; 0.02) color = vec3(0.5, 0.5, 0.5);\n    \n    // Draw a grid in the inverted space\n    vec2 grid = mod(p_inv, 0.5);\n    if (grid.x &lt; 0.02 || grid.y &lt; 0.02) color = vec3(1.0, 1.0, 0.0);\n    \n    fragColor = vec4(color, 1.0);\n}",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Appendix: Day 2 Shader Code</span>"
+      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Day 2 Code</span>"
     ]
   },
   {
     "objectID": "lectures/shaders/day2-shaders.html#a10.-apollonian-setup",
     "href": "lectures/shaders/day2-shaders.html#a10.-apollonian-setup",
-    "title": "Appendix B — Appendix: Day 2 Shader Code",
+    "title": "Appendix B — Day 2 Code",
     "section": "B.11 A10. apollonian-setup",
     "text": "B.11 A10. apollonian-setup\nThe four mutually tangent circles (no iteration).\nvec2 normalize_coord(vec2 fragCoord) {\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    return uv * 6.0;\n}\n\nstruct Circle {\n    vec2 center;\n    float radius;\n};\n\nfloat distToCircle(vec2 p, Circle c) {\n    return abs(length(p - c.center) - c.radius);\n}\n\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 p = normalize_coord(fragCoord);\n    \n    // Three mutually tangent inner circles plus outer circle\n    // For three circles of radius r centered at vertices of equilateral triangle:\n    // - Side length of triangle = 2r (so circles touch)\n    // - Circumradius of triangle = 2r / sqrt(3)\n    // - Outer circle radius = circumradius + r\n    \n    float r = 1.0;\n    float triSide = 2.0 * r;\n    float circumradius = triSide / sqrt(3.0);\n    \n    // Inner circles at vertices of equilateral triangle\n    Circle c1 = Circle(vec2(0.0, circumradius), r);\n    Circle c2 = Circle(vec2(-circumradius * 0.866, -circumradius * 0.5), r);\n    Circle c3 = Circle(vec2(circumradius * 0.866, -circumradius * 0.5), r);\n    \n    // Outer circle tangent to all three from outside\n    Circle outer = Circle(vec2(0.0, 0.0), circumradius + r);\n    \n    vec3 color = vec3(0.1, 0.1, 0.15);\n    \n    // Draw all four circles\n    if (distToCircle(p, c1) &lt; 0.03) color = vec3(1.0, 0.3, 0.3);\n    if (distToCircle(p, c2) &lt; 0.03) color = vec3(0.3, 1.0, 0.3);\n    if (distToCircle(p, c3) &lt; 0.03) color = vec3(0.3, 0.3, 1.0);\n    if (distToCircle(p, outer) &lt; 0.03) color = vec3(1.0, 1.0, 1.0);\n    \n    fragColor = vec4(color, 1.0);\n}",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Appendix: Day 2 Shader Code</span>"
+      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Day 2 Code</span>"
     ]
   },
   {
     "objectID": "lectures/shaders/day2-shaders.html#a11.-apollonian-iterated",
     "href": "lectures/shaders/day2-shaders.html#a11.-apollonian-iterated",
-    "title": "Appendix B — Appendix: Day 2 Shader Code",
+    "title": "Appendix B — Day 2 Code",
     "section": "B.12 A11. apollonian-iterated",
     "text": "B.12 A11. apollonian-iterated\nFull Apollonian gasket with iteration.\nvec2 normalize_coord(vec2 fragCoord) {\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    return uv * 6.0;\n}\n\nstruct Circle {\n    vec2 center;\n    float radius;\n};\n\nvec2 invert(vec2 p, Circle c) {\n    vec2 d = p - c.center;\n    return c.center + c.radius * c.radius * d / dot(d, d);\n}\n\nfloat distToCircle(vec2 p, Circle c) {\n    return abs(length(p - c.center) - c.radius);\n}\n\nbool isInside(vec2 p, Circle c) {\n    return length(p - c.center) &lt; c.radius;\n}\n\nvec3 palette(float t) {\n    vec3 a = vec3(0.5, 0.5, 0.5);\n    vec3 b = vec3(0.5, 0.5, 0.5);\n    vec3 c = vec3(1.0, 1.0, 1.0);\n    vec3 d = vec3(0.00, 0.33, 0.67);\n    return a + b * cos(6.28318 * (c * t + d));\n}\n\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 p = normalize_coord(fragCoord);\n    \n    // Setup circles with correct geometry\n    float r = 1.0;\n    float triSide = 2.0 * r;\n    float circumradius = triSide / sqrt(3.0);\n    \n    Circle c1 = Circle(vec2(0.0, circumradius), r);\n    Circle c2 = Circle(vec2(-circumradius * 0.866, -circumradius * 0.5), r);\n    Circle c3 = Circle(vec2(circumradius * 0.866, -circumradius * 0.5), r);\n    Circle outer = Circle(vec2(0.0, 0.0), circumradius + r);\n    \n    // Iterate inversions\n    int max_iter = 50;\n    int iter;\n    \n    for (iter = 0; iter &lt; max_iter; iter++) {\n        if (isInside(p, c1)) {\n            p = invert(p, c1);\n        } else if (isInside(p, c2)) {\n            p = invert(p, c2);\n        } else if (isInside(p, c3)) {\n            p = invert(p, c3);\n        } else if (!isInside(p, outer)) {\n            p = invert(p, outer);\n        } else {\n            break;\n        }\n    }\n    \n    // Color by iteration count\n    float t = float(iter) / float(max_iter);\n    vec3 color = palette(t);\n    \n    // Draw circle boundaries\n    float dMin = min(min(distToCircle(p, c1), distToCircle(p, c2)), \n                     min(distToCircle(p, c3), distToCircle(p, outer)));\n    if (dMin &lt; 0.02) color = vec3(1.0);\n    \n    fragColor = vec4(color, 1.0);\n}",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Appendix: Day 2 Shader Code</span>"
+      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Day 2 Code</span>"
     ]
   },
   {
     "objectID": "lectures/shaders/day2-shaders.html#a12.-apollonian-final",
     "href": "lectures/shaders/day2-shaders.html#a12.-apollonian-final",
-    "title": "Appendix B — Appendix: Day 2 Shader Code",
+    "title": "Appendix B — Day 2 Code",
     "section": "B.13 A12. apollonian-final",
     "text": "B.13 A12. apollonian-final\nApollonian gasket with coloring emphasizing the limit set.\nvec2 normalize_coord(vec2 fragCoord) {\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    return uv * 6.0;\n}\n\nstruct Circle {\n    vec2 center;\n    float radius;\n};\n\nvec2 invert(vec2 p, Circle c) {\n    vec2 d = p - c.center;\n    return c.center + c.radius * c.radius * d / dot(d, d);\n}\n\nbool isInside(vec2 p, Circle c) {\n    return length(p - c.center) &lt; c.radius;\n}\n\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 p = normalize_coord(fragCoord);\n    \n    // Setup circles with correct geometry\n    float r = 1.0;\n    float triSide = 2.0 * r;\n    float circumradius = triSide / sqrt(3.0);\n    \n    Circle c1 = Circle(vec2(0.0, circumradius), r);\n    Circle c2 = Circle(vec2(-circumradius * 0.866, -circumradius * 0.5), r);\n    Circle c3 = Circle(vec2(circumradius * 0.866, -circumradius * 0.5), r);\n    Circle outer = Circle(vec2(0.0, 0.0), circumradius + r);\n    \n    // Iterate inversions\n    int max_iter = 100;\n    int iter;\n    \n    for (iter = 0; iter &lt; max_iter; iter++) {\n        if (isInside(p, c1)) {\n            p = invert(p, c1);\n        } else if (isInside(p, c2)) {\n            p = invert(p, c2);\n        } else if (isInside(p, c3)) {\n            p = invert(p, c3);\n        } else if (!isInside(p, outer)) {\n            p = invert(p, outer);\n        } else {\n            break;\n        }\n    }\n    \n    // Color by iteration count, emphasizing the limit set\n    float t = float(iter) / float(max_iter);\n    vec3 color = 30.0 * vec3(pow(t, 2.0));\n    \n    fragColor = vec4(color, 1.0);\n}",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Appendix: Day 2 Shader Code</span>"
+      "<span class='chapter-number'>B</span>  <span class='chapter-title'>Day 2 Code</span>"
     ]
   },
   {
     "objectID": "lectures/shaders/day3-shaders.html",
     "href": "lectures/shaders/day3-shaders.html",
-    "title": "Appendix C — Day 3: Complete Shader Code",
+    "title": "Appendix C — Day 3 Code",
     "section": "",
     "text": "This document provides complete, standalone shader code for each demo in Day 3. Copy any of these directly into Shadertoy to run.\n\n\nstrip-circle\nBasic strip tiling with a circle in the fundamental domain.\nvec2 normalize_coord(vec2 fragCoord) {\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    return uv * 8.0;\n}\n\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 p = normalize_coord(fragCoord);\n    \n    // Fold into the strip [0, 1]\n    for (int i = 0; i &lt; 20; i++) {\n        if (p.x &lt; 0.0) p.x = -p.x;\n        if (p.x &gt; 1.0) p.x = 2.0 - p.x;\n    }\n    \n    // Draw a circle in the fundamental domain\n    float d = length(p - vec2(0.5, 0.0));\n    vec3 color = vec3(0.1, 0.1, 0.15);\n    if (d &lt; 0.3) {\n        color = vec3(1.0, 0.8, 0.3);\n    }\n    \n    fragColor = vec4(color, 1.0);\n}\n\n\n\nstrip-F\nStrip tiling with the letter F to show reflection behavior.\nvec3 drawF(vec2 p, vec3 bgColor, vec3 fgColor) {\n    vec3 color = bgColor;\n    if (p.x &gt; -0.2 && p.x &lt; -0.05 && p.y &gt; -0.3 && p.y &lt; 0.3) color = fgColor;\n    if (p.x &gt; -0.2 && p.x &lt; 0.2 && p.y &gt; 0.15 && p.y &lt; 0.3) color = fgColor;\n    if (p.x &gt; -0.2 && p.x &lt; 0.1 && p.y &gt; -0.05 && p.y &lt; 0.1) color = fgColor;\n    return color;\n}\n\nvec2 normalize_coord(vec2 fragCoord) {\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    return uv * 8.0;\n}\n\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 p = normalize_coord(fragCoord);\n    \n    for (int i = 0; i &lt; 20; i++) {\n        if (p.x &lt; 0.0) p.x = -p.x;\n        if (p.x &gt; 1.0) p.x = 2.0 - p.x;\n    }\n    \n    vec3 color = drawF(p - vec2(0.5, 0.0), vec3(0.1, 0.1, 0.15), vec3(1.0, 0.8, 0.3));\n    fragColor = vec4(color, 1.0);\n}\n\n\n\nsquare-F\nSquare tiling with the letter F.\nvec3 drawF(vec2 p, vec3 bgColor, vec3 fgColor) {\n    vec3 color = bgColor;\n    if (p.x &gt; -0.2 && p.x &lt; -0.05 && p.y &gt; -0.3 && p.y &lt; 0.3) color = fgColor;\n    if (p.x &gt; -0.2 && p.x &lt; 0.2 && p.y &gt; 0.15 && p.y &lt; 0.3) color = fgColor;\n    if (p.x &gt; -0.2 && p.x &lt; 0.1 && p.y &gt; -0.05 && p.y &lt; 0.1) color = fgColor;\n    return color;\n}\n\nvec2 normalize_coord(vec2 fragCoord) {\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    return uv * 8.0;\n}\n\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 p = normalize_coord(fragCoord);\n    \n    for (int i = 0; i &lt; 20; i++) {\n        if (p.x &lt; 0.0) p.x = -p.x;\n        if (p.x &gt; 1.0) p.x = 2.0 - p.x;\n        if (p.y &lt; 0.0) p.y = -p.y;\n        if (p.y &gt; 1.0) p.y = 2.0 - p.y;\n    }\n    \n    vec3 color = drawF(p - vec2(0.5, 0.5), vec3(0.1, 0.1, 0.15), vec3(1.0, 0.8, 0.3));\n    fragColor = vec4(color, 1.0);\n}\n\n\n\nsquare-foldcount\nSquare tiling colored by number of reflections.\nvec2 normalize_coord(vec2 fragCoord) {\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    return uv * 8.0;\n}\n\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 p = normalize_coord(fragCoord);\n    \n    int foldCount = 0;\n    for (int i = 0; i &lt; 20; i++) {\n        vec2 p0 = p;\n        if (p.x &lt; 0.0) { p.x = -p.x; foldCount++; }\n        if (p.x &gt; 1.0) { p.x = 2.0 - p.x; foldCount++; }\n        if (p.y &lt; 0.0) { p.y = -p.y; foldCount++; }\n        if (p.y &gt; 1.0) { p.y = 2.0 - p.y; foldCount++; }\n        if (length(p - p0) &lt; 0.0001) break;\n    }\n    \n    float t = float(foldCount) / 10.0;\n    vec3 color = 0.5 + 0.5 * cos(6.28318 * (t + vec3(0.0, 0.33, 0.67)));\n    fragColor = vec4(color, 1.0);\n}\n\n\n\nsquare-parity\nSquare tiling with checkerboard parity coloring.\nvec2 normalize_coord(vec2 fragCoord) {\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    return uv * 8.0;\n}\n\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 p = normalize_coord(fragCoord);\n    \n    int foldCount = 0;\n    for (int i = 0; i &lt; 20; i++) {\n        vec2 p0 = p;\n        if (p.x &lt; 0.0) { p.x = -p.x; foldCount++; }\n        if (p.x &gt; 1.0) { p.x = 2.0 - p.x; foldCount++; }\n        if (p.y &lt; 0.0) { p.y = -p.y; foldCount++; }\n        if (p.y &gt; 1.0) { p.y = 2.0 - p.y; foldCount++; }\n        if (length(p - p0) &lt; 0.0001) break;\n    }\n    \n    float parity = mod(float(foldCount), 2.0);\n    vec3 color = (parity &lt; 0.5) ? vec3(0.9, 0.85, 0.8) : vec3(0.3, 0.35, 0.4);\n    fragColor = vec4(color, 1.0);\n}\n\n\n\nhalfspace-single\nVisualization of a single half-space.\nstruct HalfSpace {\n    float a, b, c;\n    float side;\n};\n\nbool inside(vec2 p, HalfSpace h) {\n    float val = h.a * p.x + h.b * p.y - h.c;\n    return val * h.side &lt; 0.0;\n}\n\nvec2 normalize_coord(vec2 fragCoord) {\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    return uv * 4.0;\n}\n\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 p = normalize_coord(fragCoord);\n    \n    HalfSpace h = HalfSpace(1.0, 0.0, 1.0, 1.0);\n    \n    vec3 color = inside(p, h) ? vec3(0.3, 0.5, 0.7) : vec3(0.1, 0.1, 0.15);\n    \n    float dist = abs(h.a * p.x + h.b * p.y - h.c) / length(vec2(h.a, h.b));\n    if (dist &lt; 0.03) color = vec3(1.0);\n    \n    fragColor = vec4(color, 1.0);\n}\n\n\n\nsquare-halfspace\nSquare tiling using half-space abstraction with F and parity coloring.\nstruct HalfSpace {\n    float a, b, c;\n    float side;\n};\n\nvec2 reflectInto(vec2 p, HalfSpace h, inout int count) {\n    float val = h.a * p.x + h.b * p.y - h.c;\n    if (val * h.side &lt; 0.0) return p;\n    \n    vec2 n = vec2(h.a, h.b);\n    n = n / length(n);\n    float dist = val / length(vec2(h.a, h.b));\n    count++;\n    return p - 2.0 * dist * n;\n}\n\nvec3 drawF(vec2 p, vec3 bgColor, vec3 fgColor) {\n    vec3 color = bgColor;\n    if (p.x &gt; -0.2 && p.x &lt; -0.05 && p.y &gt; -0.3 && p.y &lt; 0.3) color = fgColor;\n    if (p.x &gt; -0.2 && p.x &lt; 0.2 && p.y &gt; 0.15 && p.y &lt; 0.3) color = fgColor;\n    if (p.x &gt; -0.2 && p.x &lt; 0.1 && p.y &gt; -0.05 && p.y &lt; 0.1) color = fgColor;\n    return color;\n}\n\nvec2 normalize_coord(vec2 fragCoord) {\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    return uv * 8.0;\n}\n\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 p = normalize_coord(fragCoord);\n    \n    HalfSpace left   = HalfSpace(1.0, 0.0, 0.0, -1.0);\n    HalfSpace right  = HalfSpace(1.0, 0.0, 1.0,  1.0);\n    HalfSpace bottom = HalfSpace(0.0, 1.0, 0.0, -1.0);\n    HalfSpace top    = HalfSpace(0.0, 1.0, 1.0,  1.0);\n    \n    int foldCount = 0;\n    for (int i = 0; i &lt; 20; i++) {\n        vec2 p0 = p;\n        p = reflectInto(p, left, foldCount);\n        p = reflectInto(p, right, foldCount);\n        p = reflectInto(p, bottom, foldCount);\n        p = reflectInto(p, top, foldCount);\n        if (length(p - p0) &lt; 0.0001) break;\n    }\n    \n    float parity = mod(float(foldCount), 2.0);\n    vec3 bg = (parity &lt; 0.5) ? vec3(0.85, 0.8, 0.75) : vec3(0.35, 0.4, 0.45);\n    vec3 fg = (parity &lt; 0.5) ? vec3(0.6, 0.2, 0.2) : vec3(0.2, 0.2, 0.6);\n    \n    vec3 color = drawF(p - vec2(0.5, 0.5), bg, fg);\n    fragColor = vec4(color, 1.0);\n}\n\n\n\ntriangle-tiling\nEuclidean equilateral triangle tiling.\nstruct HalfSpace {\n    float a, b, c;\n    float side;\n};\n\nvec2 reflectInto(vec2 p, HalfSpace h, inout int count) {\n    float val = h.a * p.x + h.b * p.y - h.c;\n    if (val * h.side &lt; 0.0) return p;\n    \n    vec2 n = vec2(h.a, h.b);\n    n = n / length(n);\n    float dist = val / length(vec2(h.a, h.b));\n    count++;\n    return p - 2.0 * dist * n;\n}\n\nvec3 drawF(vec2 p, vec3 bgColor, vec3 fgColor) {\n    vec3 color = bgColor;\n    if (p.x &gt; -0.15 && p.x &lt; 0.0 && p.y &gt; -0.2 && p.y &lt; 0.2) color = fgColor;\n    if (p.x &gt; -0.15 && p.x &lt; 0.15 && p.y &gt; 0.1 && p.y &lt; 0.2) color = fgColor;\n    if (p.x &gt; -0.15 && p.x &lt; 0.08 && p.y &gt; -0.02 && p.y &lt; 0.08) color = fgColor;\n    return color;\n}\n\nvec2 normalize_coord(vec2 fragCoord) {\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.5);\n    uv.x *= iResolution.x / iResolution.y;\n    return uv * 6.0;\n}\n\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 p = normalize_coord(fragCoord);\n    \n    HalfSpace h1 = HalfSpace(0.0, 1.0, -0.5, -1.0);\n    HalfSpace h2 = HalfSpace(0.866, -0.5, -0.5, -1.0);\n    HalfSpace h3 = HalfSpace(-0.866, -0.5, -0.5, -1.0);\n    \n    int foldCount = 0;\n    for (int i = 0; i &lt; 30; i++) {\n        vec2 p0 = p;\n        p = reflectInto(p, h1, foldCount);\n        p = reflectInto(p, h2, foldCount);\n        p = reflectInto(p, h3, foldCount);\n        if (length(p - p0) &lt; 0.0001) break;\n    }\n    \n    float parity = mod(float(foldCount), 2.0);\n    vec3 bg = (parity &lt; 0.5) ? vec3(0.85, 0.8, 0.75) : vec3(0.35, 0.4, 0.45);\n    vec3 fg = (parity &lt; 0.5) ? vec3(0.6, 0.2, 0.2) : vec3(0.2, 0.2, 0.6);\n    \n    vec3 color = drawF(p, bg, fg);\n    fragColor = vec4(color, 1.0);\n}\n\n\n\nhyp-halfspaces\nHyperbolic half-spaces in the upper half-plane.\nstruct HalfSpaceVert {\n    float x;\n    float side;\n};\n\nstruct HalfSpaceCirc {\n    float center;\n    float radius;\n    float side;\n};\n\nbool inside(vec2 z, HalfSpaceVert h) {\n    return (z.x - h.x) * h.side &lt; 0.0;\n}\n\nbool inside(vec2 z, HalfSpaceCirc h) {\n    vec2 rel = z - vec2(h.center, 0.0);\n    float dist2 = dot(rel, rel);\n    return (dist2 - h.radius * h.radius) * h.side &gt; 0.0;\n}\n\nvec2 normalize_coord(vec2 fragCoord) {\n    vec2 uv = fragCoord / iResolution.xy;\n    uv.y *= iResolution.y / iResolution.x;\n    return uv * 5.0 - vec2(1.0, 0.0);\n}\n\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 z = normalize_coord(fragCoord);\n    \n    HalfSpaceVert hv = HalfSpaceVert(1.0, -1.0);\n    HalfSpaceCirc hc = HalfSpaceCirc(2.5, 1.0, 1.0);\n    \n    vec3 color = vec3(0.1, 0.1, 0.15);\n    \n    if (inside(z, hv)) color = vec3(0.3, 0.5, 0.7);\n    if (inside(z, hc)) color += vec3(0.4, 0.2, 0.1);\n    \n    if (abs(z.x - hv.x) &lt; 0.03) color = vec3(1.0);\n    if (abs(length(z - vec2(hc.center, 0.0)) - hc.radius) &lt; 0.03 && z.y &gt; 0.0) color = vec3(1.0);\n    \n    if (z.y &lt; 0.02) color = vec3(0.15);\n    \n    fragColor = vec4(color, 1.0);\n}\n\n\n\nhyp-reflect-F\nHyperbolic reflections of F across vertical and circular geodesics.\nstruct HalfSpaceVert {\n    float x;\n    float side;\n};\n\nstruct HalfSpaceCirc {\n    float center;\n    float radius;\n    float side;\n};\n\nvec2 reflectInto(vec2 z, HalfSpaceVert h) {\n    if ((z.x - h.x) * h.side &lt; 0.0) return z;\n    z.x = 2.0 * h.x - z.x;\n    return z;\n}\n\nvec2 reflectInto(vec2 z, HalfSpaceCirc h) {\n    vec2 rel = z - vec2(h.center, 0.0);\n    float dist2 = dot(rel, rel);\n    \n    if ((dist2 - h.radius * h.radius) * h.side &gt; 0.0) return z;\n    \n    z.x -= h.center;\n    z /= h.radius;\n    z /= dot(z, z);\n    z *= h.radius;\n    z.x += h.center;\n    \n    return z;\n}\n\nvec3 drawF(vec2 p, vec3 bgColor, vec3 fgColor) {\n    vec3 color = bgColor;\n    if (p.x &gt; -0.2 && p.x &lt; -0.05 && p.y &gt; -0.3 && p.y &lt; 0.3) color = fgColor;\n    if (p.x &gt; -0.2 && p.x &lt; 0.2 && p.y &gt; 0.15 && p.y &lt; 0.3) color = fgColor;\n    if (p.x &gt; -0.2 && p.x &lt; 0.1 && p.y &gt; -0.05 && p.y &lt; 0.1) color = fgColor;\n    return color;\n}\n\nvec2 normalize_coord(vec2 fragCoord) {\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = uv - vec2(0.5, 0.0);\n    uv.x *= iResolution.x / iResolution.y;\n    return uv * 6.0;\n}\n\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 z = normalize_coord(fragCoord);\n    \n    HalfSpaceVert hv = HalfSpaceVert(-1.5, -1.0);\n    HalfSpaceCirc hc = HalfSpaceCirc(1.5, 2.5, 1.0);\n    \n    float t = mod(iTime, 4.0);\n    if (t &lt; 2.0) {\n        z = reflectInto(z, hv);\n    } else {\n        z = reflectInto(z, hc);\n    }\n    \n    vec3 color = drawF(z - vec2(0.5, 3.5), vec3(0.1, 0.1, 0.15), vec3(1.0, 0.8, 0.3));\n    \n    vec2 z_orig = normalize_coord(fragCoord);\n    \n    if (abs(z_orig.x - hv.x) &lt; 0.04) color = vec3(0.5);\n    if (abs(length(z_orig - vec2(hc.center, 0.0)) - hc.radius) &lt; 0.04 && z_orig.y &gt; 0.0) color = vec3(0.5);\n    if (z_orig.y &lt; 0.02) color = vec3(0.15);\n    \n    fragColor = vec4(color, 1.0);\n}\n\n\n\nhyp-triangle-halfspaces\nThe three half-spaces defining the (2,3,∞) triangle.\nstruct HalfSpaceVert {\n    float x;\n    float side;\n};\n\nstruct HalfSpaceCirc {\n    float center;\n    float radius;\n    float side;\n};\n\nbool inside(vec2 z, HalfSpaceVert h) {\n    return (z.x - h.x) * h.side &lt; 0.0;\n}\n\nbool inside(vec2 z, HalfSpaceCirc h) {\n    vec2 rel = z - vec2(h.center, 0.0);\n    float dist2 = dot(rel, rel);\n    return (dist2 - h.radius * h.radius) * h.side &gt; 0.0;\n}\n\nvec2 normalize_coord(vec2 fragCoord) {\n    vec2 uv = fragCoord / iResolution.xy;\n    uv.y *= iResolution.y / iResolution.x;\n    return uv * 4.0 - vec2(0.75, 0.0);\n}\n\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 z = normalize_coord(fragCoord);\n    \n    HalfSpaceVert left = HalfSpaceVert(0.0, -1.0);\n    HalfSpaceVert right = HalfSpaceVert(0.5, 1.0);\n    HalfSpaceCirc bottom = HalfSpaceCirc(0.0, 1.0, 1.0);\n    \n    vec3 color = vec3(0.1, 0.1, 0.15);\n    if (inside(z, left) && inside(z, right) && inside(z, bottom)) {\n        color = vec3(0.3, 0.5, 0.7);\n    }\n    \n    if (abs(z.x - 0.0) &lt; 0.02 && z.y &gt; 0.0) color = vec3(1.0);\n    if (abs(z.x - 0.5) &lt; 0.02 && z.y &gt; 0.0) color = vec3(1.0);\n    if (abs(length(z) - 1.0) &lt; 0.02 && z.y &gt; 0.0) color = vec3(1.0);\n    \n    if (z.y &lt; 0.01) color = vec3(0.15);\n    \n    fragColor = vec4(color, 1.0);\n}\n\n\n\nhyp-tiling-23inf\nThe (2,3,∞) hyperbolic triangle tiling in the upper half-plane.\nstruct HalfSpaceVert {\n    float x;\n    float side;\n};\n\nstruct HalfSpaceCirc {\n    float center;\n    float radius;\n    float side;\n};\n\nvec2 reflectInto(vec2 z, HalfSpaceVert h, inout int count) {\n    float val = z.x - h.x;\n    if (val * h.side &lt; 0.0) return z;\n    z.x = 2.0 * h.x - z.x;\n    count++;\n    return z;\n}\n\nvec2 reflectInto(vec2 z, HalfSpaceCirc h, inout int count) {\n    vec2 rel = z - vec2(h.center, 0.0);\n    float dist2 = dot(rel, rel);\n    \n    if ((dist2 - h.radius * h.radius) * h.side &gt; 0.0) return z;\n    \n    z.x -= h.center;\n    z /= h.radius;\n    z /= dot(z, z);\n    z *= h.radius;\n    z.x += h.center;\n    \n    count++;\n    return z;\n}\n\nvec2 normalize_coord(vec2 fragCoord) {\n    vec2 uv = fragCoord / iResolution.xy;\n    uv.y *= iResolution.y / iResolution.x;\n    return uv * 4.0 - vec2(0.75, 0.0);\n}\n\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 z = normalize_coord(fragCoord);\n    \n    HalfSpaceVert left = HalfSpaceVert(0.0, -1.0);\n    HalfSpaceVert right = HalfSpaceVert(0.5, 1.0);\n    HalfSpaceCirc bottom = HalfSpaceCirc(0.0, 1.0, 1.0);\n    \n    int foldCount = 0;\n    for (int i = 0; i &lt; 100; i++) {\n        vec2 z0 = z;\n        z = reflectInto(z, left, foldCount);\n        z = reflectInto(z, right, foldCount);\n        z = reflectInto(z, bottom, foldCount);\n        if (length(z - z0) &lt; 0.0001) break;\n    }\n    \n    float parity = mod(float(foldCount), 2.0);\n    vec3 color = (parity &lt; 0.5) ? vec3(0.85, 0.8, 0.75) : vec3(0.35, 0.4, 0.45);\n    \n    vec2 z_orig = normalize_coord(fragCoord);\n    if (z_orig.y &lt; 0.01) color = vec3(0.15);\n    \n    fragColor = vec4(color, 1.0);\n}\n\n\n\npoincare-disk\nThe (2,3,∞) tiling in the Poincaré disk model.\nstruct HalfSpaceVert {\n    float x;\n    float side;\n};\n\nstruct HalfSpaceCirc {\n    float center;\n    float radius;\n    float side;\n};\n\nvec2 reflectInto(vec2 z, HalfSpaceVert h, inout int count) {\n    float val = z.x - h.x;\n    if (val * h.side &lt; 0.0) return z;\n    z.x = 2.0 * h.x - z.x;\n    count++;\n    return z;\n}\n\nvec2 reflectInto(vec2 z, HalfSpaceCirc h, inout int count) {\n    vec2 rel = z - vec2(h.center, 0.0);\n    float dist2 = dot(rel, rel);\n    \n    if ((dist2 - h.radius * h.radius) * h.side &gt; 0.0) return z;\n    \n    z.x -= h.center;\n    z /= h.radius;\n    z /= dot(z, z);\n    z *= h.radius;\n    z.x += h.center;\n    \n    count++;\n    return z;\n}\n\nvec2 cmul(vec2 a, vec2 b) {\n    return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);\n}\n\nvec2 cdiv(vec2 a, vec2 b) {\n    float denom = dot(b, b);\n    return vec2(a.x * b.x + a.y * b.y, a.y * b.x - a.x * b.y) / denom;\n}\n\nvec2 diskToUHP(vec2 w) {\n    vec2 i = vec2(0.0, 1.0);\n    vec2 one = vec2(1.0, 0.0);\n    return cmul(i, cdiv(one + w, one - w));\n}\n\nvec2 normalize_coord(vec2 fragCoord) {\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = (uv - 0.5) * 2.5;\n    uv.x *= iResolution.x / iResolution.y;\n    return uv;\n}\n\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 w = normalize_coord(fragCoord);\n    vec2 z = diskToUHP(w);\n    \n    HalfSpaceVert left = HalfSpaceVert(0.0, -1.0);\n    HalfSpaceVert right = HalfSpaceVert(0.5, 1.0);\n    HalfSpaceCirc bottom = HalfSpaceCirc(0.0, 1.0, 1.0);\n    \n    int foldCount = 0;\n    for (int i = 0; i &lt; 100; i++) {\n        vec2 z0 = z;\n        z = reflectInto(z, left, foldCount);\n        z = reflectInto(z, right, foldCount);\n        z = reflectInto(z, bottom, foldCount);\n        if (length(z - z0) &lt; 0.0001) break;\n    }\n    \n    float parity = mod(float(foldCount), 2.0);\n    vec3 color = (parity &lt; 0.5) ? vec3(0.85, 0.8, 0.75) : vec3(0.35, 0.4, 0.45);\n    \n    if (length(w) &gt; 1.0) color = vec3(0.05);\n    \n    fragColor = vec4(color, 1.0);\n}\n\n\n\npoincare-disk-F\nThe (2,3,∞) tiling in the Poincaré disk with F markers.\nstruct HalfSpaceVert {\n    float x;\n    float side;\n};\n\nstruct HalfSpaceCirc {\n    float center;\n    float radius;\n    float side;\n};\n\nvec2 reflectInto(vec2 z, HalfSpaceVert h, inout int count) {\n    float val = z.x - h.x;\n    if (val * h.side &lt; 0.0) return z;\n    z.x = 2.0 * h.x - z.x;\n    count++;\n    return z;\n}\n\nvec2 reflectInto(vec2 z, HalfSpaceCirc h, inout int count) {\n    vec2 rel = z - vec2(h.center, 0.0);\n    float dist2 = dot(rel, rel);\n    \n    if ((dist2 - h.radius * h.radius) * h.side &gt; 0.0) return z;\n    \n    z.x -= h.center;\n    z /= h.radius;\n    z /= dot(z, z);\n    z *= h.radius;\n    z.x += h.center;\n    \n    count++;\n    return z;\n}\n\nvec2 cmul(vec2 a, vec2 b) {\n    return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);\n}\n\nvec2 cdiv(vec2 a, vec2 b) {\n    float denom = dot(b, b);\n    return vec2(a.x * b.x + a.y * b.y, a.y * b.x - a.x * b.y) / denom;\n}\n\nvec2 diskToUHP(vec2 w) {\n    vec2 i = vec2(0.0, 1.0);\n    vec2 one = vec2(1.0, 0.0);\n    return cmul(i, cdiv(one + w, one - w));\n}\n\nvec3 drawF(vec2 p, vec3 bgColor, vec3 fgColor) {\n    vec3 color = bgColor;\n    if (p.x &gt; -0.06 && p.x &lt; -0.02 && p.y &gt; -0.08 && p.y &lt; 0.08) color = fgColor;\n    if (p.x &gt; -0.06 && p.x &lt; 0.06 && p.y &gt; 0.04 && p.y &lt; 0.08) color = fgColor;\n    if (p.x &gt; -0.06 && p.x &lt; 0.03 && p.y &gt; -0.01 && p.y &lt; 0.03) color = fgColor;\n    return color;\n}\n\nvec2 normalize_coord(vec2 fragCoord) {\n    vec2 uv = fragCoord / iResolution.xy;\n    uv = (uv - 0.5) * 2.5;\n    uv.x *= iResolution.x / iResolution.y;\n    return uv;\n}\n\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 w = normalize_coord(fragCoord);\n    vec2 z = diskToUHP(w);\n    \n    HalfSpaceVert left = HalfSpaceVert(0.0, -1.0);\n    HalfSpaceVert right = HalfSpaceVert(0.5, 1.0);\n    HalfSpaceCirc bottom = HalfSpaceCirc(0.0, 1.0, 1.0);\n    \n    int foldCount = 0;\n    for (int i = 0; i &lt; 100; i++) {\n        vec2 z0 = z;\n        z = reflectInto(z, left, foldCount);\n        z = reflectInto(z, right, foldCount);\n        z = reflectInto(z, bottom, foldCount);\n        if (length(z - z0) &lt; 0.0001) break;\n    }\n    \n    float parity = mod(float(foldCount), 2.0);\n    vec3 bg = (parity &lt; 0.5) ? vec3(0.85, 0.8, 0.75) : vec3(0.35, 0.4, 0.45);\n    vec3 fg = (parity &lt; 0.5) ? vec3(0.6, 0.2, 0.2) : vec3(0.2, 0.2, 0.6);\n    \n    vec3 color = drawF(z - vec2(0.25, 1.2), bg, fg);\n    \n    if (length(w) &gt; 1.0) color = vec3(0.05);\n    \n    fragColor = vec4(color, 1.0);\n}",
     "crumbs": [
       "Appendices",
-      "<span class='chapter-number'>C</span>  <span class='chapter-title'>Day 3: Complete Shader Code</span>"
+      "<span class='chapter-number'>C</span>  <span class='chapter-title'>Day 3 Code</span>"
     ]
   }
 ]
