@@ -4,7 +4,6 @@ project:
 
 website:
   title: "GPU-Accelerated Mathematical Illustration"
-  subtitle: "An Introduction to Shader Programming"
   repo-url: https://github.com/stevejtrettel/shader-course
 
   sidebar:
