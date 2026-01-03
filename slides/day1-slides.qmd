@@ -3,8 +3,47 @@ title: "Day 1"
 format: revealjs
 ---
 
-# Day 1: Introduction
+# Day 1: Introduction to Shaders
 
-## Welcome
+## What is a Shader?
 
-Your slides here...
+A shader is a program that runs on the GPU.
+
+- Executes **in parallel** for every pixel
+- Takes coordinates as input
+- Outputs a color
+- Incredibly fast for mathematical visualization
+
+## The Basic Setup
+
+Every fragment shader has this structure:
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    // Normalize coordinates to [0, 1]
+    vec2 uv = fragCoord / iResolution.xy;
+
+    // Output a color (RGBA)
+    fragColor = vec4(uv.x, uv.y, 0.0, 1.0);
+}
+```
+
+## Your First Shader
+
+Let's start with the simplest possible shader - solid red:
+
+{{< shader-demo day1/red >}}
+
+## Implicit Curves
+
+We can draw curves using **signed distance functions**.
+
+A circle of radius $r$ centered at the origin:
+
+$$d(x, y) = \sqrt{x^2 + y^2} - r$$
+
+{{< shader-demo day1/circle >}}
+
+## The Circle Shader Code
+
+{{< shader-code day1/circle >}}

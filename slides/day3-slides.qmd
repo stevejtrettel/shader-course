@@ -3,8 +3,48 @@ title: "Day 3"
 format: revealjs
 ---
 
-# Day 3: Tilings
+# Day 3: Symmetry & Tilings
 
-## Welcome
+## The Folding Algorithm
 
-Your slides here...
+To create symmetric patterns, we **fold** points into a fundamental domain:
+
+```glsl
+// Fold across vertical line at x = 0
+if (p.x < 0.0) p.x = -p.x;
+
+// Fold across horizontal line at y = 0
+if (p.y < 0.0) p.y = -p.y;
+```
+
+## Half-Space Reflections
+
+A half-space is defined by a line. We reflect points to one side:
+
+```glsl
+float halfspace(vec2 p, vec2 normal, float offset) {
+    return dot(p, normal) - offset;
+}
+
+vec2 reflect_halfspace(vec2 p, vec2 normal, float offset) {
+    float d = halfspace(p, normal, offset);
+    if (d < 0.0) p -= 2.0 * d * normal;
+    return p;
+}
+```
+
+## Square Tiling
+
+{{< shader-demo day3/square-f >}}
+
+## Hyperbolic Geometry
+
+In the Poincaré disk model, the entire hyperbolic plane fits inside a circle.
+
+{{< shader-demo day3/poincare-disk >}}
+
+## Hyperbolic Tilings
+
+Reflection groups in hyperbolic space create stunning patterns:
+
+{{< shader-demo day3/hyp-tiling-23inf >}}
