@@ -1,0 +1,1768 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Steve Trettel">
+
+<title>day2 – GPU-Accelerated Mathematical Illustration</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e62aa0a8c28b52a0e19b1cebeabd7fd3.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-f0463eacbf7faa50df92658b97a72515.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e62aa0a8c28b52a0e19b1cebeabd7fd3.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-d72af2198ff6241fba5e91235accbade.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-9ba55aa6988265aad246d48a0606a5a7.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-d72af2198ff6241fba5e91235accbade.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">
+      GPU-Accelerated Mathematical Illustration
+      </li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">GPU-Accelerated Mathematical Illustration</a> 
+        <div class="sidebar-tools-main">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">About</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Day 1: Introduction</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/day1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lecture Notes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../slides/day1-slides.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Slides</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Day 2: Dynamics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/day2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lecture Notes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../slides/day2-slides.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Slides</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Day 3: Tilings</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/day3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lecture Notes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../slides/day3-slides.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Slides</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/shaders/day1-shaders.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Day 1 Code</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/shaders/day2-shaders.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Day 2 Code</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/shaders/day3-shaders.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Day 3 Code</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../GPU-Accelerated-Mathematical-Illustration.pdf" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Download PDF</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#day-2-complex-dynamics-and-iterated-inversions" id="toc-day-2-complex-dynamics-and-iterated-inversions" class="nav-link active" data-scroll-target="#day-2-complex-dynamics-and-iterated-inversions"><span class="header-section-number">1</span> Day 2: Complex Dynamics and Iterated Inversions</a>
+  <ul class="collapse">
+  <li><a href="#overview" id="toc-overview" class="nav-link" data-scroll-target="#overview"><span class="header-section-number">1.1</span> Overview</a></li>
+  <li><a href="#complex-numbers-in-glsl" id="toc-complex-numbers-in-glsl" class="nav-link" data-scroll-target="#complex-numbers-in-glsl"><span class="header-section-number">1.2</span> Complex Numbers in GLSL</a>
+  <ul class="collapse">
+  <li><a href="#representation" id="toc-representation" class="nav-link" data-scroll-target="#representation">Representation</a></li>
+  <li><a href="#complex-arithmetic" id="toc-complex-arithmetic" class="nav-link" data-scroll-target="#complex-arithmetic">Complex Arithmetic</a></li>
+  </ul></li>
+  <li><a href="#the-mandelbrot-set" id="toc-the-mandelbrot-set" class="nav-link" data-scroll-target="#the-mandelbrot-set"><span class="header-section-number">1.3</span> The Mandelbrot Set</a>
+  <ul class="collapse">
+  <li><a href="#definition" id="toc-definition" class="nav-link" data-scroll-target="#definition">Definition</a></li>
+  <li><a href="#the-escape-radius-theorem" id="toc-the-escape-radius-theorem" class="nav-link" data-scroll-target="#the-escape-radius-theorem">The Escape Radius Theorem</a></li>
+  <li><a href="#historical-context" id="toc-historical-context" class="nav-link" data-scroll-target="#historical-context">Historical Context</a></li>
+  <li><a href="#basic-implementation" id="toc-basic-implementation" class="nav-link" data-scroll-target="#basic-implementation">Basic Implementation</a></li>
+  <li><a href="#smooth-coloring" id="toc-smooth-coloring" class="nav-link" data-scroll-target="#smooth-coloring">Smooth Coloring</a></li>
+  <li><a href="#color-palettes" id="toc-color-palettes" class="nav-link" data-scroll-target="#color-palettes">Color Palettes</a></li>
+  </ul></li>
+  <li><a href="#julia-sets" id="toc-julia-sets" class="nav-link" data-scroll-target="#julia-sets"><span class="header-section-number">1.4</span> Julia Sets</a>
+  <ul class="collapse">
+  <li><a href="#definition-1" id="toc-definition-1" class="nav-link" data-scroll-target="#definition-1">Definition</a></li>
+  <li><a href="#implementation-as-homework" id="toc-implementation-as-homework" class="nav-link" data-scroll-target="#implementation-as-homework">Implementation as Homework</a></li>
+  </ul></li>
+  <li><a href="#interlude-from-complex-to-geometric-dynamics" id="toc-interlude-from-complex-to-geometric-dynamics" class="nav-link" data-scroll-target="#interlude-from-complex-to-geometric-dynamics"><span class="header-section-number">1.5</span> Interlude: From Complex to Geometric Dynamics</a></li>
+  <li><a href="#circle-inversion" id="toc-circle-inversion" class="nav-link" data-scroll-target="#circle-inversion"><span class="header-section-number">1.6</span> Circle Inversion</a>
+  <ul class="collapse">
+  <li><a href="#mathematical-definition" id="toc-mathematical-definition" class="nav-link" data-scroll-target="#mathematical-definition">Mathematical Definition</a></li>
+  <li><a href="#key-properties" id="toc-key-properties" class="nav-link" data-scroll-target="#key-properties">Key Properties</a></li>
+  <li><a href="#implementation" id="toc-implementation" class="nav-link" data-scroll-target="#implementation">Implementation</a></li>
+  <li><a href="#visualizing-circle-inversion" id="toc-visualizing-circle-inversion" class="nav-link" data-scroll-target="#visualizing-circle-inversion">Visualizing Circle Inversion</a></li>
+  </ul></li>
+  <li><a href="#structs-in-glsl" id="toc-structs-in-glsl" class="nav-link" data-scroll-target="#structs-in-glsl"><span class="header-section-number">1.7</span> Structs in GLSL</a>
+  <ul class="collapse">
+  <li><a href="#defining-and-using-structs" id="toc-defining-and-using-structs" class="nav-link" data-scroll-target="#defining-and-using-structs">Defining and Using Structs</a></li>
+  </ul></li>
+  <li><a href="#the-apollonian-gasket" id="toc-the-apollonian-gasket" class="nav-link" data-scroll-target="#the-apollonian-gasket"><span class="header-section-number">1.8</span> The Apollonian Gasket</a>
+  <ul class="collapse">
+  <li><a href="#descartes-circle-theorem" id="toc-descartes-circle-theorem" class="nav-link" data-scroll-target="#descartes-circle-theorem">Descartes Circle Theorem</a></li>
+  <li><a href="#setup-three-mutually-tangent-circles" id="toc-setup-three-mutually-tangent-circles" class="nav-link" data-scroll-target="#setup-three-mutually-tangent-circles">Setup: Three Mutually Tangent Circles</a></li>
+  <li><a href="#the-iteration-algorithm" id="toc-the-iteration-algorithm" class="nav-link" data-scroll-target="#the-iteration-algorithm">The Iteration Algorithm</a></li>
+  <li><a href="#coloring-strategies" id="toc-coloring-strategies" class="nav-link" data-scroll-target="#coloring-strategies">Coloring Strategies</a></li>
+  <li><a href="#putting-it-all-together" id="toc-putting-it-all-together" class="nav-link" data-scroll-target="#putting-it-all-together">Putting It All Together</a></li>
+  <li><a href="#historical-context-and-connections" id="toc-historical-context-and-connections" class="nav-link" data-scroll-target="#historical-context-and-connections">Historical Context and Connections</a></li>
+  </ul></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">1.9</span> Summary</a></li>
+  <li><a href="#homework" id="toc-homework" class="nav-link" data-scroll-target="#homework"><span class="header-section-number">1.10</span> Homework</a>
+  <ul class="collapse">
+  <li><a href="#required-julia-set-explorer" id="toc-required-julia-set-explorer" class="nav-link" data-scroll-target="#required-julia-set-explorer">Required: Julia Set Explorer</a></li>
+  <li><a href="#optional-1-grid-of-julia-sets" id="toc-optional-1-grid-of-julia-sets" class="nav-link" data-scroll-target="#optional-1-grid-of-julia-sets">Optional #1: Grid of Julia Sets</a></li>
+  <li><a href="#optional-2-other-iterated-inversions" id="toc-optional-2-other-iterated-inversions" class="nav-link" data-scroll-target="#optional-2-other-iterated-inversions">Optional #2: Other Iterated Inversions</a></li>
+  </ul></li>
+  <li><a href="#looking-ahead" id="toc-looking-ahead" class="nav-link" data-scroll-target="#looking-ahead"><span class="header-section-number">1.11</span> Looking Ahead</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Steve Trettel </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">January 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="day-2-complex-dynamics-and-iterated-inversions" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Day 2: Complex Dynamics and Iterated Inversions</h1>
+<section id="overview" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="overview"><span class="header-section-number">1.1</span> Overview</h2>
+<p>Today we explore the power of iteration to generate fractals. We’ll implement complex arithmetic in GLSL and use it to render the iconic Mandelbrot set, then understand its companion, the Julia set. After that, we shift gears to geometric iteration: circle inversion, a beautiful conformal transformation that creates intricate nested patterns when applied repeatedly. We’ll see how the Apollonian gasket emerges from iterated inversions of three mutually tangent circles.</p>
+<p>By the end of today, you’ll understand how simple iterative processes—whether in the complex plane or through geometric transformations—can generate infinitely detailed fractal structures from just a few lines of code.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Roadmap for Today
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>We’ll explore iteration in two different mathematical settings:</p>
+<ol type="1">
+<li><strong>Complex dynamics</strong>: Iterating holomorphic maps (Mandelbrot and Julia sets)</li>
+<li><strong>Geometric dynamics</strong>: Iterating circle inversions (Apollonian gasket)</li>
+</ol>
+<p>Both produce fractals through the same fundamental mechanism: simple rules applied repeatedly reveal infinite complexity. The common thread is <strong>conformality</strong>—both complex multiplication and circle inversion preserve angles, and this angle preservation is key to the beautiful structures we’ll see.</p>
+<p>Along the way, we’ll learn shader programming techniques for organizing data (structs), implementing mathematical operations efficiently, and creating sophisticated coloring schemes.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="complex-numbers-in-glsl" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="complex-numbers-in-glsl"><span class="header-section-number">1.2</span> Complex Numbers in GLSL</h2>
+<section id="representation" class="level3">
+<h3 class="anchored" data-anchor-id="representation">Representation</h3>
+<p>A complex number <span class="math inline">\(z = a + bi\)</span> can be represented as a 2D vector with real part <span class="math inline">\(a\)</span> and imaginary part <span class="math inline">\(b\)</span>. This is the natural representation—complex numbers are the 2D plane with a particular multiplication structure! In GLSL:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> z <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span>a<span class="op">,</span> b<span class="op">);</span>  <span class="co">// Represents a + bi</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>We’ll consistently use the convention: <code>z.x</code> is the real part, <code>z.y</code> is the imaginary part. You already know complex numbers geometrically as rotations and scalings in the plane—here we’re just implementing that algebra in shader code.</p>
+</section>
+<section id="complex-arithmetic" class="level3">
+<h3 class="anchored" data-anchor-id="complex-arithmetic">Complex Arithmetic</h3>
+<p>Let <span class="math inline">\(z = a + bi\)</span> and <span class="math inline">\(w = c + di\)</span>. We need to implement the basic operations. Some of these are trivial, others require a bit more work:</p>
+<p><strong>Addition:</strong> <span class="math inline">\((a + bi) + (c + di) = (a + c) + (b + d)i\)</span></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="fu">cadd</span><span class="op">(</span><span class="dt">vec2</span> z<span class="op">,</span> <span class="dt">vec2</span> w<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> z <span class="op">+</span> w<span class="op">;</span>  <span class="co">// Vector addition is sufficient!</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Addition of complex numbers is just vector addition—componentwise! You might not even need this function since you can just write <code>z + w</code> directly, but it’s here for completeness.</p>
+<p><strong>Multiplication:</strong> <span class="math inline">\((a + bi)(c + di) = (ac - bd) + (ad + bc)i\)</span></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="fu">cmul</span><span class="op">(</span><span class="dt">vec2</span> z<span class="op">,</span> <span class="dt">vec2</span> w<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="dt">vec2</span><span class="op">(</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        z<span class="op">.</span><span class="fu">x</span> <span class="op">*</span> w<span class="op">.</span><span class="fu">x</span> <span class="op">-</span> z<span class="op">.</span><span class="fu">y</span> <span class="op">*</span> w<span class="op">.</span><span class="fu">y</span><span class="op">,</span>  <span class="co">// Real part: ac - bd</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        z<span class="op">.</span><span class="fu">x</span> <span class="op">*</span> w<span class="op">.</span><span class="fu">y</span> <span class="op">+</span> z<span class="op">.</span><span class="fu">y</span> <span class="op">*</span> w<span class="op">.</span><span class="fu">x</span>   <span class="co">// Imaginary part: ad + bc</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">);</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This implements the familiar FOIL pattern with <span class="math inline">\(i^2 = -1\)</span>, giving us that minus sign in the real part.</p>
+<p><strong>Magnitude squared:</strong> <span class="math inline">\(|z|^2 = a^2 + b^2\)</span></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">cabs2</span><span class="op">(</span><span class="dt">vec2</span> z<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">dot</span><span class="op">(</span>z<span class="op">,</span> z<span class="op">);</span>  <span class="co">// z.x * z.x + z.y * z.y</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The squared magnitude is just the dot product with itself. This is computationally cheaper than taking the square root, so when we just need to check if <span class="math inline">\(|z| &gt; 2\)</span>, we’ll check if <span class="math inline">\(|z|^2 &gt; 4\)</span> instead—millions of avoided square roots per frame!</p>
+<p><strong>Magnitude:</strong> <span class="math inline">\(|z| = \sqrt{a^2 + b^2}\)</span></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">cabs</span><span class="op">(</span><span class="dt">vec2</span> z<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">length</span><span class="op">(</span>z<span class="op">);</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The magnitude is the Euclidean distance from the origin—exactly what <code>length()</code> computes!</p>
+<p><strong>Conjugate:</strong> <span class="math inline">\(\overline{z} = a - bi\)</span></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="fu">cconj</span><span class="op">(</span><span class="dt">vec2</span> z<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="dt">vec2</span><span class="op">(</span>z<span class="op">.</span><span class="fu">x</span><span class="op">,</span> <span class="op">-</span>z<span class="op">.</span><span class="fu">y</span><span class="op">);</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The conjugate flips the sign of the imaginary part—reflection across the real axis.</p>
+<p><strong>Division:</strong> <span class="math inline">\(\frac{a + bi}{c + di} = \frac{(a + bi)(c - di)}{c^2 + d^2}\)</span></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="fu">cdiv</span><span class="op">(</span><span class="dt">vec2</span> z<span class="op">,</span> <span class="dt">vec2</span> w<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> denom <span class="op">=</span> <span class="bu">dot</span><span class="op">(</span>w<span class="op">,</span> w<span class="op">);</span>  <span class="co">// c² + d²</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="dt">vec2</span><span class="op">(</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">(</span>z<span class="op">.</span><span class="fu">x</span> <span class="op">*</span> w<span class="op">.</span><span class="fu">x</span> <span class="op">+</span> z<span class="op">.</span><span class="fu">y</span> <span class="op">*</span> w<span class="op">.</span><span class="fu">y</span><span class="op">)</span> <span class="op">/</span> denom<span class="op">,</span>  <span class="co">// Real part</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        <span class="op">(</span>z<span class="op">.</span><span class="fu">y</span> <span class="op">*</span> w<span class="op">.</span><span class="fu">x</span> <span class="op">-</span> z<span class="op">.</span><span class="fu">x</span> <span class="op">*</span> w<span class="op">.</span><span class="fu">y</span><span class="op">)</span> <span class="op">/</span> denom   <span class="co">// Imaginary part</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">);</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Division multiplies numerator and denominator by the conjugate of <span class="math inline">\(w\)</span> to rationalize. The denominator becomes real (<span class="math inline">\(c^2 + d^2\)</span>), and the numerator becomes a new complex number we can compute directly.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Computational Efficiency in Complex Arithmetic
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Notice we use <code>dot(z, z)</code> for magnitude squared—this is a single GPU operation rather than component-wise multiplication and addition. Similarly, <code>dot(w, w)</code> in the division routine. For operations you’ll compute millions of times per frame, these micro-optimizations add up!</p>
+<p>We’re also using helper functions rather than inlining the formulas everywhere. This makes the code much more readable (<code>cmul(z, z)</code> vs <code>vec2(z.x*z.x - z.y*z.y, 2.0*z.x*z.y)</code>) and easier to debug. If you make a sign error once in <code>cmul</code>, you fix it once. If you inline the formula fifty times, you’ll hunt for bugs forever!</p>
+</div>
+</div>
+<p>These are the building blocks we need for complex dynamics. Let’s put them to work!</p>
+<hr>
+</section>
+</section>
+<section id="the-mandelbrot-set" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="the-mandelbrot-set"><span class="header-section-number">1.3</span> The Mandelbrot Set</h2>
+<section id="definition" class="level3">
+<h3 class="anchored" data-anchor-id="definition">Definition</h3>
+<p>The Mandelbrot set <span class="math inline">\(\mathcal{M}\)</span> is one of the most famous objects in mathematics—and for good reason! It’s defined as the set of complex numbers <span class="math inline">\(c\)</span> for which the iteration <span class="math display">\[z_{n+1} = z_n^2 + c, \quad z_0 = 0\]</span> remains bounded as <span class="math inline">\(n \to \infty\)</span>.</p>
+<p>That’s it! Just iterate this simple quadratic map starting from <span class="math inline">\(z_0 = 0\)</span>, and see if the orbit escapes to infinity or stays bounded. Points that stay bounded are in the set (traditionally colored black), while points that escape are colored based on how quickly they escape.</p>
+</section>
+<section id="the-escape-radius-theorem" class="level3">
+<h3 class="anchored" data-anchor-id="the-escape-radius-theorem">The Escape Radius Theorem</h3>
+<p>In practice, we can’t iterate to infinity, so we need a criterion to detect escape. Fortunately, there’s a beautiful theorem that tells us exactly when to stop:</p>
+<p><strong>Theorem (Escape Radius).</strong> If <span class="math inline">\(|z_n| &gt; 2\)</span> for any <span class="math inline">\(n\)</span>, then <span class="math inline">\(|z_n| \to \infty\)</span> as <span class="math inline">\(n \to \infty\)</span>.</p>
+<p>This means: once the orbit leaves the disk of radius 2, it’s definitely escaping to infinity. Points that escape are not in the Mandelbrot set, while points that remain bounded after many iterations are (likely) in the set or very close to its boundary.</p>
+<p><strong>Proof.</strong> Suppose <span class="math inline">\(|z_n| &gt; 2\)</span> and write <span class="math inline">\(|z_n| = 2 + \epsilon\)</span> for some <span class="math inline">\(\epsilon &gt; 0\)</span>. Then <span class="math display">\[\begin{align*}
+|z_{n+1}| &amp;= |z_n^2 + c|\\
+&amp;\geq |z_n^2| - |c|\\
+&amp;= |z_n|^2 - |c|\\
+&amp;&gt; |z_n|^2 - 2 \quad \text{(since $c$ is in or near $\mathcal{M}$, which fits in $|z| \leq 2$)}\\
+&amp;= (2 + \epsilon)^2 - 2\\
+&amp;= 4 + 4\epsilon + \epsilon^2 - 2\\
+&amp;= 2 + 4\epsilon + \epsilon^2\\
+&amp;&gt; 2 + 2\epsilon = |z_n| + \epsilon
+\end{align*}\]</span></p>
+<p>So once <span class="math inline">\(|z_n| &gt; 2\)</span>, we have <span class="math inline">\(|z_{n+1}| &gt; |z_n| + \epsilon\)</span>, meaning the magnitude grows by at least <span class="math inline">\(\epsilon\)</span> each iteration. This linear growth accelerates: if <span class="math inline">\(|z_{n+1}| &gt; 2 + \epsilon\)</span>, then <span class="math inline">\(|z_{n+2}| &gt; |z_{n+1}| + \epsilon' &gt; 2 + 2\epsilon\)</span>, and so on. More carefully, the orbit actually grows exponentially (roughly like <span class="math inline">\(|z_n| \sim 2^{2^n}\)</span> for large <span class="math inline">\(n\)</span>), but the key point is: it definitely escapes to infinity.</p>
+<p><strong>Computational Implication:</strong> We only need to check if <span class="math inline">\(|z_n| &gt; 2\)</span>. The moment this happens, we can stop iterating—this point will never be in the Mandelbrot set. This single theorem makes efficient rendering possible!</p>
+</section>
+<section id="historical-context" class="level3">
+<h3 class="anchored" data-anchor-id="historical-context">Historical Context</h3>
+<p>The Mandelbrot set was discovered remarkably recently—1980! Benoit Mandelbrot, working at IBM, was among the first to have access to computers powerful enough to visualize iterative processes in the complex plane. Before computers, studying these sets was nearly impossible—you’d need to manually iterate complex arithmetic hundreds of times for millions of points.</p>
+<p>Interestingly, the mathematical theory predates visualization by over 60 years. Gaston Julia and Pierre Fatou studied iterative complex dynamics extensively in 1918, but without computers, they could only reason about these sets abstractly. They knew Julia sets existed and had deep properties, but had never seen one! When Mandelbrot generated the first images in 1980, it revolutionized the field—suddenly the intricate structure of these sets was visible, creating an explosion of interest in fractal geometry and complex dynamics.</p>
+<p>The Mandelbrot set became iconic partly because it’s so accessible: anyone can understand the definition (iterate <span class="math inline">\(z \mapsto z^2 + c\)</span>), yet it produces infinitely intricate beauty. It also sparked broader interest in fractals, chaos theory, and the idea that simple rules can generate complex behavior—themes that would influence everything from physics to economics to art.</p>
+</section>
+<section id="basic-implementation" class="level3">
+<h3 class="anchored" data-anchor-id="basic-implementation">Basic Implementation</h3>
+<p>Let’s code it up:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">mainImage</span><span class="op">(</span><span class="dt">out</span> <span class="dt">vec4</span> fragColor<span class="op">,</span> <span class="dt">in</span> <span class="dt">vec2</span> fragCoord<span class="op">)</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Coordinate setup: center at origin, scale to show interesting region</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> uv <span class="op">=</span> fragCoord <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">xy</span><span class="op">;</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    uv <span class="op">=</span> uv <span class="op">-</span> <span class="fl">0.5</span><span class="op">;</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    uv<span class="op">.</span><span class="fu">x</span> <span class="op">*=</span> iResolution<span class="op">.</span><span class="fu">x</span> <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">y</span><span class="op">;</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Scale to view the Mandelbrot set (roughly [-2.5, 1] × [-1.25, 1.25])</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> c <span class="op">=</span> uv <span class="op">*</span> <span class="fl">3.5</span><span class="op">;</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    c<span class="op">.</span><span class="fu">x</span> <span class="op">-=</span> <span class="fl">0.5</span><span class="op">;</span>  <span class="co">// Center on the interesting part</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Mandelbrot iteration</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> z <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span><span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">);</span>  <span class="co">// z_0 = 0</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> max_iter <span class="op">=</span> <span class="dv">100</span><span class="op">;</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> iter<span class="op">;</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    <span class="kw">for</span><span class="op">(</span>iter <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> iter <span class="op">&lt;</span> max_iter<span class="op">;</span> iter<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Check if escaped</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>        <span class="kw">if</span><span class="op">(</span><span class="fu">cabs2</span><span class="op">(</span>z<span class="op">)</span> <span class="op">&gt;</span> <span class="fl">4.0</span><span class="op">)</span> <span class="kw">break</span><span class="op">;</span>  <span class="co">// |z| &gt; 2, so |z|² &gt; 4</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>        <span class="co">// z_{n+1} = z_n² + c</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>        z <span class="op">=</span> <span class="fu">cmul</span><span class="op">(</span>z<span class="op">,</span> z<span class="op">)</span> <span class="op">+</span> c<span class="op">;</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Color based on iteration count</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> t <span class="op">=</span> <span class="dt">float</span><span class="op">(</span>iter<span class="op">)</span> <span class="op">/</span> <span class="dt">float</span><span class="op">(</span>max_iter<span class="op">);</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span> color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span>t<span class="op">);</span>  <span class="co">// Grayscale for now</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>    fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>That’s the entire Mandelbrot set renderer! The coordinate scaling is tuned to show the “interesting part”—the main cardioid body and its surrounding bulbs. The set extends roughly from <span class="math inline">\(-2.5\)</span> to <span class="math inline">\(0.5\)</span> on the real axis, so we shift our coordinate system accordingly.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Why This Is Perfect for GPUs
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Notice what’s happening computationally: every pixel performs its own independent calculation. There’s no communication between pixels, no shared data structures, no synchronization needed. Each pixel just iterates its own complex number and decides when to stop.</p>
+<p>This is <strong>embarrassingly parallel</strong>—the ideal workload for GPU architecture. A modern GPU has thousands of small processors, and they can all work on different pixels simultaneously. No pixel needs to wait for another pixel’s result. The entire screen (potentially millions of pixels) is computed in parallel, which is why we can render the Mandelbrot set at 60fps even with 100+ iterations per pixel.</p>
+<p>Memory-wise, this is also very efficient: each pixel only needs to store its current <span class="math inline">\(z\)</span> value (two floats) and an iteration counter (one integer). No arrays, no history, no complex data structures. The computation is stateless—we only care about the current iterate, not the full orbit.</p>
+<p>This contrasts sharply with sequential CPU code, where you’d iterate over pixels one at a time. Even with clever optimizations and SIMD vectorization, you’d be orders of magnitude slower than a GPU shader doing the same work.</p>
+</div>
+</div>
+</section>
+<section id="smooth-coloring" class="level3">
+<h3 class="anchored" data-anchor-id="smooth-coloring">Smooth Coloring</h3>
+<p>The grayscale rendering shows the structure of the set, but it has harsh banding—sudden transitions between integer iteration counts create visible stripes. We can do much better by interpolating between iteration steps!</p>
+<p>The key insight is that near escape, the orbit grows exponentially. Specifically, once <span class="math inline">\(|z_n|\)</span> is large, we have approximately <span class="math inline">\(|z_{n+1}| \approx |z_n|^2\)</span>, which means <span class="math inline">\(\log |z_{n+1}| \approx 2\log|z_n|\)</span>. Taking logs repeatedly, we get <span class="math display">\[\log\log|z_{n+1}| \approx \log(2\log|z_n|) = \log 2 + \log\log|z_n|\]</span></p>
+<p>This suggests that <span class="math inline">\(\log\log|z_n|\)</span> grows approximately linearly near escape, increasing by <span class="math inline">\(\log 2\)</span> per iteration. We can use this to compute a fractional iteration count!</p>
+<p>Here’s the formula:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span><span class="op">(</span>iter <span class="op">&lt;</span> max_iter<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Smooth iteration count (accounts for continuous escape)</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> log_zn <span class="op">=</span> <span class="bu">log</span><span class="op">(</span><span class="fu">cabs2</span><span class="op">(</span>z<span class="op">))</span> <span class="op">/</span> <span class="fl">2.0</span><span class="op">;</span>  <span class="co">// = log|z_n|</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> nu <span class="op">=</span> <span class="bu">log</span><span class="op">(</span>log_zn <span class="op">/</span> <span class="bu">log</span><span class="op">(</span><span class="fl">2.0</span><span class="op">))</span> <span class="op">/</span> <span class="bu">log</span><span class="op">(</span><span class="fl">2.0</span><span class="op">);</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> smooth_iter <span class="op">=</span> <span class="dt">float</span><span class="op">(</span>iter<span class="op">)</span> <span class="op">+</span> <span class="fl">1.0</span> <span class="op">-</span> nu<span class="op">;</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> t <span class="op">=</span> smooth_iter <span class="op">/</span> <span class="dt">float</span><span class="op">(</span>max_iter<span class="op">);</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span> color <span class="op">=</span> <span class="fu">palette</span><span class="op">(</span>t<span class="op">);</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Inside the set: black</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span> color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.0</span><span class="op">);</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The variable <code>nu</code> represents how far we’ve progressed toward the next integer iteration. When <span class="math inline">\(|z_n| = 2\)</span> exactly (just hitting the escape threshold), <span class="math inline">\(nu = 0\)</span> and we get the integer iteration count. When <span class="math inline">\(|z_n|\)</span> is large (deep into escape), <span class="math inline">\(nu\)</span> approaches 1. Subtracting <code>nu</code> from <code>iter + 1</code> gives us a continuous, smooth value that transitions gradually between iteration levels.</p>
+<p>This eliminates banding entirely! The result is smooth, continuous color gradients that look much more professional and reveal the fractal structure more clearly.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Smooth Coloring as Anti-Aliasing
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Smooth coloring is fundamentally an anti-aliasing technique. Without it, nearby pixels with iteration counts of, say, 45 and 46 get completely different colors—creating harsh edges. With smooth coloring, these pixels get nearly identical colors (say, iteration 45.3 and 45.8), producing a smooth gradient.</p>
+<p>This is especially important at high zoom levels, where tiny changes in position lead to different integer iteration counts. The smooth interpolation ensures that small changes in <span class="math inline">\(c\)</span> produce small changes in color, which is exactly what we want for a continuous mathematical function.</p>
+</div>
+</div>
+</section>
+<section id="color-palettes" class="level3">
+<h3 class="anchored" data-anchor-id="color-palettes">Color Palettes</h3>
+<p>Now we need a good color mapping function. A classic approach uses cosines to create smooth, cyclic color palettes:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> <span class="fu">palette</span><span class="op">(</span><span class="dt">float</span> t<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Create a cyclic color palette using cosines</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span> a <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.5</span><span class="op">,</span> <span class="fl">0.5</span><span class="op">,</span> <span class="fl">0.5</span><span class="op">);</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span> b <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.5</span><span class="op">,</span> <span class="fl">0.5</span><span class="op">,</span> <span class="fl">0.5</span><span class="op">);</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span> c <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span> d <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.33</span><span class="op">,</span> <span class="fl">0.67</span><span class="op">);</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> a <span class="op">+</span> b <span class="op">*</span> <span class="bu">cos</span><span class="op">(</span><span class="fl">6.28318</span> <span class="op">*</span> <span class="op">(</span>c <span class="op">*</span> t <span class="op">+</span> d<span class="op">));</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This uses a cosine-based palette function that creates smooth, cyclic colors—perfect for the Mandelbrot set where we want colors to repeat as we zoom in to the fractal boundary. The parameters control different aspects:</p>
+<ul>
+<li><code>a</code> and <code>b</code> control the range and center of the colors (here, mapping to <span class="math inline">\([0,1]\)</span>)</li>
+<li><code>c</code> controls the frequency of color cycling</li>
+<li><code>d</code> controls the phase offset, shifting the entire palette</li>
+</ul>
+<p>Play with these parameters to get different color schemes! Try <code>d = vec3(0.0, 0.1, 0.2)</code> for a blue-purple palette, or <code>d = vec3(0.3, 0.2, 0.2)</code> for warmer tones. You can also adjust <code>c</code> to make the colors cycle faster or slower through the iteration range.</p>
+<p>The beauty of this cosine approach is that it’s smooth (continuous derivatives), cyclic (no seams), and efficient (just a few trig operations). Other approaches exist—hand-picked color stops with interpolation, HSV color spaces, perceptually uniform LAB spaces—but cosine palettes are a great default for fractal visualization.</p>
+<hr>
+</section>
+</section>
+<section id="julia-sets" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="julia-sets"><span class="header-section-number">1.4</span> Julia Sets</h2>
+<p>The Julia set is the natural companion to the Mandelbrot set, and understanding their relationship is key to understanding complex dynamics. Where the Mandelbrot set varies <span class="math inline">\(c\)</span> and fixes <span class="math inline">\(z_0 = 0\)</span>, the Julia set does the opposite: it fixes <span class="math inline">\(c\)</span> and varies <span class="math inline">\(z_0\)</span>.</p>
+<section id="definition-1" class="level3">
+<h3 class="anchored" data-anchor-id="definition-1">Definition</h3>
+<p>For a fixed complex number <span class="math inline">\(c\)</span>, the <strong>filled Julia set</strong> <span class="math inline">\(K_c\)</span> is the set of initial conditions <span class="math inline">\(z_0\)</span> for which the iteration <span class="math display">\[z_{n+1} = z_n^2 + c\]</span> remains bounded. The <strong>Julia set</strong> <span class="math inline">\(J_c\)</span> is the boundary of <span class="math inline">\(K_c\)</span>—the set where the dynamics are chaotic, neither definitely bounded nor definitely escaping.</p>
+<p>Think about what this means: every point <span class="math inline">\(c\)</span> in the complex plane has an associated Julia set <span class="math inline">\(J_c\)</span>. The Mandelbrot set is telling us about the topology of these Julia sets! Specifically:</p>
+<ul>
+<li>If <span class="math inline">\(c \in \mathcal{M}\)</span> (inside the Mandelbrot set), then <span class="math inline">\(J_c\)</span> is <strong>connected</strong>—a single, intricate curve</li>
+<li>If <span class="math inline">\(c \notin \mathcal{M}\)</span> (outside the Mandelbrot set), then <span class="math inline">\(J_c\)</span> is <strong>totally disconnected</strong>—a Cantor-like dust of points</li>
+</ul>
+<p>This is one of the most beautiful connections in mathematics: the Mandelbrot set is a map of parameter space, showing which values of <span class="math inline">\(c\)</span> produce connected Julia sets. Julia and Fatou proved this in 1918 without ever seeing a picture—they understood these sets purely abstractly!</p>
+</section>
+<section id="implementation-as-homework" class="level3">
+<h3 class="anchored" data-anchor-id="implementation-as-homework">Implementation as Homework</h3>
+<p>You’ll implement Julia set rendering in the homework. The algorithm is nearly identical to the Mandelbrot set—just swap what’s fixed and what varies! Instead of setting <code>z = vec2(0.0)</code> and varying <code>c</code> across pixels, you’ll set <code>c</code> to a fixed value and let <code>z</code> be the pixel coordinate.</p>
+<p>The key changes: 1. Fix <code>c</code> to an interesting value (we’ll give suggestions) 2. Initialize <code>z</code> from the pixel position (that’s your <span class="math inline">\(z_0\)</span>) 3. Iterate <span class="math inline">\(z \mapsto z^2 + c\)</span> exactly as before 4. Use the same escape criterion and coloring</p>
+<p>This will give you a Julia set! Try different values of <span class="math inline">\(c\)</span> to see how the topology changes. You can make <code>c</code> depend on time (<code>iTime</code>) for animation, or on mouse position (<code>iMouse</code>) for interactive exploration.</p>
+<p><strong>Some interesting values to try:</strong> - <span class="math inline">\(c = -0.7 + 0.27015i\)</span> — classic Julia set, intricate tendrils - <span class="math inline">\(c = -0.4 + 0.6i\)</span> — dendrite-like fractal trees - <span class="math inline">\(c = 0.285 + 0.01i\)</span> — beautiful spiral patterns - <span class="math inline">\(c = -0.8 + 0.156i\)</span> — highly filamentary - <span class="math inline">\(c = -0.70176 - 0.3842i\)</span> — “San Marco dragon”</p>
+<p>Values inside the Mandelbrot set give connected Julia sets (single curves), while values outside give disconnected Julia sets (dust). The most interesting Julia sets often come from values right near the boundary of <span class="math inline">\(\mathcal{M}\)</span>—this is where the transition between connected and disconnected happens!</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Exploring Parameter Space
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>When you implement Julia sets, try this: tie <span class="math inline">\(c\)</span> to your mouse position. Move the mouse around and watch the Julia set morph in real time! This is an incredibly powerful way to build intuition for how the parameter <span class="math inline">\(c\)</span> affects the dynamics.</p>
+<p>You’ll notice that small changes in <span class="math inline">\(c\)</span> can produce dramatic changes in the Julia set topology—this is the sensitive dependence on parameters that makes complex dynamics so rich. Near the boundary of the Mandelbrot set, tiny movements create entirely different structures.</p>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="interlude-from-complex-to-geometric-dynamics" class="level2" data-number="1.5">
+<h2 data-number="1.5" class="anchored" data-anchor-id="interlude-from-complex-to-geometric-dynamics"><span class="header-section-number">1.5</span> Interlude: From Complex to Geometric Dynamics</h2>
+<p>We’ve been iterating algebraic functions in the complex plane: <span class="math inline">\(z \mapsto z^2 + c\)</span>. Now we shift to iterating geometric transformations of the plane itself: circle inversion. The mathematical frameworks are different—holomorphic dynamics versus conformal geometry—but they share fundamental similarities.</p>
+<p>Both complex multiplication and circle inversion are <strong>conformal maps</strong>: they preserve angles between curves. In complex dynamics, this comes from the Cauchy-Riemann equations and the geometric interpretation of multiplication as rotation and scaling. In circle inversion, it’s a theorem we’ll state shortly. This angle preservation is crucial—it’s what makes the fractal structures we generate geometrically coherent and visually beautiful.</p>
+<p>There’s also a deep connection we’ll explore tomorrow: circle inversion is actually an isometry of hyperbolic space! The inversions we’re about to do are the same transformations that generate Kleinian groups and tessellate the hyperbolic plane. So in some sense, we’re already working in non-Euclidean geometry without realizing it. Tomorrow we’ll make this explicit when we explore hyperbolic tilings.</p>
+<p>For now, let’s learn circle inversion and use it to build the Apollonian gasket—a fractal structure every bit as intricate as the Mandelbrot set, but generated through pure Euclidean geometry.</p>
+<hr>
+</section>
+<section id="circle-inversion" class="level2" data-number="1.6">
+<h2 data-number="1.6" class="anchored" data-anchor-id="circle-inversion"><span class="header-section-number">1.6</span> Circle Inversion</h2>
+<p>Circle inversion is a beautiful geometric operation that will be the foundation for everything we do with geometric dynamics. It’s a transformation of the plane that turns inside into outside, maps circles to circles (or lines), and preserves angles—making it a powerful tool for creating fractal patterns.</p>
+<section id="mathematical-definition" class="level3">
+<h3 class="anchored" data-anchor-id="mathematical-definition">Mathematical Definition</h3>
+<p>Circle inversion is a transformation with respect to a circle. For a circle of radius <span class="math inline">\(R\)</span> centered at a point <span class="math inline">\(\mathbf{c}\)</span>, inversion maps a point <span class="math inline">\(\mathbf{p} \neq \mathbf{c}\)</span> to: <span class="math display">\[\text{inv}(\mathbf{p}) = \mathbf{c} + R^2 \frac{\mathbf{p} - \mathbf{c}}{|\mathbf{p} - \mathbf{c}|^2}\]</span></p>
+<p>The vector <span class="math inline">\(\mathbf{p} - \mathbf{c}\)</span> points from the center to <span class="math inline">\(\mathbf{p}\)</span>. We normalize this direction by dividing by its squared length, then scale by <span class="math inline">\(R^2\)</span>, and finally translate back by the center. Geometrically:</p>
+<ul>
+<li>Points inside the circle map to points outside (and vice versa)</li>
+<li>Points on the circle are fixed (they map to themselves)</li>
+<li>The closer you are to the center, the farther away you go</li>
+<li>The center itself maps to infinity, and infinity maps to the center</li>
+</ul>
+<p>Here’s another way to think about it: draw a ray from the center through <span class="math inline">\(\mathbf{p}\)</span>. The inversion of <span class="math inline">\(\mathbf{p}\)</span> is the unique point on this ray such that the product of distances from the center is <span class="math inline">\(R^2\)</span>. If <span class="math inline">\(\mathbf{p}\)</span> is at distance <span class="math inline">\(r\)</span> from the center, its image is at distance <span class="math inline">\(R^2/r\)</span>.</p>
+</section>
+<section id="key-properties" class="level3">
+<h3 class="anchored" data-anchor-id="key-properties">Key Properties</h3>
+<p>Circle inversion has remarkable geometric properties. These aren’t obvious from the formula, but they’re all classical theorems:</p>
+<ol type="1">
+<li><p><strong>Lines through the center</strong> remain lines through the center (they’re “flipped inside out” along the ray)</p></li>
+<li><p><strong>Lines not through the center</strong> become circles through the center</p></li>
+<li><p><strong>Circles through the center</strong> become lines (not through the center)</p></li>
+<li><p><strong>Circles not through the center</strong> generally remain circles, but with different center and radius</p></li>
+<li><p><strong>Angles are preserved</strong> (conformal property)</p></li>
+</ol>
+<p>The angle preservation is the deepest property. It’s not at all obvious from the formula, but it can be proved using the chain rule and careful calculation. The key insight is that inversion is locally similar to a complex conjugation-like operation, which preserves angles.</p>
+<p><strong>Why These Properties Matter for Iteration:</strong> When we iterate inversions through multiple circles, these properties ensure that the geometry remains coherent. Circles stay circles (or become lines), and the angles between curves are preserved. This means repeated inversion creates intricate but geometrically regular patterns—the hallmark of fractals generated by conformal maps.</p>
+<p>Another key fact: inversion is <strong>involutive</strong>—applying it twice returns to the original point (assuming the point isn’t the center). Mathematically, <span class="math inline">\(\text{inv}(\text{inv}(\mathbf{p})) = \mathbf{p}\)</span>. This makes inversion a geometric reflection of sorts, which will be important when we think about symmetry groups tomorrow.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Historical Context: Circle Inversion
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Circle inversion has ancient roots—Apollonius of Perga studied related problems involving tangent circles around 200 BCE. But the modern theory of inversion as a geometric transformation developed in the 19th century as part of projective and non-Euclidean geometry.</p>
+<p>A key insight was recognizing that circle inversion is related to stereographic projection: if you place a sphere on the plane, inversion in a circle corresponds to reflection through the sphere! This connection links circle inversion to spherical geometry and ultimately to hyperbolic geometry.</p>
+<p>In the late 19th and early 20th centuries, mathematicians realized that groups of circle inversions (Kleinian groups) could tessellate hyperbolic space and create fractal limit sets. This anticipates the fractal geometry revolution of the 1970s-80s, though the connection wasn’t fully appreciated until computers made visualization possible.</p>
+</div>
+</div>
+</section>
+<section id="implementation" class="level3">
+<h3 class="anchored" data-anchor-id="implementation">Implementation</h3>
+<p>The formula translates directly to GLSL:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="fu">invertCircle</span><span class="op">(</span><span class="dt">vec2</span> p<span class="op">,</span> <span class="dt">vec2</span> center<span class="op">,</span> <span class="dt">float</span> radius<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> diff <span class="op">=</span> p <span class="op">-</span> center<span class="op">;</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> r2 <span class="op">=</span> <span class="bu">dot</span><span class="op">(</span>diff<span class="op">,</span> diff<span class="op">);</span>  <span class="co">// squared distance from center</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Handle center (would be division by zero)</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">if</span><span class="op">(</span>r2 <span class="op">&lt;</span> <span class="fl">0.0001</span><span class="op">)</span> <span class="kw">return</span> <span class="dt">vec2</span><span class="op">(</span><span class="fl">1000.0</span><span class="op">);</span>  <span class="co">// Map to "infinity"</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> center <span class="op">+</span> <span class="op">(</span>radius <span class="op">*</span> radius<span class="op">)</span> <span class="op">*</span> diff <span class="op">/</span> r2<span class="op">;</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The only tricky part is handling the center point, which mathematically maps to infinity. We approximate this by mapping to a very large value—far enough away that it’s effectively off-screen. The threshold <code>0.0001</code> is small enough to catch points numerically close to the center but large enough to avoid precision issues.</p>
+<p>Computationally, circle inversion is very cheap: just one dot product, a division, a multiplication, and some vector operations. This efficiency is important because we’ll be doing many inversions per pixel when generating fractals!</p>
+</section>
+<section id="visualizing-circle-inversion" class="level3">
+<h3 class="anchored" data-anchor-id="visualizing-circle-inversion">Visualizing Circle Inversion</h3>
+<p>Let’s see what happens when we apply inversion to a grid. This is one of the best ways to understand the transformation visually:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">mainImage</span><span class="op">(</span><span class="dt">out</span> <span class="dt">vec4</span> fragColor<span class="op">,</span> <span class="dt">in</span> <span class="dt">vec2</span> fragCoord<span class="op">)</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Standard coordinate setup</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> uv <span class="op">=</span> fragCoord <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">xy</span><span class="op">;</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    uv <span class="op">=</span> uv <span class="op">-</span> <span class="fl">0.5</span><span class="op">;</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    uv<span class="op">.</span><span class="fu">x</span> <span class="op">*=</span> iResolution<span class="op">.</span><span class="fu">x</span> <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">y</span><span class="op">;</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> p <span class="op">=</span> uv <span class="op">*</span> <span class="fl">4.0</span><span class="op">;</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Inversion circle</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> circleCenter <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span><span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">);</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> circleRadius <span class="op">=</span> <span class="fl">1.0</span><span class="op">;</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Apply inversion</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> p_inverted <span class="op">=</span> <span class="fu">invertCircle</span><span class="op">(</span>p<span class="op">,</span> circleCenter<span class="op">,</span> circleRadius<span class="op">);</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Draw a grid in the inverted space</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> grid <span class="op">=</span> <span class="bu">fract</span><span class="op">(</span>p_inverted <span class="op">*</span> <span class="fl">2.0</span><span class="op">);</span>  <span class="co">// Create repeating cells</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> gridLine <span class="op">=</span> <span class="bu">step</span><span class="op">(</span><span class="fl">0.95</span><span class="op">,</span> <span class="bu">max</span><span class="op">(</span>grid<span class="op">.</span><span class="fu">x</span><span class="op">,</span> grid<span class="op">.</span><span class="fu">y</span><span class="op">));</span>  <span class="co">// Draw grid lines</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span> color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span>gridLine<span class="op">);</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Draw the inversion circle itself (for reference)</span></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> circDist <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span><span class="bu">length</span><span class="op">(</span>p<span class="op">)</span> <span class="op">-</span> circleRadius<span class="op">);</span></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>    <span class="kw">if</span><span class="op">(</span>circDist <span class="op">&lt;</span> <span class="fl">0.05</span><span class="op">)</span> color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">);</span></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>    fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>You’ll see straight grid lines transform into beautiful circular arcs! Lines farther from the inversion circle get bent more dramatically, while lines near the circle stay relatively straight. Horizontal and vertical lines through the center remain horizontal and vertical (but swap inside/outside), while other lines become circles.</p>
+<p>This visualization really helps build intuition. You can see: - The circle itself (in red) is unchanged—points on it are fixed - The grid inside the circle maps to a grid outside (and vice versa) - Lines become curves, but the angles where they intersect are preserved - The pattern has a pole singularity at the center (infinite distortion)</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Exploring Circle Inversion
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Here are some experiments to try:</p>
+<ol type="1">
+<li><p><strong>Multiple circles</strong>: Create a grid of circles using <code>mod()</code> (like we did on Day 1) and invert through each cell’s circle independently. You’ll see beautiful overlapping patterns!</p></li>
+<li><p><strong>Animated radius</strong>: Make <code>circleRadius = 1.0 + 0.5 * sin(iTime)</code> to watch the grid breathe in and out. This helps you see how the inversion depends on the circle’s size.</p></li>
+<li><p><strong>Different patterns</strong>: Instead of a grid, try drawing circles or other shapes in the inverted space. Circles become circles (or lines), creating intricate nested patterns.</p></li>
+<li><p><strong>Off-center inversion</strong>: Move the inversion circle away from the origin. Watch how the asymmetry creates even more complex distortions.</p></li>
+</ol>
+<p>Each of these will give you geometric intuition for how inversion behaves, which will be crucial when we iterate multiple inversions!</p>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="structs-in-glsl" class="level2" data-number="1.7">
+<h2 data-number="1.7" class="anchored" data-anchor-id="structs-in-glsl"><span class="header-section-number">1.7</span> Structs in GLSL</h2>
+<p>Before we build the Apollonian gasket, we need to talk about organizing our data. We’re about to deal with multiple circles, and passing around <code>center1</code>, <code>radius1</code>, <code>center2</code>, <code>radius2</code>, etc. gets unwieldy fast. GLSL provides <strong>structs</strong> (just like in C) for grouping related data together.</p>
+<section id="defining-and-using-structs" class="level3">
+<h3 class="anchored" data-anchor-id="defining-and-using-structs">Defining and Using Structs</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> Circle <span class="op">{</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> center<span class="op">;</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> radius<span class="op">;</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Now <code>Circle</code> is a type we can use just like <code>vec2</code> or <code>float</code>. Creating and using structs is straightforward:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Declare and initialize</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>Circle c1 <span class="op">=</span> <span class="fu">Circle</span><span class="op">(</span><span class="dt">vec2</span><span class="op">(</span><span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">),</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Or declare first, set later</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>Circle c2<span class="op">;</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>c2<span class="op">.</span><span class="fu">center</span> <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.5</span><span class="op">);</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>c2<span class="op">.</span><span class="fu">radius</span> <span class="op">=</span> <span class="fl">0.75</span><span class="op">;</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co">// Pass to functions</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="fu">invertThroughCircle</span><span class="op">(</span><span class="dt">vec2</span> p<span class="op">,</span> Circle circ<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="fu">invertCircle</span><span class="op">(</span>p<span class="op">,</span> circ<span class="op">.</span><span class="fu">center</span><span class="op">,</span> circ<span class="op">.</span><span class="fu">radius</span><span class="op">);</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This makes the code dramatically more readable. Compare:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Without structs - messy!</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="fu">iterate</span><span class="op">(</span><span class="dt">vec2</span> p<span class="op">,</span> <span class="dt">vec2</span> c1_cen<span class="op">,</span> <span class="dt">float</span> c1_rad<span class="op">,</span> <span class="dt">vec2</span> c2_cen<span class="op">,</span> <span class="dt">float</span> c2_rad<span class="op">,</span> <span class="dt">vec2</span> c3_cen<span class="op">,</span> <span class="dt">float</span> c3_rad<span class="op">);</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co">// With structs - clean!</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="fu">iterate</span><span class="op">(</span><span class="dt">vec2</span> p<span class="op">,</span> Circle c1<span class="op">,</span> Circle c2<span class="op">,</span> Circle c3<span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>For the Apollonian gasket, we’ll have three circles we need to track and pass around. Structs make this much more manageable and semantically clear—we’re working with circles as geometric objects, not just pairs of vectors and floats.</p>
+<hr>
+</section>
+</section>
+<section id="the-apollonian-gasket" class="level2" data-number="1.8">
+<h2 data-number="1.8" class="anchored" data-anchor-id="the-apollonian-gasket"><span class="header-section-number">1.8</span> The Apollonian Gasket</h2>
+<p>Now for the main event! The Apollonian gasket is a fractal generated by iterating circle inversions through three mutually tangent circles. It’s named after Apollonius of Perga, who studied the problem of finding circles tangent to three given circles around 200 BCE, though the fractal interpretation is much more modern.</p>
+<section id="descartes-circle-theorem" class="level3">
+<h3 class="anchored" data-anchor-id="descartes-circle-theorem">Descartes Circle Theorem</h3>
+<p>To understand the Apollonian gasket, we need to know about a beautiful theorem: <strong>Descartes Circle Theorem</strong> (1643).</p>
+<p>Given four mutually tangent circles (each tangent to the other three), let their curvatures be <span class="math inline">\(k_1, k_2, k_3, k_4\)</span> where curvature <span class="math inline">\(k = 1/r\)</span> (positive for external tangency, negative for internal). Then: <span class="math display">\[(k_1 + k_2 + k_3 + k_4)^2 = 2(k_1^2 + k_2^2 + k_3^2 + k_4^2)\]</span></p>
+<p>This can be rearranged to solve for the fourth curvature given three: <span class="math display">\[k_4 = k_1 + k_2 + k_3 \pm 2\sqrt{k_1 k_2 + k_2 k_3 + k_3 k_1}\]</span></p>
+<p>The <span class="math inline">\(\pm\)</span> gives two solutions—the two circles tangent to the original three (one inside the curvilinear triangle they form, one outside).</p>
+<p>What makes this magical for fractals: if you start with three mutually tangent circles with integer curvatures, then <strong>all</strong> circles in the Apollonian gasket have integer curvatures! This is the Apollonian gasket’s connection to number theory—it’s a fractal made entirely of circles with rational radii.</p>
+<p>We won’t use this formula directly in our shader (we’ll set up circles geometrically), but it explains why certain configurations are special and why the patterns are so regular despite infinite nesting.</p>
+</section>
+<section id="setup-three-mutually-tangent-circles" class="level3">
+<h3 class="anchored" data-anchor-id="setup-three-mutually-tangent-circles">Setup: Three Mutually Tangent Circles</h3>
+<p>We start with three circles that are all tangent to each other—meaning each pair touches at exactly one point. For this to work, the distance between any two circle centers must be exactly twice the radius (so they touch edge-to-edge). The three centers form an equilateral triangle, and we’ll position this triangle symmetrically at the origin:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">setupApollonianCircles</span><span class="op">(</span><span class="dt">out</span> Circle c1<span class="op">,</span> <span class="dt">out</span> Circle c2<span class="op">,</span> <span class="dt">out</span> Circle c3<span class="op">,</span> <span class="dt">out</span> Circle outer<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> r <span class="op">=</span> <span class="fl">0.5</span><span class="op">;</span>  <span class="co">// Radius of each inner circle</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// For three circles to be mutually tangent: distance between centers = 2r</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Centers form equilateral triangle with circumradius = 2r/sqrt(3)</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> d <span class="op">=</span> <span class="fl">2.0</span> <span class="op">*</span> r <span class="op">/</span> <span class="bu">sqrt</span><span class="op">(</span><span class="fl">3.0</span><span class="op">);</span>  <span class="co">// ≈ 0.577 for r = 0.5</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Three inner circles</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    c1 <span class="op">=</span> <span class="fu">Circle</span><span class="op">(</span><span class="dt">vec2</span><span class="op">(</span><span class="fl">0.0</span><span class="op">,</span> d<span class="op">),</span> r<span class="op">);</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    c2 <span class="op">=</span> <span class="fu">Circle</span><span class="op">(</span><span class="dt">vec2</span><span class="op">(-</span>d <span class="op">*</span> <span class="fl">0.866</span><span class="op">,</span> <span class="op">-</span>d <span class="op">*</span> <span class="fl">0.5</span><span class="op">),</span> r<span class="op">);</span>  <span class="co">// 0.866 ≈ sqrt(3)/2</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    c3 <span class="op">=</span> <span class="fu">Circle</span><span class="op">(</span><span class="dt">vec2</span><span class="op">(</span>d <span class="op">*</span> <span class="fl">0.866</span><span class="op">,</span> <span class="op">-</span>d <span class="op">*</span> <span class="fl">0.5</span><span class="op">),</span> r<span class="op">);</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Outer circle tangent to all three, centered at origin</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> R <span class="op">=</span> d <span class="op">+</span> r<span class="op">;</span>  <span class="co">// ≈ 1.077 for r = 0.5</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>    outer <span class="op">=</span> <span class="fu">Circle</span><span class="op">(</span><span class="dt">vec2</span><span class="op">(</span><span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">),</span> R<span class="op">);</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>With <span class="math inline">\(r = 0.5\)</span>, the circumradius <span class="math inline">\(d \approx 0.577\)</span>, and the outer circle has radius <span class="math inline">\(R = d + r \approx 1.077\)</span>. All four circles are mutually tangent—each inner circle touches the other two inner circles and the outer circle.</p>
+<p>This is just one possible configuration! You could use different radii (related by Descartes’ theorem), different arrangements, or even animated circles. The key is that they start mutually tangent—this ensures the iteration creates a proper Apollonian packing.</p>
+</section>
+<section id="the-iteration-algorithm" class="level3">
+<h3 class="anchored" data-anchor-id="the-iteration-algorithm">The Iteration Algorithm</h3>
+<p>The algorithm is beautifully simple:</p>
+<ol type="1">
+<li>Start with a point <span class="math inline">\(p\)</span></li>
+<li>Check which circles contain <span class="math inline">\(p\)</span></li>
+<li>If <span class="math inline">\(p\)</span> is inside a circle, invert through that circle</li>
+<li>Repeat until <span class="math inline">\(p\)</span> is outside all circles or we hit max iterations</li>
+<li>Color based on iteration behavior</li>
+</ol>
+<p>Here’s the implementation:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> <span class="fu">iterateApollonian</span><span class="op">(</span><span class="dt">vec2</span> p<span class="op">,</span> Circle c1<span class="op">,</span> Circle c2<span class="op">,</span> Circle c3<span class="op">,</span> Circle outer<span class="op">,</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>                       <span class="dt">int</span> maxIter<span class="op">,</span> <span class="dt">out</span> <span class="dt">int</span> finalIter<span class="op">,</span> <span class="dt">out</span> <span class="dt">int</span> lastCircle<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">for</span><span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> maxIter<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>        <span class="dt">bool</span> moved <span class="op">=</span> <span class="kw">false</span><span class="op">;</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Check the three inner circles</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>        <span class="kw">if</span><span class="op">(</span><span class="bu">length</span><span class="op">(</span>p <span class="op">-</span> c1<span class="op">.</span><span class="fu">center</span><span class="op">)</span> <span class="op">&lt;</span> c1<span class="op">.</span><span class="fu">radius</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>            p <span class="op">=</span> <span class="fu">invertCircle</span><span class="op">(</span>p<span class="op">,</span> c1<span class="op">.</span><span class="fu">center</span><span class="op">,</span> c1<span class="op">.</span><span class="fu">radius</span><span class="op">);</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>            lastCircle <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>            moved <span class="op">=</span> <span class="kw">true</span><span class="op">;</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span> </span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>        <span class="kw">else</span> <span class="kw">if</span><span class="op">(</span><span class="bu">length</span><span class="op">(</span>p <span class="op">-</span> c2<span class="op">.</span><span class="fu">center</span><span class="op">)</span> <span class="op">&lt;</span> c2<span class="op">.</span><span class="fu">radius</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>            p <span class="op">=</span> <span class="fu">invertCircle</span><span class="op">(</span>p<span class="op">,</span> c2<span class="op">.</span><span class="fu">center</span><span class="op">,</span> c2<span class="op">.</span><span class="fu">radius</span><span class="op">);</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>            lastCircle <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>            moved <span class="op">=</span> <span class="kw">true</span><span class="op">;</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>        <span class="kw">else</span> <span class="kw">if</span><span class="op">(</span><span class="bu">length</span><span class="op">(</span>p <span class="op">-</span> c3<span class="op">.</span><span class="fu">center</span><span class="op">)</span> <span class="op">&lt;</span> c3<span class="op">.</span><span class="fu">radius</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>            p <span class="op">=</span> <span class="fu">invertCircle</span><span class="op">(</span>p<span class="op">,</span> c3<span class="op">.</span><span class="fu">center</span><span class="op">,</span> c3<span class="op">.</span><span class="fu">radius</span><span class="op">);</span></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>            lastCircle <span class="op">=</span> <span class="dv">2</span><span class="op">;</span></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>            moved <span class="op">=</span> <span class="kw">true</span><span class="op">;</span></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Check if outside the outer circle</span></span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>        <span class="kw">else</span> <span class="kw">if</span><span class="op">(</span><span class="bu">length</span><span class="op">(</span>p <span class="op">-</span> outer<span class="op">.</span><span class="fu">center</span><span class="op">)</span> <span class="op">&gt;</span> outer<span class="op">.</span><span class="fu">radius</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>            p <span class="op">=</span> <span class="fu">invertCircle</span><span class="op">(</span>p<span class="op">,</span> outer<span class="op">.</span><span class="fu">center</span><span class="op">,</span> outer<span class="op">.</span><span class="fu">radius</span><span class="op">);</span></span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>            lastCircle <span class="op">=</span> <span class="dv">3</span><span class="op">;</span></span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>            moved <span class="op">=</span> <span class="kw">true</span><span class="op">;</span></span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>        <span class="co">// If we didn't move, we're in the gaps - done!</span></span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a>        <span class="kw">if</span><span class="op">(!</span>moved<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a>            finalIter <span class="op">=</span> i<span class="op">;</span></span>
+<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a>            <span class="kw">return</span> p<span class="op">;</span></span>
+<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb17-34"><a href="#cb17-34" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb17-35"><a href="#cb17-35" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb17-36"><a href="#cb17-36" aria-hidden="true" tabindex="-1"></a>    finalIter <span class="op">=</span> maxIter<span class="op">;</span></span>
+<span id="cb17-37"><a href="#cb17-37" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> p<span class="op">;</span></span>
+<span id="cb17-38"><a href="#cb17-38" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>We also track which circle we last inverted through (<code>lastCircle</code>) and how many iterations we performed (<code>finalIter</code>). These will be useful for coloring!</p>
+<p><strong>Why This Creates a Fractal:</strong> Each time we invert through a circle, we “push” the point away from that circle’s center. But because the four circles are mutually tangent, pushing away from one circle might push us into another circle, triggering another inversion. The interplay between these four inversions (three inner circles plus the outer circle) creates a complex orbit.</p>
+<p>Points in the “gaps” between the inner circles (the curvilinear triangles) escape quickly—they’re inside the outer circle but not inside any inner circle, so no inversion happens. But points near the tangency points get bounced back and forth between circles many times before escaping. And at the actual tangency points (where circles touch), the orbit never escapes—these are fixed points or periodic orbits of the iterated inversions.</p>
+<p>The fractal structure emerges because these dynamics are self-similar: zooming in near any tangency point reveals the same pattern of nested circles and gaps. This self-similarity is a direct consequence of the conformal nature of circle inversion—the transformation preserves angles, so local geometry looks the same at all scales.</p>
+</section>
+<section id="coloring-strategies" class="level3">
+<h3 class="anchored" data-anchor-id="coloring-strategies">Coloring Strategies</h3>
+<p>There are several interesting ways to color the Apollonian gasket:</p>
+<p><strong>By iteration count</strong> (like the Mandelbrot set):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> t <span class="op">=</span> <span class="dt">float</span><span class="op">(</span>finalIter<span class="op">)</span> <span class="op">/</span> <span class="dt">float</span><span class="op">(</span>maxIter<span class="op">);</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> color <span class="op">=</span> <span class="fu">palette</span><span class="op">(</span>t<span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This shows the “depth” of the orbit—points that escape quickly are colored differently from points that bounce around many times.</p>
+<p><strong>By last circle hit</strong>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> colors<span class="op">[</span><span class="dv">4</span><span class="op">]</span> <span class="op">=</span> <span class="dt">vec3</span><span class="op">[</span><span class="dv">4</span><span class="op">](</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">),</span>  <span class="co">// Circle 1: red</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">),</span>  <span class="co">// Circle 2: green</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">),</span>  <span class="co">// Circle 3: blue</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">)</span>   <span class="co">// Outer circle: yellow</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="op">);</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> color <span class="op">=</span> colors<span class="op">[</span>lastCircle<span class="op">];</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This shows the basin of attraction—which circle’s “influence” each point ultimately fell into. Yellow regions show points that escaped through the outer circle.</p>
+<p><strong>By final distance from circles</strong>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> d1 <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span><span class="bu">length</span><span class="op">(</span>p <span class="op">-</span> c1<span class="op">.</span><span class="fu">center</span><span class="op">)</span> <span class="op">-</span> c1<span class="op">.</span><span class="fu">radius</span><span class="op">);</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> d2 <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span><span class="bu">length</span><span class="op">(</span>p <span class="op">-</span> c2<span class="op">.</span><span class="fu">center</span><span class="op">)</span> <span class="op">-</span> c2<span class="op">.</span><span class="fu">radius</span><span class="op">);</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> d3 <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span><span class="bu">length</span><span class="op">(</span>p <span class="op">-</span> c3<span class="op">.</span><span class="fu">center</span><span class="op">)</span> <span class="op">-</span> c3<span class="op">.</span><span class="fu">radius</span><span class="op">);</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> d <span class="op">=</span> <span class="bu">min</span><span class="op">(</span>d1<span class="op">,</span> <span class="bu">min</span><span class="op">(</span>d2<span class="op">,</span> d3<span class="op">));</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="bu">smoothstep</span><span class="op">(</span><span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.05</span><span class="op">,</span> d<span class="op">));</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This highlights the circle boundaries themselves, making the geometric structure more apparent.</p>
+<p>Each coloring reveals different aspects of the fractal. Try combining them—for example, color by iteration count but modulate brightness by distance to circles.</p>
+</section>
+<section id="putting-it-all-together" class="level3">
+<h3 class="anchored" data-anchor-id="putting-it-all-together">Putting It All Together</h3>
+<p>Here’s a complete Apollonian gasket renderer:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">mainImage</span><span class="op">(</span><span class="dt">out</span> <span class="dt">vec4</span> fragColor<span class="op">,</span> <span class="dt">in</span> <span class="dt">vec2</span> fragCoord<span class="op">)</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Coordinate setup</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> uv <span class="op">=</span> fragCoord <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">xy</span><span class="op">;</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    uv <span class="op">=</span> uv <span class="op">-</span> <span class="fl">0.5</span><span class="op">;</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    uv<span class="op">.</span><span class="fu">x</span> <span class="op">*=</span> iResolution<span class="op">.</span><span class="fu">x</span> <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">y</span><span class="op">;</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> p <span class="op">=</span> uv <span class="op">*</span> <span class="fl">4.0</span><span class="op">;</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Setup the four circles</span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    Circle c1<span class="op">,</span> c2<span class="op">,</span> c3<span class="op">,</span> outer<span class="op">;</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">setupApollonianCircles</span><span class="op">(</span>c1<span class="op">,</span> c2<span class="op">,</span> c3<span class="op">,</span> outer<span class="op">);</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Iterate</span></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> maxIter <span class="op">=</span> <span class="dv">50</span><span class="op">;</span></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> finalIter<span class="op">,</span> lastCircle<span class="op">;</span></span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> final_p <span class="op">=</span> <span class="fu">iterateApollonian</span><span class="op">(</span>p<span class="op">,</span> c1<span class="op">,</span> c2<span class="op">,</span> c3<span class="op">,</span> outer<span class="op">,</span> maxIter<span class="op">,</span> finalIter<span class="op">,</span> lastCircle<span class="op">);</span></span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Color by iteration count with palette</span></span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> t <span class="op">=</span> <span class="dt">float</span><span class="op">(</span>finalIter<span class="op">)</span> <span class="op">/</span> <span class="dt">float</span><span class="op">(</span>maxIter<span class="op">);</span></span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span> color <span class="op">=</span> <span class="fu">palette</span><span class="op">(</span>t<span class="op">);</span></span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Draw all four circles for reference</span></span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> d1 <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span><span class="bu">length</span><span class="op">(</span>p <span class="op">-</span> c1<span class="op">.</span><span class="fu">center</span><span class="op">)</span> <span class="op">-</span> c1<span class="op">.</span><span class="fu">radius</span><span class="op">);</span></span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> d2 <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span><span class="bu">length</span><span class="op">(</span>p <span class="op">-</span> c2<span class="op">.</span><span class="fu">center</span><span class="op">)</span> <span class="op">-</span> c2<span class="op">.</span><span class="fu">radius</span><span class="op">);</span></span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> d3 <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span><span class="bu">length</span><span class="op">(</span>p <span class="op">-</span> c3<span class="op">.</span><span class="fu">center</span><span class="op">)</span> <span class="op">-</span> c3<span class="op">.</span><span class="fu">radius</span><span class="op">);</span></span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> d_outer <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span><span class="bu">length</span><span class="op">(</span>p <span class="op">-</span> outer<span class="op">.</span><span class="fu">center</span><span class="op">)</span> <span class="op">-</span> outer<span class="op">.</span><span class="fu">radius</span><span class="op">);</span></span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> d <span class="op">=</span> <span class="bu">min</span><span class="op">(</span><span class="bu">min</span><span class="op">(</span>d1<span class="op">,</span> <span class="bu">min</span><span class="op">(</span>d2<span class="op">,</span> d3<span class="op">)),</span> d_outer<span class="op">);</span></span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>    <span class="kw">if</span><span class="op">(</span>d <span class="op">&lt;</span> <span class="fl">0.02</span><span class="op">)</span> color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">);</span>  <span class="co">// White circle outlines</span></span>
+<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a>    fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb21-32"><a href="#cb21-32" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>You should see a beautiful nested pattern of circles! The fractal structure is immediately apparent—circles within circles within circles, filling every gap with smaller circles.</p>
+<p>Zoom in (by scaling <code>p</code> differently in the coordinate setup) to see the self-similarity. No matter how far you zoom, you’ll keep finding the same pattern repeated at smaller scales. This is true fractality—infinite detail that never runs out.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Computational Efficiency
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Despite the complexity of the output, this algorithm is remarkably efficient. Each iteration just checks three distances (cheap) and potentially does one inversion (also cheap—just a few arithmetic operations). With 50 iterations, we’re doing maybe 150 distance checks and 50 inversions per pixel.</p>
+<p>Compare this to raymarching (Day 4), where we might do hundreds of distance evaluations per pixel! The Apollonian gasket is very GPU-friendly.</p>
+<p>The key is that we terminate early—most pixels escape in just a few iterations. Only points near the fractal boundary require many iterations. This is similar to the Mandelbrot set: most of the computational work focuses on the interesting regions (the boundary), while simple regions (deep inside or far outside) are handled quickly.</p>
+</div>
+</div>
+</section>
+<section id="historical-context-and-connections" class="level3">
+<h3 class="anchored" data-anchor-id="historical-context-and-connections">Historical Context and Connections</h3>
+<p>The Apollonian gasket connects several mathematical threads across millennia:</p>
+<p><strong>Ancient roots:</strong> Apollonius of Perga (~200 BCE) studied the problem of constructing circles tangent to three given circles (the “Problem of Apollonius”). He found geometric constructions but couldn’t have imagined the infinite fractal structure we’re visualizing.</p>
+<p><strong>Renaissance mathematics:</strong> René Descartes (1643) discovered the circle theorem bearing his name, giving an algebraic formula for tangent circles. This turned Apollonius’s geometric problem into arithmetic.</p>
+<p><strong>19th century:</strong> The connection to projective geometry and circle inversions was developed. Mathematicians realized that packing problems could be studied through group theory—the inversions form a discrete subgroup of the group of Möbius transformations.</p>
+<p><strong>20th century:</strong> With computers, the fractal nature became visible. The Apollonian gasket was recognized as a limit set of a Kleinian group—a group of isometries of hyperbolic space. This connects to tomorrow’s material: the inversions we’re doing are actually hyperbolic isometries! In the Poincaré disk model (which we’ll see tomorrow), these inversions are reflections through hyperbolic geodesics.</p>
+<p>The gasket also has connections to number theory: if the initial circles have integer curvatures, all circles in the packing do too (by Descartes’ theorem). This has led to deep questions about the distribution of integers in these packings, which remain active research areas today.</p>
+<hr>
+</section>
+</section>
+<section id="summary" class="level2" data-number="1.9">
+<h2 data-number="1.9" class="anchored" data-anchor-id="summary"><span class="header-section-number">1.9</span> Summary</h2>
+<p>Today we’ve explored two powerful iterative processes that generate fractals:</p>
+<ol type="1">
+<li><strong>Complex dynamics</strong>: The Mandelbrot and Julia sets emerge from iterating <span class="math inline">\(z \mapsto z^2 + c\)</span>
+<ul>
+<li>Implemented complex arithmetic in GLSL efficiently</li>
+<li>Learned escape-time algorithms and the crucial escape radius theorem</li>
+<li>Developed smooth coloring techniques for anti-aliased rendering</li>
+<li>Understood the parameter space (Mandelbrot) vs dynamical space (Julia) distinction</li>
+<li>Saw how 1980s computational power revolutionized a 1918 theory</li>
+</ul></li>
+<li><strong>Geometric dynamics</strong>: The Apollonian gasket emerges from iterating circle inversions
+<ul>
+<li>Circle inversion as a conformal transformation preserving angles</li>
+<li>Used structs to organize geometric data cleanly</li>
+<li>Applied Descartes Circle Theorem to understand tangent circle configurations</li>
+<li>Iterated inversions through three circles to create fractal patterns</li>
+<li>Connected ancient Greek geometry to modern fractal theory</li>
+</ul></li>
+</ol>
+<p>Both processes show how incredibly simple rules—a quadratic map, a geometric transformation—generate infinite complexity through iteration. The key in both cases is <strong>conformality</strong>: angle-preserving maps create geometrically coherent fractals. This is one of the core insights of fractal geometry and dynamical systems.</p>
+<p>The computational perspective is also crucial: both algorithms are embarrassingly parallel, making them perfect for GPU rendering. Each pixel’s calculation is independent, and we can terminate early when orbits escape. The result is real-time rendering of infinitely detailed mathematical objects.</p>
+<p>Tomorrow we’ll push geometric iteration further, moving from Euclidean to hyperbolic geometry. The circle inversions we’ve learned today are actually hyperbolic isometries—transformations that preserve distances in hyperbolic space. We’ll explore the upper half-plane and Poincaré disk models, create <span class="math inline">\((2,3,7)\)</span> and <span class="math inline">\((2,3,\infty)\)</span> triangle tilings, and see how the same algorithmic ideas (iterated geometric transformations) work in non-Euclidean geometry. The results will be even more intricate because hyperbolic space has “more room” than Euclidean space—triangles can have angle sums less than <span class="math inline">\(\pi\)</span>, allowing denser tilings and more complex fractal structures.</p>
+<hr>
+</section>
+<section id="homework" class="level2" data-number="1.10">
+<h2 data-number="1.10" class="anchored" data-anchor-id="homework"><span class="header-section-number">1.10</span> Homework</h2>
+<section id="required-julia-set-explorer" class="level3">
+<h3 class="anchored" data-anchor-id="required-julia-set-explorer">Required: Julia Set Explorer</h3>
+<p>Implement a Julia set renderer starting from the Mandelbrot code. The algorithm is nearly identical—you just need to swap what’s fixed and what varies!</p>
+<p><strong>Requirements:</strong></p>
+<ol type="1">
+<li>Start from the Mandelbrot implementation</li>
+<li>Fix <code>c</code> to a constant value (see suggestions below)</li>
+<li>Initialize <code>z</code> from the pixel position instead of zero</li>
+<li>Iterate <span class="math inline">\(z_{n+1} = z_n^2 + c\)</span> exactly as before</li>
+<li>Use the same escape criterion and coloring</li>
+</ol>
+<p><strong>Suggested structure:</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">mainImage</span><span class="op">(</span><span class="dt">out</span> <span class="dt">vec4</span> fragColor<span class="op">,</span> <span class="dt">in</span> <span class="dt">vec2</span> fragCoord<span class="op">)</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Coordinate setup</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> uv <span class="op">=</span> fragCoord <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">xy</span><span class="op">;</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    uv <span class="op">=</span> uv <span class="op">-</span> <span class="fl">0.5</span><span class="op">;</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    uv<span class="op">.</span><span class="fu">x</span> <span class="op">*=</span> iResolution<span class="op">.</span><span class="fu">x</span> <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">y</span><span class="op">;</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> p <span class="op">=</span> uv <span class="op">*</span> <span class="fl">3.0</span><span class="op">;</span>  <span class="co">// Scale for Julia set viewing</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Fix c to an interesting value</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> c <span class="op">=</span> <span class="dt">vec2</span><span class="op">(-</span><span class="fl">0.7</span><span class="op">,</span> <span class="fl">0.27015</span><span class="op">);</span>  <span class="co">// Classic Julia set</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Initialize z from pixel position (this is the key change!)</span></span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> z <span class="op">=</span> p<span class="op">;</span>  <span class="co">// z_0 = pixel position</span></span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>    <span class="co">// [Rest of iteration exactly like Mandelbrot]</span></span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Interesting parameters to try:</strong> - <code>vec2(-0.7, 0.27015)</code> — classic Julia set, intricate tendrils - <code>vec2(-0.4, 0.6)</code> — dendrite-like fractal trees<br>
+- <code>vec2(0.285, 0.01)</code> — beautiful spiral patterns - <code>vec2(-0.8, 0.156)</code> — highly filamentary structure - <code>vec2(-0.70176, -0.3842)</code> — “San Marco dragon” - <code>vec2(-0.835, -0.2321)</code> — another classic - <code>vec2(-0.7269, 0.1889)</code> — “Douady’s rabbit” (famous example)</p>
+<p><strong>Extension Options (pick one or both):</strong></p>
+<p><strong>Option A: Animated Parameter Space</strong></p>
+<p>Make <span class="math inline">\(c\)</span> depend on time to watch the Julia set morph:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> angle <span class="op">=</span> iTime <span class="op">*</span> <span class="fl">0.3</span><span class="op">;</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> radius <span class="op">=</span> <span class="fl">0.7885</span><span class="op">;</span>  <span class="co">// Distance from origin in parameter space</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> c <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span>radius <span class="op">*</span> <span class="bu">cos</span><span class="op">(</span>angle<span class="op">),</span> radius <span class="op">*</span> <span class="bu">sin</span><span class="op">(</span>angle<span class="op">));</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Watch how the Julia set changes topology as you trace a circle in the complex plane! You’ll see it transition from connected to disconnected, develop tendrils, and create organic shapes.</p>
+<p><strong>Option B: Mouse-Controlled Exploration</strong></p>
+<p>Tie <span class="math inline">\(c\)</span> to mouse position for interactive exploration:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> mouse_uv <span class="op">=</span> <span class="op">(</span>iMouse<span class="op">.</span><span class="fu">xy</span> <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">xy</span><span class="op">)</span> <span class="op">-</span> <span class="fl">0.5</span><span class="op">;</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>mouse_uv<span class="op">.</span><span class="fu">x</span> <span class="op">*=</span> iResolution<span class="op">.</span><span class="fu">x</span> <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">y</span><span class="op">;</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="dt">vec2</span> c <span class="op">=</span> mouse_uv <span class="op">*</span> <span class="fl">3.0</span><span class="op">;</span>  <span class="co">// Scale to cover interesting parameter range</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Now you can explore parameter space by moving the mouse! This really helps build intuition for how <span class="math inline">\(c\)</span> affects the Julia set. Try finding the boundary of the Mandelbrot set—parameters right at the edge produce the most intricate Julia sets.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Understanding Connected vs Disconnected
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>As you explore parameter space, pay attention to whether the Julia set appears as a single connected structure or as disconnected dust. Values of <span class="math inline">\(c\)</span> inside the Mandelbrot set give connected Julia sets, while values outside give disconnected ones. The most beautiful Julia sets often come from values right near the boundary of <span class="math inline">\(\mathcal{M}\)</span>!</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="optional-1-grid-of-julia-sets" class="level3">
+<h3 class="anchored" data-anchor-id="optional-1-grid-of-julia-sets">Optional #1: Grid of Julia Sets</h3>
+<p>Create a grid where each cell shows the Julia set for that value of <span class="math inline">\(c\)</span>, revealing the Mandelbrot set as an emergent pattern!</p>
+<p><strong>The idea:</strong> The Mandelbrot set is a map of Julia set topology. If we draw a grid of Julia sets for different values of <span class="math inline">\(c\)</span>, we should see the Mandelbrot set emerge in the overall pattern—cells with connected Julia sets (solid regions) correspond to points in <span class="math inline">\(\mathcal{M}\)</span>, while cells with disconnected Julia sets (dust) are outside.</p>
+<p><strong>Implementation strategy:</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">mainImage</span><span class="op">(</span><span class="dt">out</span> <span class="dt">vec4</span> fragColor<span class="op">,</span> <span class="dt">in</span> <span class="dt">vec2</span> fragCoord<span class="op">)</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Coordinate setup</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> uv <span class="op">=</span> fragCoord <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">xy</span><span class="op">;</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    uv <span class="op">=</span> uv <span class="op">-</span> <span class="fl">0.5</span><span class="op">;</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    uv<span class="op">.</span><span class="fu">x</span> <span class="op">*=</span> iResolution<span class="op">.</span><span class="fu">x</span> <span class="op">/</span> iResolution<span class="op">.</span><span class="fu">y</span><span class="op">;</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> p <span class="op">=</span> uv <span class="op">*</span> <span class="fl">4.0</span><span class="op">;</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Divide screen into grid cells</span></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> grid_size <span class="op">=</span> <span class="fl">8.0</span><span class="op">;</span>  <span class="co">// 8×8 grid of Julia sets</span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> cell_id <span class="op">=</span> <span class="bu">floor</span><span class="op">(</span>p <span class="op">*</span> grid_size <span class="op">/</span> <span class="fl">4.0</span><span class="op">);</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> cell_p <span class="op">=</span> <span class="bu">fract</span><span class="op">(</span>p <span class="op">*</span> grid_size <span class="op">/</span> <span class="fl">4.0</span><span class="op">)</span> <span class="op">-</span> <span class="fl">0.5</span><span class="op">;</span></span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>    cell_p <span class="op">*=</span> <span class="fl">4.0</span><span class="op">;</span>  <span class="co">// Local coordinates within cell</span></span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Map cell_id to parameter c</span></span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> c <span class="op">=</span> <span class="op">(</span>cell_id <span class="op">/</span> grid_size<span class="op">)</span> <span class="op">*</span> <span class="fl">4.0</span> <span class="op">-</span> <span class="dt">vec2</span><span class="op">(</span><span class="fl">2.5</span><span class="op">,</span> <span class="fl">2.0</span><span class="op">);</span></span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>    c<span class="op">.</span><span class="fu">x</span> <span class="op">-=</span> <span class="fl">0.5</span><span class="op">;</span>  <span class="co">// Center on interesting region of Mandelbrot set</span></span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Run Julia set iteration with z = cell_p, fixed c</span></span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> z <span class="op">=</span> cell_p<span class="op">;</span></span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> max_iter <span class="op">=</span> <span class="dv">50</span><span class="op">;</span></span>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> iter<span class="op">;</span></span>
+<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a>    <span class="kw">for</span><span class="op">(</span>iter <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> iter <span class="op">&lt;</span> max_iter<span class="op">;</span> iter<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a>        <span class="kw">if</span><span class="op">(</span><span class="fu">cabs2</span><span class="op">(</span>z<span class="op">)</span> <span class="op">&gt;</span> <span class="fl">4.0</span><span class="op">)</span> <span class="kw">break</span><span class="op">;</span></span>
+<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a>        z <span class="op">=</span> <span class="fu">cmul</span><span class="op">(</span>z<span class="op">,</span> z<span class="op">)</span> <span class="op">+</span> c<span class="op">;</span></span>
+<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb25-29"><a href="#cb25-29" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Color</span></span>
+<span id="cb25-30"><a href="#cb25-30" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> t <span class="op">=</span> <span class="dt">float</span><span class="op">(</span>iter<span class="op">)</span> <span class="op">/</span> <span class="dt">float</span><span class="op">(</span>max_iter<span class="op">);</span></span>
+<span id="cb25-31"><a href="#cb25-31" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span> color <span class="op">=</span> <span class="fu">palette</span><span class="op">(</span>t<span class="op">);</span></span>
+<span id="cb25-32"><a href="#cb25-32" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb25-33"><a href="#cb25-33" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Optional: draw grid lines to separate cells</span></span>
+<span id="cb25-34"><a href="#cb25-34" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> grid_edge <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span><span class="bu">fract</span><span class="op">(</span>p <span class="op">*</span> grid_size <span class="op">/</span> <span class="fl">4.0</span><span class="op">)</span> <span class="op">-</span> <span class="fl">0.5</span><span class="op">);</span></span>
+<span id="cb25-35"><a href="#cb25-35" aria-hidden="true" tabindex="-1"></a>    <span class="kw">if</span><span class="op">(</span><span class="bu">max</span><span class="op">(</span>grid_edge<span class="op">.</span><span class="fu">x</span><span class="op">,</span> grid_edge<span class="op">.</span><span class="fu">y</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0.48</span><span class="op">)</span> color <span class="op">=</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">0.0</span><span class="op">);</span></span>
+<span id="cb25-36"><a href="#cb25-36" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb25-37"><a href="#cb25-37" aria-hidden="true" tabindex="-1"></a>    fragColor <span class="op">=</span> <span class="dt">vec4</span><span class="op">(</span>color<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb25-38"><a href="#cb25-38" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>You should see a grid of tiny Julia sets! If you look carefully at the overall pattern, you’ll notice it resembles the Mandelbrot set—cells with connected Julia sets (solid colored regions) correspond to points inside <span class="math inline">\(\mathcal{M}\)</span>, while cells with disconnected Julia sets (fine dust patterns) are outside.</p>
+<p>This is one of the most beautiful visualizations in complex dynamics—the Mandelbrot set literally encodes the topology of all Julia sets!</p>
+<p><strong>Variations to try:</strong> - Adjust <code>grid_size</code> (larger for more detail, smaller for clearer overview) - Change the parameter space region being sampled - Color cells based on whether the Julia set appears connected (black) or disconnected (white)—you’ll get a pixelated approximation of the Mandelbrot set!</p>
+<hr>
+</section>
+<section id="optional-2-other-iterated-inversions" class="level3">
+<h3 class="anchored" data-anchor-id="optional-2-other-iterated-inversions">Optional #2: Other Iterated Inversions</h3>
+<p>Explore variations on the Apollonian gasket theme! The key is setting up circles in interesting configurations and iterating inversions.</p>
+<p><strong>Different circle arrangements:</strong></p>
+<p><strong>Four circles in a square:</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="fu">setupSquareCircles</span><span class="op">(</span><span class="dt">out</span> Circle c1<span class="op">,</span> <span class="dt">out</span> Circle c2<span class="op">,</span> <span class="dt">out</span> Circle c3<span class="op">,</span> <span class="dt">out</span> Circle c4<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> r <span class="op">=</span> <span class="fl">0.5</span><span class="op">;</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> d <span class="op">=</span> <span class="fl">1.5</span><span class="op">;</span>  <span class="co">// Distance from center</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    c1 <span class="op">=</span> <span class="fu">Circle</span><span class="op">(</span><span class="dt">vec2</span><span class="op">(</span>d<span class="op">,</span> <span class="fl">0.0</span><span class="op">),</span> r<span class="op">);</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    c2 <span class="op">=</span> <span class="fu">Circle</span><span class="op">(</span><span class="dt">vec2</span><span class="op">(</span><span class="fl">0.0</span><span class="op">,</span> d<span class="op">),</span> r<span class="op">);</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    c3 <span class="op">=</span> <span class="fu">Circle</span><span class="op">(</span><span class="dt">vec2</span><span class="op">(-</span>d<span class="op">,</span> <span class="fl">0.0</span><span class="op">),</span> r<span class="op">);</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>    c4 <span class="op">=</span> <span class="fu">Circle</span><span class="op">(</span><span class="dt">vec2</span><span class="op">(</span><span class="fl">0.0</span><span class="op">,</span> <span class="op">-</span>d<span class="op">),</span> r<span class="op">);</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Modify the iteration loop to check four circles instead of three!</p>
+<p><strong>Nested circles:</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">// One large circle containing several smaller ones</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>c1 <span class="op">=</span> <span class="fu">Circle</span><span class="op">(</span><span class="dt">vec2</span><span class="op">(</span><span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">),</span> <span class="fl">2.0</span><span class="op">);</span>  <span class="co">// Large outer circle</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>c2 <span class="op">=</span> <span class="fu">Circle</span><span class="op">(</span><span class="dt">vec2</span><span class="op">(-</span><span class="fl">0.5</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">),</span> <span class="fl">0.4</span><span class="op">);</span>  <span class="co">// Small inner circles</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>c3 <span class="op">=</span> <span class="fu">Circle</span><span class="op">(</span><span class="dt">vec2</span><span class="op">(</span><span class="fl">0.5</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">),</span> <span class="fl">0.4</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Animated radii:</strong></p>
+<p>Make the circles pulse:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>c1<span class="op">.</span><span class="fu">radius</span> <span class="op">=</span> <span class="fl">0.5</span> <span class="op">+</span> <span class="fl">0.2</span> <span class="op">*</span> <span class="bu">sin</span><span class="op">(</span>iTime<span class="op">);</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>c2<span class="op">.</span><span class="fu">radius</span> <span class="op">=</span> <span class="fl">0.5</span> <span class="op">+</span> <span class="fl">0.2</span> <span class="op">*</span> <span class="bu">sin</span><span class="op">(</span>iTime <span class="op">+</span> <span class="fl">2.0</span> <span class="op">*</span> <span class="fl">3.14159</span> <span class="op">/</span> <span class="fl">3.0</span><span class="op">);</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>c3<span class="op">.</span><span class="fu">radius</span> <span class="op">=</span> <span class="fl">0.5</span> <span class="op">+</span> <span class="fl">0.2</span> <span class="op">*</span> <span class="bu">sin</span><span class="op">(</span>iTime <span class="op">+</span> <span class="fl">4.0</span> <span class="op">*</span> <span class="fl">3.14159</span> <span class="op">/</span> <span class="fl">3.0</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Watch the fractal breathe!</p>
+<p><strong>Alternating inversion patterns:</strong></p>
+<p>Instead of inverting through whichever circle contains the point, try a fixed cycling pattern:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Cycle through circles in order</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> circle_index <span class="op">=</span> i <span class="op">%</span> <span class="dv">3</span><span class="op">;</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span><span class="op">(</span>circle_index <span class="op">==</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    p <span class="op">=</span> <span class="fu">invertCircle</span><span class="op">(</span>p<span class="op">,</span> c1<span class="op">.</span><span class="fu">center</span><span class="op">,</span> c1<span class="op">.</span><span class="fu">radius</span><span class="op">);</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span><span class="op">(</span>circle_index <span class="op">==</span> <span class="dv">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>    p <span class="op">=</span> <span class="fu">invertCircle</span><span class="op">(</span>p<span class="op">,</span> c2<span class="op">.</span><span class="fu">center</span><span class="op">,</span> c2<span class="op">.</span><span class="fu">radius</span><span class="op">);</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>    p <span class="op">=</span> <span class="fu">invertCircle</span><span class="op">(</span>p<span class="op">,</span> c3<span class="op">.</span><span class="fu">center</span><span class="op">,</span> c3<span class="op">.</span><span class="fu">radius</span><span class="op">);</span></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This creates very different patterns—more regular and less space-filling than the gasket, but with interesting self-similarity.</p>
+<p><strong>Challenge problems:</strong> - Can you create a configuration that tiles the plane with circular patterns? - What about spiraling structures? - Can you make a fractal that’s asymmetric (not rotationally symmetric)? - Try combining inversion with other transformations (rotation, scaling)</p>
+<p>The key is experimentation—try different setups and see what emerges!</p>
+<hr>
+</section>
+</section>
+<section id="looking-ahead" class="level2" data-number="1.11">
+<h2 data-number="1.11" class="anchored" data-anchor-id="looking-ahead"><span class="header-section-number">1.11</span> Looking Ahead</h2>
+<p>Tomorrow we continue with geometric transformations, but move from Euclidean to <strong>hyperbolic geometry</strong>. The circle inversions you’ve learned today are actually hyperbolic isometries—transformations that preserve distances in hyperbolic space!</p>
+<p>We’ll explore: - <strong>Multiple models</strong> of the hyperbolic plane (upper half-plane, Poincaré disk) - <strong>Geodesics</strong> (straight lines in hyperbolic geometry—they look like circles in our Euclidean view!) - <strong>Triangle tilings</strong> with <span class="math inline">\((2,3,7)\)</span> and <span class="math inline">\((2,3,\infty)\)</span> symmetry groups - <strong>Why hyperbolic space is different</strong>: triangles with angle sum less than <span class="math inline">\(\pi\)</span>, exponential growth of area</p>
+<p>The same algorithmic ideas we’ve used today (iterated geometric transformations, escape-time coloring, distance-based rendering) will work in hyperbolic space. But the results will be even more intricate because hyperbolic space has “more room” than Euclidean space—allowing denser tilings and more complex fractal structures.</p>
+<p>Make sure you’re comfortable with: - <strong>Iteration and escape-time algorithms</strong> (we’ll use similar ideas for tiling) - <strong>Circle inversion</strong> (this becomes reflection through hyperbolic geodesics!) - <strong>Structs</strong> for organizing geometric data - <strong>Coloring strategies</strong> based on orbit behavior</p>
+<p>See you tomorrow!</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

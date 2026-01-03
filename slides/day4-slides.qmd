@@ -1,0 +1,8 @@
+---
+title: "Day 4"
+format: revealjs
+---
+
+# Day 4: Rendering
+
+## How to render a scene
