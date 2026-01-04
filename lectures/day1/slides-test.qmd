@@ -1,16 +1,16 @@
 ---
-title: "Test Slides"
+title: "Test"
 format: revealjs
 ---
 
-## Red
+##
 
 {{< shader-demo day1/red >}}
 
-## Circle
+##
 
 {{< shader-demo day1/circle >}}
 
-## Parabola
+##
 
 {{< shader-demo day1/parabola >}}
