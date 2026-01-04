@@ -42,7 +42,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     uv.x *= iResolution.x / iResolution.y;
     vec2 p = uv * 4.0;
     
-    float L = p.x;  // changed from p.y
+    float L = p.x;  // test x-coordinate for left/right split
     
     vec3 color;
     if (L < 0.0) {
@@ -761,46 +761,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
 ---
 
-### H2. Elliptic Curve Explorer
-
-```glsl
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    vec2 uv = fragCoord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
-    vec2 p = uv * 4.0;
-    
-    // Map mouse to (a, b) parameter space
-    float a = mix(-3.0, 1.0, iMouse.x / iResolution.x);
-    float b = mix(-2.0, 2.0, iMouse.y / iResolution.y);
-    
-    // Discriminant
-    float disc = 4.0 * a * a * a + 27.0 * b * b;
-    
-    // Elliptic curve: y² = x³ + ax + b
-    float F = p.y * p.y - p.x * p.x * p.x - a * p.x - b;
-    vec2 grad = vec2(-3.0 * p.x * p.x - a, 2.0 * p.y);
-    float dist = abs(F) / max(length(grad), 0.01);
-    
-    vec3 color = vec3(0.1, 0.1, 0.2);
-    
-    if (dist < 0.05) {
-        // Color based on discriminant: red for singular, yellow for smooth
-        if (abs(disc) < 0.5) {
-            color = vec3(1.0, 0.2, 0.2);  // red for singular
-        } else {
-            color = vec3(1.0, 1.0, 0.0);  // yellow for smooth
-        }
-    }
-    
-    fragColor = vec4(color, 1.0);
-}
-```
-
----
-
-### H3. Signed Distance Functions
+### H2. Signed Distance Functions
 
 ```glsl
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
@@ -847,7 +808,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
 ---
 
-### H4. Smooth Blending
+### H3. Smooth Blending
 
 ```glsl
 // Smooth minimum function
@@ -891,7 +852,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
 ---
 
-### H5. Inversion
+### H4. Inversion
 
 ```glsl
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
@@ -940,6 +901,56 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 - The unit circle (gray) is the "mirror" of the inversion
 
 Drag the mouse to move the original line (cyan) and watch its inverted image (yellow circle) change.
+
+---
+
+### H5. Fourier Epicycles
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
+    
+    float omega = 1.0;
+    int N = 7;
+    float scale = 1.2;
+    
+    vec3 color = vec3(0.02, 0.02, 0.05);
+    
+    vec2 pos = vec2(0.0, 0.0);
+    
+    for (int i = 0; i < 20; i++) {
+        if (i >= N) break;
+        
+        int n = 2 * i + 1;  // odd harmonics: 1, 3, 5, ...
+        float r = scale / float(n);
+        float freq = float(n) * omega;
+        
+        vec2 next_pos = pos + r * vec2(cos(freq * iTime), sin(freq * iTime));
+        
+        // Draw circle
+        float d_circle = abs(length(p - pos) - r);
+        if (d_circle < 0.02) {
+            color = vec3(0.2, 0.2, 0.4);
+        }
+        
+        pos = next_pos;
+    }
+    
+    // Final point (bright)
+    float d_point = length(p - pos);
+    if (d_point < 0.08) {
+        color = vec3(1.0, 1.0, 0.2);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+**Teaching note:** Each circle represents a term in the Fourier series. The square wave uses odd harmonics with 1/n coefficients. More circles = better approximation. The final point traces out a path that approximates a square wave in the y-coordinate.
 
 ---
 
@@ -999,73 +1010,9 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
 ---
 
-## Project: Fourier Epicycles
+## Project: Elliptic Curve Family
 
-**Full solution with arms:**
-
-```glsl
-vec2 normalize_coord(vec2 coord) {
-    vec2 uv = coord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
-    return uv * 4.0;
-}
-
-float sd_segment(vec2 p, vec2 a, vec2 b) {
-    vec2 pa = p - a;
-    vec2 ba = b - a;
-    float t = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
-    return length(pa - ba * t);
-}
-
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    vec2 p = normalize_coord(fragCoord);
-    
-    float omega = 1.0;
-    int N = 7;
-    float scale = 1.2;
-    
-    vec3 color = vec3(0.02, 0.02, 0.05);
-    
-    vec2 pos = vec2(0.0, 0.0);
-    
-    for (int i = 0; i < 20; i++) {
-        if (i >= N) break;
-        
-        int n = 2 * i + 1;
-        float r = scale / float(n);
-        float freq = float(n) * omega;
-        float fade = 1.0 - float(i) / float(N);
-        
-        vec2 next_pos = pos + r * vec2(cos(freq * iTime), sin(freq * iTime));
-        
-        // Circle
-        float d_circle = abs(length(p - pos) - r);
-        if (d_circle < 0.02) {
-            color = mix(color, vec3(0.2, 0.2, 0.35), 0.5 * fade);
-        }
-        
-        // Arm
-        float d_arm = sd_segment(p, pos, next_pos);
-        if (d_arm < 0.015) {
-            color = mix(color, vec3(0.3, 0.3, 0.4), 0.7 * fade);
-        }
-        
-        pos = next_pos;
-    }
-    
-    // Final point
-    float d_point = length(p - pos);
-    if (d_point < 0.08) {
-        color = vec3(1.0, 1.0, 0.2);
-    }
-    
-    fragColor = vec4(color, 1.0);
-}
-```
-
-**Variation: Mouse-controlled number of terms:**
+**Full solution:**
 
 ```glsl
 vec2 normalize_coord(vec2 coord) {
@@ -1075,67 +1022,54 @@ vec2 normalize_coord(vec2 coord) {
     return uv * 4.0;
 }
 
-float sd_segment(vec2 p, vec2 a, vec2 b) {
-    vec2 pa = p - a;
-    vec2 ba = b - a;
-    float t = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
-    return length(pa - ba * t);
-}
-
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
     vec2 p = normalize_coord(fragCoord);
     
-    float omega = 1.0;
-    // Mouse x controls number of terms (1 to 15)
-    int N = int(mix(1.0, 15.0, iMouse.x / iResolution.x));
-    float scale = 1.2;
+    // Mouse picks (a, b) in parameter space
+    float a = mix(-2.0, 1.0, iMouse.x / iResolution.x);
+    float b_center = mix(-2.0, 2.0, iMouse.y / iResolution.y);
     
-    vec3 color = vec3(0.02, 0.02, 0.05);
+    vec3 color = vec3(0.05, 0.05, 0.1);
     
-    vec2 pos = vec2(0.0, 0.0);
+    vec3 oneComponent = vec3(1.0, 0.85, 0.3);   // gold
+    vec3 twoComponent = vec3(0.3, 0.5, 0.8);    // blue
+    vec3 singularColor = vec3(1.0, 0.2, 0.2);   // red
     
-    for (int i = 0; i < 20; i++) {
-        if (i >= N) break;
+    for (int j = -15; j <= 15; j++) {
+        float b = b_center + float(j) * 0.15;
         
-        int n = 2 * i + 1;
-        float r = scale / float(n);
-        float freq = float(n) * omega;
-        float fade = 1.0 - float(i) / float(N);
+        float dist_from_center = abs(float(j));
         
-        vec2 next_pos = pos + r * vec2(cos(freq * iTime), sin(freq * iTime));
+        // Discriminant: 4a³ + 27b²
+        float disc = 4.0 * a * a * a + 27.0 * b * b;
         
-        // Circle
-        float d_circle = abs(length(p - pos) - r);
-        if (d_circle < 0.02) {
-            color = mix(color, vec3(0.2, 0.2, 0.35), 0.5 * fade);
+        float F = p.y * p.y - p.x * p.x * p.x - a * p.x - b;
+        vec2 grad = vec2(-3.0 * p.x * p.x - a, 2.0 * p.y);
+        float dist = abs(F) / max(length(grad), 0.01);
+        
+        float thickness = 0.05 / (1.0 + dist_from_center * 0.8);
+        
+        // Color by topology
+        vec3 curveColor;
+        if (abs(disc) < 0.3) {
+            curveColor = singularColor;
+        } else if (disc > 0.0) {
+            curveColor = oneComponent;
+        } else {
+            curveColor = twoComponent;
         }
         
-        // Arm
-        float d_arm = sd_segment(p, pos, next_pos);
-        if (d_arm < 0.015) {
-            color = mix(color, vec3(0.3, 0.3, 0.4), 0.7 * fade);
-        }
+        float brightness = 1.0 / (1.0 + dist_from_center * 0.4);
+        curveColor *= brightness;
         
-        pos = next_pos;
-    }
-    
-    // Final point
-    float d_point = length(p - pos);
-    if (d_point < 0.08) {
-        color = vec3(1.0, 1.0, 0.2);
+        if (dist < thickness) {
+            color = curveColor;
+        }
     }
     
     fragColor = vec4(color, 1.0);
 }
 ```
 
-**Variation: Triangle wave (alternating signs, 1/n² coefficients):**
-
-```glsl
-// In the loop, replace the square wave coefficients with:
-float sign = (i % 2 == 0) ? 1.0 : -1.0;
-float r = scale * sign / float(n * n);
-```
-
-**Teaching note:** The triangle wave converges faster than the square wave because of the $1/n^2$ coefficients. Students should observe smoother motion with fewer terms.
+**Teaching note:** The discriminant $\Delta = 4a^3 + 27b^2$ determines curve topology. When $\Delta > 0$, the curve has one component (gold). When $\Delta < 0$, it splits into two components — the "egg" and the infinite piece (blue). When $\Delta = 0$, the curve is singular — it has a self-intersection or cusp (red). The singular locus forms a cusp curve in the $(a, b)$ parameter space.

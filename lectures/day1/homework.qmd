@@ -16,7 +16,7 @@ Homework is organized into four types:
 
 **C1. Solid Colors.** Modify the red screen shader to display: (a) green, (b) cyan, (c) a color of your choice using all three RGB channels.
 
-**C2. Vertical Split.** Modify the half-plane shader to divide the screen into left (red) and right (blue) instead of top and bottom.
+**C2. Vertical Split.** Using the standard coordinate setup, divide the screen into left (red) and right (blue) by testing `p.x < 0.0`.
 
 **C3. Off-Center Circle.** Draw a filled circle of radius 0.5 centered at the point $(1, 1)$ instead of the origin.
 
@@ -65,13 +65,13 @@ Homework is organized into four types:
 
 As you drag the mouse, the parabola should reshape and the root indicators should move (or appear/disappear as roots become real or complex).
 
-**H2. Elliptic Curve Explorer.** Elliptic curves in Weierstrass form are $y^2 = x^3 + ax + b$. Build a shader where the mouse position controls $(a, b)$. Use gradient correction for uniform thickness. The *discriminant* $\Delta = 4a^3 + 27b^2$ determines whether the curve is smooth ($\Delta \neq 0$) or singular ($\Delta = 0$). Can you display the current value of $\Delta$ somehow, or change the curve's color when it becomes singular?
+**H2. Signed Distance Functions.** For a filled circle, $f(p) = |p| - r$ is the *signed* distance function: negative inside, positive outside, with $|f|$ giving the actual distance to the boundary. What is the signed distance function for a half-plane? For an axis-aligned rectangle? Implement both and draw them with uniform-thickness boundaries. Note: when you have the true signed distance function, you don't need the gradient correction trick—that's the payoff for computing the right thing from the start.
 
-**H3. Signed Distance Functions.** For a filled circle, $f(p) = |p| - r$ is the *signed* distance function: negative inside, positive outside, with $|f|$ giving the actual distance to the boundary. What is the signed distance function for a half-plane? For an axis-aligned rectangle? Implement both and draw them with uniform-thickness boundaries. Note: when you have the true signed distance function, you don't need the gradient correction trick—that's the payoff for computing the right thing from the start.
+**H3. Smooth Blending.** When two circles overlap, we currently just draw one on top of the other. Research *smooth minimum* functions (e.g., `smin`) that blend distance fields smoothly. Draw two circles that "melt together" where they meet.
 
-**H4. Smooth Blending.** When two circles overlap, we currently just draw one on top of the other. Research *smooth minimum* functions (e.g., `smin`) that blend distance fields smoothly. Draw two circles that "melt together" where they meet.
+**H4. Inversion.** Circle inversion is the map $p \mapsto p / |p|^2$. Apply this transformation to your coordinate $p$ before drawing a shape. What happens to a line? What happens to a circle not passing through the origin? Experiment with different shapes.
 
-**H5. Inversion.** Circle inversion is the map $p \mapsto p / |p|^2$. Apply this transformation to your coordinate $p$ before drawing a shape. What happens to a line? What happens to a circle not passing through the origin? Experiment with different shapes.
+**H5. Fourier Epicycles.** Build an animation of Fourier series using epicycles—circles whose centers ride on the edges of other circles. For the square wave, the Fourier series uses odd harmonics: frequencies $\omega, 3\omega, 5\omega, \ldots$ with radii $1, 1/3, 1/5, \ldots$ Stack N circles, each rotating at its frequency, and draw a bright dot at the final position. Bonus: draw the arms connecting circle centers, fade the outer circles, or let the mouse control the number of terms.
 
 ---
 
@@ -178,116 +178,99 @@ Design a grid-based pattern that you find visually interesting. Some directions:
 The goal is to produce an image you'd be happy to hang on a wall.
 
 
-## Project: Fourier Epicycles
+## Project: Elliptic Curve Family
 
-This project builds a visualization of Fourier series using epicycles—circles whose centers sit on the circumferences of other circles. This is how Ptolemy modeled planetary motion, and it turns out to be exactly how Fourier series work geometrically.
+This project builds a beautiful visualization of elliptic curves—the kind used in cryptography and studied throughout number theory. We'll draw not just one curve, but a family of curves that morph as you drag the mouse.
 
-### Part 1: The Idea
+### Part 1: One Elliptic Curve
 
-Any periodic function can be written as a sum of sines and cosines. Geometrically, $\sin(n\omega t)$ and $\cos(n\omega t)$ describe a point moving around a circle of frequency $n\omega$. Adding these components corresponds to stacking circles: each circle's center rides on the previous circle's edge.
+An elliptic curve in Weierstrass form is $y^2 = x^3 + ax + b$. As an implicit curve: $F(x, y) = y^2 - x^3 - ax - b = 0$.
 
-For example, the square wave has Fourier series:
-$$f(t) = \sum_{n=1,3,5,...} \frac{1}{n} \sin(n\omega t)$$
-
-This means circles with:
-
-- Radii: $1, \frac{1}{3}, \frac{1}{5}, \frac{1}{7}, ...$
-- Frequencies: $\omega, 3\omega, 5\omega, 7\omega, ...$
-
-The more terms we add, the closer the final point's $y$-coordinate approximates a square wave.
-
-### Part 2: Drawing Circles
-
-Start by drawing a chain of circles. Each circle is centered at the current position, and the next position is computed by moving along the circle:
+Start with fixed parameters, say $a = -1$ and $b = 1$:
 
 ```glsl
-vec2 pos = vec2(0.0, 0.0);  // start at origin
+float a = -1.0;
+float b = 1.0;
 
-for (int i = 0; i < N; i++) {
-    int n = 2 * i + 1;  // 1, 3, 5, 7, ...
-    float r = scale / float(n);
-    float freq = float(n) * omega;
-    
-    // Draw circle at current position
-    float d_circle = abs(length(p - pos) - r);
-    if (d_circle < 0.02) {
-        // color the circle
-    }
-    
-    // Move to next position
-    pos = pos + r * vec2(cos(freq * iTime), sin(freq * iTime));
-}
+float F = p.y * p.y - p.x * p.x * p.x - a * p.x - b;
+vec2 grad = vec2(-3.0 * p.x * p.x - a, 2.0 * p.y);
+float dist = abs(F) / max(length(grad), 0.01);
 
-// Draw final point
-float d_point = length(p - pos);
-if (d_point < 0.08) {
-    // bright color
+if (dist < 0.05) {
+    color = vec3(1.0, 0.85, 0.3);  // gold
 }
 ```
 
-Try this with `N = 1`, then `N = 3`, then `N = 7`. Watch how more circles create more complex motion.
+Get this working first. You should see a smooth curve.
 
-### Part 3: The Line Segment SDF
+### Part 2: Mouse Controls a Parameter
 
-To draw the arms connecting circle centers, we need the signed distance function for a line segment. Given endpoints $a$ and $b$, the distance from point $p$ to the segment is:
+Let the mouse $y$-coordinate control $b$:
 
 ```glsl
-float sd_segment(vec2 p, vec2 a, vec2 b) {
-    vec2 pa = p - a;
-    vec2 ba = b - a;
-    float t = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
-    return length(pa - ba * t);
+float a = -1.0;
+float b = mix(-2.0, 2.0, iMouse.y / iResolution.y);
+```
+
+Drag up and down. Notice how the curve changes shape—sometimes it's connected, sometimes it splits into two pieces.
+
+### Part 3: The Discriminant
+
+The discriminant $\Delta = 4a^3 + 27b^2$ determines the curve's topology:
+
+- $\Delta > 0$: one connected component
+- $\Delta < 0$: two components (an "egg" and an infinite piece)
+- $\Delta = 0$: singular (the curve crosses itself)
+
+Color the curve based on this:
+
+```glsl
+float disc = 4.0 * a * a * a + 27.0 * b * b;
+
+vec3 curveColor;
+if (abs(disc) < 0.3) {
+    curveColor = vec3(1.0, 0.2, 0.2);  // red for singular
+} else if (disc > 0.0) {
+    curveColor = vec3(1.0, 0.85, 0.3); // gold for one component
+} else {
+    curveColor = vec3(0.3, 0.5, 0.8);  // blue for two components
 }
 ```
 
-The math: we project $p - a$ onto the line direction $b - a$, clamp to $[0, 1]$ to stay within the segment, then measure the distance to that closest point.
+### Part 4: A Family of Curves
 
-### Part 4: Connecting the Arms
-
-Now modify your loop to also draw line segments:
+Instead of one curve, draw many curves at nearby parameter values. Use a loop to vary $b$ around the mouse position:
 
 ```glsl
-vec2 pos = vec2(0.0, 0.0);
+float b_center = mix(-2.0, 2.0, iMouse.y / iResolution.y);
 
-for (int i = 0; i < N; i++) {
-    int n = 2 * i + 1;
-    float r = scale / float(n);
-    float freq = float(n) * omega;
-    
-    vec2 next_pos = pos + r * vec2(cos(freq * iTime), sin(freq * iTime));
-    
-    // Draw circle
-    float d_circle = abs(length(p - pos) - r);
-    if (d_circle < 0.02) {
-        // faint circle color
-    }
-    
-    // Draw arm from pos to next_pos
-    float d_arm = sd_segment(p, pos, next_pos);
-    if (d_arm < 0.015) {
-        // arm color
-    }
-    
-    pos = next_pos;
+for (int j = -10; j <= 10; j++) {
+    float b = b_center + float(j) * 0.15;
+    // ... draw curve with this b
 }
 ```
 
-### Part 5: Polish and Explore
+### Part 5: Fading
 
-Now make it beautiful:
+The family looks cluttered. Make curves fade as they get further from the center:
 
-**Fading circles:** Later circles are smaller and less important. Fade their brightness:
+- **Thickness**: thinner curves further from center
+- **Brightness**: dimmer curves further from center
+
 ```glsl
-float fade = 1.0 - float(i) / float(N);
+float dist_from_center = abs(float(j));
+float thickness = 0.05 / (1.0 + dist_from_center * 0.8);
+float brightness = 1.0 / (1.0 + dist_from_center * 0.4);
+curveColor *= brightness;
 ```
 
-**Color variation:** Color circles differently based on their index, or based on their frequency.
+### Part 6: Two-Parameter Control
 
-**Different waves:** The square wave uses odd harmonics with $1/n$ coefficients. Try:
+Finally, let the mouse control both parameters: $x$ controls $a$, $y$ controls $b$. The family sweeps through $b$ values around the mouse position, while $a$ is set by mouse $x$.
 
-- Triangle wave: odd harmonics with $1/n^2$ coefficients (alternating signs)
-- Sawtooth wave: all harmonics with $1/n$ coefficients
+```glsl
+float a = mix(-2.0, 1.0, iMouse.x / iResolution.x);
+float b_center = mix(-2.0, 2.0, iMouse.y / iResolution.y);
+```
 
-**Mouse control:** Map `iMouse.x` to the number of terms, so dragging adds or removes circles.
-
-The goal: create a mesmerizing animation that reveals the geometry hidden inside Fourier series.
+Now you can explore the full parameter space. Find where the singular curves live—they form a cusp in $(a, b)$ space!

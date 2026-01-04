@@ -135,8 +135,8 @@ function he(n) {
 function de(n, e, t, r) {
   const p = new Float32Array(3072);
   for (let o = 0; o < 256; o++) {
-    const m = t.get(o) || !1, b = r.get(o) || 0, v = (0 * 256 + o) * 4;
-    p[v + 0] = m ? 1 : 0, p[v + 1] = m ? 1 : 0, p[v + 2] = m ? 1 : 0, p[v + 3] = 1;
+    const m = t.get(o) || !1, b = r.get(o) || 0, T = (0 * 256 + o) * 4;
+    p[T + 0] = m ? 1 : 0, p[T + 1] = m ? 1 : 0, p[T + 2] = m ? 1 : 0, p[T + 3] = 1;
     const E = (2 * 256 + o) * 4;
     p[E + 0] = b, p[E + 1] = b, p[E + 2] = b, p[E + 3] = 1;
   }
@@ -268,8 +268,8 @@ class ge {
     this._lastStepTime = e, this._time = e;
     const c = [this._width, this._height, 1], p = this._time, o = i, m = this._frame, b = t;
     r.viewport(0, 0, this._width, this._height);
-    const v = ["BufferA", "BufferB", "BufferC", "BufferD", "Image"];
-    for (const E of v) {
+    const T = ["BufferA", "BufferB", "BufferC", "BufferD", "Image"];
+    for (const E of T) {
       const x = this._passes.find((y) => y.name === E);
       x && (this.executePass(x, {
         iResolution: c,
@@ -418,22 +418,22 @@ class ge {
             e.getUniformLocation(m, "iChannel2"),
             e.getUniformLocation(m, "iChannel3")
           ]
-        }, v = j(e, this._width, this._height), E = j(e, this._width, this._height), x = Y(e, v), y = {
+        }, T = j(e, this._width, this._height), E = j(e, this._width, this._height), x = Y(e, T), y = {
           name: c,
           projectChannels: p.channels,
           vao: r,
           uniforms: b,
           framebuffer: x,
-          currentTexture: v,
+          currentTexture: T,
           previousTexture: E
         };
         this._passes.push(y);
       } catch (m) {
-        const b = m instanceof Error ? m.message : String(m), v = this.getLineMapping(), E = b.match(/ERROR:\s*\d+:(\d+):/);
+        const b = m instanceof Error ? m.message : String(m), T = this.getLineMapping(), E = b.match(/ERROR:\s*\d+:(\d+):/);
         let x = !1, y = null;
         if (E && this.project.commonSource) {
-          const A = parseInt(E[1], 10), _ = v.boilerplateLinesBeforeCommon + 2, w = _ + v.commonLineCount - 1;
-          A >= _ && A <= w && (x = !0, y = A - _ + 1);
+          const R = parseInt(E[1], 10), _ = T.boilerplateLinesBeforeCommon + 2, w = _ + T.commonLineCount - 1;
+          R >= _ && R <= w && (x = !0, y = R - _ + 1);
         }
         this._compilationErrors.push({
           passName: c,
@@ -806,19 +806,19 @@ class Ee {
    */
   showErrorOverlay(e) {
     this.errorOverlay || (this.errorOverlay = document.createElement("div"), this.errorOverlay.className = "shader-error-overlay", this.container.appendChild(this.errorOverlay));
-    const t = e.filter((b) => b.isFromCommon), r = e.filter((b) => !b.isFromCommon), o = [...t.length > 0 ? [t[0]] : [], ...r].map(({ passName: b, error: v, source: E, isFromCommon: x, originalLine: y }) => {
-      const A = v.replace(`Shader compilation failed:
+    const t = e.filter((b) => b.isFromCommon), r = e.filter((b) => !b.isFromCommon), o = [...t.length > 0 ? [t[0]] : [], ...r].map(({ passName: b, error: T, source: E, isFromCommon: x, originalLine: y }) => {
+      const R = T.replace(`Shader compilation failed:
 `, "");
-      let _ = A;
-      return x && y !== null && (_ = A.replace(/Line \d+:/, `Line ${y}:`), _ = _.replace(/ERROR:\s*\d+:(\d+):/, `ERROR: 0:${y}:`)), {
+      let _ = R;
+      return x && y !== null && (_ = R.replace(/Line \d+:/, `Line ${y}:`), _ = _.replace(/ERROR:\s*\d+:(\d+):/, `ERROR: 0:${y}:`)), {
         passName: x ? "common.glsl" : b,
         error: this.parseShaderError(_),
         codeContext: x ? this.extractCodeContextFromCommon(y) : this.extractCodeContext(_, E)
       };
-    }).map(({ passName: b, error: v, codeContext: E }) => `
+    }).map(({ passName: b, error: T, codeContext: E }) => `
       <div class="error-section">
         <div class="error-pass-name">${b}</div>
-        <pre class="error-content">${this.escapeHTML(v)}</pre>
+        <pre class="error-content">${this.escapeHTML(T)}</pre>
         ${E ? `<pre class="error-code-context">${E}</pre>` : ""}
       </div>
     `).join("");
@@ -866,8 +866,8 @@ class Ee {
     const i = parseInt(r[1], 10), c = t.split(`
 `), p = 3, o = Math.max(0, i - p - 1), m = Math.min(c.length, i + p);
     return c.slice(o, m).map((E, x) => {
-      const y = o + x + 1, A = y === i, _ = String(y).padStart(4, " "), w = this.escapeHTML(E);
-      return A ? `<span class="error-line-highlight">${_} │ ${w}</span>` : `<span class="context-line">${_} │ ${w}</span>`;
+      const y = o + x + 1, R = y === i, _ = String(y).padStart(4, " "), w = this.escapeHTML(E);
+      return R ? `<span class="error-line-highlight">${_} │ ${w}</span>` : `<span class="context-line">${_} │ ${w}</span>`;
     }).join("");
   }
   /**
@@ -879,9 +879,9 @@ class Ee {
     if (!t) return null;
     const r = t.split(`
 `), i = 3, c = Math.max(0, e - i - 1), p = Math.min(r.length, e + i);
-    return r.slice(c, p).map((b, v) => {
-      const E = c + v + 1, x = E === e, y = String(E).padStart(4, " "), A = this.escapeHTML(b);
-      return x ? `<span class="error-line-highlight">${y} │ ${A}</span>` : `<span class="context-line">${y} │ ${A}</span>`;
+    return r.slice(c, p).map((b, T) => {
+      const E = c + T + 1, x = E === e, y = String(E).padStart(4, " "), R = this.escapeHTML(b);
+      return x ? `<span class="error-line-highlight">${y} │ ${R}</span>` : `<span class="context-line">${y} │ ${R}</span>`;
     }).join("");
   }
   /**
@@ -912,7 +912,7 @@ class be {
     this.container.innerHTML = "";
   }
 }
-class Te {
+class ve {
   constructor(e) {
     g(this, "container");
     g(this, "root");
@@ -1052,8 +1052,8 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
             case "Array":
               return h = o.util.objId(a), u[h] ? u[h] : (l = [], u[h] = l, /** @type {Array} */
               /** @type {any} */
-              a.forEach(function(T, f) {
-                l[f] = s(T, u);
+              a.forEach(function(v, f) {
+                l[f] = s(v, u);
               }), /** @type {any} */
               l);
             default:
@@ -1274,12 +1274,12 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
           l = l || /** @type {any} */
           o.languages;
           var h = l[s], d = {};
-          for (var T in h)
-            if (h.hasOwnProperty(T)) {
-              if (T == a)
+          for (var v in h)
+            if (h.hasOwnProperty(v)) {
+              if (v == a)
                 for (var f in u)
                   u.hasOwnProperty(f) && (d[f] = u[f]);
-              u.hasOwnProperty(T) || (d[T] = h[T]);
+              u.hasOwnProperty(v) || (d[v] = h[v]);
             }
           var F = l[s];
           return l[s] = d, o.languages.DFS(o.languages, function(C, M) {
@@ -1290,11 +1290,11 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
         DFS: function s(a, u, l, h) {
           h = h || {};
           var d = o.util.objId;
-          for (var T in a)
-            if (a.hasOwnProperty(T)) {
-              u.call(a, T, a[T], l || T);
-              var f = a[T], F = o.util.type(f);
-              F === "Object" && !h[d(f)] ? (h[d(f)] = !0, s(f, u, null, h)) : F === "Array" && !h[d(f)] && (h[d(f)] = !0, s(f, u, T, h));
+          for (var v in a)
+            if (a.hasOwnProperty(v)) {
+              u.call(a, v, a[v], l || v);
+              var f = a[v], F = o.util.type(f);
+              F === "Object" && !h[d(f)] ? (h[d(f)] = !0, s(f, u, null, h)) : F === "Array" && !h[d(f)] && (h[d(f)] = !0, s(f, u, v, h));
             }
         }
       },
@@ -1372,11 +1372,11 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
         o.util.setLanguage(s, l);
         var d = s.parentElement;
         d && d.nodeName.toLowerCase() === "pre" && o.util.setLanguage(d, l);
-        var T = s.textContent, f = {
+        var v = s.textContent, f = {
           element: s,
           language: l,
           grammar: h,
-          code: T
+          code: v
         };
         function F(M) {
           f.highlightedCode = M, o.hooks.run("before-insert", f), f.element.innerHTML = f.highlightedCode, o.hooks.run("after-highlight", f), o.hooks.run("complete", f), u && u.call(f.element);
@@ -1463,7 +1463,7 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
           delete a.rest;
         }
         var h = new E();
-        return x(h, h.head, s), v(s, h, a, h.head, 0), A(h);
+        return x(h, h.head, s), T(s, h, a, h.head, 0), R(h);
       },
       /**
        * @namespace
@@ -1528,10 +1528,10 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
         language: u
       }, d = a.alias;
       d && (Array.isArray(d) ? Array.prototype.push.apply(h.classes, d) : h.classes.push(d)), o.hooks.run("wrap", h);
-      var T = "";
+      var v = "";
       for (var f in h.attributes)
-        T += " " + f + '="' + (h.attributes[f] || "").replace(/"/g, "&quot;") + '"';
-      return "<" + h.tag + ' class="' + h.classes.join(" ") + '"' + T + ">" + h.content + "</" + h.tag + ">";
+        v += " " + f + '="' + (h.attributes[f] || "").replace(/"/g, "&quot;") + '"';
+      return "<" + h.tag + ' class="' + h.classes.join(" ") + '"' + v + ">" + h.content + "</" + h.tag + ">";
     };
     function b(s, a, u, l) {
       s.lastIndex = a;
@@ -1542,13 +1542,13 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
       }
       return h;
     }
-    function v(s, a, u, l, h, d) {
-      for (var T in u)
-        if (!(!u.hasOwnProperty(T) || !u[T])) {
-          var f = u[T];
+    function T(s, a, u, l, h, d) {
+      for (var v in u)
+        if (!(!u.hasOwnProperty(v) || !u[v])) {
+          var f = u[v];
           f = Array.isArray(f) ? f : [f];
           for (var F = 0; F < f.length; ++F) {
-            if (d && d.cause == T + "," + F)
+            if (d && d.cause == v + "," + F)
               return;
             var C = f[F], M = C.inside, D = !!C.lookbehind, V = !!C.greedy, ne = C.alias;
             if (V && !C.pattern.global) {
@@ -1574,17 +1574,17 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
                   $--, P = s.slice(B, k), L.index -= B;
                 } else if (L = b(q, 0, P, D), !L)
                   continue;
-                var I = L.index, N = L[0], X = P.slice(0, I), W = P.slice(I + N.length), z = B + P.length;
-                d && z > d.reach && (d.reach = z);
+                var I = L.index, N = L[0], H = P.slice(0, I), W = P.slice(I + N.length), X = B + P.length;
+                d && X > d.reach && (d.reach = X);
                 var O = S.prev;
-                X && (O = x(a, O, X), B += X.length), y(a, O, $);
-                var se = new m(T, M ? o.tokenize(N, M) : N, ne, N);
+                H && (O = x(a, O, H), B += H.length), y(a, O, $);
+                var se = new m(v, M ? o.tokenize(N, M) : N, ne, N);
                 if (S = x(a, O, se), W && x(a, S, W), $ > 1) {
                   var G = {
-                    cause: T + "," + F,
-                    reach: z
+                    cause: v + "," + F,
+                    reach: X
                   };
-                  v(s, a, u, S.prev, B, G), d && G.reach > d.reach && (d.reach = G.reach);
+                  T(s, a, u, S.prev, B, G), d && G.reach > d.reach && (d.reach = G.reach);
                 }
               }
             }
@@ -1604,7 +1604,7 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
         l = l.next;
       a.next = l, l.prev = a, s.length -= h;
     }
-    function A(s) {
+    function R(s) {
       for (var a = [], u = s.head.next; u !== s.tail; )
         a.push(u.value), u = u.next;
       return a;
@@ -1620,8 +1620,8 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
       o.manual || o.highlightAll();
     }
     if (!o.manual) {
-      var R = document.readyState;
-      R === "loading" || R === "interactive" && _ && _.defer ? document.addEventListener("DOMContentLoaded", w) : window.requestAnimationFrame ? window.requestAnimationFrame(w) : window.setTimeout(w, 16);
+      var A = document.readyState;
+      A === "loading" || A === "interactive" && _ && _.defer ? document.addEventListener("DOMContentLoaded", w) : window.requestAnimationFrame ? window.requestAnimationFrame(w) : window.setTimeout(w, 16);
     }
     return o;
   }(e);
@@ -2015,18 +2015,18 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
       bat: "batch",
       h: "c",
       tex: "latex"
-    }, o = "data-src-status", m = "loading", b = "loaded", v = "failed", E = "pre[data-src]:not([" + o + '="' + b + '"]):not([' + o + '="' + m + '"])';
-    function x(_, w, R) {
+    }, o = "data-src-status", m = "loading", b = "loaded", T = "failed", E = "pre[data-src]:not([" + o + '="' + b + '"]):not([' + o + '="' + m + '"])';
+    function x(_, w, A) {
       var s = new XMLHttpRequest();
       s.open("GET", _, !0), s.onreadystatechange = function() {
-        s.readyState == 4 && (s.status < 400 && s.responseText ? w(s.responseText) : s.status >= 400 ? R(i(s.status, s.statusText)) : R(c));
+        s.readyState == 4 && (s.status < 400 && s.responseText ? w(s.responseText) : s.status >= 400 ? A(i(s.status, s.statusText)) : A(c));
       }, s.send(null);
     }
     function y(_) {
       var w = /^\s*(\d+)\s*(?:(,)\s*(?:(\d+)\s*)?)?$/.exec(_ || "");
       if (w) {
-        var R = Number(w[1]), s = w[2], a = w[3];
-        return s ? a ? [R, Number(a)] : [R, void 0] : [R, R];
+        var A = Number(w[1]), s = w[2], a = w[3];
+        return s ? a ? [A, Number(a)] : [A, void 0] : [A, A];
       }
     }
     t.hooks.add("before-highlightall", function(_) {
@@ -2038,14 +2038,14 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
       );
       if (w.matches(E)) {
         _.code = "", w.setAttribute(o, m);
-        var R = w.appendChild(document.createElement("CODE"));
-        R.textContent = r;
+        var A = w.appendChild(document.createElement("CODE"));
+        A.textContent = r;
         var s = w.getAttribute("data-src"), a = _.language;
         if (a === "none") {
           var u = (/\.(\w+)$/.exec(s) || [, "none"])[1];
           a = p[u] || u;
         }
-        t.util.setLanguage(R, a), t.util.setLanguage(w, a);
+        t.util.setLanguage(A, a), t.util.setLanguage(w, a);
         var l = t.plugins.autoloader;
         l && l.loadLanguages(a), x(
           s,
@@ -2053,14 +2053,14 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
             w.setAttribute(o, b);
             var d = y(w.getAttribute("data-range"));
             if (d) {
-              var T = h.split(/\r\n?|\n/g), f = d[0], F = d[1] == null ? T.length : d[1];
-              f < 0 && (f += T.length), f = Math.max(0, Math.min(f - 1, T.length)), F < 0 && (F += T.length), F = Math.max(0, Math.min(F, T.length)), h = T.slice(f, F).join(`
+              var v = h.split(/\r\n?|\n/g), f = d[0], F = d[1] == null ? v.length : d[1];
+              f < 0 && (f += v.length), f = Math.max(0, Math.min(f - 1, v.length)), F < 0 && (F += v.length), F = Math.max(0, Math.min(F, v.length)), h = v.slice(f, F).join(`
 `), w.hasAttribute("data-start") || w.setAttribute("data-start", String(f + 1));
             }
-            R.textContent = h, t.highlightElement(R);
+            A.textContent = h, t.highlightElement(A);
           },
           function(h) {
-            w.setAttribute(o, v), R.textContent = h;
+            w.setAttribute(o, T), A.textContent = h;
           }
         );
       }
@@ -2073,13 +2073,13 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
        * @param {ParentNode} [container=document]
        */
       highlight: function(w) {
-        for (var R = (w || document).querySelectorAll(E), s = 0, a; a = R[s++]; )
+        for (var A = (w || document).querySelectorAll(E), s = 0, a; a = A[s++]; )
           t.highlightElement(a);
       }
     };
-    var A = !1;
+    var R = !1;
     t.fileHighlight = function() {
-      A || (console.warn("Prism.fileHighlight is deprecated. Use `Prism.plugins.fileHighlight.highlight` instead."), A = !0), t.plugins.fileHighlight.highlight.apply(this, arguments);
+      R || (console.warn("Prism.fileHighlight is deprecated. Use `Prism.plugins.fileHighlight.highlight` instead."), R = !0), t.plugins.fileHighlight.highlight.apply(this, arguments);
     };
   }();
 })(ee);
@@ -2245,7 +2245,7 @@ delete Prism.languages.c.boolean;
     "class-name": /\b[a-z_]\w*\b(?!\s*::)/i
   }, n.languages.cpp["base-clause"]);
 })(Prism);
-class ve {
+class Te {
   constructor(e) {
     g(this, "container");
     g(this, "project");
@@ -2298,11 +2298,11 @@ class ve {
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
         <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/>
       </svg>
-    `, v = (E) => {
+    `, T = (E) => {
       const x = e[E];
       o = x.source;
-      const y = document.createElement("pre"), A = document.createElement("code");
-      A.className = "language-cpp", A.textContent = x.source, y.appendChild(A), c.innerHTML = "", c.appendChild(y), te.highlightElement(A);
+      const y = document.createElement("pre"), R = document.createElement("code");
+      R.className = "language-cpp", R.textContent = x.source, y.appendChild(R), c.innerHTML = "", c.appendChild(y), te.highlightElement(R);
     };
     p.addEventListener("click", async () => {
       try {
@@ -2315,9 +2315,9 @@ class ve {
     }), e.forEach((E, x) => {
       const y = document.createElement("button");
       y.className = "tab-button", y.textContent = E.name, x === 0 && y.classList.add("active"), y.addEventListener("click", () => {
-        i.querySelectorAll(".tab-button").forEach((A) => A.classList.remove("active")), y.classList.add("active"), v(x);
+        i.querySelectorAll(".tab-button").forEach((R) => R.classList.remove("active")), y.classList.add("active"), T(x);
       }), i.appendChild(y);
-    }), this.codePanel.appendChild(i), this.codePanel.appendChild(p), this.codePanel.appendChild(c), e.length > 0 && v(0);
+    }), this.codePanel.appendChild(i), this.codePanel.appendChild(p), this.codePanel.appendChild(c), e.length > 0 && T(0);
   }
 }
 class xe {
@@ -2358,11 +2358,11 @@ class xe {
       "BufferD"
     ];
     for (const b of r) {
-      const v = this.project.passes[b];
-      v && t.push({
+      const T = this.project.passes[b];
+      T && t.push({
         name: `${b.toLowerCase()}.glsl`,
         isShader: !1,
-        source: v.glslSource
+        source: T.glslSource
       });
     }
     const i = this.project.passes.Image;
@@ -2383,26 +2383,26 @@ class xe {
       }
     });
     const m = (b) => {
-      const v = t[b];
+      const T = t[b];
       if (e.querySelectorAll(".tabbed-tab-button").forEach((E, x) => {
         E.classList.toggle("active", x === b);
-      }), v.isShader)
+      }), T.isShader)
         this.canvasContainer.style.visibility = "visible", this.codeViewer.style.visibility = "hidden", this.copyButton.style.visibility = "hidden";
       else {
-        this.canvasContainer.style.visibility = "hidden", this.codeViewer.style.visibility = "visible", this.copyButton.style.visibility = "visible", c = v.source || "";
+        this.canvasContainer.style.visibility = "hidden", this.codeViewer.style.visibility = "visible", this.copyButton.style.visibility = "visible", c = T.source || "";
         const E = c.split(`
 `), x = document.createElement("pre"), y = document.createElement("div");
-        y.className = "tabbed-line-numbers", y.innerHTML = E.map((w, R) => R + 1).join(`
+        y.className = "tabbed-line-numbers", y.innerHTML = E.map((w, A) => A + 1).join(`
 `);
-        const A = document.createElement("div");
-        A.className = "tabbed-code-content";
+        const R = document.createElement("div");
+        R.className = "tabbed-code-content";
         const _ = document.createElement("code");
-        _.className = "language-cpp", _.textContent = c, A.appendChild(_), x.appendChild(y), x.appendChild(A), this.codeViewer.innerHTML = "", this.codeViewer.appendChild(x), te.highlightElement(_);
+        _.className = "language-cpp", _.textContent = c, R.appendChild(_), x.appendChild(y), x.appendChild(R), this.codeViewer.innerHTML = "", this.codeViewer.appendChild(x), te.highlightElement(_);
       }
     };
-    return t.forEach((b, v) => {
+    return t.forEach((b, T) => {
       const E = document.createElement("button");
-      E.className = "tabbed-tab-button", b.isShader && E.classList.add("shader-tab"), E.textContent = b.name, v === 0 && E.classList.add("active"), E.addEventListener("click", () => m(v)), e.appendChild(E);
+      E.className = "tabbed-tab-button", b.isShader && E.classList.add("shader-tab"), E.textContent = b.name, T === 0 && E.classList.add("active"), E.addEventListener("click", () => m(T)), e.appendChild(E);
     }), e;
   }
 }
@@ -2411,9 +2411,9 @@ function _e(n, e) {
     case "fullscreen":
       return new be(e);
     case "centered":
-      return new Te(e);
-    case "split":
       return new ve(e);
+    case "split":
+      return new Te(e);
     case "tabbed":
       return new xe(e);
   }
@@ -2427,7 +2427,7 @@ async function ye(n, e, t, r) {
     return Q(n, e);
 }
 async function Q(n, e, t) {
-  var m, b, v;
+  var m, b, T;
   const r = `/demos/${n}/image.glsl`;
   if (!(r in e))
     throw new Error(`Demo '${n}' not found. Expected ${r}`);
@@ -2437,7 +2437,7 @@ async function Q(n, e, t) {
     meta: {
       title: o,
       author: ((b = t == null ? void 0 : t.meta) == null ? void 0 : b.author) || null,
-      description: ((v = t == null ? void 0 : t.meta) == null ? void 0 : v.description) || null
+      description: ((T = t == null ? void 0 : t.meta) == null ? void 0 : T.description) || null
     },
     layout: c,
     controls: p,
@@ -2458,7 +2458,7 @@ async function Q(n, e, t) {
   };
 }
 async function we(n, e, t, r) {
-  var _, w, R, s, a, u, l, h;
+  var _, w, A, s, a, u, l, h;
   let i = null;
   if (e.common) {
     const d = `/demos/${n}/${e.common}`;
@@ -2469,19 +2469,19 @@ async function we(n, e, t, r) {
   }
   const c = /* @__PURE__ */ new Set(), p = ["Image", "BufferA", "BufferB", "BufferC", "BufferD"];
   for (const d of p) {
-    const T = e.passes[d];
-    if (T)
+    const v = e.passes[d];
+    if (v)
       for (const f of ["iChannel0", "iChannel1", "iChannel2", "iChannel3"]) {
-        const F = (_ = T.channels) == null ? void 0 : _[f];
+        const F = (_ = v.channels) == null ? void 0 : _[f];
         F && "texture" in F && c.add(F.texture);
       }
   }
   const o = [], m = /* @__PURE__ */ new Map();
   for (const d of c) {
-    const T = `/demos/${n}/${d.replace(/^\.\//, "")}`;
-    if (!(T in r))
-      throw new Error(`Texture not found: ${d} (expected at ${T})`);
-    const f = await r[T](), F = d.split("/").pop().replace(/\.[^.]+$/, "");
+    const v = `/demos/${n}/${d.replace(/^\.\//, "")}`;
+    if (!(v in r))
+      throw new Error(`Texture not found: ${d} (expected at ${v})`);
+    const f = await r[v](), F = d.split("/").pop().replace(/\.[^.]+$/, "");
     o.push({
       name: F,
       source: f,
@@ -2491,22 +2491,22 @@ async function we(n, e, t, r) {
   }
   const b = {};
   for (const d of p) {
-    const T = e.passes[d];
-    if (!T) continue;
+    const v = e.passes[d];
+    if (!v) continue;
     const f = {
       Image: "image.glsl",
       BufferA: "bufferA.glsl",
       BufferB: "bufferB.glsl",
       BufferC: "bufferC.glsl",
       BufferD: "bufferD.glsl"
-    }, F = T.source || f[d], C = `/demos/${n}/${F}`;
+    }, F = v.source || f[d], C = `/demos/${n}/${F}`;
     if (!(C in t))
       throw new Error(`Missing shader file: ${C}`);
     const M = await t[C](), D = [
-      H((w = T.channels) == null ? void 0 : w.iChannel0, m),
-      H((R = T.channels) == null ? void 0 : R.iChannel1, m),
-      H((s = T.channels) == null ? void 0 : s.iChannel2, m),
-      H((a = T.channels) == null ? void 0 : a.iChannel3, m)
+      z((w = v.channels) == null ? void 0 : w.iChannel0, m),
+      z((A = v.channels) == null ? void 0 : A.iChannel1, m),
+      z((s = v.channels) == null ? void 0 : s.iChannel2, m),
+      z((a = v.channels) == null ? void 0 : a.iChannel3, m)
     ];
     b[d] = {
       name: d,
@@ -2516,18 +2516,18 @@ async function we(n, e, t, r) {
   }
   if (!b.Image)
     throw new Error(`Demo '${n}' must have an Image pass`);
-  const v = ((u = e.meta) == null ? void 0 : u.title) || n.split("-").map((d) => d.charAt(0).toUpperCase() + d.slice(1)).join(" "), E = ((l = e.meta) == null ? void 0 : l.author) || null, x = ((h = e.meta) == null ? void 0 : h.description) || null, y = e.layout || "tabbed", A = e.controls ?? !0;
+  const T = ((u = e.meta) == null ? void 0 : u.title) || n.split("-").map((d) => d.charAt(0).toUpperCase() + d.slice(1)).join(" "), E = ((l = e.meta) == null ? void 0 : l.author) || null, x = ((h = e.meta) == null ? void 0 : h.description) || null, y = e.layout || "tabbed", R = e.controls ?? !0;
   return {
     root: `/demos/${n}`,
-    meta: { title: v, author: E, description: x },
+    meta: { title: T, author: E, description: x },
     layout: y,
-    controls: A,
+    controls: R,
     commonSource: i,
     passes: b,
     textures: o
   };
 }
-function H(n, e) {
+function z(n, e) {
   return n ? "buffer" in n ? {
     kind: "buffer",
     buffer: n.buffer,
@@ -2538,7 +2538,7 @@ function H(n, e) {
   } : "keyboard" in n ? { kind: "keyboard" } : { kind: "none" } : { kind: "none" };
 }
 const Fe = "course/day1/sun-earth";
-async function Ae() {
+async function Re() {
   return ye(Fe, /* @__PURE__ */ Object.assign({
     "/demos/course/day1/sun-earth/image.glsl": () => Promise.resolve().then(() => Ce).then((r) => r.default)
   }), /* @__PURE__ */ Object.assign({}), /* @__PURE__ */ Object.assign({}));
@@ -2547,7 +2547,7 @@ async function Le(n) {
   const e = typeof n.container == "string" ? document.querySelector(n.container) : n.container;
   if (!e || !(e instanceof HTMLElement))
     throw new Error(`Container not found: ${n.container}`);
-  const t = await Ae(), r = _e(t.layout, {
+  const t = await Re(), r = _e(t.layout, {
     container: e,
     project: t
   }), i = new Ee({
@@ -2563,9 +2563,41 @@ async function Le(n) {
     }
   };
 }
-const Re = "", Ce = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const Ae = `vec2 normalize_coord(vec2 coord) {
+    vec2 uv = coord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    return uv * 4.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 p = normalize_coord(fragCoord);
+    
+    // Sun follows mouse position
+    vec2 sun = normalize_coord(iMouse.xy);
+    
+    // Earth orbits the sun
+    float orbit_radius = 0.8;
+    vec2 earth = sun + orbit_radius * vec2(cos(iTime), sin(iTime));
+    
+    // Draw sun (larger, yellow)
+    float d_sun = length(p - sun);
+    // Draw earth (smaller, blue)
+    float d_earth = length(p - earth);
+    
+    vec3 color = vec3(0.02, 0.02, 0.05);  // dark background
+    if (d_sun < 0.3) {
+        color = vec3(1.0, 0.9, 0.2);  // yellow sun
+    }
+    if (d_earth < 0.15) {
+        color = vec3(0.2, 0.5, 1.0);  // blue earth
+    }
+    
+    fragColor = vec4(color, 1.0);
+}`, Ce = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  default: Re
+  default: Ae
 }, Symbol.toStringTag, { value: "Module" }));
 export {
   Fe as DEMO_NAME,
