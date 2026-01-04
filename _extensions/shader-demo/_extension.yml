@@ -5,3 +5,4 @@ contributes:
   shortcodes:
     - shader-demo.lua
     - shader-slide.lua
+    - shader-code.lua
