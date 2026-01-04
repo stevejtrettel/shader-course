@@ -88,10 +88,13 @@ $color-caution: #dc3545 !default;
 }
 
 // ===========================================
-// Code Blocks
+// Code Blocks - Large, readable, light on dark
 // ===========================================
 
-.reveal pre {
+// All code containers
+.reveal pre,
+.reveal div.sourceCode,
+.reveal pre.sourceCode {
   width: 100%;
   margin: 0.5em 0;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -99,41 +102,80 @@ $color-caution: #dc3545 !default;
   background: #1e1e1e !important;
 }
 
-.reveal pre code {
-  font-family: $font-family-monospace;
-  font-size: 0.75em !important;
-  line-height: 1.5;
+// All code text - FORCE large white text
+.reveal pre,
+.reveal pre code,
+.reveal pre.sourceCode,
+.reveal pre.sourceCode code,
+.reveal div.sourceCode pre,
+.reveal div.sourceCode pre code,
+.reveal code.sourceCode,
+.reveal pre code span,
+.reveal div.sourceCode pre code span {
+  font-family: $font-family-monospace !important;
+  font-size: 26px !important;
+  line-height: 1.5 !important;
+  color: #e0e0e0 !important;
+  background: #1e1e1e !important;
+}
+
+.reveal pre code,
+.reveal div.sourceCode pre code {
+  display: block;
   padding: 1em 1.2em !important;
   max-height: 600px;
   border-radius: 8px;
-  background: #1e1e1e !important;
-  color: #e0e0e0 !important;
+  overflow: auto;
 }
 
-// Force all code text to be light
-.reveal pre code,
-.reveal pre code span {
-  color: #e0e0e0 !important;
-}
+// Pandoc syntax highlighting classes
+.reveal pre code span.kw,
+.reveal .sourceCode span.kw { color: #569cd6 !important; } // keyword
+.reveal pre code span.dt,
+.reveal .sourceCode span.dt { color: #4ec9b0 !important; } // data type
+.reveal pre code span.dv,
+.reveal .sourceCode span.dv { color: #b5cea8 !important; } // decimal value
+.reveal pre code span.bn,
+.reveal .sourceCode span.bn { color: #b5cea8 !important; } // base n
+.reveal pre code span.fl,
+.reveal .sourceCode span.fl { color: #b5cea8 !important; } // float
+.reveal pre code span.ch,
+.reveal .sourceCode span.ch { color: #ce9178 !important; } // char
+.reveal pre code span.st,
+.reveal .sourceCode span.st { color: #ce9178 !important; } // string
+.reveal pre code span.co,
+.reveal .sourceCode span.co { color: #6a9955 !important; } // comment
+.reveal pre code span.ot,
+.reveal .sourceCode span.ot { color: #9cdcfe !important; } // other
+.reveal pre code span.fu,
+.reveal .sourceCode span.fu { color: #dcdcaa !important; } // function
+.reveal pre code span.cf,
+.reveal .sourceCode span.cf { color: #c586c0 !important; } // control flow
+.reveal pre code span.op,
+.reveal .sourceCode span.op { color: #d4d4d4 !important; } // operator
+.reveal pre code span.pp,
+.reveal .sourceCode span.pp { color: #c586c0 !important; } // preprocessor
+.reveal pre code span.at,
+.reveal .sourceCode span.at { color: #9cdcfe !important; } // attribute
+.reveal pre code span.va,
+.reveal .sourceCode span.va { color: #9cdcfe !important; } // variable
+.reveal pre code span.bu,
+.reveal .sourceCode span.bu { color: #4ec9b0 !important; } // built-in
+.reveal pre code span.cn,
+.reveal .sourceCode span.cn { color: #569cd6 !important; } // constant
+.reveal pre code span.sc,
+.reveal .sourceCode span.sc { color: #d7ba7d !important; } // special char
 
-// Syntax highlighting colors (light on dark)
-.reveal pre code .hljs-keyword,
-.reveal pre code .hljs-type { color: #569cd6 !important; }
-.reveal pre code .hljs-string { color: #ce9178 !important; }
-.reveal pre code .hljs-number { color: #b5cea8 !important; }
-.reveal pre code .hljs-comment { color: #6a9955 !important; }
-.reveal pre code .hljs-function { color: #dcdcaa !important; }
-.reveal pre code .hljs-variable { color: #9cdcfe !important; }
-.reveal pre code .hljs-built_in { color: #4ec9b0 !important; }
-
-// Inline code
-.reveal code {
-  font-family: $font-family-monospace;
-  font-size: 0.85em;
-  background: rgba(0, 0, 0, 0.08);
+// Inline code (in paragraphs and lists, NOT in pre blocks)
+.reveal p > code,
+.reveal li > code,
+.reveal td > code {
+  font-family: $font-family-monospace !important;
+  font-size: 0.9em !important;
+  background: rgba(0, 0, 0, 0.08) !important;
+  color: #c7254e !important;
   padding: 0.15em 0.4em;
   border-radius: 4px;
-  color: #c7254e;
 }
 
 // ===========================================
