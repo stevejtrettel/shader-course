@@ -10,8 +10,8 @@
 
 format:
   revealjs:
-    # Theme
-    theme: [default, styles/slides.scss]
+    # Theme - base only; custom scss added per-file with relative path
+    theme: default
     highlight-style: arrow
 
     # Slide dimensions (16:9 aspect ratio)

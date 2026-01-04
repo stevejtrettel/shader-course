@@ -1,7 +1,9 @@
 ---
 title: "Day 4: Ray Marching"
 subtitle: "GPU-Accelerated Mathematical Illustration"
-format: revealjs
+format:
+  revealjs:
+    theme: [default, ../../styles/slides.scss]
 metadata-files:
   - ../../_slides-metadata.yml
 ---
