@@ -6,22 +6,7 @@ return {
     
     local base_path = "/demos/" .. name
     
-    -- Check if the demo exists
-    local embed_file = "demos/" .. name .. "/embed.js"
-    local screenshot_file = "demos/" .. name .. "/screenshot.png"
-    
-    local function file_exists(path)
-      local f = io.open(path, "r")
-      if f then
-        f:close()
-        return true
-      end
-      return false
-    end
-    
     if quarto.doc.is_format("html") then
-      -- Skip file existence check - it fails on Netlify due to working directory issues
-      -- If the demo doesn't exist, the browser will fail to load embed.js
       local id = "demo-" .. name:gsub("[^%w]", "-")
       
       return pandoc.RawBlock("html", string.format([[
@@ -36,26 +21,12 @@ return {
 ]], id, height, base_path, id, 
         caption ~= "" and string.format("<figcaption>%s</figcaption>", caption) or ""))
     else
-      -- Check for screenshot
-      if not file_exists(screenshot_file) then
-        return pandoc.RawBlock("latex", string.format([[
-\begin{tcolorbox}[colback=yellow!10, colframe=yellow!50!black, title=Missing Demo]
-Shader demo \texttt{%s} not found.
-\end{tcolorbox}
-]], name))
-      end
-      
-      local img = pandoc.Image(
-        {pandoc.Str(caption)},
-        base_path .. "/screenshot.png",
-        caption
-      )
-      img.attributes.width = "75%"
-      
-      return pandoc.Blocks({
-        pandoc.RawBlock("latex", "\\begin{center}"),
-        pandoc.Para({img}),
-        pandoc.RawBlock("latex", "\\end{center}")
+      return pandoc.Para({
+        pandoc.Image(
+          {pandoc.Str(caption)},
+          base_path .. "/screenshot.png",
+          caption
+        )
       })
     end
   end
