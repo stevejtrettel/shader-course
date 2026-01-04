@@ -14,7 +14,7 @@ return {
   <div id="%s" style="width: 100%%; height: %s;"></div>
   <script type="module">
     import { embed } from '%s/embed.js';
-    await embed({ container: '#%s' });
+    await embed({ container: '#%s', layout: 'tabbed' });
   </script>
   %s
 </figure>
