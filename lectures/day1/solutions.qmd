@@ -1,4 +1,4 @@
-# Appendix: Day 1 Homework Solutions
+# Day 1 Homework Solutions
 
 ---
 
@@ -242,7 +242,7 @@ vec2 normalize_coord(vec2 coord) {
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
     vec2 p = normalize_coord(fragCoord);
-    vec2 sun = normalize_coord(iMouse.zw);
+    vec2 sun = normalize_coord(iMouse.xy);
     
     // Earth orbits the sun
     float earth_orbit = 1.2;
@@ -279,16 +279,13 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 **Extension: Solar system with more planets**
 
 ```glsl
-vec2 normalize_coord(vec2 coord) {
-    vec2 uv = coord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
-    return uv * 4.0;
-}
-
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    vec2 p = normalize_coord(fragCoord);
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
+    
     vec2 sun = vec2(0.0, 0.0);  // sun at center
     
     // Planet parameters: orbit radius, speed, size, color
@@ -381,16 +378,12 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 **Example: Superellipse** $|x/a|^n + |y/b|^n = 1$, with exponent $n$ controlled by mouse.
 
 ```glsl
-vec2 normalize_coord(vec2 coord) {
-    vec2 uv = coord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
-    return uv * 4.0;
-}
-
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    vec2 p = normalize_coord(fragCoord);
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
     
     // Map mouse x to exponent n in [0.5, 4.0]
     // n < 1: star shape, n = 1: diamond, n = 2: ellipse, n > 2: rounded rectangle
@@ -498,21 +491,217 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
 ---
 
+### E6. Soft Circles
+
+**Basic anti-aliased circle:**
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
+    
+    float d = length(p);
+    float r = 1.0;
+    float f = d - r;
+    
+    // smoothstep creates a soft transition
+    float t = smoothstep(-0.05, 0.05, f);
+    vec3 color = mix(vec3(1.0, 1.0, 0.0), vec3(0.1, 0.1, 0.3), t);
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+**Circle with glow effect:**
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
+    
+    float d = length(p);
+    float r = 1.0;
+    float f = d - r;
+    
+    vec3 bg = vec3(0.05, 0.05, 0.1);
+    vec3 circle_color = vec3(1.0, 0.8, 0.2);
+    vec3 glow_color = vec3(1.0, 0.5, 0.1);
+    
+    vec3 color = bg;
+    
+    // Outer glow: fades from glow_color to background
+    float glow_width = 0.5;
+    if (f > 0.0 && f < glow_width) {
+        float glow_t = f / glow_width;
+        float glow_intensity = 1.0 - glow_t * glow_t;  // quadratic falloff
+        color = mix(glow_color, bg, 1.0 - glow_intensity * 0.6);
+    }
+    
+    // Circle itself with soft edge
+    float t = smoothstep(-0.05, 0.05, f);
+    color = mix(circle_color, color, t);
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+**Teaching note:** The glow effect uses distance beyond the circle boundary to create a fade. The quadratic falloff (`1.0 - t*t`) gives a more natural-looking glow than linear falloff. Students can experiment with different falloff functions and glow widths.
+
+---
+
+### E7. HSV Experiments
+
+**HSV conversion function (from Color Appendix—copy into your shader):**
+
+```glsl
+vec3 hsv2rgb(vec3 c) {
+    vec3 p = abs(fract(c.xxx + vec3(1.0, 2.0/3.0, 1.0/3.0)) * 6.0 - 3.0);
+    return c.z * mix(vec3(1.0, 1.0, 1.0), clamp(p - 1.0, 0.0, 1.0), c.y);
+}
+```
+
+**Color wheel (hue varies with angle):**
+
+```glsl
+vec3 hsv2rgb(vec3 c) {
+    vec3 p = abs(fract(c.xxx + vec3(1.0, 2.0/3.0, 1.0/3.0)) * 6.0 - 3.0);
+    return c.z * mix(vec3(1.0, 1.0, 1.0), clamp(p - 1.0, 0.0, 1.0), c.y);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
+    
+    float d = length(p);
+    float angle = atan(p.y, p.x);
+    float hue = angle / 6.28318 + 0.5;
+    
+    vec3 color;
+    if (d < 1.5) {
+        color = hsv2rgb(vec3(hue, 1.0, 1.0));
+    } else {
+        color = vec3(0.1, 0.1, 0.2);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+**Rainbow rings (hue varies with distance):**
+
+```glsl
+vec3 hsv2rgb(vec3 c) {
+    vec3 p = abs(fract(c.xxx + vec3(1.0, 2.0/3.0, 1.0/3.0)) * 6.0 - 3.0);
+    return c.z * mix(vec3(1.0, 1.0, 1.0), clamp(p - 1.0, 0.0, 1.0), c.y);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
+    
+    float d = length(p);
+    float hue = fract(d * 0.5);  // repeating rainbow bands
+    
+    vec3 color = hsv2rgb(vec3(hue, 0.8, 0.9));
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+**Animated cycling colors:**
+
+```glsl
+vec3 hsv2rgb(vec3 c) {
+    vec3 p = abs(fract(c.xxx + vec3(1.0, 2.0/3.0, 1.0/3.0)) * 6.0 - 3.0);
+    return c.z * mix(vec3(1.0, 1.0, 1.0), clamp(p - 1.0, 0.0, 1.0), c.y);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
+    
+    float d = length(p);
+    
+    // Hue cycles over time, with spatial variation
+    float hue = fract(iTime * 0.1 + d * 0.2);
+    
+    vec3 color = hsv2rgb(vec3(hue, 0.7, 0.9));
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+**Colored implicit curve:**
+
+```glsl
+vec3 hsv2rgb(vec3 c) {
+    vec3 p = abs(fract(c.xxx + vec3(1.0, 2.0/3.0, 1.0/3.0)) * 6.0 - 3.0);
+    return c.z * mix(vec3(1.0, 1.0, 1.0), clamp(p - 1.0, 0.0, 1.0), c.y);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
+    
+    // Lemniscate
+    float a = 1.5;
+    float r2 = dot(p, p);
+    float F = r2 * r2 - a * a * (p.x * p.x - p.y * p.y);
+    
+    vec2 grad = vec2(
+        4.0 * p.x * r2 - 2.0 * a * a * p.x,
+        4.0 * p.y * r2 + 2.0 * a * a * p.y
+    );
+    
+    float dist = abs(F) / max(length(grad), 0.01);
+    
+    // Hue varies with angle
+    float angle = atan(p.y, p.x);
+    float hue = angle / 6.28318 + 0.5;
+    
+    vec3 curve_color = hsv2rgb(vec3(hue, 1.0, 1.0));
+    vec3 bg = vec3(0.1, 0.1, 0.2);
+    
+    float t = smoothstep(0.0, 0.08, dist);
+    vec3 color = mix(curve_color, bg, t);
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+**Teaching note:** HSV is invaluable for shader art. The key insight is that hue is cyclic (0 and 1 are the same color), so `fract()` naturally creates smooth color cycles. Using angle for hue creates radial color patterns; using distance creates concentric patterns; using time creates animation.
+
+---
+
 ## Challenges
 
 ### H1. Parabola Graphing Calculator
 
 ```glsl
-vec2 normalize_coord(vec2 coord) {
-    vec2 uv = coord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
-    return uv * 4.0;
-}
-
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    vec2 p = normalize_coord(fragCoord);
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
     
     // Map mouse to coefficients
     // a in [-2, 2], b in [-3, 3], c fixed at -1
@@ -575,16 +764,12 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 ### H2. Elliptic Curve Explorer
 
 ```glsl
-vec2 normalize_coord(vec2 coord) {
-    vec2 uv = coord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
-    return uv * 4.0;
-}
-
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    vec2 p = normalize_coord(fragCoord);
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
     
     // Map mouse to (a, b) parameter space
     float a = mix(-3.0, 1.0, iMouse.x / iResolution.x);
@@ -709,16 +894,12 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 ### H5. Inversion
 
 ```glsl
-vec2 normalize_coord(vec2 coord) {
-    vec2 uv = coord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
-    return uv * 4.0;
-}
-
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    vec2 p = normalize_coord(fragCoord);
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
     
     // Mouse controls the line position
     float line_x = mix(0.5, 2.0, iMouse.x / iResolution.x);

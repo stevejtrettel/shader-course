@@ -1,6 +1,6 @@
 ---
 title: "Day 1: Introduction"
-subtitle: "GPU-Accelerated Mathematical Illustration"
+subtitle: "Shaders for Mathematical Visualization"
 format:
   revealjs:
     theme: [default, ../../styles/slides.scss]
@@ -8,184 +8,352 @@ metadata-files:
   - ../../_slides-metadata.yml
 ---
 
-# Introduction to Shaders
+# Introduction
+
+## {background-color="black"}
+
+{{< shader-demo day1/elliptic-family height="700px" >}}
 
 ## What is a Shader?
 
-A shader is a program that runs on the GPU.
+A **shader** is a function from coordinates to colors.
 
 ::: {.incremental}
-- Executes **in parallel** for every pixel
-- Takes coordinates as input
-- Outputs a color
-- Incredibly fast for mathematical visualization
+- You write code that takes a point $(x, y)$
+- It returns an RGB color
+- The GPU runs it for every pixel, in parallel
+- Result: an image, recomputed 60 times per second
 :::
 
-## The Parallel Model
+## The Parallel Constraint
 
 ::: {.callout-note}
 Each pixel's computation must be **independent**.
-
-Pixel $(100, 200)$ cannot ask what color pixel $(100, 199)$ received.
 :::
 
-Every pixel sees the same global inputs—coordinates, time, mouse position—and must determine its color from those alone.
+Pixel $(100, 200)$ cannot ask what color pixel $(100, 199)$ received.
 
-## The Basic Setup
-
-Every fragment shader has this structure:
-
-```glsl
-void mainImage(out vec4 fragColor, in vec2 fragCoord) {
-    // Normalize coordinates to [0, 1]
-    vec2 uv = fragCoord / iResolution.xy;
-
-    // Output a color (RGBA)
-    fragColor = vec4(uv.x, uv.y, 0.0, 1.0);
-}
-```
+Every pixel sees the same global inputs—coordinates, time, mouse—and decides its color alone.
 
 # First Shaders
 
-## Your First Shader {.smaller}
+## The mainImage Function
 
-The simplest shader: make every pixel red.
-
-:::: {.columns}
-::: {.column width="45%"}
 ```glsl
-void mainImage(out vec4 fragColor,
-               in vec2 fragCoord) {
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // fragCoord = pixel coordinates (input)
+    // fragColor = RGBA color (output)
+}
+```
+
+Called once per pixel, every frame.
+
+## Hello World: Red Screen
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
     fragColor = vec4(1.0, 0.0, 0.0, 1.0);
 }
 ```
-:::
-::: {.column width="55%"}
-{{< shader-demo day1/red height="350px" >}}
-:::
-::::
 
-## GLSL Syntax Essentials
+`vec4(red, green, blue, alpha)` — each component in $[0, 1]$.
 
-- **Semicolons** are required
-- **Floats must include a decimal**: `1.0`, not `1`
+## {background-color="black"}
+
+{{< shader-demo day1/red height="700px" >}}
+
+## GLSL Quick Reference
+
+- **Semicolons required** at end of each statement
+- **Floats need decimals**: `1.0` not `1`
 - **Vector types**: `vec2`, `vec3`, `vec4`
+- **Component access**: `.x`, `.y`, `.z`, `.w` (or `.r`, `.g`, `.b`, `.a`)
 - **Arithmetic is component-wise**:
   ```glsl
   vec2(1.0, 2.0) + vec2(3.0, 4.0)  // = vec2(4.0, 6.0)
   ```
-- **Access components** with `.x`, `.y`, `.z`, `.w` (or `.r`, `.g`, `.b`, `.a`)
+
+## Common Mistakes
+
+::: {.callout-warning}
+**Black screen? Check these first:**
+:::
+
+- Forgot semicolon
+- Wrote `1` instead of `1.0`
+- Swapped `fragColor` and `fragCoord`
+- Dividing by zero (check `iResolution` on first frame)
+
+## Uniforms: Global Inputs
+
+| Uniform | Type | Description |
+|---------|------|-------------|
+| `iResolution` | `vec3` | `(width, height, 1)` in pixels |
+| `iTime` | `float` | Seconds since start |
+| `iMouse` | `vec4` | Mouse position and click |
+
+Same value for every pixel.
 
 # Coordinate Systems
 
-## The Standard Boilerplate
+## The Problem
+
+`fragCoord` gives pixel coordinates:
+
+- Origin at bottom-left
+- Ranges from $(0, 0)$ to $(1920, 1080)$ or whatever
+
+We want mathematical coordinates:
+
+- Origin at center
+- Reasonable scale (say, $-2$ to $2$)
+- Circles should look like circles
+
+## The Transformation {.smaller}
 
 ```glsl
 vec2 uv = fragCoord / iResolution.xy;   // normalize to [0,1]
-uv = uv - vec2(0.5, 0.5);               // center origin
+uv = uv - 0.5;                          // center origin
 uv.x *= iResolution.x / iResolution.y;  // aspect correction
-vec2 p = uv * 4.0;                      // scale
+vec2 p = uv * 4.0;                      // scale to [-2, 2]
 ```
 
-From here, `p` is our mathematical coordinate:
+::: {.incremental}
+- **Normalize**: pixel coords → unit square
+- **Center**: shift origin to middle
+- **Aspect correct**: keep circles circular
+- **Scale**: choose your window
+:::
 
-- Centered at origin
-- Aspect-corrected
-- Range roughly $[-2, 2]$
+## {background-color="black"}
 
-## Coordinate Visualization
+{{< shader-demo day1/coordinates height="700px" >}}
 
-{{< shader-demo day1/coordinates height="500px" >}}
+## The Standard Boilerplate
 
-Black at $(0,0)$, red at $(1,0)$, green at $(0,1)$, yellow at $(1,1)$.
+From now on, every shader starts with:
+
+```glsl
+vec2 uv = fragCoord / iResolution.xy;
+uv = uv - 0.5;
+uv.x *= iResolution.x / iResolution.y;
+vec2 p = uv * 4.0;
+```
+
+`p` is our mathematical coordinate.
 
 # Drawing with Distance
 
-## Implicit Curves
+## The Key Idea
 
-We can draw curves using **signed distance functions**.
+Throughout this course: **compute a distance, then threshold it**.
 
-A circle of radius $r$ centered at the origin:
+::: {.incremental}
+- Filled circle: points within distance $r$ of origin
+- Ring: points at distance $\approx r$ from origin  
+- Curve: points at distance $\approx 0$ from the curve
+:::
 
-$$d(x, y) = \sqrt{x^2 + y^2} - r$$
-
-- **Negative** inside the circle
-- **Positive** outside
-- **Zero** on the boundary
-
-## Circle Demo
-
-{{< shader-demo day1/circle height="500px" >}}
-
-## The Circle Shader Code {.smaller}
+## Circle: The Code {.smaller}
 
 ```glsl
-float d = length(p);
-float r = 1.0;
-float f = d - r;
+float d = length(p);        // distance from origin
+float r = 1.0;              // radius
+float f = d - r;            // signed distance to boundary
 
 vec3 color;
 if (f < 0.0) {
     color = vec3(1.0, 1.0, 0.0);  // yellow inside
 } else {
-    color = vec3(0.1, 0.1, 0.3);  // dark blue outside
+    color = vec3(0.1, 0.1, 0.3);  // blue outside
 }
 
 fragColor = vec4(color, 1.0);
 ```
 
-## Implicit Curves: Parabola
+## {background-color="black"}
+
+{{< shader-demo day1/circle height="700px" >}}
+
+## Ring: Small Modification
+
+For a ring, color where $|d - r|$ is small:
+
+```glsl
+float f = abs(d - r) - 0.1;  // distance to the circle itself
+
+if (f < 0.0) {
+    color = vec3(1.0, 1.0, 1.0);  // white ring
+} else {
+    color = vec3(0.1, 0.1, 0.3);  // background
+}
+```
+
+## {background-color="black"}
+
+{{< shader-demo day1/circle-ring height="700px" >}}
+
+# Implicit Curves
+
+## Any Equation $F(x,y) = 0$
+
+The circle was $F = \sqrt{x^2 + y^2} - r$.
+
+But we can draw **any** implicit curve:
+
+```glsl
+float F = /* some expression in p.x, p.y */;
+
+if (abs(F) < 0.1) {
+    color = yellow;  // on the curve
+} else {
+    color = blue;    // off the curve
+}
+```
+
+## Parabola
 
 $F(x,y) = y - x^2$
 
-{{< shader-demo day1/parabola height="450px" >}}
+```glsl
+float F = p.y - p.x * p.x;
+```
 
-## The Thickness Problem
+## {background-color="black"}
 
-The lemniscate $F = (x^2+y^2)^2 - a^2(x^2 - y^2)$:
+{{< shader-demo day1/parabola height="700px" >}}
 
-{{< shader-demo day1/lemniscate-naive height="400px" >}}
+## The Thickness Problem {background-color="black"}
 
-Notice: thickness blows up at the singular point!
+{{< shader-demo day1/lemniscate-naive height="600px" >}}
+
+Thickness blows up at the singular point!
+
+## Why?
+
+$|F| < \varepsilon$ captures points where $F$ is small.
+
+But $F$ isn't distance—it's just some function.
+
+::: {.incremental}
+- Where $|\nabla F|$ is large: $F$ changes fast → thin band
+- Where $|\nabla F|$ is small: $F$ changes slow → thick band
+- Where $\nabla F = 0$ (singularity): infinite thickness
+:::
 
 ## Gradient Correction
 
-Divide by gradient magnitude: $\displaystyle\frac{|F|}{|\nabla F|} < \varepsilon$
+Divide by gradient magnitude:
 
-{{< shader-demo day1/lemniscate-gradient height="400px" >}}
+$$\frac{|F|}{|\nabla F|} < \varepsilon$$
 
-Uniform thickness everywhere.
+```glsl
+vec2 grad = vec2(/* dF/dx */, /* dF/dy */);
+float dist = abs(F) / length(grad);
+
+if (dist < 0.05) { /* on curve */ }
+```
+
+## {background-color="black"}
+
+{{< shader-demo day1/lemniscate-gradient height="700px" >}}
+
+# Softer Edges
+
+## mix and smoothstep
+
+**`mix(a, b, t)`**: linear interpolation
+
+- `t = 0` → returns `a`
+- `t = 1` → returns `b`
+- In between → blends
+
+**`smoothstep(lo, hi, x)`**: smooth threshold
+
+- `x < lo` → returns 0
+- `x > hi` → returns 1
+- In between → smooth S-curve
+
+## Anti-Aliased Circle
+
+```glsl
+float f = length(p) - 1.0;
+
+float t = smoothstep(-0.05, 0.05, f);
+vec3 color = mix(yellow, blue, t);
+```
+
+Smooth transition instead of jagged pixels.
+
+## Cassini Ovals {background-color="black"}
+
+{{< shader-demo day1/lemniscate-animated height="700px" >}}
 
 # Interactivity
 
-## Mouse Input
+## The iMouse Uniform
 
 `iMouse` is a `vec4`:
 
 - `iMouse.xy` — current mouse position (pixels)
 - `iMouse.zw` — position of last click
 
-## Sun and Earth
+To use it: normalize the same way as `fragCoord`.
 
-{{< shader-demo day1/sun-earth height="500px" >}}
+## Helper Function
 
-Drag to move the sun; the earth follows in orbit.
+```glsl
+vec2 normalize_coord(vec2 coord) {
+    vec2 uv = coord / iResolution.xy;
+    uv = uv - 0.5;
+    uv.x *= iResolution.x / iResolution.y;
+    return uv * 4.0;
+}
 
-# What's Next
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 p = normalize_coord(fragCoord);
+    vec2 mouse = normalize_coord(iMouse.xy);
+    // ...
+}
+```
+
+## {background-color="black"}
+
+{{< shader-demo day1/sun-earth height="700px" >}}
+
+Drag to move the sun.
+
+# Wrap Up
+
+## What We Learned
+
+::: {.incremental}
+- Shaders: functions from coordinates to colors, run in parallel
+- Coordinate transformation: center, aspect-correct, scale
+- Distance-based drawing: threshold on distance to shape
+- Implicit curves: any $F(x,y) = 0$
+- Gradient correction: uniform thickness via $|F|/|\nabla F|$
+- Mouse interaction: normalize `iMouse` like `fragCoord`
+:::
 
 ## Day 2 Preview
 
-- Complex number arithmetic in GLSL
+- Complex numbers in GLSL
 - Iteration and escape-time algorithms
-- The Mandelbrot set and Julia sets
-- Circle inversion and Möbius transformations
+- The Mandelbrot set
+- Julia sets
+- (maybe) Circle inversion
 
 ## Exercises
 
-**Checkpoints**: Solid colors, half-planes, circles
+**Checkpoints**: Solid colors, vertical split, off-center circle
 
-**Explorations**: Concentric rings, moon orbit, favorite curves
+**Explorations**: Concentric rings, moon orbit, your favorite curve, HSV color
 
-**Challenges**: Graphing calculator, elliptic curves, smooth blending
+**Challenges**: Graphing calculator, elliptic curves, SDFs, smooth blending
 
 **Projects**: Grid patterns, Fourier epicycles
+
+See the homework handout!

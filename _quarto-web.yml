@@ -11,7 +11,7 @@ website:
     collapse-level: 2
     contents:
       - index.qmd
-      - section: "Day 1: Introduction"
+      - section: "Day 1: Pixels"
         contents:
           - text: "Notes"
             href: lectures/day1/notes.qmd
@@ -19,7 +19,9 @@ website:
             href: lectures/day1/slides.html
           - text: "Code"
             href: lectures/day1/shaders.qmd
-      - section: "Day 2: Dynamics"
+          - text: "Homework"
+            href: lectures/day1/homework.qmd
+      - section: "Day 2: Fractals"
         contents:
           - text: "Notes"
             href: lectures/day2/notes.qmd

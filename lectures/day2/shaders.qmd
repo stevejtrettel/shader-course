@@ -37,7 +37,7 @@ vec3 palette(float t) {
 ```
 
 
-## A1. mandelbrot-zoom
+## mandelbrot-zoom
 
 Animated zoom into the Mandelbrot set with smooth coloring.
 
@@ -85,7 +85,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     
     vec3 color;
     if (iter == max_iter) {
-        color = vec3(0.0);
+        color = vec3(0.0, 0.0, 0.0);
     } else {
         // Smooth coloring
         float log_zn = log(cabs2(z)) / 2.0;
@@ -100,7 +100,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 ```
 
 
-## A2. mandelbrot-bw
+## mandelbrot-bw
 
 Black and white Mandelbrot set.
 
@@ -138,9 +138,9 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     
     vec3 color;
     if (iter == max_iter) {
-        color = vec3(0.0);
+        color = vec3(0.0, 0.0, 0.0);
     } else {
-        color = vec3(1.0);
+        color = vec3(1.0, 1.0, 1.0);
     }
     
     fragColor = vec4(color, 1.0);
@@ -148,7 +148,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 ```
 
 
-## A3. mandelbrot-gray
+## mandelbrot-gray
 
 Mandelbrot set with grayscale iteration coloring.
 
@@ -186,10 +186,10 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     
     vec3 color;
     if (iter == max_iter) {
-        color = vec3(0.0);
+        color = vec3(0.0, 0.0, 0.0);
     } else {
         float t = float(iter) / float(max_iter);
-        color = vec3(t);
+        color = vec3(t, t, t);
     }
     
     fragColor = vec4(color, 1.0);
@@ -197,7 +197,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 ```
 
 
-## A4. mandelbrot-color
+## mandelbrot-color
 
 Mandelbrot set with cosine palette coloring.
 
@@ -243,7 +243,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     
     vec3 color;
     if (iter == max_iter) {
-        color = vec3(0.0);
+        color = vec3(0.0, 0.0, 0.0);
     } else {
         float t = float(iter) / float(max_iter);
         color = palette(t);
@@ -254,9 +254,9 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 ```
 
 
-## A5. julia-static
+## julia-static
 
-Julia set with fixed parameter (black and white).
+Julia set with fixed parameter.
 
 ```glsl
 vec2 cmul(vec2 z, vec2 w) {
@@ -278,7 +278,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
     vec2 p = normalize_coord(fragCoord);
     
-    // Fixed parameter - try different values!
+    // Fixed parameter
     vec2 c = vec2(-0.7, 0.27015);
     
     // z starts at pixel position
@@ -294,9 +294,9 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     
     vec3 color;
     if (iter == max_iter) {
-        color = vec3(0.0);  // In the set: black
+        color = vec3(0.0, 0.0, 0.0);
     } else {
-        color = vec3(1.0);  // Escaped: white
+        color = vec3(1.0, 1.0, 1.0);
     }
     
     fragColor = vec4(color, 1.0);
@@ -304,9 +304,9 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 ```
 
 
-## A6. julia-explorer
+## julia-explorer
 
-Interactive Julia set explorer: gray Mandelbrot as parameter space background, black Julia set overlaid, red dot shows current c.
+Interactive Julia set explorer: Mandelbrot as parameter space, Julia set overlaid.
 
 ```glsl
 vec2 cmul(vec2 z, vec2 w) {
@@ -340,7 +340,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     // Mandelbrot iteration (for background)
     vec2 mc = p;
     mc.x -= 0.5;
-    vec2 mz = vec2(0.0);
+    vec2 mz = vec2(0.0, 0.0);
     int m_iter;
     for (m_iter = 0; m_iter < 100; m_iter++) {
         if (cabs2(mz) > 4.0) break;
@@ -356,17 +356,17 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     }
     
     // Color: light background, Mandelbrot in gray, Julia in black
-    vec3 color = vec3(0.9);  // light background (escaped both)
+    vec3 color = vec3(0.9, 0.9, 0.9);
     if (m_iter == 100) {
-        color = vec3(0.6);  // Mandelbrot set in gray
+        color = vec3(0.6, 0.6, 0.6);
     }
     if (j_iter == 100) {
-        color = vec3(0.0);  // Julia set in black
+        color = vec3(0.0, 0.0, 0.0);
     }
     
-    // Draw red dot at c position (in Mandelbrot coordinates)
+    // Draw red dot at c position
     vec2 c_pos = c;
-    c_pos.x += 0.5;  // undo the offset we applied to c
+    c_pos.x += 0.5;
     if (length(p - c_pos) < 0.05) {
         color = vec3(1.0, 0.0, 0.0);
     }
@@ -376,7 +376,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 ```
 
 
-## A7. inversion-toggle
+## inversion-toggle
 
 Circle inversion visualization with toggling.
 
@@ -427,7 +427,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 ```
 
 
-## A8. inversion-grid
+## inversion-grid
 
 Circle inversion of a grid.
 
@@ -472,7 +472,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 ```
 
 
-## A9. inversion-moving
+## inversion-moving
 
 Inversion through a moving circle.
 
@@ -520,9 +520,9 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 ```
 
 
-## A10. apollonian-setup
+## apollonian-setup
 
-The four mutually tangent circles (no iteration).
+The four mutually tangent circles.
 
 ```glsl
 vec2 normalize_coord(vec2 fragCoord) {
@@ -545,27 +545,17 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
     vec2 p = normalize_coord(fragCoord);
     
-    // Three mutually tangent inner circles plus outer circle
-    // For three circles of radius r centered at vertices of equilateral triangle:
-    // - Side length of triangle = 2r (so circles touch)
-    // - Circumradius of triangle = 2r / sqrt(3)
-    // - Outer circle radius = circumradius + r
-    
     float r = 1.0;
     float triSide = 2.0 * r;
     float circumradius = triSide / sqrt(3.0);
     
-    // Inner circles at vertices of equilateral triangle
     Circle c1 = Circle(vec2(0.0, circumradius), r);
     Circle c2 = Circle(vec2(-circumradius * 0.866, -circumradius * 0.5), r);
     Circle c3 = Circle(vec2(circumradius * 0.866, -circumradius * 0.5), r);
-    
-    // Outer circle tangent to all three from outside
     Circle outer = Circle(vec2(0.0, 0.0), circumradius + r);
     
     vec3 color = vec3(0.1, 0.1, 0.15);
     
-    // Draw all four circles
     if (distToCircle(p, c1) < 0.03) color = vec3(1.0, 0.3, 0.3);
     if (distToCircle(p, c2) < 0.03) color = vec3(0.3, 1.0, 0.3);
     if (distToCircle(p, c3) < 0.03) color = vec3(0.3, 0.3, 1.0);
@@ -576,7 +566,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 ```
 
 
-## A11. apollonian-iterated
+## apollonian-iterated
 
 Full Apollonian gasket with iteration.
 
@@ -618,7 +608,6 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
     vec2 p = normalize_coord(fragCoord);
     
-    // Setup circles with correct geometry
     float r = 1.0;
     float triSide = 2.0 * r;
     float circumradius = triSide / sqrt(3.0);
@@ -628,7 +617,6 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     Circle c3 = Circle(vec2(circumradius * 0.866, -circumradius * 0.5), r);
     Circle outer = Circle(vec2(0.0, 0.0), circumradius + r);
     
-    // Iterate inversions
     int max_iter = 50;
     int iter;
     
@@ -646,21 +634,19 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
         }
     }
     
-    // Color by iteration count
     float t = float(iter) / float(max_iter);
     vec3 color = palette(t);
     
-    // Draw circle boundaries
     float dMin = min(min(distToCircle(p, c1), distToCircle(p, c2)), 
                      min(distToCircle(p, c3), distToCircle(p, outer)));
-    if (dMin < 0.02) color = vec3(1.0);
+    if (dMin < 0.02) color = vec3(1.0, 1.0, 1.0);
     
     fragColor = vec4(color, 1.0);
 }
 ```
 
 
-## A12. apollonian-final
+## apollonian-final
 
 Apollonian gasket with coloring emphasizing the limit set.
 
@@ -690,7 +676,6 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
     vec2 p = normalize_coord(fragCoord);
     
-    // Setup circles with correct geometry
     float r = 1.0;
     float triSide = 2.0 * r;
     float circumradius = triSide / sqrt(3.0);
@@ -700,7 +685,6 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     Circle c3 = Circle(vec2(circumradius * 0.866, -circumradius * 0.5), r);
     Circle outer = Circle(vec2(0.0, 0.0), circumradius + r);
     
-    // Iterate inversions
     int max_iter = 100;
     int iter;
     
@@ -718,7 +702,6 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
         }
     }
     
-    // Color by iteration count, emphasizing the limit set
     float t = float(iter) / float(max_iter);
     vec3 color = 30.0 * vec3(pow(t, 2.0));
     

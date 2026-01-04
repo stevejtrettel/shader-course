@@ -1,0 +1,169 @@
+# Day 2: Fractals — Homework
+
+## Checkpoints
+
+These verify you've understood the core material.
+
+**C1. Julia Set.** Modify the Mandelbrot shader to render a Julia set. Fix `c = vec2(-0.7, 0.27015)` and initialize `z` from the pixel position instead of zero. Verify you get a connected fractal (this $c$ is inside $\mathcal{M}$).
+
+**C2. Julia Mouse.** Make the Julia parameter `c` follow the mouse. Map `iMouse.xy` to the region $[-2, 2] \times [-2, 2]$. Drag across the Mandelbrot boundary and watch the Julia set transition from connected to dust.
+
+**C3. Cubic Mandelbrot.** Change the iteration from $z^2 + c$ to $z^3 + c$:
+```glsl
+vec2 ccube(vec2 z) {
+    return cmul(cmul(z, z), z);
+}
+```
+What rotational symmetry does the cubic Mandelbrot have? Why?
+
+**C4. Colorize a Fractal.** Take the black-and-white Mandelbrot or Julia shader and add color using the cosine palette. Try different values of `d` to shift the hues.
+
+**C5. Apollonian Animation.** Animate the Apollonian gasket by letting the iteration count grow with time:
+```glsl
+int max_iter = int(mod(iTime * 5.0, 50.0)) + 1;
+```
+Watch each iteration reveal a new layer of circles.
+
+
+## Explorations
+
+These extend the day's topics in interesting directions.
+
+**E1. Julia Animation.** Animate `c` along the boundary of the main cardioid:
+```glsl
+vec2 cardioid(float t) {
+    vec2 eit = vec2(cos(t), sin(t));
+    return cmul(eit, (vec2(2.0, 0.0) - eit) / 4.0);
+}
+vec2 c = cardioid(iTime * 0.5);
+```
+Every point on the cardioid gives a Julia set with a parabolic fixed point—right at the edge of connectivity. What do you observe about the Julia sets as $c$ traces this curve?
+
+**E2. Other Escape-Time Fractals.** The Mandelbrot iteration $z \mapsto z^2 + c$ is one choice among many. Implement these variations by figuring out how to translate the math into GLSL:
+
+- **Burning Ship**: $z_{n+1} = (\text{Re}(z_n^2) + i|\text{Im}(z_n^2)|) + c$
+- **Tricorn**: $z_{n+1} = \bar{z}_n^2 + c$ where $\bar{z}$ is the complex conjugate
+- **Celtic**: $z_{n+1} = (|\text{Re}(z_n^2)| + i\,\text{Im}(z_n^2)) + c$
+
+The escape condition $|z| > 2$ still applies. Each has its own character—the Burning Ship has a distinctive "ship" shape when rotated.
+
+**E3. Apollonian Variations.** The symmetric configuration we used is just one Apollonian gasket. Try:
+- Three inner circles with different radii (they don't have to match)
+- Circles that overlap slightly instead of being tangent
+
+What happens to the gasket structure? Does iteration still produce a fractal?
+
+**E4. Sierpinski Carpet.** The Sierpinski carpet is another iteration-based fractal. Divide the unit square into a 3×3 grid and remove the center cell. Repeat on the 8 remaining cells, forever.
+
+We render it the same way we rendered the Apollonian gasket: iterate a transformation and count steps. At each iteration, check which cell the point is in:
+
+```glsl
+int ix = int(floor(p.x * 3.0));
+int iy = int(floor(p.y * 3.0));
+```
+
+If `ix == 1 && iy == 1`, the point is in the removed center cell. Otherwise, zoom into that cell by transforming the coordinates:
+
+```glsl
+p = p * 3.0 - vec2(float(ix), float(iy));
+```
+
+This maps the cell back to the unit square, ready for the next iteration. Points that hit the center "escape"; points in the Sierpinski set never do. Color by iteration count.
+
+Start with `p` in $[0, 1] \times [0, 1]$. What happens if you start with a larger region and let points outside the unit square escape immediately?
+
+**E5. Sierpinski Triangle.** The Sierpinski triangle works similarly. Use a right triangle with vertices at $(0,0)$, $(1,0)$, and $(0,1)$. Divide it into four sub-triangles by connecting the midpoints of each edge. Remove the middle one (which points downward). Repeat on the three corner triangles.
+
+The region check: a point $(x, y)$ in the unit triangle falls into one of four regions:
+- **Bottom-left corner**: $x + y < 0.5$
+- **Bottom-right corner**: $x > 0.5$
+- **Top corner**: $y > 0.5$  
+- **Middle (removed)**: everything else
+
+The transformations zoom into each corner. They all scale by 2, with different offsets:
+
+```glsl
+if (x + y < 0.5) {
+    p = p * 2.0;                      // bottom-left
+} else if (p.x > 0.5) {
+    p = p * 2.0 - vec2(1.0, 0.0);     // bottom-right
+} else if (p.y > 0.5) {
+    p = p * 2.0 - vec2(0.0, 1.0);     // top
+} else {
+    break;  // middle—escaped
+}
+```
+
+Color by iteration count. Points in the Sierpinski triangle take many iterations; points in the removed regions escape quickly.
+
+
+## Challenges
+
+These require ideas beyond the lecture.
+
+**H1. Julia Explorer (Full).** Display the Mandelbrot set and the Julia set for the current mouse position, side by side or overlaid. This demonstrates the Mandelbrot-Julia correspondence directly: as you drag through the parameter space, you see the corresponding Julia set change in real time.
+
+**H2. Newton Fractal.** Newton's method finds roots by iterating $z \mapsto z - f(z)/f'(z)$. For $f(z) = z^3 - 1$:
+$$z_{n+1} = \frac{2z_n^3 + 1}{3z_n^2}$$
+
+This converges to one of the three cube roots of unity: $1$, $e^{2\pi i/3}$, $e^{4\pi i/3}$. Color each pixel by which root its orbit approaches (check $|z^3 - 1| < \epsilon$).
+
+You'll need complex division:
+```glsl
+vec2 cdiv(vec2 z, vec2 w) {
+    float denom = dot(w, w);
+    return vec2(z.x*w.x + z.y*w.y, z.y*w.x - z.x*w.y) / denom;
+}
+```
+
+The basin boundaries form a fractal—every point on the boundary has all three basins nearby.
+
+**H3. Higher-Power Mandelbrot.** Implement $z^n + c$ for arbitrary $n$ using polar form: if $z = re^{i\theta}$, then $z^n = r^n e^{in\theta}$.
+
+```glsl
+vec2 cpow(vec2 z, float n) {
+    float r = length(z);
+    float theta = atan(z.y, z.x);
+    return pow(r, n) * vec2(cos(n * theta), sin(n * theta));
+}
+```
+
+Integer $n$ gives $n$-fold symmetry. What happens for non-integer $n$? Try $n = 2.5$ and look for discontinuities—where do they come from?
+
+**H4. Escape Radius Proofs.** Prove the two facts that justify the escape-time algorithm:
+
+1. If $|c| > 2$, then $c \notin \mathcal{M}$.
+2. If $|z_n| > 2$ for some $n$ (with $|c| \leq 2$), the orbit escapes to infinity.
+
+Hint: Show that when $|z| > \max(|c|, 2)$, we have $|z^2 + c| \geq |z|^2 - |c| > |z|$. Use this to prove escape is monotonic once it starts.
+
+
+## Projects
+
+**Project 1: Grid of Julia Sets**
+
+Create a grid where each cell shows the Julia set for a different parameter $c$. The cell's position in the grid determines $c$:
+
+```glsl
+float grid_size = 8.0;
+vec2 cell_id = floor((p + 2.0) * grid_size / 4.0);
+vec2 cell_p = fract((p + 2.0) * grid_size / 4.0) * 4.0 - 2.0;
+
+vec2 c = (cell_id / grid_size) * 4.0 - 2.0;
+vec2 z = cell_p;
+```
+
+When you zoom out, the grid reveals the Mandelbrot set: cells with $c \in \mathcal{M}$ show connected Julia sets, cells with $c \notin \mathcal{M}$ show dust. This is the Mandelbrot-Julia correspondence made visible.
+
+**Project 2: Orbit Visualization**
+
+Instead of coloring by iteration count, visualize the actual orbit. Let the mouse control the starting point $z_0$:
+
+- Compute iterates $z_0, z_1, \ldots, z_N$
+- Draw a small circle at each iterate
+- Connect consecutive iterates with line segments (use the segment SDF from Day 1)
+- Color by iteration index—early iterates blue, later iterates red
+
+Start with the Mandelbrot/Julia iteration: for a fixed $c$ inside $\mathcal{M}$, drag $z_0$ around. Bounded orbits spiral toward an attractor; escaping orbits fly outward. You'll see sensitive dependence—nearby starting points can have very different fates.
+
+Once it works for complex dynamics, try the same visualization for the Apollonian gasket or Sierpinski carpet. Watch the point bounce between inversions or zoom into sub-cells. The iteration logic differs but the visualization technique is identical.

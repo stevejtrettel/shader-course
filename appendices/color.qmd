@@ -1,0 +1,161 @@
+# Appendix: Color
+
+This appendix collects techniques for mapping scalar values to colors. These are tools you copy, paste, and tweak as needed.
+
+
+## RGB Basics
+
+A color in GLSL is a `vec3` with red, green, and blue components, each ranging from 0.0 to 1.0:
+
+```glsl
+vec3 red = vec3(1.0, 0.0, 0.0);
+vec3 white = vec3(1.0, 1.0, 1.0);
+vec3 gray = vec3(0.5, 0.5, 0.5);
+vec3 yellow = vec3(1.0, 1.0, 0.0);
+```
+
+Mixing colors linearly often produces muddy results. For smooth color gradients, HSV or cosine palettes usually work better.
+
+
+## HSV
+
+HSV (hue, saturation, value) separates color into intuitive components:
+
+- **Hue**: the color itself, as an angle around a circle (0 = red, 0.33 = green, 0.67 = blue, 1 = red again)
+- **Saturation**: intensity, from gray (0) to vivid (1)
+- **Value**: brightness, from black (0) to full (1)
+
+This is useful when you want to cycle through colors smoothly. Incrementing hue gives a rainbow; keeping hue fixed while varying value gives natural shading.
+
+```glsl
+vec3 hsv2rgb(vec3 c) {
+    vec3 p = abs(fract(c.xxx + vec3(0.0, 2.0/3.0, 1.0/3.0)) * 6.0 - 3.0);
+    return c.z * mix(vec3(1.0, 1.0, 1.0), clamp(p - 1.0, 0.0, 1.0), c.y);
+}
+```
+
+Usage:
+
+```glsl
+float hue = 0.6;        // blue
+float saturation = 1.0; // vivid
+float value = 0.8;      // fairly bright
+vec3 color = hsv2rgb(vec3(hue, saturation, value));
+```
+
+To cycle through colors based on a scalar `t`:
+
+```glsl
+vec3 color = hsv2rgb(vec3(t, 1.0, 1.0));  // rainbow
+```
+
+### Common Patterns
+
+**Rainbow based on angle** (color wheel):
+
+```glsl
+float angle = atan(p.y, p.x);           // -π to π
+float hue = angle / 6.28318 + 0.5;      // normalize to [0, 1]
+vec3 color = hsv2rgb(vec3(hue, 1.0, 1.0));
+```
+
+**Rainbow based on distance** (concentric rings):
+
+```glsl
+float hue = fract(length(p) * 0.5);     // repeating bands
+vec3 color = hsv2rgb(vec3(hue, 0.8, 0.9));
+```
+
+**Animated color cycling**:
+
+```glsl
+vec3 color = hsv2rgb(vec3(fract(iTime * 0.2), 0.8, 1.0));
+```
+
+**Escape-time coloring** (for fractals):
+
+```glsl
+float hue = fract(float(iterations) * 0.05);
+vec3 color = hsv2rgb(vec3(hue, 0.8, 0.9));
+```
+
+
+## Cosine Palettes
+
+A cosine palette generates smooth color gradients from a simple formula:
+
+```glsl
+vec3 palette(float t) {
+    vec3 a = vec3(0.5, 0.5, 0.5);
+    vec3 b = vec3(0.5, 0.5, 0.5);
+    vec3 c = vec3(1.0, 1.0, 1.0);
+    vec3 d = vec3(0.00, 0.33, 0.67);
+    return a + b * cos(6.28318 * (c * t + d));
+}
+```
+
+Each color channel is a cosine wave. The parameters control:
+
+- `a`: the center (vertical offset) of each wave
+- `b`: the amplitude of each wave
+- `c`: the frequency (how many cycles as t goes 0 to 1)
+- `d`: the phase offset for each channel
+
+The default values above produce a palette cycling through blue, pink, orange, and back. Changing `d` shifts which colors appear:
+
+| `d` | Character |
+|-----|-----------|
+| `vec3(0.0, 0.1, 0.2)` | Cool blues and cyans |
+| `vec3(0.3, 0.2, 0.2)` | Warm oranges and reds |
+| `vec3(0.0, 0.5, 0.5)` | Greens and magentas |
+
+For more palettes and an interactive explorer, see Inigo Quilez's article: https://iquilezles.org/articles/palettes/
+
+
+## Colormaps for Scalar Fields
+
+When visualizing data like temperature or wave amplitude, the choice of colormap matters.
+
+**Sequential** colormaps go from dark to light (or vice versa). Good for data with a natural ordering:
+
+```glsl
+// Simple black-to-white
+vec3 color = vec3(t, t, t);
+
+// Black through blue to white (cold-to-hot feel)
+vec3 color = mix(vec3(0.0, 0.0, 0.0), vec3(0.5, 0.7, 1.0), t);
+```
+
+**Diverging** colormaps have a neutral center and different colors at each extreme. Good for data with a meaningful midpoint (zero velocity, equilibrium temperature):
+
+```glsl
+// Blue (negative) - white (zero) - red (positive)
+// Assumes t is remapped so 0.5 = zero
+vec3 color;
+if (t < 0.5) {
+    color = mix(vec3(0.0, 0.0, 1.0), vec3(1.0, 1.0, 1.0), t * 2.0);
+} else {
+    color = mix(vec3(1.0, 1.0, 1.0), vec3(1.0, 0.0, 0.0), (t - 0.5) * 2.0);
+}
+```
+
+For scientific visualization, perceptually uniform colormaps (like viridis) are preferable, but harder to implement in a shader. The cosine palette is a reasonable compromise.
+
+
+## Smooth Transitions
+
+Use `mix` and `smoothstep` to blend between colors:
+
+```glsl
+// Linear blend
+vec3 color = mix(colorA, colorB, t);
+
+// Smooth blend (ease in/out)
+vec3 color = mix(colorA, colorB, smoothstep(0.0, 1.0, t));
+
+// Blend based on distance from boundary
+float t = smoothstep(-0.05, 0.05, signedDistance);
+vec3 color = mix(insideColor, outsideColor, t);
+```
+
+This eliminates hard edges and creates anti-aliased boundaries between regions.
