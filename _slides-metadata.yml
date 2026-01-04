@@ -1,0 +1,72 @@
+# ===========================================
+# Shared Slide Configuration
+# GPU-Accelerated Mathematical Illustration
+# ===========================================
+#
+# Include in slides.qmd files with:
+#   metadata-files:
+#     - ../../_slides-metadata.yml
+#
+
+format:
+  revealjs:
+    # Theme - base only; custom scss added per-file with relative path
+    theme: default
+    highlight-style: arrow
+
+    # Slide dimensions (16:9 aspect ratio)
+    width: 1600
+    height: 900
+    margin: 0.08
+
+    # Navigation
+    controls: true
+    controls-layout: bottom-right
+    controls-tutorial: false
+    progress: true
+    hash: true
+    navigation-mode: linear
+
+    # Slide numbers: 'c' = current, 't' = total
+    slide-number: c/t
+    show-slide-number: all
+
+    # Transitions
+    transition: fade
+    transition-speed: fast
+
+    # Content behavior
+    center: false           # Top-align content (better for code/math)
+    auto-stretch: true      # Stretch content to fill slide
+
+    # Code settings
+    code-line-numbers: false
+    code-overflow: scroll
+    code-copy: true
+
+    # Incremental lists (can override per-slide)
+    incremental: false
+
+    # Touch/mobile
+    touch: true
+    loop: false
+
+    # Embedded content
+    embed-resources: false  # Keep demos external
+    self-contained: false
+
+    # PDF export settings
+    pdf-separate-fragments: false
+    pdf-max-pages-per-slide: 1
+
+    # Plugins
+    # chalkboard: true      # Uncomment for drawing capability
+    # multiplex: false      # For synchronized presentations
+
+# Execute code blocks
+execute:
+  echo: true
+  warning: false
+
+# Don't number sections in slides (cleaner)
+number-sections: false

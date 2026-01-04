@@ -1,16 +1,21 @@
 ---
-title: "Day 2"
-format: revealjs
+title: "Day 2: Dynamics & Iteration"
+subtitle: "GPU-Accelerated Mathematical Illustration"
+format:
+  revealjs:
+    theme: [default, ../../styles/slides.scss]
+metadata-files:
+  - ../../_slides-metadata.yml
 ---
 
-# Day 2: Dynamics & Iteration
+# Complex Dynamics
 
 ## Complex Numbers in GLSL
 
 GLSL doesn't have native complex numbers, but `vec2` works perfectly:
 
 ```glsl
-// Complex multiplication
+// Complex multiplication: (a + bi)(c + di) = (ac - bd) + (ad + bc)i
 vec2 cmul(vec2 a, vec2 b) {
     return vec2(
         a.x * b.x - a.y * b.y,
@@ -19,7 +24,27 @@ vec2 cmul(vec2 a, vec2 b) {
 }
 ```
 
-## The Mandelbrot Set
+## More Complex Operations
+
+```glsl
+// Complex division
+vec2 cdiv(vec2 a, vec2 b) {
+    float denom = dot(b, b);
+    return vec2(
+        dot(a, b),
+        a.y * b.x - a.x * b.y
+    ) / denom;
+}
+
+// Complex exponential
+vec2 cexp(vec2 z) {
+    return exp(z.x) * vec2(cos(z.y), sin(z.y));
+}
+```
+
+# The Mandelbrot Set
+
+## The Iteration
 
 Iterate $z_{n+1} = z_n^2 + c$ and check for escape:
 
@@ -34,18 +59,42 @@ int mandelbrot(vec2 c, int maxIter) {
 }
 ```
 
+## Why $|z| > 2$?
+
+::: {.callout-tip}
+If $|z| > 2$, then $|z^2 + c| \geq |z|^2 - |c| > 2|z| - |c|$
+
+For points in our view window, once $|z| > 2$, the orbit escapes to infinity.
+:::
+
 ## Mandelbrot Visualization
 
-{{< shader-demo day2/mandelbrot-color >}}
+{{< shader-demo day2/mandelbrot-color height="550px" >}}
 
-## Julia Sets
+# Julia Sets
+
+## The Relationship
 
 Same iteration, different perspective:
 
-- **Mandelbrot**: vary $c$, start at $z_0 = 0$
-- **Julia**: fix $c$, vary starting $z_0$
+| Set | Varies | Fixed |
+|-----|--------|-------|
+| **Mandelbrot** | $c$ | $z_0 = 0$ |
+| **Julia** | $z_0$ | $c$ |
 
-{{< shader-demo day2/julia-explorer >}}
+Each point $c$ in the Mandelbrot set corresponds to a connected Julia set.
+
+## Julia Set Explorer
+
+{{< shader-demo day2/julia-explorer height="500px" >}}
+
+Drag to change the parameter $c$.
+
+## Zooming In
+
+{{< shader-demo day2/mandelbrot-zoom height="550px" >}}
+
+# Möbius Transformations
 
 ## Circle Inversion
 
@@ -53,4 +102,39 @@ Inversion through a circle of radius $r$:
 
 $$z \mapsto \frac{r^2}{\bar{z}}$$
 
-{{< shader-demo day2/inversion-grid >}}
+In GLSL:
+
+```glsl
+vec2 invert(vec2 z, float r) {
+    return r * r * z / dot(z, z);
+}
+```
+
+## Inversion Demo
+
+{{< shader-demo day2/inversion-grid height="500px" >}}
+
+## Properties of Inversion
+
+::: {.incremental}
+- Maps circles to circles (or lines)
+- Maps lines through origin to themselves
+- Maps lines not through origin to circles through origin
+- Conformal (preserves angles)
+:::
+
+# What's Next
+
+## Day 3 Preview
+
+- Symmetry and reflection groups
+- The folding algorithm
+- Square and triangle tilings
+- Hyperbolic geometry in the Poincaré disk
+- Hyperbolic tilings
+
+## Exercises
+
+**Explorations**: Custom coloring, smooth iteration, burning ship
+
+**Challenges**: Newton fractals, orbit traps, deep zooming

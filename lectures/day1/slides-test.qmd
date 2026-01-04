@@ -1,0 +1,12 @@
+---
+title: "Test"
+format: revealjs
+---
+
+##
+
+{{< shader-demo day1/red >}}
+
+##
+
+{{< shader-demo day1/circle >}}

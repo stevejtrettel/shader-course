@@ -1,8 +1,219 @@
 ---
-title: "Day 4"
-format: revealjs
+title: "Day 4: Ray Marching"
+subtitle: "GPU-Accelerated Mathematical Illustration"
+format:
+  revealjs:
+    theme: [default, ../../styles/slides.scss]
+metadata-files:
+  - ../../_slides-metadata.yml
 ---
 
-# Day 4: Rendering
+# From 2D to 3D
 
-## How to render a scene
+## The Challenge
+
+In 2D: each pixel has coordinates $(x, y)$, we compute a color.
+
+In 3D: we need to figure out **what the pixel is looking at**.
+
+This requires simulating how light travels—**ray tracing**.
+
+## Ray Marching
+
+Instead of solving ray-surface intersections analytically:
+
+::: {.incremental}
+1. Cast a ray from the camera through each pixel
+2. March along the ray in small steps
+3. Use a **signed distance function** to know when we hit something
+4. The SDF tells us: how far is the nearest surface?
+:::
+
+# Signed Distance Functions
+
+## The 3D SDF
+
+For a sphere of radius $r$ centered at origin:
+
+```glsl
+float sdSphere(vec3 p, float r) {
+    return length(p) - r;
+}
+```
+
+Same idea as 2D, just with `vec3`.
+
+## More 3D Primitives
+
+```glsl
+// Box with half-dimensions b
+float sdBox(vec3 p, vec3 b) {
+    vec3 q = abs(p) - b;
+    return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
+}
+
+// Infinite cylinder along y-axis
+float sdCylinder(vec3 p, float r) {
+    return length(p.xz) - r;
+}
+```
+
+## Combining Shapes
+
+```glsl
+// Union: the closer surface wins
+float opUnion(float d1, float d2) {
+    return min(d1, d2);
+}
+
+// Intersection: both must be inside
+float opIntersection(float d1, float d2) {
+    return max(d1, d2);
+}
+
+// Subtraction: carve d2 out of d1
+float opSubtraction(float d1, float d2) {
+    return max(d1, -d2);
+}
+```
+
+# The Ray March Loop
+
+## Basic Algorithm
+
+```glsl
+float raymarch(vec3 ro, vec3 rd) {
+    float t = 0.0;
+    for (int i = 0; i < MAX_STEPS; i++) {
+        vec3 p = ro + rd * t;
+        float d = scene(p);
+        if (d < EPSILON) return t;  // hit!
+        t += d;
+        if (t > MAX_DIST) break;    // too far
+    }
+    return -1.0;  // no hit
+}
+```
+
+## Why It Works
+
+::: {.callout-tip}
+The SDF tells us the distance to the **nearest** surface.
+
+We can safely step that far without missing anything!
+:::
+
+This is called **sphere tracing**.
+
+# Lighting
+
+## Surface Normals
+
+The gradient of the SDF gives the surface normal:
+
+```glsl
+vec3 getNormal(vec3 p) {
+    vec2 e = vec2(0.001, 0.0);
+    return normalize(vec3(
+        scene(p + e.xyy) - scene(p - e.xyy),
+        scene(p + e.yxy) - scene(p - e.yxy),
+        scene(p + e.yyx) - scene(p - e.yyx)
+    ));
+}
+```
+
+## Diffuse Lighting
+
+Lambert's law: brightness $\propto \cos\theta$
+
+```glsl
+vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+vec3 normal = getNormal(p);
+float diffuse = max(dot(normal, lightDir), 0.0);
+```
+
+## Soft Shadows
+
+March toward the light, track the closest approach:
+
+```glsl
+float softShadow(vec3 ro, vec3 rd, float k) {
+    float res = 1.0;
+    float t = 0.01;
+    for (int i = 0; i < 64; i++) {
+        float d = scene(ro + rd * t);
+        res = min(res, k * d / t);
+        t += d;
+    }
+    return clamp(res, 0.0, 1.0);
+}
+```
+
+# Fractal Geometry
+
+## 3D Fractals
+
+Apply the same folding and iteration ideas from Day 2-3:
+
+- **Menger Sponge**: recursive box subtraction
+- **Mandelbulb**: Mandelbrot-like iteration in 3D
+- **Kleinian Groups**: Möbius transformations in 3D
+
+## The Menger Sponge
+
+Recursively subtract crosses from a cube:
+
+```glsl
+float sdMenger(vec3 p, int iterations) {
+    float d = sdBox(p, vec3(1.0));
+    float s = 1.0;
+    for (int i = 0; i < iterations; i++) {
+        vec3 a = mod(p * s, 2.0) - 1.0;
+        s *= 3.0;
+        vec3 r = abs(1.0 - 3.0 * abs(a));
+        float c = sdCross(r) / s;
+        d = max(d, c);
+    }
+    return d;
+}
+```
+
+# Putting It Together
+
+## The Complete Pipeline
+
+1. Set up camera (position, direction, FOV)
+2. For each pixel: cast ray through screen
+3. Ray march to find intersection
+4. Compute normal, lighting, shadows
+5. Output color
+
+## What You Can Build
+
+- Mathematical sculptures
+- Fractal landscapes
+- Impossible architecture
+- Abstract animations
+
+# Course Wrap-Up
+
+## What We Learned
+
+| Day | Topic |
+|-----|-------|
+| 1 | Coordinates, SDFs, implicit curves |
+| 2 | Iteration, Mandelbrot, Julia, inversion |
+| 3 | Symmetry, tilings, hyperbolic geometry |
+| 4 | Ray marching, 3D SDFs, lighting |
+
+## Resources
+
+- [Shadertoy](https://shadertoy.com) — experiment and share
+- [Inigo Quilez's articles](https://iquilezles.org) — deep dives on SDFs
+- [The Book of Shaders](https://thebookofshaders.com) — fundamentals
+
+## Keep Creating!
+
+The best way to learn: pick something beautiful and try to recreate it.
+
+Start simple. Build complexity. Share your work.

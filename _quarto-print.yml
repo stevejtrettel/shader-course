@@ -42,4 +42,4 @@ format:
       - right=1.5in
       - top=1.25in
       - bottom=1.25in
-    include-in-header: preamble.tex
+    include-in-header: styles/preamble.tex
