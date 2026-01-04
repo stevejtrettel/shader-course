@@ -1,8 +1,9 @@
 # Netlify configuration for Quarto site
 
 [build]
-  command = "quarto render && quarto render --profile print && cp _book/*.pdf _site/"
   publish = "_site"
 
 [[plugins]]
   package = "@quarto/netlify-plugin-quarto"
+  [plugins.inputs]
+    cmd = "render"
