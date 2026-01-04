@@ -4,3 +4,4 @@ version: 1.0.0
 contributes:
   shortcodes:
     - shader-demo.lua
+    - shader-slide.lua
