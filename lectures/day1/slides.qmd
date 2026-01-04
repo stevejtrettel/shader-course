@@ -1,5 +1,5 @@
 ---
-title: "Day 1: Introduction"
+title: "Day 1: Pixels"
 subtitle: "Shaders for Mathematical Visualization"
 format:
   revealjs:
@@ -16,13 +16,29 @@ metadata-files:
 
 A **shader** is a function from coordinates to colors.
 
-- Takes a point $(x, y)$, returns RGB
-- GPU runs it for every pixel, in parallel
-- Result: an image, 60 times per second
+- You write code that takes a point $(x, y)$
+- It returns an RGB color
+- The GPU runs it for every pixel, in parallel
+- Result: an image, recomputed 60 times per second
 
-Each pixel computes independently.
+Each pixel computes independently—no peeking at neighbors.
 
-## mainImage {.smaller}
+# First Shader
+
+## The Basics {.smaller}
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // fragCoord: pixel coordinates (input)
+    // fragColor: RGBA color (output)
+}
+```
+
+- `vec4(r, g, b, a)` holds four floats, each in $[0, 1]$
+- Floats need decimals: `1.0` not `1`
+
+**Hello World!**
 
 ```glsl
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
@@ -31,26 +47,44 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 }
 ```
 
-- `fragCoord`: pixel coordinates (input)
-- `fragColor`: RGBA color (output)
-- `vec4(r, g, b, a)`: each in $[0, 1]$
-- Floats need decimals: `1.0` not `1`
+Every pixel outputs red.
 
 ##
 
 {{< shader-slide day1/red >}}
 
-## Uniforms and Conditionals
+# Dividing the Screen
+
+## Uniforms and Vectors {.smaller}
+
+Shadertoy provides **uniforms**—same value for every pixel:
+
+| Uniform | Type | Description |
+|---------|------|-------------|
+| `iResolution` | `vec3` | `(width, height, 1)` in pixels |
+| `iTime` | `float` | Seconds since start |
+| `iMouse` | `vec4` | Mouse position and click |
+
+Access components with `.x`, `.y`, `.z`:
 
 ```glsl
-iResolution.xy    // screen size in pixels
+iResolution.x    // screen width
+fragCoord.y      // pixel's y coordinate
 ```
 
+## Left vs Right {.smaller}
+
 ```glsl
-if (fragCoord.x < iResolution.x / 2.0) {
-    color = vec3(1.0, 0.0, 0.0);  // red
-} else {
-    color = vec3(0.0, 0.0, 1.0);  // blue
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec3 color;
+    if (fragCoord.x < iResolution.x / 2.0) {
+        color = vec3(1.0, 0.0, 0.0);  // red on left
+    } else {
+        color = vec3(0.0, 0.0, 1.0);  // blue on right
+    }
+    
+    fragColor = vec4(color, 1.0);
 }
 ```
 
@@ -58,51 +92,65 @@ if (fragCoord.x < iResolution.x / 2.0) {
 
 {{< shader-slide day1/half-plane-pixels >}}
 
-## We Need Better Coordinates
+# Coordinate Systems
 
-`fragCoord.x < iResolution.x / 2.0` is awkward.
+`fragCoord.x < iResolution.x / 2.0` works, but...
 
-We want: origin at center, $x \in [-2, 2]$, circles look circular.
+What if we want a circle? A diagonal? Any mathematical shape?
 
-## The Transformation
+We need a proper coordinate system.
+
+**The Problem**
+
+`fragCoord` gives pixel coordinates: origin at bottom-left, values like $(0,0)$ to $(1920, 1080)$.
+
+We want: origin at center, scale $-2$ to $2$, circles that look circular.
+
+## The Transformation {.smaller}
 
 ```glsl
-vec2 uv = fragCoord / iResolution.xy;   // [0,1]
-uv = uv - vec2(0.5, 0.5);               // center
-uv.x *= iResolution.x / iResolution.y;  // aspect
-vec2 p = uv * 4.0;                      // scale
+vec2 uv = fragCoord / iResolution.xy;   // normalize to [0,1]
+uv = uv - vec2(0.5, 0.5);               // center origin
+uv.x *= iResolution.x / iResolution.y;  // aspect correction
+vec2 p = uv * 4.0;                      // scale to [-2, 2]
 ```
 
-Now `p.x < 0.0` means "left half."
+Vector arithmetic is component-wise: `vec2(6,8) / vec2(2,4)` = `vec2(3,2)`.
+
+This is our **standard boilerplate**. From now on, `p` is our math coordinate.
 
 ##
 
 {{< shader-slide day1/coordinates >}}
 
-## Drawing with Distance
 
-**Key idea:** compute distance, then threshold.
+# Drawing with Distance
+
+## The Key Idea
+
+**Compute a distance, then threshold it.**
+
+```glsl
+length(p)           // distance from origin
+length(p - center)  // distance from any point
+```
+
+Filled circle: `length(p) < r`
+
+
+
+**Example: Circle**
 
 ```glsl
 float d = length(p);    // distance from origin
-float r = 1.0;
-```
-
-- Inside circle: `d < r`
-- Outside circle: `d > r`
-
-## Circle Code {.smaller}
-
-```glsl
-float d = length(p);
-float r = 1.0;
-float f = d - r;    // negative inside, positive outside
+float r = 1.0;          // radius
+float f = d - r;        // negative inside, positive outside
 
 vec3 color;
 if (f < 0.0) {
-    color = vec3(1.0, 1.0, 0.0);  // yellow
+    color = vec3(1.0, 1.0, 0.0);  // yellow inside
 } else {
-    color = vec3(0.1, 0.1, 0.3);  // blue
+    color = vec3(0.1, 0.1, 0.3);  // blue outside
 }
 ```
 
@@ -110,45 +158,47 @@ if (f < 0.0) {
 
 {{< shader-slide day1/circle >}}
 
-## From Filled to Outline
+## Ring: Distance to Boundary
 
-For just the boundary:
+For a ring, we want pixels where $d \approx r$. Use `abs()`:
 
 ```glsl
-float f = abs(d - r) - 0.1;
+float f = abs(d - r) - 0.1;  // small when d is near r
 ```
 
-Small when $d \approx r$ (near the circle).
+$|d - r|$ is distance to the circle. Subtract thickness, threshold on sign.
 
 ##
 
 {{< shader-slide day1/circle-ring >}}
 
-## Animation with iTime
+# Animation
 
-`iTime` = seconds elapsed. `sin(iTime)` oscillates $-1$ to $1$.
+## iTime and sin()
+
+`iTime` = seconds since start. `sin(iTime)` oscillates $-1$ to $1$.
 
 ```glsl
-float r = 1.0 + 0.5 * sin(iTime);
+float r = 1.0 + 0.5 * sin(iTime);  // radius pulses 0.5 to 1.5
 ```
 
-Radius oscillates between $0.5$ and $1.5$.
+Period is $2\pi \approx 6.28$ seconds.
 
 ##
 
 {{< shader-slide day1/circle-pulsing >}}
 
-## Implicit Curves
+# Implicit Curves
 
-Any equation $F(x,y) = 0$ defines a curve.
+## Any Equation $F(x,y) = 0$
 
-Same pattern: color where $|F|$ is small.
+The circle was $F = |p| - r$. But we can draw **any** implicit curve:
 
 ```glsl
-float F = p.y - p.x * p.x;    // parabola: y = x²
+float F = p.y - p.x * p.x;  // parabola: y = x²
 
 if (abs(F) < 0.1) {
-    color = yellow;
+    color = yellow;  // on the curve
 }
 ```
 
@@ -158,46 +208,82 @@ if (abs(F) < 0.1) {
 
 ## The Thickness Problem
 
+What happens with a more complex curve?
+
+##
+
 {{< shader-slide day1/lemniscate-naive >}}
 
-## Why?
+## Why It Blows Up
 
-$|F| < \varepsilon$ isn't distance to the curve.
+$|F| < \varepsilon$ captures points where $F$ is small—but $F$ isn't distance.
 
-- Where $|\nabla F|$ large → curve looks thin
-- Where $|\nabla F|$ small → curve looks thick
-- Where $\nabla F = 0$ → blows up
+- Where $|\nabla F|$ is large: $F$ changes fast → thin
+- Where $|\nabla F|$ is small: $F$ changes slow → thick
+- Where $\nabla F = 0$: infinite thickness
 
-## Gradient Correction
+**Fix:** divide by gradient magnitude: $\text{dist} \approx |F|/|\nabla F|$
 
-$$\text{dist} \approx \frac{|F|}{|\nabla F|}$$
+## Lemniscate with Gradient {.smaller}
+
+$F = (x^2 + y^2)^2 - (x^2 - y^2)$, so $\nabla F = (4x(x^2+y^2) - 2x, \, 4y(x^2+y^2) + 2y)$
 
 ```glsl
-vec2 grad = vec2(dF/dx, dF/dy);  // compute by hand
+float r2 = p.x*p.x + p.y*p.y;
+float F = r2*r2 - (p.x*p.x - p.y*p.y);
+
+vec2 grad = vec2(4.0*p.x*r2 - 2.0*p.x, 4.0*p.y*r2 + 2.0*p.y);
 float dist = abs(F) / max(length(grad), 0.01);
 ```
+
+Use `max(..., 0.01)` to avoid division by zero.
 
 ##
 
 {{< shader-slide day1/lemniscate-gradient >}}
 
-## Mouse Input
+## Animating Curve Families
 
-`iMouse.xy` = mouse position in pixels.
+Any parameter can depend on `iTime`. Cassini ovals sweep through a family as $c$ varies:
 
-Normalize it the same way as `fragCoord`:
+##
+
+{{< shader-slide day1/lemniscate-animated >}}
+
+# Mouse Input
+
+## iMouse and Helper Functions {.smaller}
+
+`iMouse.xy` = mouse position in pixels. Normalize it the same way as `fragCoord`:
 
 ```glsl
-vec2 mouse = iMouse.xy / iResolution.xy;
-mouse = mouse - vec2(0.5, 0.5);
-mouse.x *= iResolution.x / iResolution.y;
-mouse = mouse * 4.0;
+vec2 normalize_coord(vec2 coord) {
+    vec2 uv = coord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    return uv * 4.0;
+}
 ```
 
-## Circle at Mouse
+Define functions **above** `mainImage`.
+
+## Circle Following Mouse {.smaller}
 
 ```glsl
-float d = length(p - mouse);
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 p = normalize_coord(fragCoord);
+    vec2 mouse = normalize_coord(iMouse.xy);
+    
+    float d = length(p - mouse);
+    
+    vec3 color = vec3(0.1, 0.1, 0.3);
+    if (d < 0.5) {
+        color = vec3(1.0, 0.9, 0.2);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
 ```
 
 ##
@@ -206,40 +292,60 @@ float d = length(p - mouse);
 
 ## Mouse as Parameter
 
-Map mouse position to parameter range:
+Mouse can control any parameter, not just position. `mix(a, b, t)` interpolates:
+
+```glsl
+float param = mix(-2.0, 2.0, iMouse.x / iResolution.x);
+```
+
+As mouse moves left→right, `param` goes $-2 \to 2$.
+
+# Coming Full Circle
+
+## Elliptic Curves
+
+$y^2 = x^3 + ax + b$ → $F = y^2 - x^3 - ax - b$, $\nabla F = (-3x^2 - a, \, 2y)$
+
+The discriminant $\Delta = 4a^3 + 27b^2$ determines topology:
+
+- $\Delta > 0$: one component
+- $\Delta < 0$: two components
+- $\Delta = 0$: singular
+
+## Elliptic Curve Code {.smaller}
 
 ```glsl
 float a = mix(-2.0, 1.0, iMouse.x / iResolution.x);
 float b = mix(-2.0, 2.0, iMouse.y / iResolution.y);
+
+float disc = 4.0*a*a*a + 27.0*b*b;
+
+float F = p.y*p.y - p.x*p.x*p.x - a*p.x - b;
+vec2 grad = vec2(-3.0*p.x*p.x - a, 2.0*p.y);
+float dist = abs(F) / max(length(grad), 0.01);
+
+if (dist < 0.05) {
+    if (abs(disc) < 0.3) color = red;
+    else if (disc > 0.0) color = gold;
+    else color = blue;
+}
 ```
-
-`mix(a, b, t)` interpolates: $a$ when $t=0$, $b$ when $t=1$.
-
-## Elliptic Curves
-
-$y^2 = x^3 + ax + b$ → $F = y^2 - x^3 - ax - b$
-
-$\nabla F = (-3x^2 - a, \; 2y)$
-
-Discriminant $\Delta = 4a^3 + 27b^2$:
-
-- $\Delta > 0$: one component (gold)
-- $\Delta < 0$: two components (blue)  
-- $\Delta = 0$: singular (red)
 
 ##
 
 {{< shader-slide day1/elliptic-curve >}}
 
-## Now You Can Build This
+## You Can Now Build This
 
 {{< shader-slide day1/elliptic-family >}}
 
-## Summary
+# Summary
 
-- Shaders: coordinates → colors, parallel
-- Coordinate transformation: pixels → math
-- Distance fields: threshold for shapes
-- Implicit curves: $|F|/|\nabla F| < \varepsilon$
-- Animation: `iTime`
-- Interaction: `iMouse`
+## What We Learned
+
+- Shaders: coordinates → colors, massively parallel
+- Coordinate transformation: pixel space → math space
+- Distance fields: threshold distance for shapes
+- Implicit curves: $F(x,y) = 0$ with gradient correction
+- Animation: parameters depending on `iTime`
+- Interaction: parameters depending on `iMouse`
