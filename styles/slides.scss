@@ -179,53 +179,51 @@ $color-caution: #dc3545 !default;
 }
 
 // ===========================================
-// Shader Demos - Full Width
+// Shader Demos - FULL SCREEN
 // ===========================================
 
-.reveal figure {
-  margin: 0.3em 0;
-  width: 100%;
-}
-
-.reveal figure figcaption {
-  font-size: 0.6em;
-  color: #666;
-  margin-top: 0.3em;
-  font-style: italic;
-  text-align: center;
-}
-
-// Shader demo containers - maximize size
-.reveal .shader-demo-container {
+// The figure wrapper from shader-demo extension
+.reveal figure.shader-demo {
   width: 100% !important;
-  height: 70vh !important;
-  min-height: 500px;
+  height: 75vh !important;
+  min-height: 550px !important;
+  margin: 0.2em 0 !important;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
-.reveal .shader-demo-container canvas,
-.reveal .shader-demo-container iframe {
+// The inner div (has inline style we must override)
+.reveal figure.shader-demo > div {
   width: 100% !important;
   height: 100% !important;
+  min-height: 550px !important;
+}
+
+// Canvas inside the demo
+.reveal figure.shader-demo canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+// Captions below demos
+.reveal figure.shader-demo figcaption {
+  font-size: 0.55em;
+  color: #666;
+  margin-top: 0.2em;
+  font-style: italic;
+  text-align: center;
+}
+
+// Generic figures
+.reveal figure {
+  margin: 0.3em 0;
+  width: 100%;
 }
 
 .reveal iframe {
   border: none;
   border-radius: 8px;
-  width: 100%;
-  min-height: 500px;
-}
-
-// When shader is the only content on a slide, make it huge
-.reveal section > figure:only-child,
-.reveal section > p:only-child > figure {
-  height: 75vh;
-
-  .shader-demo-container {
-    height: 100% !important;
-  }
 }
 
 // ===========================================
@@ -365,21 +363,20 @@ $color-caution: #dc3545 !default;
 
 // Full-bleed demo slides (use {.demo-slide} on slide)
 .reveal section.demo-slide {
-  padding: 0.3em;
+  padding: 0.2em;
 
   h2 {
-    font-size: 1.2em;
-    margin-bottom: 0.3em;
+    font-size: 1.1em;
+    margin-bottom: 0.2em;
   }
 
-  figure,
-  .shader-demo-container {
-    height: 80vh !important;
-    min-height: 600px;
+  figure.shader-demo {
+    height: 82vh !important;
+    min-height: 650px !important;
   }
 
-  iframe, canvas {
-    width: 100% !important;
+  figure.shader-demo > div,
+  figure.shader-demo canvas {
     height: 100% !important;
   }
 }
