@@ -13,36 +13,44 @@ website:
       - index.qmd
       - section: "Day 1: Introduction"
         contents:
-          - text: "Lecture Notes"
+          - text: "Notes"
             href: lectures/day1/notes.qmd
           - text: "Slides"
             href: lectures/day1/slides.html
-          - text: "Shader Code"
+          - text: "Code"
             href: lectures/day1/shaders.qmd
       - section: "Day 2: Dynamics"
         contents:
-          - text: "Lecture Notes"
+          - text: "Notes"
             href: lectures/day2/notes.qmd
           - text: "Slides"
             href: lectures/day2/slides.html
-          - text: "Shader Code"
+          - text: "Code"
             href: lectures/day2/shaders.qmd
       - section: "Day 3: Tilings"
         contents:
-          - text: "Lecture Notes"
+          - text: "Notes"
             href: lectures/day3/notes.qmd
           - text: "Slides"
             href: lectures/day3/slides.html
-          - text: "Shader Code"
+          - text: "Code"
             href: lectures/day3/shaders.qmd
-      - section: "Day 4: Ray Marching"
+      - section: "Day 4: Simulations"
         contents:
-          - text: "Lecture Notes"
+          - text: "Notes"
             href: lectures/day4/notes.qmd
           - text: "Slides"
             href: lectures/day4/slides.html
-          - text: "Shader Code"
+          - text: "Code"
             href: lectures/day4/shaders.qmd
+      - section: "Day 5: Rendering"
+        contents:
+          - text: "Notes"
+            href: lectures/day5/notes.qmd
+          - text: "Slides"
+            href: lectures/day5/slides.html
+          - text: "Code"
+            href: lectures/day5/shaders.qmd
       - text: "Download PDF"
         href: GPU-Accelerated-Mathematical-Illustration.pdf
 

@@ -1,901 +1,3002 @@
-# Day 5 Solutions
+# Day 4 Solutions
 
-## Checkpoints
+Complete solutions for all Day 4 exercises. Each solution is a standalone shader that can be copied directly into Shadertoy.
 
-### C1. HighLife
 
-HighLife uses rule B36/S23: birth with 3 or 6 neighbors, survival with 2 or 3.
+## Checkpoint Solutions
 
-**Buffer A:**
+### Checkpoint 1: Move the Sphere
+
 ```glsl
-float hash(vec2 p) {
-    p = fract(p * vec2(234.34, 435.345));
-    p += dot(p, p + 34.23);
-    return fract(p.x * p.y);
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+    
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
 }
 
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    // Initialize with random cells
-    if (iFrame == 0) {
-        float r = hash(fragCoord);
-        float alive = r < 0.3 ? 1.0 : 0.0;
-        fragColor = vec4(alive, alive, alive, 1.0);
-        return;
-    }
-    
-    ivec2 p = ivec2(fragCoord);
-    
-    // Read self and neighbors
-    float self = texelFetch(iChannel0, p, 0).r;
-    float neighbors = 
-        texelFetch(iChannel0, p + ivec2(-1, -1), 0).r +
-        texelFetch(iChannel0, p + ivec2( 0, -1), 0).r +
-        texelFetch(iChannel0, p + ivec2( 1, -1), 0).r +
-        texelFetch(iChannel0, p + ivec2(-1,  0), 0).r +
-        texelFetch(iChannel0, p + ivec2( 1,  0), 0).r +
-        texelFetch(iChannel0, p + ivec2(-1,  1), 0).r +
-        texelFetch(iChannel0, p + ivec2( 0,  1), 0).r +
-        texelFetch(iChannel0, p + ivec2( 1,  1), 0).r;
-    
-    // HighLife rules: B36/S23
-    float alive;
-    if (self > 0.5) {
-        // Currently alive: survive with 2 or 3 neighbors
-        alive = (neighbors > 1.5 && neighbors < 3.5) ? 1.0 : 0.0;
-    } else {
-        // Currently dead: birth with 3 OR 6 neighbors
-        alive = (neighbors > 2.5 && neighbors < 3.5) || 
-                (neighbors > 5.5 && neighbors < 6.5) ? 1.0 : 0.0;
-    }
-    
-    fragColor = vec4(alive, alive, alive, 1.0);
-}
-```
-
-**Image:**
-```glsl
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    fragColor = texelFetch(iChannel0, ivec2(fragCoord), 0);
-}
-```
-
----
-
-### C2. Two Hot Spots
-
-**Buffer A:**
-```glsl
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    // Initialize: two hot disks
-    if (iFrame == 0) {
-        vec2 center1 = iResolution.xy * 0.5 + vec2(-100.0, 0.0);
-        vec2 center2 = iResolution.xy * 0.5 + vec2(100.0, 0.0);
-        float d1 = length(fragCoord - center1);
-        float d2 = length(fragCoord - center2);
-        float temp = (d1 < 60.0 || d2 < 60.0) ? 1.0 : 0.0;
-        fragColor = vec4(temp, 0.0, 0.0, 1.0);
-        return;
-    }
-    
-    // Boundary: edges fixed at zero
-    if (fragCoord.x < 1.0 || fragCoord.x > iResolution.x - 1.0 ||
-        fragCoord.y < 1.0 || fragCoord.y > iResolution.y - 1.0) {
-        fragColor = vec4(0.0, 0.0, 0.0, 1.0);
-        return;
-    }
-    
-    // Read neighbors
-    ivec2 p = ivec2(fragCoord);
-    float c = texelFetch(iChannel0, p, 0).r;
-    float n = texelFetch(iChannel0, p + ivec2( 0,  1), 0).r;
-    float s = texelFetch(iChannel0, p + ivec2( 0, -1), 0).r;
-    float e = texelFetch(iChannel0, p + ivec2( 1,  0), 0).r;
-    float w = texelFetch(iChannel0, p + ivec2(-1,  0), 0).r;
-    
-    // Laplacian
-    float laplacian = n + s + e + w - 4.0 * c;
-    
-    // Explicit Euler step
-    float alpha = 0.5;
-    float dt = 0.4;
-    float newTemp = c + dt * alpha * laplacian;
-    
-    fragColor = vec4(newTemp, 0.0, 0.0, 1.0);
-}
-```
-
-**Image:**
-```glsl
-vec3 heatColor(float t) {
-    return mix(vec3(0.0, 0.0, 0.3), vec3(1.0, 0.3, 0.0), t);
+float sdSphere(vec3 p, vec3 center, float radius) {
+    return length(p - center) - radius;
 }
 
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    float temp = texelFetch(iChannel0, ivec2(fragCoord), 0).r;
-    fragColor = vec4(heatColor(temp), 1.0);
-}
-```
-
----
-
-### C3. Off-Center Pluck
-
-**Buffer A (displacement):**
-```glsl
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    // Initialize: off-center Gaussian pluck
-    if (iFrame == 0) {
-        vec2 pluck = iResolution.xy * 0.5 + vec2(150.0, 100.0);
-        float d = length(fragCoord - pluck);
-        float sigma = 30.0;
-        float u = exp(-d * d / (2.0 * sigma * sigma));
-        fragColor = vec4(u, 0.0, 0.0, 1.0);
-        return;
-    }
-    
-    // Boundary
-    if (fragCoord.x < 1.0 || fragCoord.x > iResolution.x - 1.0 ||
-        fragCoord.y < 1.0 || fragCoord.y > iResolution.y - 1.0) {
-        fragColor = vec4(0.0);
-        return;
-    }
-    
-    ivec2 p = ivec2(fragCoord);
-    float u = texelFetch(iChannel0, p, 0).r;
-    float v = texelFetch(iChannel1, p, 0).r;
-    
-    float dt = 0.5;
-    float newU = u + dt * v;
-    
-    fragColor = vec4(newU, 0.0, 0.0, 1.0);
-}
-```
-
-**Buffer B (velocity):**
-```glsl
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    // Initialize: zero velocity
-    if (iFrame == 0) {
-        fragColor = vec4(0.0);
-        return;
-    }
-    
-    // Boundary
-    if (fragCoord.x < 1.0 || fragCoord.x > iResolution.x - 1.0 ||
-        fragCoord.y < 1.0 || fragCoord.y > iResolution.y - 1.0) {
-        fragColor = vec4(0.0);
-        return;
-    }
-    
-    ivec2 p = ivec2(fragCoord);
-    
-    float u_c = texelFetch(iChannel0, p, 0).r;
-    float u_n = texelFetch(iChannel0, p + ivec2( 0,  1), 0).r;
-    float u_s = texelFetch(iChannel0, p + ivec2( 0, -1), 0).r;
-    float u_e = texelFetch(iChannel0, p + ivec2( 1,  0), 0).r;
-    float u_w = texelFetch(iChannel0, p + ivec2(-1,  0), 0).r;
-    float laplacian = u_n + u_s + u_e + u_w - 4.0 * u_c;
-    
-    float v = texelFetch(iChannel1, p, 0).r;
-    
-    float dt = 0.5;
-    float c = 0.5;
-    float newV = v + dt * c * c * laplacian;
-    
-    fragColor = vec4(newV, 0.0, 0.0, 1.0);
-}
-```
-
-**Image:**
-```glsl
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    float u = texelFetch(iChannel0, ivec2(fragCoord), 0).r;
-    u *= 5.0;
-    
-    vec3 color;
-    if (u > 0.0) {
-        color = mix(vec3(0.0), vec3(1.0, 0.5, 0.0), u);
-    } else {
-        color = mix(vec3(0.0), vec3(0.0, 0.3, 1.0), -u);
-    }
-    
-    fragColor = vec4(color, 1.0);
-}
-```
-
----
-
-### C4. Damped Waves
-
-Only Buffer B changes — add damping after computing newV:
-
-**Buffer B (velocity):**
-```glsl
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    if (iFrame == 0) {
-        fragColor = vec4(0.0);
-        return;
-    }
-    
-    if (fragCoord.x < 1.0 || fragCoord.x > iResolution.x - 1.0 ||
-        fragCoord.y < 1.0 || fragCoord.y > iResolution.y - 1.0) {
-        fragColor = vec4(0.0);
-        return;
-    }
-    
-    ivec2 p = ivec2(fragCoord);
-    
-    float u_c = texelFetch(iChannel0, p, 0).r;
-    float u_n = texelFetch(iChannel0, p + ivec2( 0,  1), 0).r;
-    float u_s = texelFetch(iChannel0, p + ivec2( 0, -1), 0).r;
-    float u_e = texelFetch(iChannel0, p + ivec2( 1,  0), 0).r;
-    float u_w = texelFetch(iChannel0, p + ivec2(-1,  0), 0).r;
-    float laplacian = u_n + u_s + u_e + u_w - 4.0 * u_c;
-    
-    float v = texelFetch(iChannel1, p, 0).r;
-    
-    float dt = 0.5;
-    float c = 0.5;
-    float newV = v + dt * c * c * laplacian;
-    
-    // Damping: waves lose energy over time
-    newV *= 0.998;
-    
-    // Mouse adds velocity kick
-    if (iMouse.z > 0.0) {
-        float d = length(fragCoord - iMouse.xy);
-        float sigma = 15.0;
-        newV += 0.001 * exp(-d * d / (2.0 * sigma * sigma));
-    }
-    
-    fragColor = vec4(newV, 0.0, 0.0, 1.0);
-}
-```
-
----
-
-## Explorations
-
-### E1. Brian's Brain
-
-**Buffer A:**
-```glsl
-float hash(vec2 p) {
-    p = fract(p * vec2(234.34, 435.345));
-    p += dot(p, p + 34.23);
-    return fract(p.x * p.y);
+float sceneSDF(vec3 p) {
+    // Sphere moved to the right
+    return sdSphere(p, vec3(1.0, 0.0, -3.0), 1.0);
 }
 
-// Count only "On" neighbors (value between 0.5 and 1.5)
-float countOn(float val) {
-    return (val > 0.5 && val < 1.5) ? 1.0 : 0.0;
+vec3 estimateNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
+        sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0)),
+        sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps))
+    ));
 }
 
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    // Initialize with random states: 0 (off), 1 (on), 2 (dying)
-    if (iFrame == 0) {
-        float r = hash(fragCoord);
-        float state = r < 0.33 ? 0.0 : (r < 0.66 ? 1.0 : 2.0);
-        fragColor = vec4(state, 0.0, 0.0, 1.0);
-        return;
-    }
-    
-    ivec2 p = ivec2(fragCoord);
-    
-    // Read current state
-    float self = texelFetch(iChannel0, p, 0).r;
-    
-    // Count only "On" neighbors
-    float n  = texelFetch(iChannel0, p + ivec2( 0,  1), 0).r;
-    float s  = texelFetch(iChannel0, p + ivec2( 0, -1), 0).r;
-    float e  = texelFetch(iChannel0, p + ivec2( 1,  0), 0).r;
-    float w  = texelFetch(iChannel0, p + ivec2(-1,  0), 0).r;
-    float ne = texelFetch(iChannel0, p + ivec2( 1,  1), 0).r;
-    float nw = texelFetch(iChannel0, p + ivec2(-1,  1), 0).r;
-    float se = texelFetch(iChannel0, p + ivec2( 1, -1), 0).r;
-    float sw = texelFetch(iChannel0, p + ivec2(-1, -1), 0).r;
-    
-    float neighbors = countOn(n) + countOn(s) + countOn(e) + countOn(w) +
-                      countOn(ne) + countOn(nw) + countOn(se) + countOn(sw);
-    
-    float newState;
-    
-    if (self < 0.5) {
-        // Off -> On if exactly 2 neighbors are On
-        newState = (neighbors > 1.5 && neighbors < 2.5) ? 1.0 : 0.0;
-    } else if (self < 1.5) {
-        // On -> Dying
-        newState = 2.0;
-    } else {
-        // Dying -> Off
-        newState = 0.0;
-    }
-    
-    fragColor = vec4(newState, 0.0, 0.0, 1.0);
-}
-```
-
-**Image:**
-```glsl
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    float state = texelFetch(iChannel0, ivec2(fragCoord), 0).r;
-    
-    vec3 color;
-    if (state < 0.5) {
-        color = vec3(0.0);              // Off: black
-    } else if (state < 1.5) {
-        color = vec3(1.0);              // On: white
-    } else {
-        color = vec3(0.0, 0.5, 1.0);    // Dying: blue
-    }
-    
-    fragColor = vec4(color, 1.0);
-}
-```
-
----
-
-### E2. Ring of Fire
-
-**Buffer A:**
-```glsl
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    // Initialize: ring (hot between two radii)
-    if (iFrame == 0) {
-        vec2 center = iResolution.xy * 0.5;
-        float d = length(fragCoord - center);
-        float temp = (d > 60.0 && d < 100.0) ? 1.0 : 0.0;
-        fragColor = vec4(temp, 0.0, 0.0, 1.0);
-        return;
-    }
-    
-    // Boundary
-    if (fragCoord.x < 1.0 || fragCoord.x > iResolution.x - 1.0 ||
-        fragCoord.y < 1.0 || fragCoord.y > iResolution.y - 1.0) {
-        fragColor = vec4(0.0);
-        return;
-    }
-    
-    ivec2 p = ivec2(fragCoord);
-    float c = texelFetch(iChannel0, p, 0).r;
-    float n = texelFetch(iChannel0, p + ivec2( 0,  1), 0).r;
-    float s = texelFetch(iChannel0, p + ivec2( 0, -1), 0).r;
-    float e = texelFetch(iChannel0, p + ivec2( 1,  0), 0).r;
-    float w = texelFetch(iChannel0, p + ivec2(-1,  0), 0).r;
-    
-    float laplacian = n + s + e + w - 4.0 * c;
-    
-    float alpha = 0.5;
-    float dt = 0.4;
-    float newTemp = c + dt * alpha * laplacian;
-    
-    fragColor = vec4(newTemp, 0.0, 0.0, 1.0);
-}
-```
-
-**Image:** Same as heat equation.
-
----
-
-### E3. Spatially Varying Diffusion
-
-**Buffer A:**
-```glsl
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    if (iFrame == 0) {
-        vec2 center = iResolution.xy * 0.5;
-        float d = length(fragCoord - center);
-        float temp = d < 80.0 ? 1.0 : 0.0;
-        fragColor = vec4(temp, 0.0, 0.0, 1.0);
-        return;
-    }
-    
-    if (fragCoord.x < 1.0 || fragCoord.x > iResolution.x - 1.0 ||
-        fragCoord.y < 1.0 || fragCoord.y > iResolution.y - 1.0) {
-        fragColor = vec4(0.0);
-        return;
-    }
-    
-    ivec2 p = ivec2(fragCoord);
-    float c = texelFetch(iChannel0, p, 0).r;
-    float n = texelFetch(iChannel0, p + ivec2( 0,  1), 0).r;
-    float s = texelFetch(iChannel0, p + ivec2( 0, -1), 0).r;
-    float e = texelFetch(iChannel0, p + ivec2( 1,  0), 0).r;
-    float w = texelFetch(iChannel0, p + ivec2(-1,  0), 0).r;
-    
-    float laplacian = n + s + e + w - 4.0 * c;
-    
-    // Spatially varying diffusion: right half diffuses faster
-    float alpha = 0.2 + 0.6 * step(iResolution.x * 0.5, fragCoord.x);
-    
-    // Alternative: sinusoidal pattern
-    // float alpha = 0.2 + 0.4 * (0.5 + 0.5 * sin(fragCoord.x * 0.02));
-    
-    float dt = 0.4;
-    float newTemp = c + dt * alpha * laplacian;
-    
-    fragColor = vec4(newTemp, 0.0, 0.0, 1.0);
-}
-```
-
----
-
-### E4. Wave Interference
-
-**Buffer A (displacement):**
-```glsl
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    // Initialize: two Gaussian plucks
-    if (iFrame == 0) {
-        vec2 center = iResolution.xy * 0.5;
-        vec2 pluck1 = center + vec2(-100.0, 0.0);
-        vec2 pluck2 = center + vec2(100.0, 0.0);
-        float sigma = 30.0;
-        float d1 = length(fragCoord - pluck1);
-        float d2 = length(fragCoord - pluck2);
-        float u = exp(-d1*d1 / (2.0*sigma*sigma)) + exp(-d2*d2 / (2.0*sigma*sigma));
-        // For opposite signs, use: - exp(-d2*d2 / (2.0*sigma*sigma));
-        fragColor = vec4(u, 0.0, 0.0, 1.0);
-        return;
-    }
-    
-    if (fragCoord.x < 1.0 || fragCoord.x > iResolution.x - 1.0 ||
-        fragCoord.y < 1.0 || fragCoord.y > iResolution.y - 1.0) {
-        fragColor = vec4(0.0);
-        return;
-    }
-    
-    ivec2 p = ivec2(fragCoord);
-    float u = texelFetch(iChannel0, p, 0).r;
-    float v = texelFetch(iChannel1, p, 0).r;
-    
-    float dt = 0.5;
-    float newU = u + dt * v;
-    
-    fragColor = vec4(newU, 0.0, 0.0, 1.0);
-}
-```
-
-**Buffer B and Image:** Same as standard wave equation.
-
----
-
-### E5. Stadium Boundary
-
-**Common:**
-```glsl
-float sdBox(vec2 p, vec2 b) {
-    vec2 d = abs(p) - b;
-    return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
-}
-
-float sdCircle(vec2 p, float r) {
-    return length(p) - r;
-}
-
-float sdStadium(vec2 p, float halfLength, float radius) {
-    // Union of a box and two circles at each end
-    float box = sdBox(p, vec2(halfLength, radius));
-    float circle1 = sdCircle(p - vec2(halfLength, 0.0), radius);
-    float circle2 = sdCircle(p + vec2(halfLength, 0.0), radius);
-    return min(box, min(circle1, circle2));
-}
-
-bool inDomain(vec2 fragCoord, vec2 resolution) {
-    vec2 center = resolution * 0.5;
-    float scale = min(resolution.x, resolution.y) * 0.3;
-    vec2 p = (fragCoord - center) / scale;
-    return sdStadium(p, 1.0, 0.5) < 0.0;
-}
-```
-
-**Buffer A, Buffer B, Image:** Same as wave-circle, using the shared `inDomain` function.
-
----
-
-## Challenges
-
-### H1. Julia Set Boundary
-
-**Common:**
-```glsl
-bool inDomain(vec2 fragCoord, vec2 resolution) {
-    vec2 center = resolution * 0.5;
-    float scale = min(resolution.x, resolution.y) * 0.25;
-    vec2 z = (fragCoord - center) / scale;
-    vec2 c = vec2(-0.4, 0.6);  // Try different values!
+float raymarch(Ray ray) {
+    float t = 0.0;
     
     for (int i = 0; i < 100; i++) {
-        z = vec2(z.x*z.x - z.y*z.y, 2.0*z.x*z.y) + c;
-        if (dot(z, z) > 4.0) return false;
-    }
-    return true;
-}
-```
-
-**Buffer A, Buffer B, Image:** Same as wave-circle.
-
----
-
-### H2. Gray-Scott Reaction-Diffusion
-
-**Buffer A:**
-```glsl
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    // Initialize: u=1 everywhere, small patch of v in center
-    if (iFrame == 0) {
-        float u = 1.0;
-        float v = 0.0;
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
         
-        vec2 center = iResolution.xy * 0.5;
-        if (length(fragCoord - center) < 20.0) {
-            v = 1.0;
-        }
-        // Add some noise for more interesting patterns
-        v += 0.1 * fract(sin(dot(fragCoord, vec2(12.9898, 78.233))) * 43758.5453);
-        
-        fragColor = vec4(u, v, 0.0, 1.0);
-        return;
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
     }
     
-    // Parameters
-    float Du = 0.2;
-    float Dv = 0.1;
-    float f = 0.04;
-    float k = 0.06;
-    float dt = 1.0;
-    
-    ivec2 p = ivec2(fragCoord);
-    
-    // Read current state
-    vec2 uv = texelFetch(iChannel0, p, 0).rg;
-    float u = uv.x;
-    float v = uv.y;
-    
-    // Laplacian of u
-    float u_n = texelFetch(iChannel0, p + ivec2( 0,  1), 0).r;
-    float u_s = texelFetch(iChannel0, p + ivec2( 0, -1), 0).r;
-    float u_e = texelFetch(iChannel0, p + ivec2( 1,  0), 0).r;
-    float u_w = texelFetch(iChannel0, p + ivec2(-1,  0), 0).r;
-    float lap_u = u_n + u_s + u_e + u_w - 4.0 * u;
-    
-    // Laplacian of v
-    float v_n = texelFetch(iChannel0, p + ivec2( 0,  1), 0).g;
-    float v_s = texelFetch(iChannel0, p + ivec2( 0, -1), 0).g;
-    float v_e = texelFetch(iChannel0, p + ivec2( 1,  0), 0).g;
-    float v_w = texelFetch(iChannel0, p + ivec2(-1,  0), 0).g;
-    float lap_v = v_n + v_s + v_e + v_w - 4.0 * v;
-    
-    // Reaction term
-    float uvv = u * v * v;
-    
-    // Gray-Scott equations
-    float newU = u + dt * (Du * lap_u - uvv + f * (1.0 - u));
-    float newV = v + dt * (Dv * lap_v + uvv - (f + k) * v);
-    
-    // Clamp to valid range
-    newU = clamp(newU, 0.0, 1.0);
-    newV = clamp(newV, 0.0, 1.0);
-    
-    fragColor = vec4(newU, newV, 0.0, 1.0);
+    return -1.0;
 }
-```
 
-**Image:**
-```glsl
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    vec2 uv = texelFetch(iChannel0, ivec2(fragCoord), 0).rg;
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
     
-    // Display v (the interesting chemical)
-    float v = uv.g;
+    float t = raymarch(ray);
     
-    // Color gradient from dark blue to white
-    vec3 color = mix(vec3(0.0, 0.0, 0.2), vec3(1.0), v);
+    vec3 color;
+    if (t > 0.0) {
+        vec3 hitPoint = ray.origin + t * ray.dir;
+        vec3 normal = estimateNormal(hitPoint);
+        
+        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+        vec3 viewDir = -ray.dir;
+        vec3 reflectDir = reflect(-lightDir, normal);
+        
+        float diffuse = max(0.0, dot(normal, lightDir));
+        float specular = pow(max(0.0, dot(reflectDir, viewDir)), 32.0);
+        
+        vec3 sphereColor = vec3(1.0, 0.0, 0.0);
+        float ambient = 0.1;
+        color = sphereColor * (ambient + diffuse) + vec3(1.0) * specular * 0.5;
+    }
+    else {
+        color = vec3(0.1, 0.1, 0.2);
+    }
     
     fragColor = vec4(color, 1.0);
 }
 ```
 
-**Extension: Gray-Scott in the Mandelbrot Set**
 
-Add a Common tab with the Mandelbrot domain check:
+### Checkpoint 2: Torus Proportions
 
-**Common:**
 ```glsl
-bool inDomain(vec2 fragCoord, vec2 resolution) {
-    vec2 center = resolution * 0.5;
-    float scale = min(resolution.x, resolution.y) * 0.3;
-    vec2 c = (fragCoord - center) / scale;
-    c.x -= 0.5;
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
     
-    vec2 z = vec2(0.0);
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+    
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+float sdTorus(vec3 p, vec2 tor) {
+    vec2 q = vec2(length(p.xy) - tor.x, p.z);
+    return length(q) - tor.y;
+}
+
+float sceneSDF(vec3 p) {
+    // Fat donut: major radius 1.0, minor radius 0.8
+    return sdTorus(p, vec2(1.0, 0.8));
+}
+
+vec3 estimateNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
+        sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0)),
+        sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    
     for (int i = 0; i < 100; i++) {
-        z = vec2(z.x*z.x - z.y*z.y, 2.0*z.x*z.y) + c;
-        if (dot(z, z) > 4.0) return false;
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
+        
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
     }
-    return true;
+    
+    return -1.0;
 }
-```
 
-Modify Buffer A to check the domain:
-
-```glsl
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    // Outside Mandelbrot: fixed at u=1, v=0
-    if (!inDomain(fragCoord, iResolution.xy)) {
-        fragColor = vec4(1.0, 0.0, 0.0, 1.0);
-        return;
-    }
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray.origin.z += 3.0;
     
-    // ... rest of Gray-Scott code unchanged
-}
-```
-
-And update Image to show the boundary:
-
-```glsl
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    if (!inDomain(fragCoord, iResolution.xy)) {
-        fragColor = vec4(0.15, 0.15, 0.15, 1.0);
-        return;
-    }
-    
-    vec2 uv = texelFetch(iChannel0, ivec2(fragCoord), 0).rg;
-    float v = uv.g;
-    vec3 color = mix(vec3(0.0, 0.0, 0.2), vec3(1.0, 0.9, 0.6), v);
-    fragColor = vec4(color, 1.0);
-}
-```
-
----
-
-### H3. Physical Coordinates
-
-**Buffer A:**
-```glsl
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    // Physical domain: [-L, L] x [-L, L]
-    float L = 2.0;
-    
-    // Grid spacing
-    float h = 2.0 * L / min(iResolution.x, iResolution.y);
-    
-    // Physical coordinates (for initial condition)
-    vec2 physCoord = (fragCoord - iResolution.xy * 0.5) * h;
-    
-    // Initialize: hot disk of radius 0.5 in physical units
-    if (iFrame == 0) {
-        float d = length(physCoord);
-        float temp = d < 0.5 ? 1.0 : 0.0;
-        fragColor = vec4(temp, 0.0, 0.0, 1.0);
-        return;
-    }
-    
-    // Boundary
-    if (fragCoord.x < 1.0 || fragCoord.x > iResolution.x - 1.0 ||
-        fragCoord.y < 1.0 || fragCoord.y > iResolution.y - 1.0) {
-        fragColor = vec4(0.0);
-        return;
-    }
-    
-    ivec2 p = ivec2(fragCoord);
-    float c = texelFetch(iChannel0, p, 0).r;
-    float n = texelFetch(iChannel0, p + ivec2( 0,  1), 0).r;
-    float s = texelFetch(iChannel0, p + ivec2( 0, -1), 0).r;
-    float e = texelFetch(iChannel0, p + ivec2( 1,  0), 0).r;
-    float w = texelFetch(iChannel0, p + ivec2(-1,  0), 0).r;
-    
-    // Laplacian with proper grid spacing
-    float laplacian = (n + s + e + w - 4.0 * c) / (h * h);
-    
-    // Physical diffusion coefficient
-    float alpha = 1.0;
-    
-    // Timestep satisfying stability: dt < h^2 / (4 * alpha)
-    float dt = 0.2 * h * h / alpha;
-    
-    float newTemp = c + dt * alpha * laplacian;
-    
-    fragColor = vec4(newTemp, 0.0, 0.0, 1.0);
-}
-```
-
----
-
-### H4. Single-Buffer Wave Equation
-
-**Buffer A:**
-```glsl
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    // Initialize: Gaussian pluck, zero velocity
-    if (iFrame == 0) {
-        vec2 center = iResolution.xy * 0.5;
-        float d = length(fragCoord - center);
-        float sigma = 30.0;
-        float u = exp(-d * d / (2.0 * sigma * sigma));
-        float v = 0.0;
-        fragColor = vec4(u, v, 0.0, 1.0);
-        return;
-    }
-    
-    // Boundary
-    if (fragCoord.x < 1.0 || fragCoord.x > iResolution.x - 1.0 ||
-        fragCoord.y < 1.0 || fragCoord.y > iResolution.y - 1.0) {
-        fragColor = vec4(0.0);
-        return;
-    }
-    
-    ivec2 p = ivec2(fragCoord);
-    
-    // Read current state: red = displacement, green = velocity
-    vec2 state = texelFetch(iChannel0, p, 0).rg;
-    float u = state.r;
-    float v = state.g;
-    
-    // Laplacian of displacement (red channel)
-    float u_n = texelFetch(iChannel0, p + ivec2( 0,  1), 0).r;
-    float u_s = texelFetch(iChannel0, p + ivec2( 0, -1), 0).r;
-    float u_e = texelFetch(iChannel0, p + ivec2( 1,  0), 0).r;
-    float u_w = texelFetch(iChannel0, p + ivec2(-1,  0), 0).r;
-    float laplacian = u_n + u_s + u_e + u_w - 4.0 * u;
-    
-    float dt = 0.5;
-    float c = 0.5;
-    
-    float newU = u + dt * v;
-    float newV = v + dt * c * c * laplacian;
-    
-    // Mouse interaction
-    if (iMouse.z > 0.0) {
-        float d = length(fragCoord - iMouse.xy);
-        float sigma = 15.0;
-        newV += 0.001 * exp(-d * d / (2.0 * sigma * sigma));
-    }
-    
-    fragColor = vec4(newU, newV, 0.0, 1.0);
-}
-```
-
-**Image:**
-```glsl
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    float u = texelFetch(iChannel0, ivec2(fragCoord), 0).r;
-    u *= 5.0;
+    float t = raymarch(ray);
     
     vec3 color;
-    if (u > 0.0) {
-        color = mix(vec3(0.0), vec3(1.0, 0.5, 0.0), u);
-    } else {
-        color = mix(vec3(0.0), vec3(0.0, 0.3, 1.0), -u);
+    if (t > 0.0) {
+        vec3 hitPoint = ray.origin + t * ray.dir;
+        vec3 normal = estimateNormal(hitPoint);
+        
+        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+        vec3 viewDir = -ray.dir;
+        vec3 reflectDir = reflect(-lightDir, normal);
+        
+        float diffuse = max(0.0, dot(normal, lightDir));
+        float specular = pow(max(0.0, dot(reflectDir, viewDir)), 32.0);
+        
+        vec3 torusColor = vec3(0.0, 0.7, 1.0);
+        float ambient = 0.1;
+        color = torusColor * (ambient + diffuse) + vec3(1.0) * specular * 0.5;
+    }
+    else {
+        color = vec3(0.1, 0.1, 0.2);
     }
     
     fragColor = vec4(color, 1.0);
 }
 ```
 
----
 
-## Project: Waves on Orbifolds
+### Checkpoint 3: Add an Object
 
-This solution uses the equilateral triangle wave equation with folding in the Image shader.
-
-**Common:**
 ```glsl
-float sdEquilateralTriangle(vec2 p) {
-    const float k = sqrt(3.0);
-    p.x = abs(p.x) - 1.0;
-    p.y = p.y + 1.0 / k;
-    if (p.x + k * p.y > 0.0) {
-        p = vec2(p.x - k * p.y, -k * p.x - p.y) / 2.0;
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+    
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+float sdSphere(vec3 p, vec3 center, float radius) {
+    return length(p - center) - radius;
+}
+
+float sdTorus(vec3 p, vec2 tor) {
+    vec2 q = vec2(length(p.xy) - tor.x, p.z);
+    return length(q) - tor.y;
+}
+
+float sdPlane(vec3 p, float height) {
+    return p.y - height;
+}
+
+// Which object is closest: 1 = sphere, 2 = torus, 3 = ground, 4 = second sphere
+float materialID;
+
+float sceneSDF(vec3 p) {
+    float d = 1e10;
+    
+    // Sphere (left)
+    float sphere = sdSphere(p, vec3(-1.5, 0.0, 0.0), 1.0);
+    if (sphere < d) {
+        d = sphere;
+        materialID = 1.0;
     }
-    p.x -= clamp(p.x, -2.0, 0.0);
-    return -length(p) * sign(p.y);
-}
-
-bool inDomain(vec2 fragCoord, vec2 resolution) {
-    vec2 center = resolution * 0.5;
-    float scale = min(resolution.x, resolution.y) * 0.4;
-    vec2 p = (fragCoord - center) / scale;
-    p.y += 0.25;
-    return sdEquilateralTriangle(p) < 0.0;
-}
-
-// Fold point into fundamental domain (equilateral triangle)
-vec2 foldTriangle(vec2 p) {
-    const float k = sqrt(3.0);
     
-    // Reflect across the three edges until inside
-    for (int i = 0; i < 20; i++) {
-        // Reflect across vertical line x = 0
-        p.x = abs(p.x);
-        
-        // Reflect across line from (1, -1/sqrt(3)) with normal (sqrt(3)/2, 1/2)
-        float d = dot(p - vec2(1.0, -1.0/k), vec2(k/2.0, 0.5));
-        if (d > 0.0) {
-            p -= 2.0 * d * vec2(k/2.0, 0.5);
-        }
-        
-        // Reflect across line from (-1, -1/sqrt(3)) with normal (-sqrt(3)/2, 1/2)
-        d = dot(p - vec2(-1.0, -1.0/k), vec2(-k/2.0, 0.5));
-        if (d > 0.0) {
-            p -= 2.0 * d * vec2(-k/2.0, 0.5);
-        }
+    // Torus (center)
+    float torus = sdTorus(p, vec2(1.0, 0.4));
+    if (torus < d) {
+        d = torus;
+        materialID = 2.0;
     }
     
-    return p;
+    // Ground plane
+    float ground = sdPlane(p, -1.0);
+    if (ground < d) {
+        d = ground;
+        materialID = 3.0;
+    }
+    
+    // Second sphere (right) - NEW
+    float sphere2 = sdSphere(p, vec3(2.5, 0.0, 0.0), 0.8);
+    if (sphere2 < d) {
+        d = sphere2;
+        materialID = 4.0;
+    }
+    
+    return d;
 }
-```
 
-**Buffer A (displacement):** Same as wave-triangle.
+vec3 getMaterialColor(float id) {
+    if (id < 1.5) return vec3(1.0, 0.0, 0.0);  // Sphere: red
+    if (id < 2.5) return vec3(0.0, 0.7, 1.0);  // Torus: cyan
+    if (id < 3.5) return vec3(0.5, 0.5, 0.5);  // Ground: gray
+    return vec3(0.0, 1.0, 0.0);                 // Second sphere: green
+}
 
-**Buffer B (velocity):** Same as wave-triangle.
+vec3 estimateNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
+        sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0)),
+        sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps))
+    ));
+}
 
-**Image:**
-```glsl
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    vec2 center = iResolution.xy * 0.5;
-    float scale = min(iResolution.x, iResolution.y) * 0.4;
+float raymarch(Ray ray) {
+    float t = 0.0;
     
-    // Transform to normalized coordinates
-    vec2 p = (fragCoord - center) / scale;
-    p.y += 0.25;  // match the centering offset
+    for (int i = 0; i < 100; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
+        
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
     
-    // Fold into fundamental domain
-    vec2 folded = foldTriangle(p);
+    return -1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray.origin.z += 5.0;
+    ray.origin.y += 1.0;
     
-    // Convert back to pixel coordinates
-    folded.y -= 0.25;
-    vec2 foldedCoord = folded * scale + center;
-    
-    // Read displacement from folded position
-    float u = texelFetch(iChannel0, ivec2(foldedCoord), 0).r;
-    u *= 5.0;
+    float t = raymarch(ray);
     
     vec3 color;
-    if (u > 0.0) {
-        color = mix(vec3(0.0), vec3(1.0, 0.5, 0.0), u);
-    } else {
-        color = mix(vec3(0.0), vec3(0.0, 0.3, 1.0), -u);
+    if (t > 0.0) {
+        vec3 hitPoint = ray.origin + t * ray.dir;
+        vec3 normal = estimateNormal(hitPoint);
+        
+        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+        vec3 viewDir = -ray.dir;
+        vec3 reflectDir = reflect(-lightDir, normal);
+        
+        float diffuse = max(0.0, dot(normal, lightDir));
+        float specular = pow(max(0.0, dot(reflectDir, viewDir)), 32.0);
+        
+        vec3 matColor = getMaterialColor(materialID);
+        float ambient = 0.1;
+        color = matColor * (ambient + diffuse) + vec3(1.0) * specular * 0.3;
+    }
+    else {
+        color = vec3(0.1, 0.1, 0.2);
     }
     
     fragColor = vec4(color, 1.0);
 }
 ```
 
-**Note:** The folding creates a tiled view of the wave simulation. Waves appear to propagate continuously through triangle boundaries because the folding "unwraps" them.
 
-**Extension — Color-coded copies:**
+### Checkpoint 4: Change the Palette
+
 ```glsl
-// In foldTriangle, count the number of reflections:
-vec2 foldTriangle(vec2 p, out int foldCount) {
-    foldCount = 0;
-    // ... same folding code, but increment foldCount each time you reflect
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+    
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
 }
 
-// In Image shader:
-int folds;
-vec2 folded = foldTriangle(p, folds);
-// Tint based on fold count:
-color *= 0.7 + 0.3 * cos(float(folds) * 0.5);
+float sdSphere(vec3 p, vec3 center, float radius) {
+    return length(p - center) - radius;
+}
+
+float sdTorus(vec3 p, vec2 tor) {
+    vec2 q = vec2(length(p.xy) - tor.x, p.z);
+    return length(q) - tor.y;
+}
+
+float sdPlane(vec3 p, float height) {
+    return p.y - height;
+}
+
+float materialID;
+
+float sceneSDF(vec3 p) {
+    float d = 1e10;
+    
+    float sphere = sdSphere(p, vec3(-1.5, 0.0, 0.0), 1.0);
+    if (sphere < d) {
+        d = sphere;
+        materialID = 1.0;
+    }
+    
+    float torus = sdTorus(p - vec3(1.5, 0.0, 0.0), vec2(1.0, 0.4));
+    if (torus < d) {
+        d = torus;
+        materialID = 2.0;
+    }
+    
+    float ground = sdPlane(p, -1.0);
+    if (ground < d) {
+        d = ground;
+        materialID = 3.0;
+    }
+    
+    return d;
+}
+
+vec3 getMaterialColor(float id) {
+    // Sunset palette
+    if (id < 1.5) return vec3(1.0, 0.5, 0.2);   // Sphere: orange
+    if (id < 2.5) return vec3(1.0, 0.4, 0.6);   // Torus: pink
+    return vec3(0.2, 0.1, 0.3);                  // Ground: dark purple
+}
+
+vec3 estimateNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
+        sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0)),
+        sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    
+    for (int i = 0; i < 100; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
+        
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    
+    return -1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray.origin.z += 5.0;
+    ray.origin.y += 1.0;
+    
+    float t = raymarch(ray);
+    
+    vec3 color;
+    if (t > 0.0) {
+        vec3 hitPoint = ray.origin + t * ray.dir;
+        vec3 normal = estimateNormal(hitPoint);
+        
+        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+        vec3 viewDir = -ray.dir;
+        vec3 reflectDir = reflect(-lightDir, normal);
+        
+        float diffuse = max(0.0, dot(normal, lightDir));
+        float specular = pow(max(0.0, dot(reflectDir, viewDir)), 32.0);
+        
+        vec3 matColor = getMaterialColor(materialID);
+        float ambient = 0.1;
+        color = matColor * (ambient + diffuse) + vec3(1.0) * specular * 0.3;
+    }
+    else {
+        color = vec3(0.1, 0.1, 0.2);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+### Checkpoint 5: Move the Light
+
+```glsl
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+    
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+float sdSphere(vec3 p, vec3 center, float radius) {
+    return length(p - center) - radius;
+}
+
+float sdTorus(vec3 p, vec2 tor) {
+    vec2 q = vec2(length(p.xy) - tor.x, p.z);
+    return length(q) - tor.y;
+}
+
+float sdPlane(vec3 p, float height) {
+    return p.y - height;
+}
+
+float materialID;
+
+float sceneSDF(vec3 p) {
+    float d = 1e10;
+    
+    float sphere = sdSphere(p, vec3(-1.5, 0.0, 0.0), 1.0);
+    if (sphere < d) {
+        d = sphere;
+        materialID = 1.0;
+    }
+    
+    float torus = sdTorus(p - vec3(1.5, 0.0, 0.0), vec2(1.0, 0.4));
+    if (torus < d) {
+        d = torus;
+        materialID = 2.0;
+    }
+    
+    float ground = sdPlane(p, -1.0);
+    if (ground < d) {
+        d = ground;
+        materialID = 3.0;
+    }
+    
+    return d;
+}
+
+vec3 getMaterialColor(float id) {
+    if (id < 1.5) return vec3(1.0, 0.0, 0.0);
+    if (id < 2.5) return vec3(0.0, 0.7, 1.0);
+    return vec3(0.5, 0.5, 0.5);
+}
+
+vec3 estimateNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
+        sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0)),
+        sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    
+    for (int i = 0; i < 100; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
+        
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    
+    return -1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray.origin.z += 5.0;
+    ray.origin.y += 1.0;
+    
+    float t = raymarch(ray);
+    
+    vec3 color;
+    if (t > 0.0) {
+        vec3 hitPoint = ray.origin + t * ray.dir;
+        vec3 normal = estimateNormal(hitPoint);
+        
+        // Light from directly above
+        vec3 lightDir = normalize(vec3(0.0, 1.0, 0.0));
+        vec3 viewDir = -ray.dir;
+        vec3 reflectDir = reflect(-lightDir, normal);
+        
+        float diffuse = max(0.0, dot(normal, lightDir));
+        float specular = pow(max(0.0, dot(reflectDir, viewDir)), 32.0);
+        
+        vec3 matColor = getMaterialColor(materialID);
+        float ambient = 0.1;
+        color = matColor * (ambient + diffuse) + vec3(1.0) * specular * 0.3;
+    }
+    else {
+        color = vec3(0.1, 0.1, 0.2);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+### Checkpoint 6: Field of View
+
+```glsl
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    // Telephoto lens: narrow FOV
+    float fov = 30.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+    
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+float sdSphere(vec3 p, vec3 center, float radius) {
+    return length(p - center) - radius;
+}
+
+float sdTorus(vec3 p, vec2 tor) {
+    vec2 q = vec2(length(p.xy) - tor.x, p.z);
+    return length(q) - tor.y;
+}
+
+float sdPlane(vec3 p, float height) {
+    return p.y - height;
+}
+
+float materialID;
+
+float sceneSDF(vec3 p) {
+    float d = 1e10;
+    
+    float sphere = sdSphere(p, vec3(-1.5, 0.0, 0.0), 1.0);
+    if (sphere < d) {
+        d = sphere;
+        materialID = 1.0;
+    }
+    
+    float torus = sdTorus(p - vec3(1.5, 0.0, 0.0), vec2(1.0, 0.4));
+    if (torus < d) {
+        d = torus;
+        materialID = 2.0;
+    }
+    
+    float ground = sdPlane(p, -1.0);
+    if (ground < d) {
+        d = ground;
+        materialID = 3.0;
+    }
+    
+    return d;
+}
+
+vec3 getMaterialColor(float id) {
+    if (id < 1.5) return vec3(1.0, 0.0, 0.0);
+    if (id < 2.5) return vec3(0.0, 0.7, 1.0);
+    return vec3(0.5, 0.5, 0.5);
+}
+
+vec3 estimateNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
+        sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0)),
+        sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    
+    for (int i = 0; i < 100; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
+        
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    
+    return -1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray.origin.z += 5.0;
+    ray.origin.y += 1.0;
+    
+    float t = raymarch(ray);
+    
+    vec3 color;
+    if (t > 0.0) {
+        vec3 hitPoint = ray.origin + t * ray.dir;
+        vec3 normal = estimateNormal(hitPoint);
+        
+        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+        vec3 viewDir = -ray.dir;
+        vec3 reflectDir = reflect(-lightDir, normal);
+        
+        float diffuse = max(0.0, dot(normal, lightDir));
+        float specular = pow(max(0.0, dot(reflectDir, viewDir)), 32.0);
+        
+        vec3 matColor = getMaterialColor(materialID);
+        float ambient = 0.1;
+        color = matColor * (ambient + diffuse) + vec3(1.0) * specular * 0.3;
+    }
+    else {
+        color = vec3(0.1, 0.1, 0.2);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+## Exploration Solutions
+
+### Exploration 1: Two Lights
+
+```glsl
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+    
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+float sdSphere(vec3 p, vec3 center, float radius) {
+    return length(p - center) - radius;
+}
+
+float sdTorus(vec3 p, vec2 tor) {
+    vec2 q = vec2(length(p.xy) - tor.x, p.z);
+    return length(q) - tor.y;
+}
+
+float sdPlane(vec3 p, float height) {
+    return p.y - height;
+}
+
+float materialID;
+
+float sceneSDF(vec3 p) {
+    float d = 1e10;
+    
+    float sphere = sdSphere(p, vec3(-1.5, 0.0, 0.0), 1.0);
+    if (sphere < d) {
+        d = sphere;
+        materialID = 1.0;
+    }
+    
+    float torus = sdTorus(p - vec3(1.5, 0.0, 0.0), vec2(1.0, 0.4));
+    if (torus < d) {
+        d = torus;
+        materialID = 2.0;
+    }
+    
+    float ground = sdPlane(p, -1.0);
+    if (ground < d) {
+        d = ground;
+        materialID = 3.0;
+    }
+    
+    return d;
+}
+
+vec3 getMaterialColor(float id) {
+    if (id < 1.5) return vec3(1.0, 0.0, 0.0);
+    if (id < 2.5) return vec3(0.0, 0.7, 1.0);
+    return vec3(0.5, 0.5, 0.5);
+}
+
+vec3 estimateNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
+        sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0)),
+        sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    
+    for (int i = 0; i < 100; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
+        
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    
+    return -1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray.origin.z += 5.0;
+    ray.origin.y += 1.0;
+    
+    float t = raymarch(ray);
+    
+    vec3 color;
+    if (t > 0.0) {
+        vec3 hitPoint = ray.origin + t * ray.dir;
+        vec3 normal = estimateNormal(hitPoint);
+        vec3 viewDir = -ray.dir;
+        
+        // Key light (warm white, from upper right)
+        vec3 lightDir1 = normalize(vec3(1.0, 1.0, 1.0));
+        vec3 lightColor1 = vec3(1.0, 0.95, 0.9);
+        vec3 reflectDir1 = reflect(-lightDir1, normal);
+        float diffuse1 = max(0.0, dot(normal, lightDir1));
+        float specular1 = pow(max(0.0, dot(reflectDir1, viewDir)), 32.0);
+        
+        // Fill light (cool blue, from left)
+        vec3 lightDir2 = normalize(vec3(-1.0, 0.5, -0.5));
+        vec3 lightColor2 = vec3(0.3, 0.3, 0.5);
+        vec3 reflectDir2 = reflect(-lightDir2, normal);
+        float diffuse2 = max(0.0, dot(normal, lightDir2));
+        float specular2 = pow(max(0.0, dot(reflectDir2, viewDir)), 32.0);
+        
+        vec3 matColor = getMaterialColor(materialID);
+        float ambient = 0.1;
+        
+        // Combine both lights
+        color = matColor * ambient;
+        color += matColor * diffuse1 * lightColor1 + specular1 * lightColor1 * 0.3;
+        color += matColor * diffuse2 * lightColor2 + specular2 * lightColor2 * 0.3;
+    }
+    else {
+        color = vec3(0.1, 0.1, 0.2);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+### Exploration 2: Fog
+
+```glsl
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+    
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+float sdSphere(vec3 p, vec3 center, float radius) {
+    return length(p - center) - radius;
+}
+
+float sdPlane(vec3 p, float height) {
+    return p.y - height;
+}
+
+float sceneSDF(vec3 p) {
+    float d = sdPlane(p, -1.0);
+    
+    // Row of spheres off to the side, receding into distance
+    for (float i = 0.0; i < 5.0; i++) {
+        d = min(d, sdSphere(p, vec3(-2.0, 0.0, -5.0 - i * 4.0), 0.8));
+    }
+    
+    return d;
+}
+
+vec3 estimateNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
+        sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0)),
+        sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    
+    for (int i = 0; i < 100; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
+        
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    
+    return -1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray.origin.z += 3.0;
+    ray.origin.y += 1.0;
+    
+    float t = raymarch(ray);
+    
+    vec3 fogColor = vec3(0.5, 0.6, 0.7);
+    vec3 color;
+    
+    if (t > 0.0) {
+        vec3 hitPoint = ray.origin + t * ray.dir;
+        vec3 normal = estimateNormal(hitPoint);
+        
+        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+        vec3 viewDir = -ray.dir;
+        vec3 reflectDir = reflect(-lightDir, normal);
+        
+        float diffuse = max(0.0, dot(normal, lightDir));
+        float specular = pow(max(0.0, dot(reflectDir, viewDir)), 32.0);
+        
+        // Simple coloring: spheres are red, ground is gray
+        vec3 matColor = (hitPoint.y > -0.9) ? vec3(1.0, 0.4, 0.4) : vec3(0.5, 0.5, 0.5);
+        float ambient = 0.1;
+        color = matColor * (ambient + diffuse) + vec3(1.0) * specular * 0.3;
+        
+        // Apply fog based on distance
+        float fogAmount = 1.0 - exp(-t * 0.08);
+        color = mix(color, fogColor, fogAmount);
+    }
+    else {
+        color = fogColor;
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+### Exploration 3: Animation
+
+```glsl
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+    
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+float sdSphere(vec3 p, vec3 center, float radius) {
+    return length(p - center) - radius;
+}
+
+float sdTorus(vec3 p, vec2 tor) {
+    vec2 q = vec2(length(p.xy) - tor.x, p.z);
+    return length(q) - tor.y;
+}
+
+float sdPlane(vec3 p, float height) {
+    return p.y - height;
+}
+
+// Rotation matrix around X axis
+mat3 rotateX(float angle) {
+    float c = cos(angle);
+    float s = sin(angle);
+    return mat3(
+        1.0, 0.0, 0.0,
+        0.0, c, -s,
+        0.0, s, c
+    );
+}
+
+float materialID;
+
+float sceneSDF(vec3 p) {
+    float d = 1e10;
+    
+    // Pulsing sphere
+    float pulseRadius = 1.0 + 0.2 * sin(iTime * 3.0);
+    float sphere = sdSphere(p, vec3(-2.0, 0.0, 0.0), pulseRadius);
+    if (sphere < d) {
+        d = sphere;
+        materialID = 1.0;
+    }
+    
+    // Rotating torus
+    vec3 torusPos = p - vec3(2.0, 0.0, 0.0);
+    torusPos = rotateX(iTime) * torusPos;
+    float torus = sdTorus(torusPos, vec2(1.0, 0.3));
+    if (torus < d) {
+        d = torus;
+        materialID = 2.0;
+    }
+    
+    // Bouncing sphere
+    float bounceHeight = abs(sin(iTime * 2.0)) * 1.5;
+    float bounceSphere = sdSphere(p, vec3(0.0, -0.5 + bounceHeight, 0.0), 0.5);
+    if (bounceSphere < d) {
+        d = bounceSphere;
+        materialID = 3.0;
+    }
+    
+    // Ground plane
+    float ground = sdPlane(p, -1.5);
+    if (ground < d) {
+        d = ground;
+        materialID = 4.0;
+    }
+    
+    return d;
+}
+
+vec3 getMaterialColor(float id) {
+    if (id < 1.5) return vec3(1.0, 0.3, 0.3);  // Pulsing sphere: red
+    if (id < 2.5) return vec3(0.3, 1.0, 0.3);  // Rotating torus: green
+    if (id < 3.5) return vec3(0.3, 0.3, 1.0);  // Bouncing sphere: blue
+    return vec3(0.5, 0.5, 0.5);                 // Ground: gray
+}
+
+vec3 estimateNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
+        sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0)),
+        sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    
+    for (int i = 0; i < 100; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
+        
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    
+    return -1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray.origin.z += 6.0;
+    ray.origin.y += 1.5;
+    
+    float t = raymarch(ray);
+    
+    vec3 color;
+    if (t > 0.0) {
+        vec3 hitPoint = ray.origin + t * ray.dir;
+        vec3 normal = estimateNormal(hitPoint);
+        
+        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+        vec3 viewDir = -ray.dir;
+        vec3 reflectDir = reflect(-lightDir, normal);
+        
+        float diffuse = max(0.0, dot(normal, lightDir));
+        float specular = pow(max(0.0, dot(reflectDir, viewDir)), 32.0);
+        
+        vec3 matColor = getMaterialColor(materialID);
+        float ambient = 0.1;
+        color = matColor * (ambient + diffuse) + vec3(1.0) * specular * 0.3;
+    }
+    else {
+        color = vec3(0.1, 0.1, 0.2);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+### Exploration 4: Cone SDF
+
+```glsl
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+    
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+float sdCylinder(vec3 p, float r, float h) {
+    float dRadial = length(p.xz) - r;
+    float dVertical = abs(p.y) - h;
+    return min(max(dRadial, dVertical), 0.0) + 
+           length(max(vec2(dRadial, dVertical), 0.0));
+}
+
+// Cone with tip at origin, opening upward, half-angle theta, capped at height h
+float sdCone(vec3 p, float angle, float h) {
+    float tanAngle = tan(angle);
+    
+    // Distance from the slanted surface
+    float q = length(p.xz);
+    float coneRadius = p.y * tanAngle;
+    float dRadial = q - coneRadius;
+    
+    // Distance from the cap
+    float dCap = p.y - h;
+    
+    // Distance from the tip (below y=0)
+    float dTip = -p.y;
+    
+    // Combine: inside cone is negative
+    float dInside = max(dRadial / sqrt(1.0 + tanAngle * tanAngle), max(dCap, dTip));
+    
+    // Outside: distance to nearest surface
+    vec2 closest = vec2(max(dRadial, 0.0), max(max(dCap, dTip), 0.0));
+    float dOutside = length(closest);
+    
+    return (dInside < 0.0) ? dInside : dOutside;
+}
+
+float sdPlane(vec3 p, float height) {
+    return p.y - height;
+}
+
+float materialID;
+
+float sceneSDF(vec3 p) {
+    float d = 1e10;
+    
+    // Cylinder on the left
+    float cylinder = sdCylinder(p - vec3(-2.0, 0.0, 0.0), 0.8, 1.5);
+    if (cylinder < d) {
+        d = cylinder;
+        materialID = 1.0;
+    }
+    
+    // Cone on the right
+    float cone = sdCone(p - vec3(2.0, -1.5, 0.0), radians(30.0), 2.5);
+    if (cone < d) {
+        d = cone;
+        materialID = 2.0;
+    }
+    
+    // Ground plane
+    float ground = sdPlane(p, -1.5);
+    if (ground < d) {
+        d = ground;
+        materialID = 3.0;
+    }
+    
+    return d;
+}
+
+vec3 getMaterialColor(float id) {
+    if (id < 1.5) return vec3(0.8, 0.4, 0.1);  // Cylinder: orange
+    if (id < 2.5) return vec3(0.1, 0.6, 0.8);  // Cone: teal
+    return vec3(0.5, 0.5, 0.5);                 // Ground: gray
+}
+
+vec3 estimateNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
+        sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0)),
+        sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    
+    for (int i = 0; i < 100; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
+        
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    
+    return -1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray.origin.z += 6.0;
+    ray.origin.y += 2.0;
+    
+    float t = raymarch(ray);
+    
+    vec3 color;
+    if (t > 0.0) {
+        vec3 hitPoint = ray.origin + t * ray.dir;
+        vec3 normal = estimateNormal(hitPoint);
+        
+        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+        vec3 viewDir = -ray.dir;
+        vec3 reflectDir = reflect(-lightDir, normal);
+        
+        float diffuse = max(0.0, dot(normal, lightDir));
+        float specular = pow(max(0.0, dot(reflectDir, viewDir)), 32.0);
+        
+        vec3 matColor = getMaterialColor(materialID);
+        float ambient = 0.1;
+        color = matColor * (ambient + diffuse) + vec3(1.0) * specular * 0.3;
+    }
+    else {
+        color = vec3(0.1, 0.1, 0.2);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+### Exploration 5: Smooth Blending (Metaballs)
+
+```glsl
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+    
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+float sdSphere(vec3 p, vec3 center, float radius) {
+    return length(p - center) - radius;
+}
+
+float sdPlane(vec3 p, float height) {
+    return p.y - height;
+}
+
+// Smooth minimum for blending
+float smin(float a, float b, float k) {
+    float h = max(k - abs(a - b), 0.0) / k;
+    return min(a, b) - h * h * k * 0.25;
+}
+
+float materialID;
+
+float sceneSDF(vec3 p) {
+    float d = 1e10;
+    
+    // Two spheres that move toward and away from each other
+    float offset = sin(iTime) * 1.2;
+    
+    float sphere1 = sdSphere(p, vec3(-0.8 - offset, 0.0, 0.0), 1.0);
+    float sphere2 = sdSphere(p, vec3(0.8 + offset, 0.0, 0.0), 1.0);
+    
+    // Smooth blend the spheres
+    float blended = smin(sphere1, sphere2, 0.5);
+    if (blended < d) {
+        d = blended;
+        materialID = 1.0;
+    }
+    
+    // Ground plane
+    float ground = sdPlane(p, -1.5);
+    if (ground < d) {
+        d = ground;
+        materialID = 2.0;
+    }
+    
+    return d;
+}
+
+vec3 getMaterialColor(float id) {
+    if (id < 1.5) return vec3(0.9, 0.2, 0.4);  // Metaballs: pink
+    return vec3(0.3, 0.3, 0.35);                // Ground: dark gray
+}
+
+vec3 estimateNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
+        sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0)),
+        sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    
+    for (int i = 0; i < 100; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
+        
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    
+    return -1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray.origin.z += 5.0;
+    ray.origin.y += 1.0;
+    
+    float t = raymarch(ray);
+    
+    vec3 color;
+    if (t > 0.0) {
+        vec3 hitPoint = ray.origin + t * ray.dir;
+        vec3 normal = estimateNormal(hitPoint);
+        
+        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+        vec3 viewDir = -ray.dir;
+        vec3 reflectDir = reflect(-lightDir, normal);
+        
+        float diffuse = max(0.0, dot(normal, lightDir));
+        float specular = pow(max(0.0, dot(reflectDir, viewDir)), 32.0);
+        
+        vec3 matColor = getMaterialColor(materialID);
+        float ambient = 0.15;
+        color = matColor * (ambient + diffuse) + vec3(1.0) * specular * 0.5;
+    }
+    else {
+        color = vec3(0.1, 0.1, 0.15);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+### Exploration 6: Normal Coloring
+
+```glsl
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+    
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+float sdSphere(vec3 p, vec3 center, float radius) {
+    return length(p - center) - radius;
+}
+
+float sdTorus(vec3 p, vec2 tor) {
+    vec2 q = vec2(length(p.xy) - tor.x, p.z);
+    return length(q) - tor.y;
+}
+
+float sdPlane(vec3 p, float height) {
+    return p.y - height;
+}
+
+float sceneSDF(vec3 p) {
+    float sphere = sdSphere(p, vec3(-1.5, 0.0, 0.0), 1.0);
+    float torus = sdTorus(p - vec3(1.5, 0.0, 0.0), vec2(1.0, 0.4));
+    float ground = sdPlane(p, -1.0);
+    
+    return min(min(sphere, torus), ground);
+}
+
+vec3 estimateNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
+        sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0)),
+        sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    
+    for (int i = 0; i < 100; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
+        
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    
+    return -1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray.origin.z += 5.0;
+    ray.origin.y += 1.0;
+    
+    float t = raymarch(ray);
+    
+    vec3 color;
+    if (t > 0.0) {
+        vec3 hitPoint = ray.origin + t * ray.dir;
+        vec3 normal = estimateNormal(hitPoint);
+        
+        // Normal coloring: remap from [-1,1] to [0,1]
+        color = normal * 0.5 + 0.5;
+    }
+    else {
+        color = vec3(0.1, 0.1, 0.15);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+## Challenge Solutions
+
+### Challenge 1: CSG Operations (Coffee Cup)
+
+```glsl
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+    
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+float sdCylinder(vec3 p, float r, float h) {
+    float dRadial = length(p.xz) - r;
+    float dVertical = abs(p.y) - h;
+    return min(max(dRadial, dVertical), 0.0) + 
+           length(max(vec2(dRadial, dVertical), 0.0));
+}
+
+// Torus with ring in XY plane (axis along Z)
+float sdTorus(vec3 p, vec2 tor) {
+    vec2 q = vec2(length(p.xy) - tor.x, p.z);
+    return length(q) - tor.y;
+}
+
+float sdPlane(vec3 p, float height) {
+    return p.y - height;
+}
+
+float smin(float a, float b, float k) {
+    float h = max(k - abs(a - b), 0.0) / k;
+    return min(a, b) - h * h * k * 0.25;
+}
+
+float materialID;
+
+float sceneSDF(vec3 p) {
+    float d = 1e10;
+    
+    // Cup body: outer cylinder minus inner cylinder (smooth subtraction)
+    float outerCylinder = sdCylinder(p, 1.0, 1.2);
+    float innerCylinder = sdCylinder(p - vec3(0.0, 0.15, 0.0), 0.85, 1.1);
+    float cupBody = -smin(-outerCylinder, innerCylinder, 0.1);  // Smooth subtraction
+    
+    // Handle: torus on the side
+    // sdTorus has core circle in XY plane (axis along Z) - perfect for a vertical handle
+    vec3 handlePos = p - vec3(1.2, 0.0, 0.0);
+    float handle = sdTorus(handlePos, vec2(0.7, 0.15));
+    
+    // Blend handle with cup body
+    float cup = smin(cupBody, handle, 0.15);
+    
+    if (cup < d) {
+        d = cup;
+        materialID = 1.0;
+    }
+    
+    // Ground plane (not rotated)
+    float ground = p.y + 1.5;
+    if (ground < d) {
+        d = ground;
+        materialID = 2.0;
+    }
+    
+    return d;
+}
+
+vec3 getMaterialColor(float id) {
+    if (id < 1.5) return vec3(0.9, 0.85, 0.8);  // Cup: cream white
+    return vec3(0.3, 0.25, 0.2);                 // Ground: brown
+}
+
+vec3 estimateNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
+        sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0)),
+        sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    
+    for (int i = 0; i < 100; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
+        
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    
+    return -1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray.origin.z += 5.0;
+    ray.origin.y += 1.0;
+    ray.origin.x += 2.0;  // Move camera to the side to see handle
+    
+    float t = raymarch(ray);
+    
+    vec3 color;
+    if (t > 0.0) {
+        vec3 hitPoint = ray.origin + t * ray.dir;
+        vec3 normal = estimateNormal(hitPoint);
+        
+        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+        vec3 viewDir = -ray.dir;
+        vec3 reflectDir = reflect(-lightDir, normal);
+        
+        float diffuse = max(0.0, dot(normal, lightDir));
+        float specular = pow(max(0.0, dot(reflectDir, viewDir)), 32.0);
+        
+        vec3 matColor = getMaterialColor(materialID);
+        float ambient = 0.2;
+        color = matColor * (ambient + diffuse) + vec3(1.0) * specular * 0.3;
+    }
+    else {
+        color = vec3(0.1, 0.1, 0.15);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+### Challenge 2: Infinite Repetition
+
+```glsl
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+    
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+float sdSphere(vec3 p, float radius) {
+    return length(p) - radius;
+}
+
+float sdBox(vec3 p, vec3 halfSize) {
+    vec3 d = abs(p) - halfSize;
+    return length(max(d, 0.0)) + min(max(d.x, max(d.y, d.z)), 0.0);
+}
+
+float sdPlane(vec3 p, float height) {
+    return p.y - height;
+}
+
+float materialID;
+
+float sceneSDF(vec3 p) {
+    float d = 1e10;
+    
+    // Infinite grid of spheres
+    vec3 spacing = vec3(3.0, 3.0, 3.0);
+    vec3 q = mod(p + spacing * 0.5, spacing) - spacing * 0.5;
+    
+    // Alternate between spheres and boxes based on cell
+    vec3 cellID = floor((p + spacing * 0.5) / spacing);
+    float checker = mod(cellID.x + cellID.y + cellID.z, 2.0);
+    
+    float shape;
+    if (checker < 0.5) {
+        shape = sdSphere(q, 0.8);
+        if (shape < d) {
+            d = shape;
+            materialID = 1.0;
+        }
+    } else {
+        shape = sdBox(q, vec3(0.6));
+        if (shape < d) {
+            d = shape;
+            materialID = 2.0;
+        }
+    }
+    
+    // Ground plane (not repeated)
+    float ground = sdPlane(p, -2.0);
+    if (ground < d) {
+        d = ground;
+        materialID = 3.0;
+    }
+    
+    return d;
+}
+
+vec3 getMaterialColor(float id) {
+    if (id < 1.5) return vec3(1.0, 0.4, 0.4);  // Spheres: red
+    if (id < 2.5) return vec3(0.4, 0.4, 1.0);  // Boxes: blue
+    return vec3(0.4, 0.4, 0.4);                 // Ground: gray
+}
+
+vec3 estimateNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
+        sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0)),
+        sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    
+    for (int i = 0; i < 150; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
+        
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 50.0) return -1.0;
+    }
+    
+    return -1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray.origin.z += 5.0;
+    ray.origin.y += 3.0;
+    
+    float t = raymarch(ray);
+    
+    vec3 fogColor = vec3(0.5, 0.6, 0.7);
+    vec3 color;
+    
+    if (t > 0.0) {
+        vec3 hitPoint = ray.origin + t * ray.dir;
+        vec3 normal = estimateNormal(hitPoint);
+        
+        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+        vec3 viewDir = -ray.dir;
+        vec3 reflectDir = reflect(-lightDir, normal);
+        
+        float diffuse = max(0.0, dot(normal, lightDir));
+        float specular = pow(max(0.0, dot(reflectDir, viewDir)), 32.0);
+        
+        vec3 matColor = getMaterialColor(materialID);
+        float ambient = 0.1;
+        color = matColor * (ambient + diffuse) + vec3(1.0) * specular * 0.3;
+        
+        // Fog
+        float fogAmount = 1.0 - exp(-t * 0.05);
+        color = mix(color, fogColor, fogAmount);
+    }
+    else {
+        color = fogColor;
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+### Challenge 3: Orbiting Camera
+
+```glsl
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+mat3 rotateY(float angle) {
+    float c = cos(angle);
+    float s = sin(angle);
+    return mat3(
+        c, 0.0, s,
+        0.0, 1.0, 0.0,
+        -s, 0.0, c
+    );
+}
+
+Ray generateRay(vec2 fragCoord, mat3 camRot, vec3 camPos) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+    
+    Ray ray;
+    ray.origin = camPos;
+    ray.dir = camRot * normalize(vec3(uv, -f));
+    return ray;
+}
+
+float sdSphere(vec3 p, vec3 center, float radius) {
+    return length(p - center) - radius;
+}
+
+float sdTorus(vec3 p, vec2 tor) {
+    vec2 q = vec2(length(p.xy) - tor.x, p.z);
+    return length(q) - tor.y;
+}
+
+float sdPlane(vec3 p, float height) {
+    return p.y - height;
+}
+
+float materialID;
+
+float sceneSDF(vec3 p) {
+    float d = 1e10;
+    
+    float sphere = sdSphere(p, vec3(-1.5, 0.0, 0.0), 1.0);
+    if (sphere < d) {
+        d = sphere;
+        materialID = 1.0;
+    }
+    
+    float torus = sdTorus(p - vec3(1.5, 0.0, 0.0), vec2(1.0, 0.4));
+    if (torus < d) {
+        d = torus;
+        materialID = 2.0;
+    }
+    
+    float ground = sdPlane(p, -1.0);
+    if (ground < d) {
+        d = ground;
+        materialID = 3.0;
+    }
+    
+    return d;
+}
+
+vec3 getMaterialColor(float id) {
+    if (id < 1.5) return vec3(1.0, 0.0, 0.0);
+    if (id < 2.5) return vec3(0.0, 0.7, 1.0);
+    return vec3(0.5, 0.5, 0.5);
+}
+
+vec3 estimateNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
+        sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0)),
+        sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    
+    for (int i = 0; i < 100; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
+        
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    
+    return -1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    // Orbiting camera
+    float angle = iTime * 0.5;
+    float height = 2.0 + sin(iTime * 0.3) * 1.0;  // Vertical bobbing
+    float radius = 6.0;
+    
+    mat3 camRot = rotateY(angle);
+    vec3 camPos = camRot * vec3(0.0, height, radius);
+    
+    Ray ray = generateRay(fragCoord, camRot, camPos);
+    
+    float t = raymarch(ray);
+    
+    vec3 color;
+    if (t > 0.0) {
+        vec3 hitPoint = ray.origin + t * ray.dir;
+        vec3 normal = estimateNormal(hitPoint);
+        
+        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+        vec3 viewDir = -ray.dir;
+        vec3 reflectDir = reflect(-lightDir, normal);
+        
+        float diffuse = max(0.0, dot(normal, lightDir));
+        float specular = pow(max(0.0, dot(reflectDir, viewDir)), 32.0);
+        
+        vec3 matColor = getMaterialColor(materialID);
+        float ambient = 0.1;
+        color = matColor * (ambient + diffuse) + vec3(1.0) * specular * 0.3;
+    }
+    else {
+        color = vec3(0.1, 0.1, 0.2);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+### Challenge 4: Reflections
+
+```glsl
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+    
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+float sdSphere(vec3 p, vec3 center, float radius) {
+    return length(p - center) - radius;
+}
+
+float sdTorus(vec3 p, vec2 tor) {
+    vec2 q = vec2(length(p.xy) - tor.x, p.z);
+    return length(q) - tor.y;
+}
+
+float sdPlane(vec3 p, float height) {
+    return p.y - height;
+}
+
+float materialID;
+
+float sceneSDF(vec3 p) {
+    float d = 1e10;
+    
+    float sphere = sdSphere(p, vec3(-1.5, 0.0, 0.0), 1.0);
+    if (sphere < d) {
+        d = sphere;
+        materialID = 1.0;
+    }
+    
+    float torus = sdTorus(p - vec3(1.5, 0.0, 0.0), vec2(1.0, 0.4));
+    if (torus < d) {
+        d = torus;
+        materialID = 2.0;
+    }
+    
+    float ground = sdPlane(p, -1.0);
+    if (ground < d) {
+        d = ground;
+        materialID = 3.0;
+    }
+    
+    return d;
+}
+
+vec3 getMaterialColor(float id) {
+    if (id < 1.5) return vec3(1.0, 0.0, 0.0);
+    if (id < 2.5) return vec3(0.0, 0.7, 1.0);
+    return vec3(0.3, 0.3, 0.3);  // Ground: darker for better reflection visibility
+}
+
+vec3 estimateNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
+        sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0)),
+        sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    
+    for (int i = 0; i < 100; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
+        
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    
+    return -1.0;
+}
+
+vec3 shade(vec3 hitPoint, vec3 normal, vec3 viewDir) {
+    vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+    vec3 reflectDir = reflect(-lightDir, normal);
+    
+    float diffuse = max(0.0, dot(normal, lightDir));
+    float specular = pow(max(0.0, dot(reflectDir, viewDir)), 32.0);
+    
+    vec3 matColor = getMaterialColor(materialID);
+    float ambient = 0.1;
+    return matColor * (ambient + diffuse) + vec3(1.0) * specular * 0.3;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray.origin.z += 5.0;
+    ray.origin.y += 1.0;
+    
+    float t = raymarch(ray);
+    
+    vec3 color;
+    if (t > 0.0) {
+        vec3 hitPoint = ray.origin + t * ray.dir;
+        vec3 normal = estimateNormal(hitPoint);
+        
+        color = shade(hitPoint, normal, -ray.dir);
+        float hitMaterial = materialID;
+        
+        // Only reflect off the ground (material 3)
+        if (hitMaterial > 2.5) {
+            vec3 reflectDir = reflect(ray.dir, normal);
+            Ray reflectedRay;
+            reflectedRay.origin = hitPoint + normal * 0.01;  // Offset to avoid self-intersection
+            reflectedRay.dir = reflectDir;
+            
+            float t2 = raymarch(reflectedRay);
+            if (t2 > 0.0) {
+                vec3 reflectedHit = reflectedRay.origin + t2 * reflectedRay.dir;
+                vec3 reflectedNormal = estimateNormal(reflectedHit);
+                vec3 reflectedColor = shade(reflectedHit, reflectedNormal, -reflectedRay.dir);
+                color = mix(color, reflectedColor, 0.5);  // 50% reflective
+            }
+        }
+    }
+    else {
+        color = vec3(0.1, 0.1, 0.2);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+### Challenge 5: Struct-Based Materials
+
+```glsl
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+struct Surface {
+    float dist;
+    float matID;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+    
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+Surface sdSphere(vec3 p, vec3 center, float radius, float matID) {
+    return Surface(length(p - center) - radius, matID);
+}
+
+Surface sdTorus(vec3 p, vec2 tor, float matID) {
+    vec2 q = vec2(length(p.xy) - tor.x, p.z);
+    return Surface(length(q) - tor.y, matID);
+}
+
+Surface sdPlane(vec3 p, float height, float matID) {
+    return Surface(p.y - height, matID);
+}
+
+Surface opUnion(Surface a, Surface b) {
+    if (a.dist < b.dist) {
+        return a;
+    }
+    return b;
+}
+
+Surface sceneSDF(vec3 p) {
+    Surface s = sdSphere(p, vec3(-1.5, 0.0, 0.0), 1.0, 1.0);
+    s = opUnion(s, sdTorus(p - vec3(1.5, 0.0, 0.0), vec2(1.0, 0.4), 2.0));
+    s = opUnion(s, sdPlane(p, -1.0, 3.0));
+    return s;
+}
+
+vec3 getMaterialColor(float id) {
+    if (id < 1.5) return vec3(1.0, 0.0, 0.0);
+    if (id < 2.5) return vec3(0.0, 0.7, 1.0);
+    return vec3(0.5, 0.5, 0.5);
+}
+
+vec3 estimateNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sceneSDF(p + vec3(eps, 0, 0)).dist - sceneSDF(p - vec3(eps, 0, 0)).dist,
+        sceneSDF(p + vec3(0, eps, 0)).dist - sceneSDF(p - vec3(0, eps, 0)).dist,
+        sceneSDF(p + vec3(0, 0, eps)).dist - sceneSDF(p - vec3(0, 0, eps)).dist
+    ));
+}
+
+Surface raymarch(Ray ray) {
+    float t = 0.0;
+    Surface s;
+    
+    for (int i = 0; i < 100; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        s = sceneSDF(p);
+        
+        if (s.dist < 0.001) {
+            return Surface(t, s.matID);
+        }
+        
+        t += s.dist;
+        
+        if (t > 100.0) {
+            return Surface(-1.0, 0.0);
+        }
+    }
+    
+    return Surface(-1.0, 0.0);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray.origin.z += 5.0;
+    ray.origin.y += 1.0;
+    
+    Surface hit = raymarch(ray);
+    
+    vec3 color;
+    if (hit.dist > 0.0) {
+        vec3 hitPoint = ray.origin + hit.dist * ray.dir;
+        vec3 normal = estimateNormal(hitPoint);
+        
+        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+        vec3 viewDir = -ray.dir;
+        vec3 reflectDir = reflect(-lightDir, normal);
+        
+        float diffuse = max(0.0, dot(normal, lightDir));
+        float specular = pow(max(0.0, dot(reflectDir, viewDir)), 32.0);
+        
+        vec3 matColor = getMaterialColor(hit.matID);
+        float ambient = 0.1;
+        color = matColor * (ambient + diffuse) + vec3(1.0) * specular * 0.3;
+    }
+    else {
+        color = vec3(0.1, 0.1, 0.2);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+### Challenge 6: Hard Shadows
+
+```glsl
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+    
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+float sdSphere(vec3 p, vec3 center, float radius) {
+    return length(p - center) - radius;
+}
+
+float sdTorus(vec3 p, vec2 tor) {
+    vec2 q = vec2(length(p.xy) - tor.x, p.z);
+    return length(q) - tor.y;
+}
+
+float sdPlane(vec3 p, float height) {
+    return p.y - height;
+}
+
+float materialID;
+
+float sceneSDF(vec3 p) {
+    float d = 1e10;
+    
+    float sphere = sdSphere(p, vec3(-1.5, 0.0, 0.0), 1.0);
+    if (sphere < d) {
+        d = sphere;
+        materialID = 1.0;
+    }
+    
+    float torus = sdTorus(p - vec3(1.5, 0.0, 0.0), vec2(1.0, 0.4));
+    if (torus < d) {
+        d = torus;
+        materialID = 2.0;
+    }
+    
+    float ground = sdPlane(p, -1.0);
+    if (ground < d) {
+        d = ground;
+        materialID = 3.0;
+    }
+    
+    return d;
+}
+
+vec3 getMaterialColor(float id) {
+    if (id < 1.5) return vec3(0.8, 0.2, 0.2);  // Sphere: red
+    if (id < 2.5) return vec3(0.2, 0.7, 0.7);  // Torus: cyan
+    return vec3(0.4, 0.4, 0.45);                // Ground: gray
+}
+
+vec3 estimateNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
+        sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0)),
+        sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    
+    for (int i = 0; i < 100; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
+        
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    
+    return -1.0;
+}
+
+// Hard shadow - returns 0 if in shadow, 1 if lit
+float hardShadow(vec3 origin, vec3 lightDir, float maxDist) {
+    float t = 0.02;  // Start slightly away from surface
+    
+    for (int i = 0; i < 64; i++) {
+        float d = sceneSDF(origin + lightDir * t);
+        if (d < 0.001) return 0.0;  // Hit something - in shadow
+        t += d;
+        if (t > maxDist) break;
+    }
+    
+    return 1.0;  // Reached the light - not in shadow
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray.origin.z += 5.0;
+    ray.origin.y += 1.0;
+    
+    float t = raymarch(ray);
+    
+    vec3 color;
+    if (t > 0.0) {
+        vec3 hitPoint = ray.origin + t * ray.dir;
+        float hitMat = materialID;
+        vec3 normal = estimateNormal(hitPoint);
+        
+        vec3 lightDir = normalize(vec3(1.0, 2.0, 1.0));
+        vec3 viewDir = -ray.dir;
+        vec3 reflectDir = reflect(-lightDir, normal);
+        
+        float diffuse = max(0.0, dot(normal, lightDir));
+        float specular = pow(max(0.0, dot(reflectDir, viewDir)), 32.0);
+        
+        // Check for shadow
+        float shadow = hardShadow(hitPoint + normal * 0.02, lightDir, 10.0);
+        
+        vec3 matColor = getMaterialColor(hitMat);
+        float ambient = 0.15;
+        color = matColor * ambient + matColor * diffuse * shadow + vec3(1.0) * specular * 0.3 * shadow;
+    }
+    else {
+        color = vec3(0.1, 0.1, 0.15);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+## Project Solutions
+
+### Project Step 1: Basic Barth Sextic
+
+Just the variety with distance estimation, no bounding volume yet.
+
+```glsl
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+    
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+float barthSextic(vec3 p) {
+    float phi = (1.0 + sqrt(5.0)) / 2.0;
+    float phi2 = phi * phi;
+    
+    float x2 = p.x * p.x;
+    float y2 = p.y * p.y;
+    float z2 = p.z * p.z;
+    
+    float a = (phi2 * x2 - y2) * (phi2 * y2 - z2) * (phi2 * z2 - x2);
+    float b = (x2 + y2 + z2 - 1.0);
+    
+    return 4.0 * a - (1.0 + 2.0 * phi) * b * b;
+}
+
+vec3 gradient(vec3 p) {
+    float eps = 0.001;
+    return vec3(
+        barthSextic(p + vec3(eps, 0, 0)) - barthSextic(p - vec3(eps, 0, 0)),
+        barthSextic(p + vec3(0, eps, 0)) - barthSextic(p - vec3(0, eps, 0)),
+        barthSextic(p + vec3(0, 0, eps)) - barthSextic(p - vec3(0, 0, eps))
+    ) / (2.0 * eps);
+}
+
+float estimateDistance(vec3 p) {
+    float f = barthSextic(p);
+    vec3 grad = gradient(p);
+    float gradLen = length(grad);
+    return 0.3 * abs(f) / max(gradLen, 0.1);
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    
+    for (int i = 0; i < 200; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = estimateDistance(p);
+        
+        if (d < 0.0005) return t;
+        t += d;
+        if (t > 20.0) return -1.0;
+    }
+    
+    return -1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray.origin.z += 3.0;
+    
+    float t = raymarch(ray);
+    
+    vec3 color;
+    if (t > 0.0) {
+        vec3 hitPoint = ray.origin + t * ray.dir;
+        vec3 normal = normalize(gradient(hitPoint));
+        
+        // Flip normal if pointing away from camera
+        if (dot(normal, ray.dir) > 0.0) normal = -normal;
+        
+        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+        float diffuse = max(0.0, dot(normal, lightDir));
+        
+        color = vec3(0.8, 0.3, 0.2) * (0.1 + diffuse);
+    }
+    else {
+        color = vec3(0.1, 0.1, 0.15);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+### Project Step 2: With Bounding Sphere
+
+Add a bounding sphere for efficiency.
+
+```glsl
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+    
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+float barthSextic(vec3 p) {
+    float phi = (1.0 + sqrt(5.0)) / 2.0;
+    float phi2 = phi * phi;
+    
+    float x2 = p.x * p.x;
+    float y2 = p.y * p.y;
+    float z2 = p.z * p.z;
+    
+    float a = (phi2 * x2 - y2) * (phi2 * y2 - z2) * (phi2 * z2 - x2);
+    float b = (x2 + y2 + z2 - 1.0);
+    
+    return 4.0 * a - (1.0 + 2.0 * phi) * b * b;
+}
+
+vec3 gradient(vec3 p) {
+    float eps = 0.001;
+    return vec3(
+        barthSextic(p + vec3(eps, 0, 0)) - barthSextic(p - vec3(eps, 0, 0)),
+        barthSextic(p + vec3(0, eps, 0)) - barthSextic(p - vec3(0, eps, 0)),
+        barthSextic(p + vec3(0, 0, eps)) - barthSextic(p - vec3(0, 0, eps))
+    ) / (2.0 * eps);
+}
+
+float estimateDistance(vec3 p) {
+    float f = barthSextic(p);
+    vec3 grad = gradient(p);
+    float gradLen = length(grad);
+    return 0.3 * abs(f) / max(gradLen, 0.1);
+}
+
+float sceneSDF(vec3 p) {
+    // Bounding sphere
+    float bounds = length(p) - 2.0;
+    if (bounds > 0.01) {
+        return bounds;
+    }
+    return estimateDistance(p);
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    
+    for (int i = 0; i < 200; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
+        
+        if (d < 0.0005) return t;
+        t += d;
+        if (t > 20.0) return -1.0;
+    }
+    
+    return -1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray.origin.z += 3.0;
+    
+    float t = raymarch(ray);
+    
+    vec3 color;
+    if (t > 0.0) {
+        vec3 hitPoint = ray.origin + t * ray.dir;
+        vec3 normal = normalize(gradient(hitPoint));
+        
+        if (dot(normal, ray.dir) > 0.0) normal = -normal;
+        
+        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+        float diffuse = max(0.0, dot(normal, lightDir));
+        
+        color = vec3(0.8, 0.3, 0.2) * (0.1 + diffuse);
+    }
+    else {
+        color = vec3(0.1, 0.1, 0.15);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+### Project Step 3: With Floor, Wall, and Specular
+
+Add a floor, back wall, and specular highlights.
+
+```glsl
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+    
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+float barthSextic(vec3 p) {
+    float phi = (1.0 + sqrt(5.0)) / 2.0;
+    float phi2 = phi * phi;
+    
+    float x2 = p.x * p.x;
+    float y2 = p.y * p.y;
+    float z2 = p.z * p.z;
+    
+    float a = (phi2 * x2 - y2) * (phi2 * y2 - z2) * (phi2 * z2 - x2);
+    float b = (x2 + y2 + z2 - 1.0);
+    
+    return 4.0 * a - (1.0 + 2.0 * phi) * b * b;
+}
+
+vec3 gradient(vec3 p) {
+    float eps = 0.001;
+    return vec3(
+        barthSextic(p + vec3(eps, 0, 0)) - barthSextic(p - vec3(eps, 0, 0)),
+        barthSextic(p + vec3(0, eps, 0)) - barthSextic(p - vec3(0, eps, 0)),
+        barthSextic(p + vec3(0, 0, eps)) - barthSextic(p - vec3(0, 0, eps))
+    ) / (2.0 * eps);
+}
+
+float varietyDistance(vec3 p) {
+    float f = barthSextic(p);
+    vec3 grad = gradient(p);
+    float gradLen = length(grad);
+    return 0.3 * abs(f) / max(gradLen, 0.1);
+}
+
+// 1 = variety, 2 = floor, 3 = wall
+float materialID;
+
+float sceneSDF(vec3 p) {
+    float d = 1e10;
+    
+    // Variety (raised up)
+    vec3 varietyPos = p - vec3(0.0, 0.3, 0.0);
+    float bounds = length(varietyPos) - 2.0;
+    float variety;
+    if (bounds > 0.01) {
+        variety = bounds;
+    } else {
+        variety = varietyDistance(varietyPos);
+    }
+    if (variety < d) {
+        d = variety;
+        materialID = 1.0;
+    }
+    
+    // Floor
+    float floor = p.y + 2.0;
+    if (floor < d) {
+        d = floor;
+        materialID = 2.0;
+    }
+    
+    // Back wall
+    float wall = p.z + 4.0;
+    if (wall < d) {
+        d = wall;
+        materialID = 3.0;
+    }
+    
+    return d;
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    
+    for (int i = 0; i < 200; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
+        
+        if (d < 0.0005) return t;
+        t += d;
+        if (t > 50.0) return -1.0;
+    }
+    
+    return -1.0;
+}
+
+vec3 getMaterialColor(float id) {
+    if (id < 1.5) return vec3(0.9, 0.4, 0.3);   // Variety: coral
+    if (id < 2.5) return vec3(0.2, 0.2, 0.22);  // Floor: dark gray
+    return vec3(0.25, 0.25, 0.28);               // Wall: slightly lighter
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray.origin.z += 4.0;
+    ray.origin.y += 0.3;
+    
+    float t = raymarch(ray);
+    
+    vec3 color;
+    if (t > 0.0) {
+        vec3 hitPoint = ray.origin + t * ray.dir;
+        float hitMat = materialID;
+        
+        // Get normal
+        vec3 normal;
+        if (hitMat < 1.5) {
+            // Variety: use gradient
+            vec3 varietyPos = hitPoint - vec3(0.0, 0.3, 0.0);
+            normal = normalize(gradient(varietyPos));
+            if (dot(normal, ray.dir) > 0.0) normal = -normal;
+        } else if (hitMat < 2.5) {
+            // Floor
+            normal = vec3(0.0, 1.0, 0.0);
+        } else {
+            // Wall
+            normal = vec3(0.0, 0.0, 1.0);
+        }
+        
+        vec3 matColor = getMaterialColor(hitMat);
+        vec3 viewDir = -ray.dir;
+        
+        // Single light with specular
+        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+        float diffuse = max(0.0, dot(normal, lightDir));
+        float specular = pow(max(0.0, dot(reflect(-lightDir, normal), viewDir)), 32.0);
+        
+        float ambient = 0.1;
+        color = matColor * (ambient + diffuse) + vec3(1.0) * specular * 0.3;
+    }
+    else {
+        color = vec3(0.1, 0.1, 0.15);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+### Project Step 4: Final Scene with Rotation and Multi-Colored Lights
+
+The complete scene with rotation and beautiful lighting.
+
+```glsl
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+    
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+mat3 rotateY(float angle) {
+    float c = cos(angle);
+    float s = sin(angle);
+    return mat3(
+        c, 0.0, s,
+        0.0, 1.0, 0.0,
+        -s, 0.0, c
+    );
+}
+
+float barthSextic(vec3 p) {
+    // Apply rotation
+    p = rotateY(iTime * 0.3) * p;
+    
+    float phi = (1.0 + sqrt(5.0)) / 2.0;
+    float phi2 = phi * phi;
+    
+    float x2 = p.x * p.x;
+    float y2 = p.y * p.y;
+    float z2 = p.z * p.z;
+    
+    float a = (phi2 * x2 - y2) * (phi2 * y2 - z2) * (phi2 * z2 - x2);
+    float b = (x2 + y2 + z2 - 1.0);
+    
+    return 4.0 * a - (1.0 + 2.0 * phi) * b * b;
+}
+
+vec3 gradient(vec3 p) {
+    float eps = 0.001;
+    return vec3(
+        barthSextic(p + vec3(eps, 0, 0)) - barthSextic(p - vec3(eps, 0, 0)),
+        barthSextic(p + vec3(0, eps, 0)) - barthSextic(p - vec3(0, eps, 0)),
+        barthSextic(p + vec3(0, 0, eps)) - barthSextic(p - vec3(0, 0, eps))
+    ) / (2.0 * eps);
+}
+
+float varietyDistance(vec3 p) {
+    float f = barthSextic(p);
+    vec3 grad = gradient(p);
+    float gradLen = length(grad);
+    return 0.3 * abs(f) / max(gradLen, 0.1);
+}
+
+// 1 = variety, 2 = floor, 3 = wall
+float materialID;
+
+float sceneSDF(vec3 p) {
+    float d = 1e10;
+    
+    // Variety (raised up)
+    vec3 varietyPos = p - vec3(0.0, 0.3, 0.0);
+    float bounds = length(varietyPos) - 2.0;
+    float variety;
+    if (bounds > 0.01) {
+        variety = bounds;
+    } else {
+        variety = varietyDistance(varietyPos);
+    }
+    if (variety < d) {
+        d = variety;
+        materialID = 1.0;
+    }
+    
+    // Floor
+    float floor = p.y + 2.0;
+    if (floor < d) {
+        d = floor;
+        materialID = 2.0;
+    }
+    
+    // Back wall
+    float wall = p.z + 4.0;
+    if (wall < d) {
+        d = wall;
+        materialID = 3.0;
+    }
+    
+    return d;
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    
+    for (int i = 0; i < 200; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
+        
+        if (d < 0.0005) return t;
+        t += d;
+        if (t > 50.0) return -1.0;
+    }
+    
+    return -1.0;
+}
+
+vec3 getMaterialColor(float id) {
+    if (id < 1.5) return vec3(0.9, 0.4, 0.3);   // Variety: coral
+    if (id < 2.5) return vec3(0.2, 0.2, 0.22);  // Floor: dark gray
+    return vec3(0.25, 0.25, 0.28);               // Wall: slightly lighter
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray.origin.z += 4.0;
+    ray.origin.y += 0.3;
+    
+    float t = raymarch(ray);
+    
+    vec3 color;
+    if (t > 0.0) {
+        vec3 hitPoint = ray.origin + t * ray.dir;
+        float hitMat = materialID;
+        
+        // Get normal
+        vec3 normal;
+        if (hitMat < 1.5) {
+            // Variety: use gradient
+            vec3 varietyPos = hitPoint - vec3(0.0, 0.3, 0.0);
+            normal = normalize(gradient(varietyPos));
+            if (dot(normal, ray.dir) > 0.0) normal = -normal;
+        } else if (hitMat < 2.5) {
+            // Floor
+            normal = vec3(0.0, 1.0, 0.0);
+        } else {
+            // Wall
+            normal = vec3(0.0, 0.0, 1.0);
+        }
+        
+        vec3 matColor = getMaterialColor(hitMat);
+        vec3 viewDir = -ray.dir;
+        
+        // Key light (warm, from upper right)
+        vec3 lightDir1 = normalize(vec3(2.0, 2.0, 1.0));
+        vec3 lightColor1 = vec3(1.0, 0.9, 0.8);
+        float diff1 = max(0.0, dot(normal, lightDir1));
+        float spec1 = pow(max(0.0, dot(reflect(-lightDir1, normal), viewDir)), 32.0);
+        
+        // Fill light (cool blue, from left)
+        vec3 lightDir2 = normalize(vec3(-2.0, 1.0, 0.5));
+        vec3 lightColor2 = vec3(0.4, 0.5, 0.8);
+        float diff2 = max(0.0, dot(normal, lightDir2));
+        float spec2 = pow(max(0.0, dot(reflect(-lightDir2, normal), viewDir)), 32.0);
+        
+        // Rim light (purple, from behind)
+        vec3 lightDir3 = normalize(vec3(0.0, 0.5, -1.0));
+        vec3 lightColor3 = vec3(0.5, 0.3, 0.6);
+        float diff3 = max(0.0, dot(normal, lightDir3));
+        
+        float ambient = 0.08;
+        color = matColor * ambient;
+        color += matColor * diff1 * lightColor1 + spec1 * lightColor1 * 0.3;
+        color += matColor * diff2 * lightColor2 + spec2 * lightColor2 * 0.2;
+        color += matColor * diff3 * lightColor3;
+        
+        // Gamma correction
+        color = pow(color, vec3(0.4545));
+    }
+    else {
+        color = vec3(0.08, 0.08, 0.1);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+### Project Step 5: Final Scene with Shadows
+
+Adding shadows to the rotating scene.
+
+```glsl
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+    
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+mat3 rotateY(float angle) {
+    float c = cos(angle);
+    float s = sin(angle);
+    return mat3(
+        c, 0.0, s,
+        0.0, 1.0, 0.0,
+        -s, 0.0, c
+    );
+}
+
+float barthSextic(vec3 p) {
+    // Apply rotation
+    p = rotateY(iTime * 0.3) * p;
+    
+    float phi = (1.0 + sqrt(5.0)) / 2.0;
+    float phi2 = phi * phi;
+    
+    float x2 = p.x * p.x;
+    float y2 = p.y * p.y;
+    float z2 = p.z * p.z;
+    
+    float a = (phi2 * x2 - y2) * (phi2 * y2 - z2) * (phi2 * z2 - x2);
+    float b = (x2 + y2 + z2 - 1.0);
+    
+    return 4.0 * a - (1.0 + 2.0 * phi) * b * b;
+}
+
+vec3 gradient(vec3 p) {
+    float eps = 0.001;
+    return vec3(
+        barthSextic(p + vec3(eps, 0, 0)) - barthSextic(p - vec3(eps, 0, 0)),
+        barthSextic(p + vec3(0, eps, 0)) - barthSextic(p - vec3(0, eps, 0)),
+        barthSextic(p + vec3(0, 0, eps)) - barthSextic(p - vec3(0, 0, eps))
+    ) / (2.0 * eps);
+}
+
+float varietyDistance(vec3 p) {
+    float f = barthSextic(p);
+    vec3 grad = gradient(p);
+    float gradLen = length(grad);
+    return 0.3 * abs(f) / max(gradLen, 0.1);
+}
+
+// 1 = variety, 2 = floor, 3 = wall
+float materialID;
+
+float sceneSDF(vec3 p) {
+    float d = 1e10;
+    
+    // Variety (raised up)
+    vec3 varietyPos = p - vec3(0.0, 0.3, 0.0);
+    float bounds = length(varietyPos) - 2.0;
+    float variety;
+    if (bounds > 0.01) {
+        variety = bounds;
+    } else {
+        variety = varietyDistance(varietyPos);
+    }
+    if (variety < d) {
+        d = variety;
+        materialID = 1.0;
+    }
+    
+    // Floor
+    float floor = p.y + 2.0;
+    if (floor < d) {
+        d = floor;
+        materialID = 2.0;
+    }
+    
+    // Back wall
+    float wall = p.z + 4.0;
+    if (wall < d) {
+        d = wall;
+        materialID = 3.0;
+    }
+    
+    return d;
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    
+    for (int i = 0; i < 200; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
+        
+        if (d < 0.0005) return t;
+        t += d;
+        if (t > 50.0) return -1.0;
+    }
+    
+    return -1.0;
+}
+
+// Hard shadow - returns 0 if in shadow, 1 if lit
+float hardShadow(vec3 origin, vec3 dir, float maxt) {
+    float t = 0.02;
+    
+    for (int i = 0; i < 64; i++) {
+        float d = sceneSDF(origin + dir * t);
+        if (d < 0.001) return 0.0;
+        t += d;
+        if (t > maxt) break;
+    }
+    
+    return 1.0;
+}
+
+vec3 getMaterialColor(float id) {
+    if (id < 1.5) return vec3(0.9, 0.4, 0.3);   // Variety: coral
+    if (id < 2.5) return vec3(0.2, 0.2, 0.22);  // Floor: dark gray
+    return vec3(0.25, 0.25, 0.28);               // Wall: slightly lighter
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray.origin.z += 4.0;
+    ray.origin.y += 0.3;
+    
+    float t = raymarch(ray);
+    
+    vec3 color;
+    if (t > 0.0) {
+        vec3 hitPoint = ray.origin + t * ray.dir;
+        float hitMat = materialID;
+        
+        // Get normal
+        vec3 normal;
+        if (hitMat < 1.5) {
+            // Variety: use gradient
+            vec3 varietyPos = hitPoint - vec3(0.0, 0.3, 0.0);
+            normal = normalize(gradient(varietyPos));
+            if (dot(normal, ray.dir) > 0.0) normal = -normal;
+        } else if (hitMat < 2.5) {
+            // Floor
+            normal = vec3(0.0, 1.0, 0.0);
+        } else {
+            // Wall
+            normal = vec3(0.0, 0.0, 1.0);
+        }
+        
+        vec3 matColor = getMaterialColor(hitMat);
+        vec3 viewDir = -ray.dir;
+        
+        // Key light (warm, from upper right)
+        vec3 lightDir1 = normalize(vec3(2.0, 2.0, 1.0));
+        vec3 lightColor1 = vec3(1.0, 0.9, 0.8);
+        float diff1 = max(0.0, dot(normal, lightDir1));
+        float spec1 = pow(max(0.0, dot(reflect(-lightDir1, normal), viewDir)), 32.0);
+        float shadow1 = hardShadow(hitPoint + normal * 0.02, lightDir1, 10.0);
+        
+        // Fill light (cool blue, from left)
+        vec3 lightDir2 = normalize(vec3(-2.0, 1.0, 0.5));
+        vec3 lightColor2 = vec3(0.4, 0.5, 0.8);
+        float diff2 = max(0.0, dot(normal, lightDir2));
+        float spec2 = pow(max(0.0, dot(reflect(-lightDir2, normal), viewDir)), 32.0);
+        
+        // Rim light (purple, from behind)
+        vec3 lightDir3 = normalize(vec3(0.0, 0.5, -1.0));
+        vec3 lightColor3 = vec3(0.5, 0.3, 0.6);
+        float diff3 = max(0.0, dot(normal, lightDir3));
+        
+        float ambient = 0.08;
+        color = matColor * ambient;
+        color += (matColor * diff1 * lightColor1 + spec1 * lightColor1 * 0.3) * shadow1;
+        color += matColor * diff2 * lightColor2 + spec2 * lightColor2 * 0.2;
+        color += matColor * diff3 * lightColor3;
+        
+        // Gamma correction
+        color = pow(color, vec3(0.4545));
+    }
+    else {
+        color = vec3(0.08, 0.08, 0.1);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
 ```
