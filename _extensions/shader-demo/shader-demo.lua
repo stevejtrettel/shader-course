@@ -20,16 +20,8 @@ return {
     end
     
     if quarto.doc.is_format("html") then
-      -- Check for embed.js
-      if not file_exists(embed_file) then
-        return pandoc.RawBlock("html", string.format([[
-<div class="callout callout-warning">
-  <div class="callout-header">Missing Demo</div>
-  <div class="callout-body">Shader demo <code>%s</code> not found.</div>
-</div>
-]], name))
-      end
-      
+      -- Skip file existence check - it fails on Netlify due to working directory issues
+      -- If the demo doesn't exist, the browser will fail to load embed.js
       local id = "demo-" .. name:gsub("[^%w]", "-")
       
       return pandoc.RawBlock("html", string.format([[
