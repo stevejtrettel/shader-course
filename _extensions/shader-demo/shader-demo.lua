@@ -31,12 +31,18 @@ return {
       local id = "demo-" .. name:gsub("[^%w]", "-")
       
       return pandoc.RawBlock("html", string.format([[
+<style>
+  #%s, #%s > *, #%s canvas {
+    width: 100%% !important;
+    height: 100%% !important;
+  }
+</style>
 <div id="%s" style="position: absolute; top: 0; left: 0; width: 100%%; height: 100%%;"></div>
 <script type="module">
   import { embed } from '%s/embed.js';
   await embed({ container: '#%s', layout: 'fullscreen' });
 </script>
-]], id, base_path, id))
+]], id, id, id, id, base_path, id))
     else
       if not file_exists(screenshot_file) then
         return pandoc.RawBlock("latex", string.format([[
