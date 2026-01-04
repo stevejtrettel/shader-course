@@ -1,18 +1,32 @@
 ---
-title: "Day 1"
-format: revealjs
+title: "Day 1: Introduction"
+subtitle: "GPU-Accelerated Mathematical Illustration"
+metadata-files:
+  - ../../_slides-metadata.yml
 ---
 
-# Day 1: Introduction to Shaders
+# Introduction to Shaders
 
 ## What is a Shader?
 
 A shader is a program that runs on the GPU.
 
+::: {.incremental}
 - Executes **in parallel** for every pixel
 - Takes coordinates as input
 - Outputs a color
 - Incredibly fast for mathematical visualization
+:::
+
+## The Parallel Model
+
+::: {.callout-note}
+Each pixel's computation must be **independent**.
+
+Pixel $(100, 200)$ cannot ask what color pixel $(100, 199)$ received.
+:::
+
+Every pixel sees the same global inputs—coordinates, time, mouse position—and must determine its color from those alone.
 
 ## The Basic Setup
 
@@ -28,11 +42,61 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 }
 ```
 
-## Your First Shader
+# First Shaders
 
-Let's start with the simplest possible shader - solid red:
+## Your First Shader {.smaller}
 
-{{< shader-demo day1/red >}}
+The simplest shader: make every pixel red.
+
+:::: {.columns}
+::: {.column width="45%"}
+```glsl
+void mainImage(out vec4 fragColor,
+               in vec2 fragCoord) {
+    fragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+```
+:::
+::: {.column width="55%"}
+{{< shader-demo day1/red height="350px" >}}
+:::
+::::
+
+## GLSL Syntax Essentials
+
+- **Semicolons** are required
+- **Floats must include a decimal**: `1.0`, not `1`
+- **Vector types**: `vec2`, `vec3`, `vec4`
+- **Arithmetic is component-wise**:
+  ```glsl
+  vec2(1.0, 2.0) + vec2(3.0, 4.0)  // = vec2(4.0, 6.0)
+  ```
+- **Access components** with `.x`, `.y`, `.z`, `.w` (or `.r`, `.g`, `.b`, `.a`)
+
+# Coordinate Systems
+
+## The Standard Boilerplate
+
+```glsl
+vec2 uv = fragCoord / iResolution.xy;   // normalize to [0,1]
+uv = uv - vec2(0.5, 0.5);               // center origin
+uv.x *= iResolution.x / iResolution.y;  // aspect correction
+vec2 p = uv * 4.0;                      // scale
+```
+
+From here, `p` is our mathematical coordinate:
+
+- Centered at origin
+- Aspect-corrected
+- Range roughly $[-2, 2]$
+
+## Coordinate Visualization
+
+{{< shader-demo day1/coordinates height="500px" >}}
+
+Black at $(0,0)$, red at $(1,0)$, green at $(0,1)$, yellow at $(1,1)$.
+
+# Drawing with Distance
 
 ## Implicit Curves
 
@@ -42,8 +106,83 @@ A circle of radius $r$ centered at the origin:
 
 $$d(x, y) = \sqrt{x^2 + y^2} - r$$
 
-{{< shader-demo day1/circle >}}
+- **Negative** inside the circle
+- **Positive** outside
+- **Zero** on the boundary
 
-## The Circle Shader Code
+## Circle Demo
 
-{{< shader-code day1/circle >}}
+{{< shader-demo day1/circle height="500px" >}}
+
+## The Circle Shader Code {.smaller}
+
+```glsl
+float d = length(p);
+float r = 1.0;
+float f = d - r;
+
+vec3 color;
+if (f < 0.0) {
+    color = vec3(1.0, 1.0, 0.0);  // yellow inside
+} else {
+    color = vec3(0.1, 0.1, 0.3);  // dark blue outside
+}
+
+fragColor = vec4(color, 1.0);
+```
+
+## Implicit Curves: Parabola
+
+$F(x,y) = y - x^2$
+
+{{< shader-demo day1/parabola height="450px" >}}
+
+## The Thickness Problem
+
+The lemniscate $F = (x^2+y^2)^2 - a^2(x^2 - y^2)$:
+
+{{< shader-demo day1/lemniscate-naive height="400px" >}}
+
+Notice: thickness blows up at the singular point!
+
+## Gradient Correction
+
+Divide by gradient magnitude: $\displaystyle\frac{|F|}{|\nabla F|} < \varepsilon$
+
+{{< shader-demo day1/lemniscate-gradient height="400px" >}}
+
+Uniform thickness everywhere.
+
+# Interactivity
+
+## Mouse Input
+
+`iMouse` is a `vec4`:
+
+- `iMouse.xy` — current mouse position (pixels)
+- `iMouse.zw` — position of last click
+
+## Sun and Earth
+
+{{< shader-demo day1/sun-earth height="500px" >}}
+
+Drag to move the sun; the earth follows in orbit.
+
+# What's Next
+
+## Day 2 Preview
+
+- Complex number arithmetic in GLSL
+- Iteration and escape-time algorithms
+- The Mandelbrot set and Julia sets
+- Circle inversion and Möbius transformations
+
+## Exercises
+
+**Checkpoints**: Solid colors, half-planes, circles
+
+**Explorations**: Concentric rings, moon orbit, favorite curves
+
+**Challenges**: Graphing calculator, elliptic curves, smooth blending
+
+**Projects**: Grid patterns, Fourier epicycles
