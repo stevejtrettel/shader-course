@@ -16,7 +16,7 @@ So the fundamental move is:
 
 That is exactly the move we will encode in GLSL.
 
-![Mapping the exterior of one circle to the interior of another](figs/schottky_geometry_two_circles.png)
+<!-- ![Mapping the exterior of one circle to the interior of another](figs/schottky_geometry_two_circles.png) -->
 
 ---
 

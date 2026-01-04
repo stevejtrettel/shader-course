@@ -6,9 +6,9 @@ A shader is a function from coordinates to colors. You write code that takes a p
 
 {{< shader-demo day1/elliptic-family >}}
 
-A family of elliptic curves $y^2 = x^3 + ax + b$, drawn for several values of $a$ at once, with $b$ varying across the screen. Watch carefully and you'll see singularities appear and disappear along the discriminant locus $4a^3 + 27b^2 = 0$. The whole thing runs in real time, recomputed sixty times per second.
+A family of elliptic curves $y^2 = x^3 + ax + b$. Drag the mouse to explore parameter space: $x$ controls $a$, $y$ controls the center of the family. Gold curves have one connected component; blue curves split into two pieces. Red marks the singular curves along the discriminant locus $4a^3 + 27b^2 = 0$—the boundary between topological types. The whole thing runs in real time, recomputed sixty times per second.
 
-The key idea: to draw a curve $F(x,y) = 0$, color a pixel yellow if $|F|$ is small, and blue otherwise. The entire machinery of implicit curves becomes accessible in a few lines of code.
+The key idea: to draw a curve $F(x,y) = 0$, color a pixel based on whether $|F|$ is small. The entire machinery of implicit curves becomes accessible in a few lines of code.
 
 There are subtleties, of course. The naive approach gives curves of uneven thickness (thin where $|\nabla F|$ is large, bloated where it's small), and we'll need a little differential geometry to fix that. We'll also need to think about coordinate systems, since the raw pixel grid isn't a natural home for mathematics. But these are pleasant problems, the kind where the fix teaches you something.
 
@@ -142,17 +142,28 @@ Shadertoy provides *uniforms*—global values that are constant across all pixel
 | `iTime` | `float` | Seconds since the shader started |
 | `iMouse` | `vec4` | Mouse position and click state |
 
-We'll use `iResolution` constantly (for coordinate transforms) and `iTime` for animation.
+We'll use `iResolution` constantly (for coordinate transforms) and `iTime` for animation—but let's hold off on animation until we have something interesting to animate.
 
-### Animation: Using iTime
+### Dividing the Screen
 
-Let's make the red channel pulse:
+With just `fragCoord` and `iResolution`, we can already divide the screen into regions. Let's color the left half red and the right half blue:
 
-{{< shader-demo day1/red-pulsing >}}
+```glsl
+vec3 color;
+if (fragCoord.x < iResolution.x / 2.0) {
+    color = vec3(1.0, 0.0, 0.0);  // red on left
+} else {
+    color = vec3(0.0, 0.0, 1.0);  // blue on right
+}
 
-Since `sin(iTime)` oscillates between -1 and 1, the expression `0.5 + 0.5 * sin(iTime)` oscillates between 0 and 1. The screen pulses from black to red.
+fragColor = vec4(color, 1.0);
+```
 
-This is our first *animated* shader—the output depends on time.
+{{< shader-demo day1/half-plane-pixels >}}
+
+This works, but the code is awkward—we're comparing against half the resolution in pixels. What if we want to divide along a diagonal? Or animate the dividing line? We'd be doing messy arithmetic with pixel counts everywhere.
+
+What we really want is a proper coordinate system.
 
 ## Coordinate Systems
 
@@ -238,56 +249,11 @@ From here on, `p` is our mathematical coordinate, centered at the origin, aspect
 
 ## Drawing with Distance
 
-We now have a coordinate system: each pixel knows its location `p` in the plane, centered at the origin, aspect-corrected, scaled to a reasonable range. The next question is what to do with it.
+We now have a coordinate system: each pixel knows its location `p` in the plane. The next question is what to do with it.
 
-The answer, throughout this course, will almost always be: compute a distance. Distances tell us how far we are from shapes, curves, boundaries. A filled circle is "the set of points within distance $r$ of the origin." A curve is "the set of points at distance zero from the curve." Even when the geometry gets complicated, the pattern stays the same: compute a distance, then decide what color based on whether it's large or small.
+Remember how we divided the screen earlier with `fragCoord.x < iResolution.x / 2.0`? With our new coordinates, the same thing is just `p.x < 0.0`. More generally, a line $ax + by + c = 0$ divides the plane into two half-planes: where $ax + by + c < 0$ and where $ax + by + c > 0$. But lines are just the beginning.
 
-### Half-Planes
-
-The simplest shape is a half-plane. Consider the rule: is the $y$-coordinate greater than 0? This divides the plane into two regions—above and below the $x$-axis.
-
-```glsl
-float L = p.y;
-
-vec3 color;
-if (L < 0.0) {
-    color = vec3(1.0, 0.0, 0.0);  // red below
-} else {
-    color = vec3(0.0, 0.0, 1.0);  // blue above
-}
-
-fragColor = vec4(color, 1.0);
-```
-
-{{< shader-demo day1/half-plane >}}
-
-To color left versus right instead, use `p.x` in place of `p.y`.
-
-More generally, a line in the plane has the form $ax + by + c = 0$. This divides the plane into two half-planes: where $ax + by + c < 0$ and where $ax + by + c > 0$.
-
-```glsl
-float a = 1.0, b = 1.0, c = 0.0;
-float L = a * p.x + b * p.y + c;
-
-vec3 color;
-if (L < 0.0) {
-    color = vec3(1.0, 0.0, 0.0);  // red
-} else {
-    color = vec3(0.0, 0.0, 1.0);  // blue
-}
-
-fragColor = vec4(color, 1.0);
-```
-
-Recall that $(a, b)$ is the normal vector to the line, and $c$ is an offset. Since these are just variables, we can animate them to move the line around:
-
-```glsl
-float a = cos(iTime);
-float b = sin(iTime);
-float c = 0.5 * sin(iTime * 0.7);
-```
-
-{{< shader-demo day1/half-plane-animated >}}
+The real power of this coordinate system is drawing shapes. Throughout this course, the pattern will almost always be: **compute a distance, then threshold it**. A filled circle is "the set of points within distance $r$ of the origin." A curve is "the set of points at distance zero from the curve." Compute a distance, decide a color.
 
 ### Circles
 
@@ -321,8 +287,6 @@ vec2 center = vec2(1.0, 0.5);
 float d = length(p - center);
 ```
 
-Since `center` and `r` are variables, you can animate them with `iTime` to create moving, pulsing circles.
-
 ### Drawing a Ring
 
 Our function $f = d - r$ is negative inside the circle and positive outside. To draw a filled disk, we colored based on the sign of $f$.
@@ -348,6 +312,31 @@ fragColor = vec4(color, 1.0);
 ```
 
 {{< shader-demo day1/circle-ring >}}
+
+### Animation with iTime
+
+So far our shaders have been static. Let's make something move.
+
+The uniform `iTime` gives the number of seconds since the shader started. Since `sin(iTime)` oscillates between -1 and 1, the expression `1.0 + 0.5 * sin(iTime)` oscillates between 0.5 and 1.5. Use this as the radius:
+
+```glsl
+float d = length(p);
+float r = 1.0 + 0.5 * sin(iTime);  // radius pulses between 0.5 and 1.5
+float f = d - r;
+
+vec3 color;
+if (f < 0.0) {
+    color = vec3(1.0, 1.0, 0.0);  // yellow inside
+} else {
+    color = vec3(0.1, 0.1, 0.3);  // dark background
+}
+
+fragColor = vec4(color, 1.0);
+```
+
+{{< shader-demo day1/circle-pulsing >}}
+
+This is our first animated shader. The same principle applies anywhere: any parameter can depend on `iTime`.
 
 ## Implicit Curves
 
@@ -641,3 +630,40 @@ fragColor = vec4(color, 1.0);
 {{< shader-demo day1/folium-mouse >}}
 
 Drag left and right to sweep through the level sets and watch the curve topology change.
+
+### Coming Full Circle: Elliptic Curves
+
+Remember the opening demo? We can now build it ourselves. An elliptic curve in Weierstrass form is $y^2 = x^3 + ax + b$. As an implicit curve: $F(x,y) = y^2 - x^3 - ax - b = 0$.
+
+```glsl
+vec2 p = normalize_coord(fragCoord);
+
+// Mouse controls (a, b)
+float a = mix(-2.0, 1.0, iMouse.x / iResolution.x);
+float b = mix(-2.0, 2.0, iMouse.y / iResolution.y);
+
+// Discriminant determines topology
+float disc = 4.0 * a * a * a + 27.0 * b * b;
+
+// Elliptic curve
+float F = p.y * p.y - p.x * p.x * p.x - a * p.x - b;
+vec2 grad = vec2(-3.0 * p.x * p.x - a, 2.0 * p.y);
+float dist = abs(F) / max(length(grad), 0.01);
+
+vec3 color = vec3(0.05, 0.05, 0.1);
+if (dist < 0.05) {
+    if (abs(disc) < 0.3) {
+        color = vec3(1.0, 0.2, 0.2);   // red: singular
+    } else if (disc > 0.0) {
+        color = vec3(1.0, 0.85, 0.3);  // gold: one component
+    } else {
+        color = vec3(0.3, 0.5, 0.8);   // blue: two components
+    }
+}
+
+fragColor = vec4(color, 1.0);
+```
+
+{{< shader-demo day1/elliptic-curve >}}
+
+Drag to explore the parameter space. Gold curves have one component; blue curves split into two pieces (an "egg" and an infinite branch). Red marks the singular curves where $\Delta = 4a^3 + 27b^2 = 0$—the boundary between topological types.

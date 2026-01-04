@@ -2,41 +2,7 @@
 
 This appendix provides complete, standalone code for each shader referenced in Day 1. Each listing can be copied directly into [Shadertoy](https://www.shadertoy.com/new) and run immediately.
 
-```glsl
-vec2 normalize_coord(vec2 coord) {
-    vec2 uv = coord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
-    return uv * 4.0;
-}
-
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    vec2 p = normalize_coord(fragCoord);
-    vec2 sun = normalize_coord(iMouse.xy);
-    
-    // Earth orbits the sun
-    float orbit_radius = 0.8;
-    vec2 earth = sun + orbit_radius * vec2(cos(iTime), sin(iTime));
-    
-    // Draw sun (larger, yellow)
-    float d_sun = length(p - sun);
-    // Draw earth (smaller, blue)
-    float d_earth = length(p - earth);
-    
-    vec3 color = vec3(0.02, 0.02, 0.05);  // dark background
-    if (d_sun < 0.3) {
-        color = vec3(1.0, 0.9, 0.2);  // yellow sun
-    }
-    if (d_earth < 0.15) {
-        color = vec3(0.2, 0.5, 1.0);  // blue earth
-    }
-    
-    fragColor = vec4(color, 1.0);
-}
-```
-
-## A1. red
+## red
 
 The simplest shader: every pixel is red.
 
@@ -49,21 +15,27 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
 ---
 
-## A2. red-pulsing
+## half-plane-pixels
 
-Red channel oscillates with time.
+Dividing the screen using raw pixel coordinates, before we learn the coordinate transformation.
 
 ```glsl
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    float red = 0.5 + 0.5 * sin(iTime);
-    fragColor = vec4(red, 0.0, 0.0, 1.0);
+    vec3 color;
+    if (fragCoord.x < iResolution.x / 2.0) {
+        color = vec3(1.0, 0.0, 0.0);  // red on left
+    } else {
+        color = vec3(0.0, 0.0, 1.0);  // blue on right
+    }
+    
+    fragColor = vec4(color, 1.0);
 }
 ```
 
 ---
 
-## A3. coordinates
+## coordinates
 
 Visualizing the coordinate system as color.
 
@@ -77,7 +49,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
 ---
 
-## A4. half-plane
+## half-plane
 
 Dividing the plane into two regions based on y-coordinate.
 
@@ -104,37 +76,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
 ---
 
-## A5. half-plane-animated
-
-Animated line dividing the plane, with rotating normal and shifting offset.
-
-```glsl
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    vec2 uv = fragCoord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
-    vec2 p = uv * 4.0;
-    
-    float a = cos(iTime);
-    float b = sin(iTime);
-    float c = 0.5 * sin(iTime * 0.7);
-    float L = a * p.x + b * p.y + c;
-    
-    vec3 color;
-    if (L < 0.0) {
-        color = vec3(1.0, 0.0, 0.0);
-    } else {
-        color = vec3(0.0, 0.0, 1.0);
-    }
-    
-    fragColor = vec4(color, 1.0);
-}
-```
-
----
-
-## A6. circle
+## circle
 
 Filled circle centered at the origin.
 
@@ -163,7 +105,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
 ---
 
-## A7. circle-curve
+## circle-ring
 
 Circle outline (ring) centered at the origin.
 
@@ -193,7 +135,36 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
 ---
 
-## A8. parabola
+## circle-pulsing
+
+Circle with radius that oscillates over time. Introduces iTime.
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
+    
+    float d = length(p);
+    float r = 1.0 + 0.5 * sin(iTime);  // radius oscillates between 0.5 and 1.5
+    float f = d - r;
+    
+    vec3 color;
+    if (f < 0.0) {
+        color = vec3(1.0, 1.0, 0.0);  // yellow inside
+    } else {
+        color = vec3(0.1, 0.1, 0.3);  // dark background
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## parabola
 
 The parabola $y = x^2$ rendered as an implicit curve.
 
@@ -221,7 +192,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
 ---
 
-## A9. lemniscate-naive
+## lemniscate-naive
 
 Lemniscate of Bernoulli with naive thresholding (non-uniform thickness).
 
@@ -252,7 +223,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
 ---
 
-## A10. lemniscate-gradient
+## lemniscate-gradient
 
 Lemniscate with gradient correction for uniform thickness.
 
@@ -289,7 +260,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
 ---
 
-## A11. lemniscate-animated
+## lemniscate-animated
 
 Cassini ovals animated through the lemniscate transition.
 
@@ -334,7 +305,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
 ---
 
-## A12. circle-mouse
+## circle-mouse
 
 Circle that follows the mouse position.
 
@@ -370,7 +341,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
 ---
 
-## A13. sun-earth
+## sun-earth
 
 Sun at mouse click position with orbiting earth.
 
@@ -386,8 +357,8 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
     vec2 p = normalize_coord(fragCoord);
     
-    // Use iMouse.zw (last click position) so sun stays put
-    vec2 sun = normalize_coord(iMouse.zw);
+    // Sun follows mouse position
+    vec2 sun = normalize_coord(iMouse.xy);
     
     // Earth orbits the sun
     float orbit_radius = 0.8;
@@ -412,7 +383,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
 ---
 
-## A14. folium-mouse
+## folium-mouse
 
 Folium of Descartes with mouse-controlled level set.
 
@@ -454,9 +425,53 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
 ---
 
-## A15. elliptic-family
+## elliptic-curve
 
-Family of elliptic curves with mouse-controlled center parameters.
+Single elliptic curve with mouse-controlled parameters. Colors by topology: gold (one component), blue (two components), red (singular).
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
+    
+    // Mouse controls (a, b) parameters
+    float a = mix(-2.0, 1.0, iMouse.x / iResolution.x);
+    float b = mix(-2.0, 2.0, iMouse.y / iResolution.y);
+    
+    // Discriminant: 4a³ + 27b²
+    float disc = 4.0 * a * a * a + 27.0 * b * b;
+    
+    // Elliptic curve: y² = x³ + ax + b
+    float F = p.y * p.y - p.x * p.x * p.x - a * p.x - b;
+    vec2 grad = vec2(-3.0 * p.x * p.x - a, 2.0 * p.y);
+    float dist = abs(F) / max(length(grad), 0.01);
+    
+    vec3 bg = vec3(0.05, 0.05, 0.1);
+    vec3 color = bg;
+    
+    if (dist < 0.05) {
+        // Color by topology
+        if (abs(disc) < 0.3) {
+            color = vec3(1.0, 0.2, 0.2);   // red for singular
+        } else if (disc > 0.0) {
+            color = vec3(1.0, 0.85, 0.3);  // gold for one component
+        } else {
+            color = vec3(0.3, 0.5, 0.8);   // blue for two components
+        }
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## elliptic-family
+
+Family of elliptic curves with mouse-controlled parameters. Gold for one component, blue for two components, red for singular. Curves fade with distance from center.
 
 ```glsl
 vec2 normalize_coord(vec2 coord) {
@@ -470,36 +485,45 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
     vec2 p = normalize_coord(fragCoord);
     
-    // Mouse controls the central (a, b) of our family
-    float a_center = mix(-3.0, 1.0, iMouse.x / iResolution.x);
+    // Mouse picks (a, b) in parameter space
+    float a = mix(-2.0, 1.0, iMouse.x / iResolution.x);
     float b_center = mix(-2.0, 2.0, iMouse.y / iResolution.y);
     
-    vec3 color = vec3(0.05, 0.05, 0.1);  // dark background
+    vec3 color = vec3(0.05, 0.05, 0.1);
     
-    // Draw curves for a range of a values around a_center
-    for (float i = -3.0; i <= 3.0; i += 1.0) {
-        float a = a_center + i * 0.5;  // more spacing
-        float b = b_center;
+    vec3 oneComponent = vec3(1.0, 0.85, 0.3);   // gold
+    vec3 twoComponent = vec3(0.3, 0.5, 0.8);    // blue
+    vec3 singularColor = vec3(1.0, 0.2, 0.2);   // red
+    
+    for (int j = -15; j <= 15; j++) {
+        float b = b_center + float(j) * 0.15;
         
-        // Elliptic curve: y² = x³ + ax + b
+        float dist_from_center = abs(float(j));
+        
+        // Discriminant: 4a³ + 27b²
+        float disc = 4.0 * a * a * a + 27.0 * b * b;
+        
         float F = p.y * p.y - p.x * p.x * p.x - a * p.x - b;
-        
-        // Gradient
         vec2 grad = vec2(-3.0 * p.x * p.x - a, 2.0 * p.y);
         float dist = abs(F) / max(length(grad), 0.01);
         
-        // Brightness fades quickly: central curve bright, outer curves fade to background
-        float t = abs(i) / 3.0;  // 0 at center, 1 at edges
-        float brightness = 1.0 - t * t;  // quadratic falloff
+        float thickness = 0.05 / (1.0 + dist_from_center * 0.8);
         
-        if (dist < 0.03 && brightness > 0.05) {
-            // Check discriminant for this specific curve
-            float disc = 4.0 * a * a * a + 27.0 * b * b;
-            if (abs(disc) < 0.3) {
-                color = mix(color, vec3(1.0, 0.3, 0.3), brightness);  // red for singular
-            } else {
-                color = mix(color, vec3(1.0, 1.0, 0.5), brightness);  // yellow for smooth
-            }
+        // Color by topology
+        vec3 curveColor;
+        if (abs(disc) < 0.3) {
+            curveColor = singularColor;
+        } else if (disc > 0.0) {
+            curveColor = oneComponent;
+        } else {
+            curveColor = twoComponent;
+        }
+        
+        float brightness = 1.0 / (1.0 + dist_from_center * 0.4);
+        curveColor *= brightness;
+        
+        if (dist < thickness) {
+            color = curveColor;
         }
     }
     
@@ -509,7 +533,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
 ---
 
-## A16. grid-circles
+## grid-circles
 
 Grid of circles with square cells.
 

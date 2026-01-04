@@ -8,7 +8,7 @@ website:
 
   sidebar:
     style: docked
-    collapse-level: 2
+    collapse-level: 1
     contents:
       - index.qmd
       - section: "Day 1: Pixels"
@@ -29,28 +29,30 @@ website:
             href: lectures/day2/slides.html
           - text: "Code"
             href: lectures/day2/shaders.qmd
+          - text: "Homework"
+            href: lectures/day2/homework.qmd
       - section: "Day 3: Tilings"
         contents:
           - text: "Notes"
             href: lectures/day3/notes.qmd
-          - text: "Slides"
-            href: lectures/day3/slides.html
+          # - text: "Slides"
+          #   href: lectures/day3/slides.html
           - text: "Code"
             href: lectures/day3/shaders.qmd
       - section: "Day 4: Simulations"
         contents:
           - text: "Notes"
             href: lectures/day4/notes.qmd
-          - text: "Slides"
-            href: lectures/day4/slides.html
+          # - text: "Slides"
+          #   href: lectures/day4/slides.html
           - text: "Code"
             href: lectures/day4/shaders.qmd
       - section: "Day 5: Rendering"
         contents:
           - text: "Notes"
             href: lectures/day5/notes.qmd
-          - text: "Slides"
-            href: lectures/day5/slides.html
+          # - text: "Slides"
+          #   href: lectures/day5/slides.html
           - text: "Code"
             href: lectures/day5/shaders.qmd
       - text: "Download PDF"

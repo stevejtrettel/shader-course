@@ -15,12 +15,14 @@ book:
         - lectures/day2/notes.qmd
         - lectures/day3/notes.qmd
         - lectures/day4/notes.qmd
+        - lectures/day5/notes.qmd
 
   appendices:
     - lectures/day1/shaders.qmd
     - lectures/day2/shaders.qmd
     - lectures/day3/shaders.qmd
     - lectures/day4/shaders.qmd
+    - lectures/day5/shaders.qmd
 
 format:
   pdf:
