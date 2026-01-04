@@ -1,6 +1,7 @@
 ---
 title: "Day 3: Symmetry & Tilings"
 subtitle: "GPU-Accelerated Mathematical Illustration"
+format: revealjs
 metadata-files:
   - ../../_slides-metadata.yml
 ---
