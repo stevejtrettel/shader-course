@@ -179,57 +179,13 @@ $color-caution: #dc3545 !default;
 }
 
 // ===========================================
-// Shader Slides - Large with tabs (shader-slide shortcode)
+// Shader Slides - Fullscreen (shader-slide shortcode)
 // ===========================================
 
-// Container for shader-slide - fills most of the slide
-.reveal .shader-slide {
-  width: 100% !important;
-  height: 85vh !important;
-  min-height: 600px !important;
-}
-
-// Force ALL elements inside to expand
-.reveal .shader-slide * {
-  max-width: 100% !important;
-  max-height: 100% !important;
-}
-
-.reveal .shader-slide > div,
-.reveal .shader-slide > div > div,
-.reveal .shader-slide > div > div > div {
+// Force canvas to fill the absolute-positioned container
+.reveal section [id^="slide-"] canvas {
   width: 100% !important;
   height: 100% !important;
-}
-
-// Force canvas to fill available space
-.reveal .shader-slide canvas {
-  width: 100% !important;
-  height: 100% !important;
-  min-width: 100% !important;
-  min-height: 80% !important;
-}
-
-// Override any fixed dimensions embed.js might set
-.reveal .shader-slide [style*="width"],
-.reveal .shader-slide [style*="height"] {
-  width: 100% !important;
-  height: 100% !important;
-}
-
-// Make tabs row compact so shader gets more space
-.reveal .shader-slide .tabs,
-.reveal .shader-slide [class*="tab"] {
-  flex-shrink: 0;
-}
-
-// Tab content area should fill remaining space
-.reveal .shader-slide .tab-content,
-.reveal .shader-slide [class*="panel"],
-.reveal .shader-slide [class*="content"] {
-  flex: 1 !important;
-  height: auto !important;
-  min-height: 0 !important;
 }
 
 // ===========================================

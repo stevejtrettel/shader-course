@@ -4,13 +4,12 @@ return {
     local base_path = "/demos/" .. name
     local id = "slide-" .. name:gsub("[^%w]", "-")
 
-    -- Large shader for reveal.js slides with tabbed code view
-    -- Uses normal flow (not absolute) so it doesn't overlay other content
+    -- Fullscreen shader for reveal.js slides
     return pandoc.RawBlock("html", string.format([[
-<div id="%s" class="shader-slide" style="width: 100%%; height: 85vh;"></div>
+<div id="%s" style="position: absolute; top: 0; left: 0; width: 100%%; height: 100%%; z-index: 1;"></div>
 <script type="module">
   import { embed } from '%s/embed.js';
-  await embed({ container: '#%s', layout: 'tabbed' });
+  await embed({ container: '#%s', layout: 'fullscreen' });
 </script>
 ]], id, base_path, id))
   end
