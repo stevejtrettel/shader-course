@@ -31,7 +31,7 @@ return {
       local id = "demo-" .. name:gsub("[^%w]", "-")
       
       return pandoc.RawBlock("html", string.format([[
-<figure class="shader-demo">
+<figure class="shader-demo" style="width: 100%%; height: 80vh; margin: 0; padding: 0;">
   <div id="%s" style="width: 100%%; height: 100%%;"></div>
   <script type="module">
     import { embed } from '%s/embed.js';
