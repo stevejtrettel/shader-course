@@ -1,7 +1,6 @@
 return {
   ['shader-demo'] = function(args, kwargs, meta)
     local name = pandoc.utils.stringify(args[1])
-    local height = pandoc.utils.stringify(kwargs["height"] or "500px")
     local caption = pandoc.utils.stringify(kwargs["caption"] or "")
     
     local base_path = "/demos/" .. name
@@ -33,14 +32,14 @@ return {
       
       return pandoc.RawBlock("html", string.format([[
 <figure class="shader-demo">
-  <div id="%s" style="width: 100%%; height: %s;"></div>
+  <div id="%s" style="width: 100%%; height: 100%%;"></div>
   <script type="module">
     import { embed } from '%s/embed.js';
-    await embed({ container: '#%s' });
+    await embed({ container: '#%s', layout: 'fullscreen' });
   </script>
   %s
 </figure>
-]], id, height, base_path, id, 
+]], id, base_path, id,
         caption ~= "" and string.format("<figcaption>%s</figcaption>", caption) or ""))
     else
       if not file_exists(screenshot_file) then
