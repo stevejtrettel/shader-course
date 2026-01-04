@@ -1,10 +1,14 @@
 return {
   ['shader-demo'] = function(args, kwargs, meta)
     local name = pandoc.utils.stringify(args[1])
+    local height = pandoc.utils.stringify(kwargs["height"] or "500px")
     local caption = pandoc.utils.stringify(kwargs["caption"] or "")
     
     local base_path = "/demos/" .. name
-    local project_dir = quarto.project.directory or "."
+    
+    -- Check if the demo exists
+    local embed_file = "demos/" .. name .. "/embed.js"
+    local screenshot_file = "demos/" .. name .. "/screenshot.png"
     
     local function file_exists(path)
       local f = io.open(path, "r")
@@ -15,10 +19,8 @@ return {
       return false
     end
     
-    local embed_file = project_dir .. "/demos/" .. name .. "/embed.js"
-    local screenshot_file = project_dir .. "/demos/" .. name .. "/screenshot.png"
-    
     if quarto.doc.is_format("html") then
+      -- Check for embed.js
       if not file_exists(embed_file) then
         return pandoc.RawBlock("html", string.format([[
 <div class="callout callout-warning">
@@ -31,13 +33,18 @@ return {
       local id = "demo-" .. name:gsub("[^%w]", "-")
       
       return pandoc.RawBlock("html", string.format([[
-<div id="%s" style="position: absolute; top: 0; left: 0; width: 100%%; height: 100%%;"></div>
-<script type="module">
-  import { embed } from '%s/embed.js';
-  await embed({ container: '#%s', layout: 'fullscreen' });
-</script>
-]], id, base_path, id))
+<figure class="shader-demo">
+  <div id="%s" style="width: 100%%; height: %s;"></div>
+  <script type="module">
+    import { embed } from '%s/embed.js';
+    await embed({ container: '#%s' });
+  </script>
+  %s
+</figure>
+]], id, height, base_path, id, 
+        caption ~= "" and string.format("<figcaption>%s</figcaption>", caption) or ""))
     else
+      -- Check for screenshot
       if not file_exists(screenshot_file) then
         return pandoc.RawBlock("latex", string.format([[
 \begin{tcolorbox}[colback=yellow!10, colframe=yellow!50!black, title=Missing Demo]
