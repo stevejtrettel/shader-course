@@ -1,5 +1,7 @@
 # Day 1 Exercises
 
+This was broken before so running atest and adding this line 
+
 Homework is organized into four types:
 
 **Checkpoints** — Short exercises to verify you understood the lecture material. Required for anyone new to shader programming.
