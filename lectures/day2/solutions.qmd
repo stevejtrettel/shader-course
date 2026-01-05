@@ -5,55 +5,7 @@ Complete solutions for the Day 2 exercises. Try the exercises yourself before lo
 
 ## Checkpoints
 
-### C1. Julia Set
-
-```glsl
-vec2 cmul(vec2 z, vec2 w) {
-    return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);
-}
-
-float cabs2(vec2 z) {
-    return dot(z, z);
-}
-
-vec2 normalize_coord(vec2 coord) {
-    vec2 uv = coord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
-    return uv * 4.0;
-}
-
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    vec2 p = normalize_coord(fragCoord);
-    
-    // Fixed parameter
-    vec2 c = vec2(-0.7, 0.27015);
-    
-    // z starts at pixel position (not zero!)
-    vec2 z = p;
-    
-    int max_iter = 100;
-    int iter;
-    
-    for (iter = 0; iter < max_iter; iter++) {
-        if (cabs2(z) > 4.0) break;
-        z = cmul(z, z) + c;
-    }
-    
-    vec3 color;
-    if (iter == max_iter) {
-        color = vec3(0.0, 0.0, 0.0);
-    } else {
-        color = vec3(1.0, 1.0, 1.0);
-    }
-    
-    fragColor = vec4(color, 1.0);
-}
-```
-
-
-### C2. Julia Mouse
+### C1. Julia Mouse
 
 ```glsl
 vec2 cmul(vec2 z, vec2 w) {
@@ -111,7 +63,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 ```
 
 
-### C3. Cubic Mandelbrot
+### C2. Higher Powers
 
 ```glsl
 vec2 cmul(vec2 z, vec2 w) {
@@ -122,51 +74,11 @@ vec2 ccube(vec2 z) {
     return cmul(cmul(z, z), z);
 }
 
-float cabs2(vec2 z) {
-    return dot(z, z);
-}
-
-vec2 normalize_coord(vec2 coord) {
-    vec2 uv = coord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
-    return uv * 3.0;  // smaller window for cubic
-}
-
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    vec2 p = normalize_coord(fragCoord);
-    
-    vec2 c = p;
-    vec2 z = vec2(0.0, 0.0);
-    
-    int max_iter = 100;
-    int iter;
-    
-    for (iter = 0; iter < max_iter; iter++) {
-        if (cabs2(z) > 4.0) break;
-        z = ccube(z) + c;
-    }
-    
-    vec3 color;
-    if (iter == max_iter) {
-        color = vec3(0.0, 0.0, 0.0);
-    } else {
-        color = vec3(1.0, 1.0, 1.0);
-    }
-    
-    fragColor = vec4(color, 1.0);
-}
-```
-
-The cubic Mandelbrot has **3-fold rotational symmetry** because $z^3$ has 3-fold symmetry: rotating $z$ by $120°$ rotates $z^3$ by $360°$, which is no change.
-
-
-### C4. Colorize a Fractal
-
-```glsl
-vec2 cmul(vec2 z, vec2 w) {
-    return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);
+vec2 cpow(vec2 z, float n) {
+    float r = length(z);
+    if (r < 0.0001) return vec2(0.0, 0.0);
+    float theta = atan(z.y, z.x);
+    return pow(r, n) * vec2(cos(n * theta), sin(n * theta));
 }
 
 float cabs2(vec2 z) {
@@ -177,7 +89,7 @@ vec3 palette(float t) {
     vec3 a = vec3(0.5, 0.5, 0.5);
     vec3 b = vec3(0.5, 0.5, 0.5);
     vec3 c = vec3(1.0, 1.0, 1.0);
-    vec3 d = vec3(0.00, 0.33, 0.67);  // Try different values!
+    vec3 d = vec3(0.00, 0.33, 0.67);
     return a + b * cos(6.28318 * (c * t + d));
 }
 
@@ -185,22 +97,25 @@ vec2 normalize_coord(vec2 coord) {
     vec2 uv = coord / iResolution.xy;
     uv = uv - vec2(0.5, 0.5);
     uv.x *= iResolution.x / iResolution.y;
-    return uv * 4.0;
+    return uv * 3.0;  // smaller window for higher powers
 }
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
     vec2 p = normalize_coord(fragCoord);
     
-    vec2 c = vec2(-0.7, 0.27015);
-    vec2 z = p;
+    vec2 c = p;
+    vec2 z = vec2(0.0001, 0.0);  // small offset avoids z=0 singularity
+    
+    float n = 3.0;  // Try 3.0, 4.0, 5.0, 2.5
     
     int max_iter = 100;
     int iter;
     
     for (iter = 0; iter < max_iter; iter++) {
         if (cabs2(z) > 4.0) break;
-        z = cmul(z, z) + c;
+        z = cpow(z, n) + c;
+        // For integer n=3, you can use: z = ccube(z) + c;
     }
     
     vec3 color;
@@ -215,13 +130,75 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 }
 ```
 
-Palette variations to try:
-- `d = vec3(0.00, 0.10, 0.20)` — cool blues
-- `d = vec3(0.30, 0.20, 0.20)` — warm tones
-- `d = vec3(0.50, 0.50, 0.50)` — shifted spectrum
+**Symmetry:** $z^n + c$ has $n$-fold rotational symmetry because rotating $z$ by $2\pi/n$ rotates $z^n$ by $2\pi$, leaving it unchanged. So $n=3$ gives 3-fold symmetry, $n=4$ gives 4-fold, etc.
+
+**Non-integer powers:** Try $n = 2.5$. The discontinuity (branch cut) appears along the negative real axis, where `atan(z.y, z.x)` jumps from $\pi$ to $-\pi$. This is because $z^{2.5}$ is multi-valued.
 
 
-### C5. Apollonian Animation
+### C3. Smooth Coloring
+
+```glsl
+vec2 cmul(vec2 z, vec2 w) {
+    return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);
+}
+
+float cabs2(vec2 z) {
+    return dot(z, z);
+}
+
+vec3 palette(float t) {
+    vec3 a = vec3(0.5, 0.5, 0.5);
+    vec3 b = vec3(0.5, 0.5, 0.5);
+    vec3 c = vec3(1.0, 1.0, 1.0);
+    vec3 d = vec3(0.00, 0.33, 0.67);
+    return a + b * cos(6.28318 * (c * t + d));
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    
+    vec2 c = uv * 4.0;
+    c.x -= 0.5;
+    
+    vec2 z = vec2(0.0, 0.0);
+    int max_iter = 100;
+    int iter;
+    
+    for (iter = 0; iter < max_iter; iter++) {
+        if (cabs2(z) > 4.0) {
+            // Run a few more iterations for smoother result
+            for (int j = 0; j < 3; j++) {
+                z = cmul(z, z) + c;
+            }
+            break;
+        }
+        z = cmul(z, z) + c;
+    }
+    
+    vec3 color;
+    if (iter == max_iter) {
+        color = vec3(0.0, 0.0, 0.0);
+    } else {
+        // Smooth coloring formula
+        float log_zn = log(cabs2(z)) / 2.0;
+        float nu = log(log_zn / log(2.0)) / log(2.0);
+        float smooth_iter = float(iter) + 1.0 - nu;
+        
+        float t = smooth_iter / float(max_iter);
+        color = palette(t * 3.0);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+The extra iterations after escape ensure $|z|$ is large enough for the formula to be accurate.
+
+
+### C4. Apollonian Animation
 
 ```glsl
 struct Circle {
@@ -238,23 +215,27 @@ bool isInside(vec2 p, Circle c) {
     return length(p - c.center) < c.radius;
 }
 
-vec2 normalize_coord(vec2 coord) {
-    vec2 uv = coord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
-    return uv * 6.0;  // larger window for Apollonian
+vec3 palette(float t) {
+    vec3 a = vec3(0.5, 0.5, 0.5);
+    vec3 b = vec3(0.5, 0.5, 0.5);
+    vec3 c = vec3(1.0, 1.0, 1.0);
+    vec3 d = vec3(0.00, 0.33, 0.67);
+    return a + b * cos(6.28318 * (c * t + d));
 }
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    vec2 p = normalize_coord(fragCoord);
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 6.0;
     
     float r = 1.0;
     float circumradius = 2.0 * r / sqrt(3.0);
     
     Circle c1 = Circle(vec2(0.0, circumradius), r);
-    Circle c2 = Circle(vec2(-circumradius * 0.866, -circumradius * 0.5), r);
-    Circle c3 = Circle(vec2(circumradius * 0.866, -circumradius * 0.5), r);
+    Circle c2 = Circle(vec2(-circumradius * sqrt(3.0)/2.0, -circumradius * 0.5), r);
+    Circle c3 = Circle(vec2(circumradius * sqrt(3.0)/2.0, -circumradius * 0.5), r);
     Circle outer = Circle(vec2(0.0, 0.0), circumradius + r);
     
     // Animate max_iter
@@ -276,7 +257,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     }
     
     float t = float(iter) / 50.0;
-    vec3 color = 30.0 * vec3(pow(t, 2.0));
+    vec3 color = palette(t);
     
     fragColor = vec4(color, 1.0);
 }
@@ -345,7 +326,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 }
 ```
 
-As $c$ traces the cardioid, the Julia sets all have parabolic fixed points and remain connected but change shape continuously.
+As $c$ traces the cardioid, the Julia sets all have parabolic fixed points and remain connected but continuously deform.
 
 
 ### E2. Other Escape-Time Fractals
@@ -357,51 +338,61 @@ vec2 cmul(vec2 z, vec2 w) {
     return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);
 }
 
+float cabs2(vec2 z) {
+    return dot(z, z);
+}
+
 vec3 palette(float t) {
     vec3 a = vec3(0.5, 0.5, 0.5);
     vec3 b = vec3(0.5, 0.5, 0.5);
-    vec3 c = vec3(1.0, 1.0, 0.5);
-    vec3 d = vec3(0.00, 0.10, 0.20);
+    vec3 c = vec3(1.0, 0.7, 0.4);
+    vec3 d = vec3(0.00, 0.15, 0.20);
     return a + b * cos(6.28318 * (c * t + d));
-}
-
-vec2 normalize_coord(vec2 coord) {
-    vec2 uv = coord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
-    return uv * 4.0;
 }
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    vec2 p = normalize_coord(fragCoord);
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
     
-    vec2 c = p;
-    c.x -= 0.5;
-    c.y -= 0.5;
+    // Main view: center on the ship
+    vec2 center = vec2(-0.5, -0.5);
+    float zoom = 1.0;
+    
+    // Mini ship zoom: uncomment to see the small ship in lower-left
+    // center = vec2(-1.8, -0.05);
+    // zoom = 20.0;
+    
+    vec2 c = center + uv * 3.5 / zoom;
     
     vec2 z = vec2(0.0, 0.0);
-    int max_iter = 100;
+    int max_iter = 200;
     int iter;
     
     for (iter = 0; iter < max_iter; iter++) {
-        if (dot(z, z) > 4.0) break;
-        z = cmul(z, z);
-        z.y = abs(z.y);  // abs of imaginary part AFTER squaring
-        z = z + c;
+        if (cabs2(z) > 4.0) break;
+        z = abs(z);  // Take absolute value BEFORE squaring
+        z = cmul(z, z) + c;
     }
     
     vec3 color;
     if (iter == max_iter) {
         color = vec3(0.0, 0.0, 0.0);
     } else {
-        float t = float(iter) / float(max_iter);
-        color = palette(t);
+        // Smooth coloring
+        float log_zn = log(cabs2(z)) / 2.0;
+        float nu = log(log_zn / log(2.0)) / log(2.0);
+        float smooth_iter = float(iter) + 1.0 - nu;
+        float t = smooth_iter / float(max_iter);
+        color = palette(t * 4.0);
     }
     
     fragColor = vec4(color, 1.0);
 }
 ```
+
+Try different palette `d` values: `vec3(0.30, 0.20, 0.20)` for warm tones, `vec3(0.00, 0.33, 0.67)` for the classic Mandelbrot look.
 
 #### Tricorn
 
@@ -422,21 +413,15 @@ vec3 palette(float t) {
     return a + b * cos(6.28318 * (c * t + d));
 }
 
-vec2 normalize_coord(vec2 coord) {
-    vec2 uv = coord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
-    return uv * 4.0;
-}
-
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    vec2 p = normalize_coord(fragCoord);
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 c = uv * 4.0;
     
-    vec2 c = p;
     vec2 z = vec2(0.0, 0.0);
-    
-    int max_iter = 100;
+    int max_iter = 200;
     int iter;
     
     for (iter = 0; iter < max_iter; iter++) {
@@ -449,8 +434,12 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     if (iter == max_iter) {
         color = vec3(0.0, 0.0, 0.0);
     } else {
-        float t = float(iter) / float(max_iter);
-        color = palette(t);
+        // Smooth coloring
+        float log_zn = log(cabs2(z)) / 2.0;
+        float nu = log(log_zn / log(2.0)) / log(2.0);
+        float smooth_iter = float(iter) + 1.0 - nu;
+        float t = smooth_iter / float(max_iter);
+        color = palette(t * 3.0);
     }
     
     fragColor = vec4(color, 1.0);
@@ -476,35 +465,32 @@ vec3 palette(float t) {
     return a + b * cos(6.28318 * (c * t + d));
 }
 
-vec2 normalize_coord(vec2 coord) {
-    vec2 uv = coord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
-    return uv * 4.0;
-}
-
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    vec2 p = normalize_coord(fragCoord);
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 c = uv * 4.0;
     
-    vec2 c = p;
     vec2 z = vec2(0.0, 0.0);
-    
-    int max_iter = 100;
+    int max_iter = 200;
     int iter;
     
     for (iter = 0; iter < max_iter; iter++) {
         if (cabs2(z) > 4.0) break;
         vec2 z2 = cmul(z, z);
-        z = vec2(abs(z2.x), z2.y) + c;  // abs of real part of z²
+        z = vec2(abs(z2.x), z2.y) + c;  // abs of real part AFTER squaring
     }
     
     vec3 color;
     if (iter == max_iter) {
         color = vec3(0.0, 0.0, 0.0);
     } else {
-        float t = float(iter) / float(max_iter);
-        color = palette(t);
+        float log_zn = log(cabs2(z)) / 2.0;
+        float nu = log(log_zn / log(2.0)) / log(2.0);
+        float smooth_iter = float(iter) + 1.0 - nu;
+        float t = smooth_iter / float(max_iter);
+        color = palette(t * 3.0);
     }
     
     fragColor = vec4(color, 1.0);
@@ -512,7 +498,108 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 ```
 
 
-### E3. Apollonian Variations
+### E3. Sierpinski Carpet
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    // Map to region containing unit square with some padding
+    vec2 p = uv * 1.4 - vec2(0.15, 0.15);
+    
+    int max_iter = 15;
+    int iter;
+    
+    for (iter = 0; iter < max_iter; iter++) {
+        // Outside unit square? Escape.
+        if (p.x < 0.0 || p.x > 1.0 || p.y < 0.0 || p.y > 1.0) {
+            break;
+        }
+        
+        // Which cell of 3x3 grid?
+        vec2 cell = floor(p * 3.0);
+        
+        // Center cell is removed
+        if (cell.x == 1.0 && cell.y == 1.0) {
+            break;  // escaped into a hole
+        }
+        
+        // Zoom into this cell
+        p = fract(p * 3.0);
+    }
+    
+    // Black for carpet, white for holes/exterior
+    vec3 color;
+    if (iter == max_iter) {
+        color = vec3(0.0, 0.0, 0.0);  // in the carpet
+    } else {
+        color = vec3(1.0, 1.0, 1.0);  // hole or outside
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+### E4. Sierpinski Triangle
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    // Map to region containing unit triangle
+    vec2 p = uv * 1.4 - vec2(0.15, 0.1);
+    
+    int max_iter = 15;
+    int iter;
+    
+    for (iter = 0; iter < max_iter; iter++) {
+        // Outside the triangle (vertices at (0,0), (1,0), (0,1))
+        if (p.x < 0.0 || p.y < 0.0 || p.x + p.y > 1.0) {
+            break;
+        }
+        
+        // Which sub-triangle?
+        if (p.x + p.y < 0.5) {
+            // Bottom-left corner: scale by 2
+            p = p * 2.0;
+        } else if (p.x > 0.5) {
+            // Bottom-right corner: scale and shift
+            p = p * 2.0 - vec2(1.0, 0.0);
+        } else if (p.y > 0.5) {
+            // Top corner: scale and shift
+            p = p * 2.0 - vec2(0.0, 1.0);
+        } else {
+            // Middle triangle (removed)
+            break;
+        }
+    }
+    
+    // Black for triangle, white for holes/exterior
+    vec3 color;
+    if (iter == max_iter) {
+        color = vec3(0.0, 0.0, 0.0);
+    } else {
+        color = vec3(1.0, 1.0, 1.0);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+**Extension - Equilateral version:**
+
+To transform the right triangle to equilateral, apply a shear and scale after computing iteration count. The transformation maps:
+- $(0,0) \to (0, 0)$
+- $(1,0) \to (1, 0)$
+- $(0,1) \to (0.5, \sqrt{3}/2)$
+
+
+### E5. Apollonian Domain Coloring
 
 ```glsl
 struct Circle {
@@ -529,164 +616,70 @@ bool isInside(vec2 p, Circle c) {
     return length(p - c.center) < c.radius;
 }
 
-vec2 normalize_coord(vec2 coord) {
-    vec2 uv = coord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
-    return uv * 6.0;
-}
-
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    vec2 p = normalize_coord(fragCoord);
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 6.0;
     
-    // Three circles with different radii
-    Circle c1 = Circle(vec2(0.0, 1.2), 0.8);
-    Circle c2 = Circle(vec2(-1.0, -0.5), 1.0);
-    Circle c3 = Circle(vec2(1.1, -0.4), 0.7);
-    Circle outer = Circle(vec2(0.0, 0.1), 2.2);
+    float r = 1.0;
+    float circumradius = 2.0 * r / sqrt(3.0);
+    
+    Circle c1 = Circle(vec2(0.0, circumradius), r);
+    Circle c2 = Circle(vec2(-circumradius * sqrt(3.0)/2.0, -circumradius * 0.5), r);
+    Circle c3 = Circle(vec2(circumradius * sqrt(3.0)/2.0, -circumradius * 0.5), r);
+    Circle outer = Circle(vec2(0.0, 0.0), circumradius + r);
     
     int max_iter = 100;
     int iter;
+    int last_circle = 0;  // Track which circle we inverted through
     
     for (iter = 0; iter < max_iter; iter++) {
         if (isInside(p, c1)) {
             p = invert(p, c1);
+            last_circle = 1;
         } else if (isInside(p, c2)) {
             p = invert(p, c2);
+            last_circle = 2;
         } else if (isInside(p, c3)) {
             p = invert(p, c3);
+            last_circle = 3;
         } else if (!isInside(p, outer)) {
             p = invert(p, outer);
+            last_circle = 4;
         } else {
             break;
         }
     }
     
-    float t = float(iter) / float(max_iter);
-    vec3 color = 30.0 * vec3(pow(t, 2.0));
-    
-    fragColor = vec4(color, 1.0);
-}
-```
-
-With non-tangent or differently-sized circles, you still get a fractal, but the symmetry changes. Overlapping circles can create interesting interference patterns.
-
-
-### E4. Sierpinski Carpet
-
-```glsl
-vec3 palette(float t) {
-    vec3 a = vec3(0.5, 0.5, 0.5);
-    vec3 b = vec3(0.5, 0.5, 0.5);
-    vec3 c = vec3(1.0, 1.0, 1.0);
-    vec3 d = vec3(0.00, 0.33, 0.67);
-    return a + b * cos(6.28318 * (c * t + d));
-}
-
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    vec2 uv = fragCoord / iResolution.xy;
-    uv.x *= iResolution.x / iResolution.y;
-    
-    // Map to unit square region
-    vec2 p = uv * 1.5 - vec2(0.25, 0.1);
-    
-    int max_iter = 20;
-    int iter;
-    
-    for (iter = 0; iter < max_iter; iter++) {
-        // Check if outside unit square
-        if (p.x < 0.0 || p.x > 1.0 || p.y < 0.0 || p.y > 1.0) {
-            break;
-        }
-        
-        // Which cell are we in?
-        int ix = int(floor(p.x * 3.0));
-        int iy = int(floor(p.y * 3.0));
-        
-        // Center cell is removed
-        if (ix == 1 && iy == 1) {
-            break;  // escaped!
-        }
-        
-        // Zoom into this cell
-        p = p * 3.0 - vec2(float(ix), float(iy));
-    }
-    
+    // Color by last circle inverted through
     vec3 color;
-    if (iter == max_iter) {
-        color = vec3(0.0, 0.0, 0.0);  // in the carpet
+    if (last_circle == 1) {
+        color = vec3(1.0, 0.3, 0.3);  // red
+    } else if (last_circle == 2) {
+        color = vec3(0.3, 1.0, 0.3);  // green
+    } else if (last_circle == 3) {
+        color = vec3(0.3, 0.3, 1.0);  // blue
+    } else if (last_circle == 4) {
+        color = vec3(1.0, 1.0, 0.3);  // yellow
     } else {
-        float t = float(iter) / float(max_iter);
-        color = palette(t);
+        color = vec3(0.5, 0.5, 0.5);  // gray
     }
+    
+    // Darken by iteration count for depth
+    color *= 1.0 - 0.4 * float(iter) / float(max_iter);
     
     fragColor = vec4(color, 1.0);
 }
 ```
 
-
-### E5. Sierpinski Triangle
-
-```glsl
-vec3 palette(float t) {
-    vec3 a = vec3(0.5, 0.5, 0.5);
-    vec3 b = vec3(0.5, 0.5, 0.5);
-    vec3 c = vec3(1.0, 1.0, 1.0);
-    vec3 d = vec3(0.00, 0.33, 0.67);
-    return a + b * cos(6.28318 * (c * t + d));
-}
-
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    vec2 uv = fragCoord / iResolution.xy;
-    uv.x *= iResolution.x / iResolution.y;
-    
-    // Map to region containing unit triangle
-    vec2 p = uv * 1.5 - vec2(0.25, 0.1);
-    
-    int max_iter = 20;
-    int iter;
-    
-    for (iter = 0; iter < max_iter; iter++) {
-        // Check if outside the triangle (vertices at (0,0), (1,0), (0,1))
-        if (p.x < 0.0 || p.y < 0.0 || p.x + p.y > 1.0) {
-            break;
-        }
-        
-        // Which sub-triangle?
-        if (p.x + p.y < 0.5) {
-            // Bottom-left corner
-            p = p * 2.0;
-        } else if (p.x > 0.5) {
-            // Bottom-right corner
-            p = p * 2.0 - vec2(1.0, 0.0);
-        } else if (p.y > 0.5) {
-            // Top corner
-            p = p * 2.0 - vec2(0.0, 1.0);
-        } else {
-            // Middle triangle (removed)
-            break;  // escaped!
-        }
-    }
-    
-    vec3 color;
-    if (iter == max_iter) {
-        color = vec3(0.0, 0.0, 0.0);  // in the triangle
-    } else {
-        float t = float(iter) / float(max_iter);
-        color = palette(t);
-    }
-    
-    fragColor = vec4(color, 1.0);
-}
-```
+The result shows how the plane partitions into regions "owned" by each circle. The boundaries between colors lie on the limit set.
 
 
 ## Challenges
 
-### H1. Julia Explorer (Full)
+### H1. Split-Screen Julia Explorer
 
 ```glsl
 vec2 cmul(vec2 z, vec2 w) {
@@ -697,57 +690,100 @@ float cabs2(vec2 z) {
     return dot(z, z);
 }
 
-vec2 normalize_coord(vec2 coord) {
-    vec2 uv = coord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
-    return uv * 4.0;
+vec3 palette(float t) {
+    vec3 a = vec3(0.5, 0.5, 0.5);
+    vec3 b = vec3(0.5, 0.5, 0.5);
+    vec3 c = vec3(1.0, 1.0, 1.0);
+    vec3 d = vec3(0.00, 0.33, 0.67);
+    return a + b * cos(6.28318 * (c * t + d));
 }
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    vec2 p = normalize_coord(fragCoord);
+    float aspect = iResolution.x / iResolution.y;
+    bool leftHalf = fragCoord.x < iResolution.x * 0.5;
     
-    // Get c from mouse position
-    vec2 c = normalize_coord(iMouse.xy);
-    c.x -= 0.5;  // shift for Mandelbrot centering
-    
-    if (iMouse.x < 1.0) {
-        c = vec2(-0.7, 0.27015);
+    // Each half gets its own coordinate system
+    vec2 uv;
+    if (leftHalf) {
+        // Left half: x from 0 to 0.5 -> mapped to [-1, 1] in half-aspect
+        uv.x = (fragCoord.x / iResolution.x) * 4.0 - 1.0;
+        uv.y = (fragCoord.y / iResolution.y - 0.5) * 4.0 / (aspect * 0.5);
+    } else {
+        // Right half: x from 0.5 to 1 -> mapped to [-1, 1] in half-aspect  
+        uv.x = ((fragCoord.x / iResolution.x) - 0.5) * 4.0 - 1.0;
+        uv.y = (fragCoord.y / iResolution.y - 0.5) * 4.0 / (aspect * 0.5);
     }
     
-    // Mandelbrot iteration (background)
-    vec2 mc = p;
-    mc.x -= 0.5;
-    vec2 mz = vec2(0.0, 0.0);
-    int m_iter;
-    for (m_iter = 0; m_iter < 100; m_iter++) {
-        if (cabs2(mz) > 4.0) break;
-        mz = cmul(mz, mz) + mc;
+    vec2 p = uv * 2.0;  // scale to [-2, 2]
+    
+    // Get c from mouse, but only if mouse is on LEFT half
+    vec2 c;
+    bool validMouse = iMouse.x > 1.0 && iMouse.x < iResolution.x * 0.5;
+    
+    if (validMouse) {
+        // Map mouse position to Mandelbrot coordinates (same as left half)
+        vec2 mouse_uv;
+        mouse_uv.x = (iMouse.x / iResolution.x) * 4.0 - 1.0;
+        mouse_uv.y = (iMouse.y / iResolution.y - 0.5) * 4.0 / (aspect * 0.5);
+        c = mouse_uv * 2.0;
+        c.x -= 0.5;  // shift for Mandelbrot centering
+    } else {
+        c = vec2(-0.7, 0.27015);  // default
     }
     
-    // Julia iteration (foreground)
-    vec2 jz = p;
-    int j_iter;
-    for (j_iter = 0; j_iter < 100; j_iter++) {
-        if (cabs2(jz) > 4.0) break;
-        jz = cmul(jz, jz) + c;
+    vec3 color;
+    int max_iter = 100;
+    int iter;
+    
+    if (leftHalf) {
+        // Mandelbrot iteration
+        vec2 mc = p;
+        mc.x -= 0.5;  // center Mandelbrot
+        vec2 z = vec2(0.0, 0.0);
+        
+        for (iter = 0; iter < max_iter; iter++) {
+            if (cabs2(z) > 4.0) break;
+            z = cmul(z, z) + mc;
+        }
+        
+        if (iter == max_iter) {
+            color = vec3(0.0, 0.0, 0.0);
+        } else {
+            float t = float(iter) / float(max_iter);
+            color = palette(t);
+        }
+        
+        // Draw marker at c position
+        vec2 c_screen = c;
+        c_screen.x += 0.5;  // undo Mandelbrot centering
+        float marker_dist = length(p - c_screen);
+        if (marker_dist < 0.12) {
+            color = vec3(1.0, 1.0, 1.0);
+        }
+        if (marker_dist < 0.08) {
+            color = vec3(1.0, 0.2, 0.2);
+        }
+    } else {
+        // Julia iteration
+        vec2 z = p;
+        
+        for (iter = 0; iter < max_iter; iter++) {
+            if (cabs2(z) > 4.0) break;
+            z = cmul(z, z) + c;
+        }
+        
+        if (iter == max_iter) {
+            color = vec3(0.0, 0.0, 0.0);
+        } else {
+            float t = float(iter) / float(max_iter);
+            color = palette(t);
+        }
     }
     
-    // Layer: light background, gray Mandelbrot, black Julia
-    vec3 color = vec3(0.9, 0.9, 0.9);
-    if (m_iter == 100) {
-        color = vec3(0.6, 0.6, 0.6);
-    }
-    if (j_iter == 100) {
-        color = vec3(0.0, 0.0, 0.0);
-    }
-    
-    // Red dot at c position
-    vec2 c_pos = c;
-    c_pos.x += 0.5;
-    if (length(p - c_pos) < 0.05) {
-        color = vec3(1.0, 0.0, 0.0);
+    // Dividing line
+    if (abs(fragCoord.x - iResolution.x * 0.5) < 1.5) {
+        color = vec3(0.3, 0.3, 0.3);
     }
     
     fragColor = vec4(color, 1.0);
@@ -767,28 +803,24 @@ vec2 cdiv(vec2 z, vec2 w) {
     return vec2(z.x * w.x + z.y * w.y, z.y * w.x - z.x * w.y) / denom;
 }
 
-vec2 normalize_coord(vec2 coord) {
-    vec2 uv = coord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
-    return uv * 4.0;
-}
-
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    vec2 z = normalize_coord(fragCoord);
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 z = uv * 4.0;
     
     // The three cube roots of unity
     vec2 root1 = vec2(1.0, 0.0);
-    vec2 root2 = vec2(-0.5, 0.866);
-    vec2 root3 = vec2(-0.5, -0.866);
+    vec2 root2 = vec2(-0.5, sqrt(3.0)/2.0);
+    vec2 root3 = vec2(-0.5, -sqrt(3.0)/2.0);
     
     int max_iter = 50;
     int iter;
     
     for (iter = 0; iter < max_iter; iter++) {
         // Newton iteration for z³ - 1 = 0
-        // z = z - (z³-1)/(3z²) = (2z³ + 1) / (3z²)
+        // z_new = z - (z³-1)/(3z²) = (2z³ + 1) / (3z²)
         vec2 z2 = cmul(z, z);
         vec2 z3 = cmul(z2, z);
         z = cdiv(2.0 * z3 + vec2(1.0, 0.0), 3.0 * z2);
@@ -818,19 +850,119 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 ```
 
 
-### H3. Higher-Power Mandelbrot
+### H3. Escape Radius Proofs
+
+**Fact 1:** If $|c| > 2$, then $c \notin \mathcal{M}$.
+
+*Proof.* Starting from $z_0 = 0$, we have $z_1 = c$. Since $|c| > 2$:
+$$|z_2| = |c^2 + c| = |c||c + 1| \geq |c|(|c| - 1) > |c|$$
+By induction, $|z_n| \to \infty$. $\square$
+
+**Fact 2:** If $|z_n| > 2$ for some $n$ (with $|c| \leq 2$), the orbit escapes.
+
+*Proof.* Suppose $|z_n| > 2$ and $|c| \leq 2$. Then:
+$$|z_{n+1}| = |z_n^2 + c| \geq |z_n|^2 - |c| > |z_n|^2 - |z_n| = |z_n|(|z_n| - 1)$$
+Since $|z_n| > 2$, we have $|z_n| - 1 > 1$, so $|z_{n+1}| > |z_n|$. The orbit grows without bound. $\square$
+
+**Julia set escape radius:** If $|z| > R$ where $R = \frac{1 + \sqrt{1 + 4|c|}}{2}$, then $|z^2 + c| > |z|$.
+
+*Proof.* By the triangle inequality:
+$$|z^2 + c| \geq |z|^2 - |c|$$
+
+We need $|z|^2 - |c| > |z|$, i.e., $|z|^2 - |z| - |c| > 0$.
+
+This quadratic in $|z|$ has positive root $R = \frac{1 + \sqrt{1 + 4|c|}}{2}$. For $|z| > R$:
+$$|z|^2 - |z| > |c| \implies |z^2 + c| \geq |z|^2 - |c| > |z|$$
+
+So once $|z_n| > R$, the orbit escapes. $\square$
+
+
+### H4. Period Detection
 
 ```glsl
+vec2 cmul(vec2 z, vec2 w) {
+    return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);
+}
+
 float cabs2(vec2 z) {
     return dot(z, z);
 }
 
-vec2 cpow(vec2 z, float n) {
-    float r = length(z);
-    if (r < 0.0001) return vec2(0.0, 0.0);
-    float theta = atan(z.y, z.x);
-    float rn = pow(r, n);
-    return rn * vec2(cos(n * theta), sin(n * theta));
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    
+    vec2 c = uv * 4.0;
+    c.x -= 0.5;
+    
+    vec2 z = vec2(0.0, 0.0);
+    
+    // Track last several iterates
+    vec2 z_prev1 = z;
+    vec2 z_prev2 = z;
+    vec2 z_prev3 = z;
+    vec2 z_prev4 = z;
+    
+    int max_iter = 300;
+    int iter;
+    int period = 0;
+    float eps = 0.0001;
+    
+    for (iter = 0; iter < max_iter; iter++) {
+        // Store history
+        z_prev4 = z_prev3;
+        z_prev3 = z_prev2;
+        z_prev2 = z_prev1;
+        z_prev1 = z;
+        
+        z = cmul(z, z) + c;
+        
+        if (cabs2(z) > 4.0) break;  // escaped
+        
+        // Check for periods (only after orbit has settled)
+        if (iter > 50) {
+            if (length(z - z_prev1) < eps) { period = 1; break; }
+            if (length(z - z_prev2) < eps) { period = 2; break; }
+            if (length(z - z_prev3) < eps) { period = 3; break; }
+            if (length(z - z_prev4) < eps) { period = 4; break; }
+        }
+    }
+    
+    vec3 color;
+    if (period == 1) {
+        color = vec3(0.2, 0.2, 0.9);  // blue: period 1
+    } else if (period == 2) {
+        color = vec3(0.9, 0.2, 0.2);  // red: period 2
+    } else if (period == 3) {
+        color = vec3(0.2, 0.9, 0.2);  // green: period 3
+    } else if (period == 4) {
+        color = vec3(0.9, 0.9, 0.2);  // yellow: period 4
+    } else if (iter == max_iter) {
+        color = vec3(0.0, 0.0, 0.0);  // bounded but period not detected
+    } else {
+        // Escaped - gray scale by iteration
+        float t = float(iter) / float(max_iter);
+        color = vec3(t * 0.5);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+The colored regions reveal the internal structure of the Mandelbrot set. Each bulb has a characteristic period.
+
+
+### H5. Orbit Traps
+
+```glsl
+vec2 cmul(vec2 z, vec2 w) {
+    return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);
+}
+
+float cabs2(vec2 z) {
+    return dot(z, z);
 }
 
 vec3 palette(float t) {
@@ -841,58 +973,128 @@ vec3 palette(float t) {
     return a + b * cos(6.28318 * (c * t + d));
 }
 
-vec2 normalize_coord(vec2 coord) {
-    vec2 uv = coord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
-    return uv * 3.0;
-}
-
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    vec2 p = normalize_coord(fragCoord);
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
     
-    vec2 c = p;
-    vec2 z = vec2(0.0001, 0.0);  // small offset to avoid z=0 singularity
+    vec2 c = uv * 4.0;
+    c.x -= 0.5;
     
-    float n = 2.5;  // Try different values!
+    vec2 z = vec2(0.0, 0.0);
     
     int max_iter = 100;
     int iter;
     
+    // Track minimum distance to trap
+    float trap_dist = 1000.0;
+    
+    // Trap: point at origin (try different positions!)
+    vec2 trap_point = vec2(0.0, 0.0);
+    
     for (iter = 0; iter < max_iter; iter++) {
-        if (cabs2(z) > 4.0) break;
-        z = cpow(z, n) + c;
+        z = cmul(z, z) + c;
+        if (cabs2(z) > 100.0) break;
+        
+        // Point trap
+        float d = length(z - trap_point);
+        
+        // Alternative traps:
+        // float d = abs(length(z) - 0.5);  // circle of radius 0.5
+        // float d = min(abs(z.x), abs(z.y));  // cross at axes
+        // float d = abs(z.y);  // real axis
+        
+        trap_dist = min(trap_dist, d);
     }
     
     vec3 color;
     if (iter == max_iter) {
-        color = vec3(0.0, 0.0, 0.0);
+        // Bounded orbit - color by trap distance
+        color = palette(trap_dist * 5.0);
+        
+        // Alternative: glow effect
+        // color = vec3(1.0, 0.9, 0.8) * exp(-trap_dist * 20.0);
     } else {
-        float t = float(iter) / float(max_iter);
-        color = palette(t);
+        // Escaped - just black
+        color = vec3(0.0);
     }
     
     fragColor = vec4(color, 1.0);
 }
 ```
 
-Non-integer powers create branch cut discontinuities where `atan` jumps from $\pi$ to $-\pi$.
+The interesting structure is all inside the set. Try different traps and different coloring scales.
 
 
-### H4. Escape Radius Proofs
+### H6. Distance Estimation
 
-**Fact 1:** If $|c| > 2$, then $c \notin \mathcal{M}$.
+The derivative recurrence: From $z_{n+1} = z_n^2 + c$:
+$$z'_{n+1} = \frac{\partial}{\partial c}(z_n^2 + c) = 2z_n z'_n + 1$$
+with $z'_0 = 0$.
 
-*Proof.* Starting from $z_0 = 0$, we have $z_1 = c$. If $|c| > 2$, then for $n \geq 1$:
-$$|z_{n+1}| = |z_n^2 + c| \geq |z_n|^2 - |c|$$
-When $|z_n| > |c|$, we have $|z_n|^2 - |c| > |z_n|(|z_n| - 1)$. Since $|z_1| = |c| > 2$, by induction $|z_n| \to \infty$. $\square$
+```glsl
+vec2 cmul(vec2 z, vec2 w) {
+    return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);
+}
 
-**Fact 2:** If $|z_n| > 2$ for some $n$ (with $|c| \leq 2$), the orbit escapes.
+float cabs2(vec2 z) {
+    return dot(z, z);
+}
 
-*Proof.* Suppose $|z_n| > 2$ and $|c| \leq 2$. Then $|z_n| > |c|$, so:
-$$|z_{n+1}| = |z_n^2 + c| \geq |z_n|^2 - |c| > |z_n|^2 - |z_n| = |z_n|(|z_n| - 1)$$
-Since $|z_n| > 2$, we have $|z_n| - 1 > 1$, so $|z_{n+1}| > |z_n|$. The orbit grows without bound. $\square$
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    
+    // Zoom into an interesting region to see the difference
+    // Try: center = (-0.75, 0.1), zoom = 50.0
+    vec2 center = vec2(-0.75, 0.1);
+    float zoom = 50.0;
+    vec2 c = center + uv * 4.0 / zoom;
+    
+    vec2 z = vec2(0.0, 0.0);
+    vec2 dz = vec2(0.0, 0.0);  // derivative dz/dc
+    
+    int max_iter = 500;
+    int iter;
+    
+    for (iter = 0; iter < max_iter; iter++) {
+        if (cabs2(z) > 10000.0) break;
+        
+        // Derivative recurrence: dz' = 2*z*dz + 1
+        dz = 2.0 * cmul(z, dz) + vec2(1.0, 0.0);
+        
+        // Standard iteration
+        z = cmul(z, z) + c;
+    }
+    
+    vec3 color;
+    if (iter == max_iter) {
+        color = vec3(0.0, 0.0, 0.0);
+    } else {
+        // Distance estimate
+        float r = length(z);
+        float dr = length(dz);
+        float dist = 0.5 * r * log(r) / dr;
+        
+        // Glow effect - try different scales
+        float glow = exp(-dist * 200.0 * zoom);
+        color = vec3(1.0, 0.9, 0.7) * glow;
+        
+        // Alternative: sharp boundary
+        // color = dist < 0.001 / zoom ? vec3(1.0) : vec3(0.0);
+        
+        // Alternative: contour lines
+        // color = vec3(fract(log(dist * zoom) * 3.0));
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+The distance estimator gives crisp, smooth boundaries at any zoom level. Compare to regular escape-time coloring at the same zoom to see the improvement.
 
 
 ## Projects
@@ -910,20 +1112,25 @@ float cabs2(vec2 z) {
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    // For the grid, we use a different coordinate setup
     vec2 uv = fragCoord / iResolution.xy;
     uv.x *= iResolution.x / iResolution.y;
-    vec2 p = uv * 4.0;
     
-    float grid_size = 20.0;
-    vec2 cell_id = floor(p * grid_size / 4.0);
-    vec2 cell_p = fract(p * grid_size / 4.0) - 0.5;
-    cell_p *= 4.0;
+    // Grid setup (consistent with Day 1 grid project)
+    float L = 0.25;  // cell size
+    vec2 p = uv * 3.0 - vec2(1.0, 1.0);  // center the grid
     
-    // c from cell position
-    vec2 c = (cell_id / grid_size) * 3.0 - vec2(2.0, 1.5);
+    vec2 cell_id = floor(p / L + 0.5);
+    vec2 cell_center = cell_id * L;
+    vec2 cell_p = p - cell_center;
     
-    vec2 z = cell_p;
+    // Map cell_id to parameter c in interesting region
+    vec2 c = cell_center;
+    c.x = c.x * 1.0 - 0.5;  // x: [-2, 0.5] roughly
+    c.y = c.y * 1.0;         // y: [-1.25, 1.25] roughly
+    
+    // Map cell_p to starting point z
+    vec2 z = cell_p / L * 4.0;  // scale to [-2, 2] within cell
+    
     int max_iter = 50;
     int iter;
     
@@ -932,12 +1139,19 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
         z = cmul(z, z) + c;
     }
     
-    float t = float(iter) / float(max_iter);
-    vec3 color = vec3(t, t, t);
+    // Inverted colors: Julia set dark on light background
+    vec3 color;
+    if (iter == max_iter) {
+        color = vec3(0.1, 0.1, 0.15);  // dark Julia set
+    } else {
+        color = vec3(0.95, 0.95, 0.9);  // light background
+    }
     
     fragColor = vec4(color, 1.0);
 }
 ```
+
+Zoom out to see the Mandelbrot set emerge: cells with $c \in \mathcal{M}$ show dark connected Julia sets, cells outside show scattered dark dust on light backgrounds.
 
 
 ### Project 2: Orbit Visualization
@@ -953,22 +1167,21 @@ float sdSegment(vec2 p, vec2 a, vec2 b) {
     return length(pa - ba * h);
 }
 
-vec2 normalize_coord(vec2 coord) {
-    vec2 uv = coord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
-    return uv * 4.0;
-}
-
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    vec2 p = normalize_coord(fragCoord);
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 4.0;
     
     // z0 from mouse
-    vec2 z0 = normalize_coord(iMouse.xy);
-    
+    vec2 z0;
     if (iMouse.x < 1.0) {
         z0 = vec2(0.3, 0.5);
+    } else {
+        vec2 mouse_uv = iMouse.xy / iResolution.xy - 0.5;
+        mouse_uv.x *= iResolution.x / iResolution.y;
+        z0 = mouse_uv * 4.0;
     }
     
     vec2 c = vec2(-0.7, 0.27015);
@@ -980,13 +1193,13 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     for (int i = 1; i < N; i++) {
         orbit[i] = cmul(orbit[i-1], orbit[i-1]) + c;
         if (dot(orbit[i], orbit[i]) > 100.0) {
-            orbit[i] = orbit[i-1];
+            orbit[i] = orbit[i-1];  // clamp escaped points
         }
     }
     
     vec3 color = vec3(0.1, 0.1, 0.15);
     
-    // Julia set in background
+    // Julia set in background (faint)
     vec2 z = p;
     int iter;
     for (iter = 0; iter < 100; iter++) {
@@ -1021,5 +1234,3 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     fragColor = vec4(color, 1.0);
 }
 ```
-
-The same visualization technique works for Apollonian (watch the point bounce between inversions) or Sierpinski (watch it zoom into sub-cells). The iteration logic changes but the orbit-drawing code stays the same.

@@ -524,5 +524,3 @@ This pattern—per-pixel iteration with no communication between pixels—is ide
 - The **Mandelbrot set** indexes Julia sets: $c \in \mathcal{M}$ if and only if $K_c$ is connected
 - **Circle inversion** generalizes reflection and preserves angles (it's a conformal map)
 - **Iteration count** encodes geometric information—how close a point is to the fractal boundary
-
-Tomorrow we move to three dimensions.

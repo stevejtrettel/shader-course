@@ -961,35 +961,44 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 ```glsl
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    vec2 uv = fragCoord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
+    // Normalized coordinates centered at origin
+    vec2 uv = fragCoord / iResolution.xy - 0.5;
+    float aspect = iResolution.x / iResolution.y;
+    uv.x *= aspect;
     vec2 p = uv * 4.0;
     
-    float aspect = iResolution.x / iResolution.y;
+    // Grid setup
     float N = 8.0;
     float L = (4.0 * aspect) / N;
     
+    // Grid formula
     vec2 cell_id = floor(p / L);
-    vec2 cell_p = mod(p, L) - vec2(L/2.0, L/2.0);
+    vec2 cell_center = (cell_id + 0.5) * L;
+    vec2 local = p - cell_center;
     
-    // Pseudo-random per cell (determines orientation)
+    // Pseudo-random per cell (determines arc orientation)
     float rand = fract(sin(dot(cell_id, vec2(12.9898, 78.233))) * 43758.5453);
     
-    // Quarter circles in corners
+    // Quarter circles centered at corners
     float r = L / 2.0;
     float thickness = 0.05;
     
+    // Corner positions relative to cell center
+    vec2 TL = vec2(-L/2.0,  L/2.0);   // top-left
+    vec2 TR = vec2( L/2.0,  L/2.0);   // top-right
+    vec2 BL = vec2(-L/2.0, -L/2.0);   // bottom-left
+    vec2 BR = vec2( L/2.0, -L/2.0);   // bottom-right
+    
     float d;
     if (rand > 0.5) {
-        // Arcs connecting top-left to bottom-right
-        float d1 = abs(length(cell_p - vec2(-L/2.0, L/2.0)) - r);
-        float d2 = abs(length(cell_p - vec2(L/2.0, -L/2.0)) - r);
+        // Arcs from top-left and bottom-right corners
+        float d1 = abs(length(local - TL) - r);
+        float d2 = abs(length(local - BR) - r);
         d = min(d1, d2);
     } else {
-        // Arcs connecting top-right to bottom-left
-        float d1 = abs(length(cell_p - vec2(L/2.0, L/2.0)) - r);
-        float d2 = abs(length(cell_p - vec2(-L/2.0, -L/2.0)) - r);
+        // Arcs from top-right and bottom-left corners
+        float d1 = abs(length(local - TR) - r);
+        float d2 = abs(length(local - BL) - r);
         d = min(d1, d2);
     }
     
