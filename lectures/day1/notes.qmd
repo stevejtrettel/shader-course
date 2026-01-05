@@ -1,4 +1,4 @@
-# Day 1: Pixels
+# Day 1: Introduction
 
 ## Overview
 
@@ -313,9 +313,12 @@ fragColor = vec4(color, 1.0);
 
 {{< shader-demo day1/circle-ring >}}
 
-### Animation with iTime
 
-So far our shaders have been static. Let's make something move.
+## Animation and Interaction
+
+So far our shaders are static images. Let's make them move and respond to input.
+
+### Animation with iTime
 
 The uniform `iTime` gives the number of seconds since the shader started. Since `sin(iTime)` oscillates between -1 and 1, the expression `1.0 + 0.5 * sin(iTime)` oscillates between 0.5 and 1.5. Use this as the radius:
 
@@ -337,6 +340,116 @@ fragColor = vec4(color, 1.0);
 {{< shader-demo day1/circle-pulsing >}}
 
 This is our first animated shader. The same principle applies anywhere: any parameter can depend on `iTime`.
+
+
+### The iMouse Uniform
+
+`iMouse` is a `vec4`:
+
+- `iMouse.xy` — current mouse position (in pixels)
+- `iMouse.zw` — position where the mouse was last clicked
+
+For now we'll focus on `iMouse.xy`.
+
+### Dragging a Circle
+
+Let's draw a circle centered at the mouse position. Since `iMouse.xy` is in pixel coordinates, we need to normalize it the same way we normalize `fragCoord`:
+
+```glsl
+// Normalize fragment coordinate
+vec2 uv = fragCoord / iResolution.xy;
+uv = uv - vec2(0.5, 0.5);
+uv.x *= iResolution.x / iResolution.y;
+vec2 p = uv * 4.0;
+
+// Normalize mouse coordinate the same way
+vec2 mouse = iMouse.xy / iResolution.xy;
+mouse = mouse - vec2(0.5, 0.5);
+mouse.x *= iResolution.x / iResolution.y;
+mouse = mouse * 4.0;
+
+// Circle centered at mouse
+float d = length(p - mouse);
+float r = 0.5;
+
+vec3 color;
+if (d < r) {
+    color = vec3(1.0, 0.9, 0.2);  // yellow
+} else {
+    color = vec3(0.1, 0.1, 0.3);
+}
+
+fragColor = vec4(color, 1.0);
+```
+
+{{< shader-demo day1/circle-mouse >}}
+
+Click and drag to move the circle.
+
+### Writing a Helper Function
+
+We just wrote the same four lines of coordinate normalization twice. This is a sign we should write a function.
+
+A GLSL function declares its return type, then the function name, then its parameters with their types:
+
+```glsl
+vec2 normalize_coord(vec2 coord) {
+    vec2 uv = coord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    return uv * 4.0;
+}
+```
+
+Functions must be defined before they're used, so they go above `mainImage`. Here's the overall structure:
+
+```glsl
+vec2 normalize_coord(vec2 coord) {
+    // normalization logic here
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 p = normalize_coord(fragCoord);
+    vec2 mouse = normalize_coord(iMouse.xy);
+    
+    // code using p and mouse
+}
+```
+
+Now our shader is cleaner, and we won't make mistakes copying the normalization code.
+
+### Combining iMouse and iTime: Sun and Earth
+
+Let's make a circle orbit around the mouse position:
+
+```glsl
+vec2 p = normalize_coord(fragCoord);
+vec2 sun = normalize_coord(iMouse.xy);
+
+// Earth orbits the sun
+float orbit_radius = 0.8;
+vec2 earth = sun + orbit_radius * vec2(cos(iTime), sin(iTime));
+
+// Draw sun (larger, yellow)
+float d_sun = length(p - sun);
+// Draw earth (smaller, blue)
+float d_earth = length(p - earth);
+
+vec3 color = vec3(0.02, 0.02, 0.05);  // dark background
+if (d_sun < 0.3) {
+    color = vec3(1.0, 0.9, 0.2);  // yellow sun
+}
+if (d_earth < 0.15) {
+    color = vec3(0.2, 0.5, 1.0);  // blue earth
+}
+
+fragColor = vec4(color, 1.0);
+```
+
+{{< shader-demo day1/sun-earth >}}
+
+Drag to move the sun; the earth follows in orbit. (Exercise: add a moon orbiting the earth!)
+
 
 ## Implicit Curves
 
@@ -474,126 +587,10 @@ The same idea works for curves. Replace the hard threshold on distance with a `s
 
 So far we've used simple RGB colors like `vec3(1.0, 1.0, 0.0)` for yellow. For more sophisticated coloring—rainbows, smooth gradients, escape-time fractal coloring—the **Color Appendix** provides copy-and-paste solutions including HSV conversion and cosine palettes.
 
-### Animated Curve Families
 
-The lemniscate is part of a one-parameter family called the Cassini ovals, defined by the product of distances from two foci being constant:
-$$(x^2 + y^2)^2 - 2c^2(x^2 - y^2) = a^4 - c^4$$
+## Putting It All Together
 
-As the parameter $a$ varies relative to the fixed focal distance $c$, the topology changes: two separate loops when $a < c$, a lemniscate when $a = c$, a single oval when $a > c$.
-
-{{< shader-demo day1/lemniscate-animated >}}
-
-## Interactivity and Abstraction
-
-So far our shaders respond to time (`iTime`) but not to user input. Shadertoy provides `iMouse` for mouse interaction.
-
-### The iMouse Uniform
-
-`iMouse` is a `vec4`:
-
-- `iMouse.xy` — current mouse position (in pixels)
-- `iMouse.zw` — position where the mouse was last clicked
-
-For now we'll focus on `iMouse.xy`.
-
-### Dragging a Circle
-
-Let's draw a circle centered at the mouse position. Since `iMouse.xy` is in pixel coordinates, we need to normalize it the same way we normalize `fragCoord`:
-
-```glsl
-// Normalize fragment coordinate
-vec2 uv = fragCoord / iResolution.xy;
-uv = uv - vec2(0.5, 0.5);
-uv.x *= iResolution.x / iResolution.y;
-vec2 p = uv * 4.0;
-
-// Normalize mouse coordinate the same way
-vec2 mouse = iMouse.xy / iResolution.xy;
-mouse = mouse - vec2(0.5, 0.5);
-mouse.x *= iResolution.x / iResolution.y;
-mouse = mouse * 4.0;
-
-// Circle centered at mouse
-float d = length(p - mouse);
-float r = 0.5;
-
-vec3 color;
-if (d < r) {
-    color = vec3(1.0, 0.9, 0.2);  // yellow
-} else {
-    color = vec3(0.1, 0.1, 0.3);
-}
-
-fragColor = vec4(color, 1.0);
-```
-
-{{< shader-demo day1/circle-mouse >}}
-
-Click and drag to move the circle.
-
-### Writing a Helper Function
-
-We just wrote the same four lines of coordinate normalization twice. This is a sign we should write a function.
-
-A GLSL function declares its return type, then the function name, then its parameters with their types:
-
-```glsl
-vec2 normalize_coord(vec2 coord) {
-    vec2 uv = coord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
-    return uv * 4.0;
-}
-```
-
-Functions must be defined before they're used, so they go above `mainImage`. Here's the overall structure:
-
-```glsl
-vec2 normalize_coord(vec2 coord) {
-    // normalization logic here
-}
-
-void mainImage(out vec4 fragColor, in vec2 fragCoord) {
-    vec2 p = normalize_coord(fragCoord);
-    vec2 mouse = normalize_coord(iMouse.xy);
-    
-    // code using p and mouse
-}
-```
-
-Now our shader is cleaner, and we won't make mistakes copying the normalization code.
-
-### Combining iMouse and iTime: Sun and Earth
-
-Let's make a circle orbit around the mouse position:
-
-```glsl
-vec2 p = normalize_coord(fragCoord);
-vec2 sun = normalize_coord(iMouse.xy);
-
-// Earth orbits the sun
-float orbit_radius = 0.8;
-vec2 earth = sun + orbit_radius * vec2(cos(iTime), sin(iTime));
-
-// Draw sun (larger, yellow)
-float d_sun = length(p - sun);
-// Draw earth (smaller, blue)
-float d_earth = length(p - earth);
-
-vec3 color = vec3(0.02, 0.02, 0.05);  // dark background
-if (d_sun < 0.3) {
-    color = vec3(1.0, 0.9, 0.2);  // yellow sun
-}
-if (d_earth < 0.15) {
-    color = vec3(0.2, 0.5, 1.0);  // blue earth
-}
-
-fragColor = vec4(color, 1.0);
-```
-
-{{< shader-demo day1/sun-earth >}}
-
-Drag to move the sun; the earth follows in orbit. (Exercise: add a moon orbiting the earth!)
+We now have all the tools: coordinate systems, distance-based rendering, implicit curves with gradient correction, animation, and mouse interaction. Let's combine them.
 
 ### Mouse as Parameter
 
@@ -631,7 +628,8 @@ fragColor = vec4(color, 1.0);
 
 Drag left and right to sweep through the level sets and watch the curve topology change.
 
-### Coming Full Circle: Elliptic Curves
+
+### Example: Elliptic Curves
 
 Remember the opening demo? We can now build it ourselves. An elliptic curve in Weierstrass form is $y^2 = x^3 + ax + b$. As an implicit curve: $F(x,y) = y^2 - x^3 - ax - b = 0$.
 

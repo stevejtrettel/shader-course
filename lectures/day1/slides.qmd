@@ -1,5 +1,5 @@
 ---
-title: "Day 1: Pixels"
+title: "Day 1: Introduction"
 subtitle: "Shaders for Mathematical Visualization"
 format:
   revealjs:
@@ -7,6 +7,8 @@ format:
 metadata-files:
   - ../../_slides-metadata.yml
 ---
+
+# Introduction
 
 ##
 
@@ -38,7 +40,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 - `vec4(r, g, b, a)` holds four floats, each in $[0, 1]$
 - Floats need decimals: `1.0` not `1`
 
-**Hello World!**
+## Hello World
 
 ```glsl
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
@@ -92,7 +94,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
 {{< shader-slide day1/half-plane-pixels >}}
 
-# Coordinate Systems
+## The Awkwardness
 
 `fragCoord.x < iResolution.x / 2.0` works, but...
 
@@ -100,7 +102,9 @@ What if we want a circle? A diagonal? Any mathematical shape?
 
 We need a proper coordinate system.
 
-**The Problem**
+# Coordinate Systems
+
+## The Problem
 
 `fragCoord` gives pixel coordinates: origin at bottom-left, values like $(0,0)$ to $(1920, 1080)$.
 
@@ -123,6 +127,11 @@ This is our **standard boilerplate**. From now on, `p` is our math coordinate.
 
 {{< shader-slide day1/coordinates >}}
 
+## Now: p.x < 0.0
+
+With proper coordinates, left vs right is just `p.x < 0.0`.
+
+Much cleaner—and now we can draw shapes.
 
 # Drawing with Distance
 
@@ -137,9 +146,7 @@ length(p - center)  // distance from any point
 
 Filled circle: `length(p) < r`
 
-
-
-**Example: Circle**
+## Circle Code {.smaller}
 
 ```glsl
 float d = length(p);    // distance from origin
@@ -172,11 +179,11 @@ $|d - r|$ is distance to the circle. Subtract thickness, threshold on sign.
 
 {{< shader-slide day1/circle-ring >}}
 
-# Animation
+# Animation and Interaction
 
-## iTime and sin()
+## iTime
 
-`iTime` = seconds since start. `sin(iTime)` oscillates $-1$ to $1$.
+`iTime` = seconds since shader started. `sin(iTime)` oscillates $-1$ to $1$.
 
 ```glsl
 float r = 1.0 + 0.5 * sin(iTime);  // radius pulses 0.5 to 1.5
@@ -187,6 +194,61 @@ Period is $2\pi \approx 6.28$ seconds.
 ##
 
 {{< shader-slide day1/circle-pulsing >}}
+
+## iMouse
+
+`iMouse.xy` = mouse position in pixels.
+
+To use it as a coordinate, normalize the same way as `fragCoord`. Since we'll do this twice, let's write a helper function:
+
+## Helper Function {.smaller}
+
+```glsl
+vec2 normalize_coord(vec2 coord) {
+    vec2 uv = coord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    return uv * 4.0;
+}
+```
+
+Define functions **above** `mainImage`.
+
+## Circle Following Mouse {.smaller}
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 p = normalize_coord(fragCoord);
+    vec2 mouse = normalize_coord(iMouse.xy);
+    
+    float d = length(p - mouse);
+    
+    vec3 color = vec3(0.1, 0.1, 0.3);
+    if (d < 0.5) {
+        color = vec3(1.0, 0.9, 0.2);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+##
+
+{{< shader-slide day1/circle-mouse >}}
+
+## Combining Time and Mouse
+
+The sun is at the mouse position. The earth orbits around it:
+
+```glsl
+vec2 sun = normalize_coord(iMouse.xy);
+vec2 earth = sun + 0.8 * vec2(cos(iTime), sin(iTime));
+```
+
+##
+
+{{< shader-slide day1/sun-earth >}}
 
 # Implicit Curves
 
@@ -242,53 +304,7 @@ Use `max(..., 0.01)` to avoid division by zero.
 
 {{< shader-slide day1/lemniscate-gradient >}}
 
-## Animating Curve Families
-
-Any parameter can depend on `iTime`. Cassini ovals sweep through a family as $c$ varies:
-
-##
-
-{{< shader-slide day1/lemniscate-animated >}}
-
-# Mouse Input
-
-## iMouse and Helper Functions {.smaller}
-
-`iMouse.xy` = mouse position in pixels. Normalize it the same way as `fragCoord`:
-
-```glsl
-vec2 normalize_coord(vec2 coord) {
-    vec2 uv = coord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
-    return uv * 4.0;
-}
-```
-
-Define functions **above** `mainImage`.
-
-## Circle Following Mouse {.smaller}
-
-```glsl
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    vec2 p = normalize_coord(fragCoord);
-    vec2 mouse = normalize_coord(iMouse.xy);
-    
-    float d = length(p - mouse);
-    
-    vec3 color = vec3(0.1, 0.1, 0.3);
-    if (d < 0.5) {
-        color = vec3(1.0, 0.9, 0.2);
-    }
-    
-    fragColor = vec4(color, 1.0);
-}
-```
-
-##
-
-{{< shader-slide day1/circle-mouse >}}
+# Putting It All Together
 
 ## Mouse as Parameter
 
@@ -299,8 +315,6 @@ float param = mix(-2.0, 2.0, iMouse.x / iResolution.x);
 ```
 
 As mouse moves left→right, `param` goes $-2 \to 2$.
-
-# Coming Full Circle
 
 ## Elliptic Curves
 
@@ -346,6 +360,6 @@ if (dist < 0.05) {
 - Shaders: coordinates → colors, massively parallel
 - Coordinate transformation: pixel space → math space
 - Distance fields: threshold distance for shapes
+- Animation: `iTime` for motion, `iMouse` for interaction
 - Implicit curves: $F(x,y) = 0$ with gradient correction
-- Animation: parameters depending on `iTime`
-- Interaction: parameters depending on `iMouse`
+- Parameter exploration: mouse controls curve families
