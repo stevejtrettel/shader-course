@@ -25,8 +25,8 @@ website:
         contents:
           - text: "Notes"
             href: lectures/day2/notes.qmd
-          - text: "Slides"
-            href: lectures/day2/slides.html
+          # - text: "Slides"
+          #   href: lectures/day2/slides.html
           - text: "Code"
             href: lectures/day2/shaders.qmd
           - text: "Homework"
