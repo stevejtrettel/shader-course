@@ -6,8 +6,6 @@ A fractal is a shape with structure at every scale—zoom in and you find more d
 
 {{< shader-demo day2/mandelbrot-zoom >}}
 
-{{< shader-demo day2/apollonian-final >}}
-
 The first is the Mandelbrot set, born from iterating $z \mapsto z^2 + c$ in the complex plane. The second is the Apollonian gasket, born from iterating circle inversions. Different mathematics, same principle: take a simple operation and repeat it.
 
 Both fit naturally into shaders. Each pixel asks "what happens when I iterate from here?"—and since pixels don't depend on each other, the GPU can answer millions of these questions in parallel.
@@ -164,6 +162,14 @@ vec2 z = p;
 
 {{< shader-demo day2/julia-static >}}
 
+### Escape Radius for Julia Sets
+
+**Fact.** For the iteration $z \mapsto z^2 + c$, if $|z_n| > R$ where
+$$R = \frac{1 + \sqrt{1 + 4|c|}}{2}$$
+then the orbit escapes to infinity, so $z_0 \notin K_c$.
+
+This is the Julia set analog of the Mandelbrot escape facts—once outside this disk, you never come back. In practice, the simpler bound $R = \max(2, |c|)$ is also valid and easier to compute. Proving this is Exercise H5.
+
 Different values of $c$ produce very different Julia sets. Some are connected (one piece), others are totally disconnected (Cantor dust). The relationship is governed by a precise theorem.
 
 ### The Mandelbrot-Julia Correspondence
@@ -201,7 +207,7 @@ if (iter == max_iter) {
 
 {{< shader-demo day2/mandelbrot-gray >}}
 
-Structure appears: tendrils, spirals, bulbs around the boundary. Points near the boundary take many iterations to escape (bright); points far away escape quickly (dark).
+Structure appears: tendrils, spirals, bulbs around the boundary. Points near the boundary of the Mandelbrot set take many iterations to escape (bright); points far from the set escape quickly (dark).
 
 ### Color
 
@@ -246,7 +252,7 @@ Circle inversion is to circles what reflection is to lines: it swaps inside and 
 Inversion in the unit circle sends a point $\mathbf{p}$ to:
 $$\text{inv}(\mathbf{p}) = \frac{\mathbf{p}}{|\mathbf{p}|^2}$$
 
-The inverted point lies on the same ray from the origin, but at reciprocal distance: if $\mathbf{p}$ is at distance $r$, its image is at distance $1/r$. Points inside the circle map outside; points outside map inside; points on the circle stay fixed.
+The inverted point lies on the same ray from the origin, but at reciprocal distance: if $\mathbf{p}$ is at distance $r$, its image is at distance $1/r$. Points inside the circle map outside; points outside map inside; points on the circle stay fixed. (The origin maps to "infinity"—inversion extends naturally to the Riemann sphere.)
 
 ```glsl
 vec2 invert(vec2 p) {
@@ -360,7 +366,7 @@ bool isInside(vec2 p, Circle c) {
 
 ## The Apollonian Gasket
 
-The Apollonian gasket is a fractal circle packing. Start with four mutually tangent circles, three inside one, and fill each curved gap with a circle tangent to its three neighbors. Repeat.
+The Apollonian gasket is a fractal circle packing, named for Apollonius of Perga who studied tangent circles in the 3rd century BCE. Start with four mutually tangent circles, three inside one, and fill each curved gap with a circle tangent to its three neighbors. Repeat.
 
 ### Setup
 
@@ -371,8 +377,8 @@ float r = 1.0;
 float circumradius = 2.0 * r / sqrt(3.0);  // center-to-vertex distance
 
 Circle c1 = Circle(vec2(0.0, circumradius), r);
-Circle c2 = Circle(vec2(-circumradius * 0.866, -circumradius * 0.5), r);
-Circle c3 = Circle(vec2(circumradius * 0.866, -circumradius * 0.5), r);
+Circle c2 = Circle(vec2(-circumradius * sqrt(3.0)/2.0, -circumradius * 0.5), r);
+Circle c3 = Circle(vec2(circumradius * sqrt(3.0)/2.0, -circumradius * 0.5), r);
 Circle outer = Circle(vec2(0.0, 0.0), circumradius + r);
 ```
 
@@ -406,6 +412,8 @@ Color by iteration count, just like escape-time fractals:
 float t = float(iter) / float(max_iter);
 vec3 color = palette(t);
 ```
+
+Each inversion maps the configuration into a smaller copy of itself, creating self-similar structure at every scale.
 
 ### Full Implementation
 
@@ -444,8 +452,8 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     float circumradius = 2.0 * r / sqrt(3.0);
     
     Circle c1 = Circle(vec2(0.0, circumradius), r);
-    Circle c2 = Circle(vec2(-circumradius * 0.866, -circumradius * 0.5), r);
-    Circle c3 = Circle(vec2(circumradius * 0.866, -circumradius * 0.5), r);
+    Circle c2 = Circle(vec2(-circumradius * sqrt(3.0)/2.0, -circumradius * 0.5), r);
+    Circle c3 = Circle(vec2(circumradius * sqrt(3.0)/2.0, -circumradius * 0.5), r);
     Circle outer = Circle(vec2(0.0, 0.0), circumradius + r);
     
     // Iterate inversions
@@ -490,3 +498,31 @@ The squaring suppresses low iteration counts while the factor of 30 boosts high 
 {{< shader-demo day2/apollonian-final >}}
 
 All of this from iterating four circle inversions.
+
+
+## Summary
+
+Today we built fractals from two different iterations: complex quadratic polynomials (Mandelbrot and Julia sets) and circle inversions (Apollonian gasket). Despite their different origins, both share the same algorithmic structure:
+
+1. **Iterate** a transformation
+2. **Test** a stopping condition (escape, or landing in a fundamental region)
+3. **Color** based on iteration count
+
+This pattern—per-pixel iteration with no communication between pixels—is ideal for GPUs.
+
+### GLSL Skills
+
+- **Complex arithmetic**: Representing $\mathbb{C}$ as `vec2`, implementing `cmul` and `cabs2`
+- **Structs**: Bundling related data (`Circle` with center and radius)
+- **Control flow**: `for` loops with early `break`, nested `if/else`
+- **Built-in functions**: `dot`, `length`, `mod`, `step`, `mix`
+- **Cosine palettes**: Mapping scalar values to smooth color gradients
+
+### Key Concepts
+
+- The **escape radius** lets us stop iterating early—once $|z|$ exceeds the threshold, we know the orbit escapes
+- The **Mandelbrot set** indexes Julia sets: $c \in \mathcal{M}$ if and only if $K_c$ is connected
+- **Circle inversion** generalizes reflection and preserves angles (it's a conformal map)
+- **Iteration count** encodes geometric information—how close a point is to the fractal boundary
+
+Tomorrow we move to three dimensions.

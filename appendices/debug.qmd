@@ -1,0 +1,343 @@
+# Debugging
+
+Shader debugging is hard: no print statements, no breakpoints, no stepping through code. The main tool is your screen — you debug by making problems visible.
+
+---
+
+## 1. Visualizing Values
+
+The core technique: output intermediate values as colors to see what's happening.
+
+### Floats to Grayscale
+
+```glsl
+float value = /* something you want to inspect */;
+fragColor = vec4(vec3(value), 1.0);
+```
+
+If the value is in [0, 1], you'll see black to white. If it's outside that range, you'll see clamped black or white everywhere — a sign you need to remap.
+
+### Remapping to [0, 1]
+
+For values in a known range:
+
+```glsl
+float visible = (value - minVal) / (maxVal - minVal);
+fragColor = vec4(vec3(visible), 1.0);
+```
+
+For signed values (negative and positive):
+
+```glsl
+float visible = value * 0.5 + 0.5;  // maps [-1, 1] to [0, 1]
+fragColor = vec4(vec3(visible), 1.0);
+```
+
+For unknown ranges, pick a scale and adjust:
+
+```glsl
+float visible = value * 0.1;  // if value is roughly in [-10, 10]
+```
+
+### vec2 to Red/Green
+
+```glsl
+vec2 v = /* something you want to inspect */;
+fragColor = vec4(v * 0.5 + 0.5, 0.0, 1.0);  // RG channels, blue = 0
+```
+
+Red shows the x component, green shows y. Gray (0.5, 0.5) means the zero vector. Useful for visualizing directions, gradients, and UV coordinates.
+
+### vec3 Directly
+
+```glsl
+vec3 v = /* something */;
+fragColor = vec4(v, 1.0);  // if already in [0, 1]
+fragColor = vec4(v * 0.5 + 0.5, 1.0);  // if in [-1, 1], like normals
+```
+
+### False Color for Conditions
+
+Highlight where a condition is true:
+
+```glsl
+// Highlight negative values in red
+if (value < 0.0) {
+    fragColor = vec4(1.0, 0.0, 0.0, 1.0);
+    return;
+}
+```
+
+Or blend:
+
+```glsl
+vec3 debug = value < 0.0 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
+fragColor = vec4(debug, 1.0);
+```
+
+### Check for NaN
+
+NaN is tricky — it's not equal to anything, including itself:
+
+```glsl
+if (value != value) {
+    fragColor = vec4(1.0, 0.0, 1.0, 1.0);  // magenta = NaN
+    return;
+}
+```
+
+For vectors:
+
+```glsl
+if (any(isnan(color))) {
+    fragColor = vec4(1.0, 0.0, 1.0, 1.0);
+    return;
+}
+```
+
+---
+
+## 2. Isolating Problems
+
+When something's wrong and you don't know where, narrow it down systematically.
+
+### Return Early
+
+Test intermediate steps by returning before the final result:
+
+```glsl
+vec3 color = vec3(0.0);
+
+float d = sceneSDF(p);
+fragColor = vec4(vec3(d * 0.1 + 0.5), 1.0);  // visualize SDF
+return;  // skip everything after
+
+// ... lighting code never runs ...
+```
+
+Move the `return` down line by line until the problem appears.
+
+### Comment Out
+
+Disable parts of the code to find what's breaking:
+
+```glsl
+// vec3 light1 = calcLight(p, n, lightPos1);
+vec3 light2 = calcLight(p, n, lightPos2);
+vec3 color = /* light1 + */ light2;
+```
+
+### Simplify
+
+Replace complex operations with simple ones:
+
+```glsl
+// Instead of your complex SDF:
+float d = length(p) - 1.0;  // just a sphere
+
+// Instead of procedural color:
+vec3 color = vec3(0.5);  // flat gray
+
+// Instead of calculated normal:
+vec3 n = normalize(p);  // works for a sphere at origin
+```
+
+If the simple version works, the problem is in what you removed.
+
+### Test Components Separately
+
+Check each part of a computation:
+
+```glsl
+// Testing a normal calculation
+vec3 n = getNormal(p);
+
+// Is it unit length?
+fragColor = vec4(vec3(length(n)), 1.0);  // should be white (1.0)
+
+// What direction is it pointing?
+fragColor = vec4(n * 0.5 + 0.5, 1.0);  // visualize as color
+```
+
+---
+
+## 3. Compiler Errors
+
+Shadertoy provides helpful error messages with line numbers — one advantage of the platform. The editor highlights the offending line in red.
+
+### Type Mismatch
+
+```
+ERROR: 0:15: '=' : cannot convert from 'int' to 'float'
+```
+
+Fix: use `1.0` instead of `1`, or explicitly cast with `float(i)`.
+
+### Undeclared Identifier
+
+```
+ERROR: 0:23: 'myFunction' : no matching overloaded function found
+```
+
+Possible causes:
+- Function defined below where you're calling it (move it up)
+- Typo in function name
+- Wrong argument types
+
+### Vector Size Mismatch
+
+```
+ERROR: 0:18: 'constructor' : not enough data provided for construction
+```
+
+You wrote `vec3(a, b)` where `a` and `b` are both floats (only 2 components). Check your vector sizes.
+
+---
+
+## 4. Numerical Problems
+
+### NaN (Not a Number)
+
+NaN appears and poisons everything it touches. Common causes:
+
+| Operation | When it produces NaN |
+|-----------|---------------------|
+| `0.0 / 0.0` | Always |
+| `sqrt(x)` | When `x < 0` |
+| `log(x)` | When `x <= 0` |
+| `pow(x, y)` | When `x < 0` and `y` is not an integer |
+| `asin(x)`, `acos(x)` | When `|x| > 1` |
+
+NaN propagates: any operation involving NaN produces NaN. A single NaN in your color turns the pixel black (or undefined).
+
+**Prevention:**
+
+```glsl
+sqrt(max(x, 0.0))        // safe sqrt
+log(max(x, 0.0001))      // safe log
+pow(abs(x), y)           // safe pow for arbitrary exponents
+asin(clamp(x, -1.0, 1.0)) // safe asin
+```
+
+### Infinity
+
+Division by very small numbers produces infinity:
+
+```glsl
+float x = 1.0 / 0.0001;   // large but finite
+float y = 1.0 / 0.0;       // infinity
+```
+
+**Prevention:**
+
+```glsl
+float safe = 1.0 / max(abs(x), 0.0001);
+```
+
+**Detection:**
+
+```glsl
+if (isinf(value)) {
+    fragColor = vec4(0.0, 1.0, 1.0, 1.0);  // cyan = infinity
+    return;
+}
+```
+
+### Precision Loss
+
+Floats have about 7 significant digits. At large coordinates, you lose precision:
+
+```glsl
+float x = 100000.0;
+float y = x + 0.0001;
+// y might equal x due to precision limits
+```
+
+This causes:
+- Banding in distant geometry
+- Flickering at large coordinates
+- Raymarching failing far from origin
+
+**Solutions:**
+
+- Work near the origin when possible
+- Use `fract()` for repeating patterns: `fract(p)` keeps coordinates small
+- For raymarching: don't start rays too far out
+
+---
+
+## 5. Shadertoy-Specific Issues
+
+### Buffer Not Connected
+
+If you're reading from a buffer and getting black (or the Shadertoy logo), you forgot to connect the channel:
+
+1. Click `iChannel0` (or whichever channel) at the bottom
+2. Select **Misc → Buffer A** (or the appropriate buffer)
+
+### Buffer Self-Feedback
+
+For simulations that read their previous frame:
+
+1. In Buffer A's channel settings, set `iChannel0` to **Buffer A**
+2. Read with `texelFetch(iChannel0, ivec2(fragCoord), 0)`
+
+If it's not working:
+- Check that the channel is connected to the buffer itself
+- Make sure you're using `texelFetch` with integer coordinates
+- The first frame has undefined content; initialize on `iFrame == 0`
+
+```glsl
+if (iFrame == 0) {
+    fragColor = initialState;
+    return;
+}
+vec4 prev = texelFetch(iChannel0, ivec2(fragCoord), 0);
+```
+
+### texelFetch vs texture
+
+| Function | Coordinates | Interpolation |
+|----------|-------------|---------------|
+| `texture(sampler, uv)` | `vec2` in [0, 1] | Bilinear (smooth) |
+| `texelFetch(sampler, coord, 0)` | `ivec2` in pixels | None (exact pixel) |
+
+Use `texelFetch` for simulations where you need exact pixel values. Use `texture` for images where interpolation is desirable.
+
+```glsl
+// Reading exact pixel data (simulation state)
+vec4 state = texelFetch(iChannel0, ivec2(fragCoord), 0);
+
+// Sampling an image with coordinates
+vec4 color = texture(iChannel0, uv);
+```
+
+### Aspect Ratio
+
+If your circles look like ellipses:
+
+```glsl
+// Incorrect — stretches on non-square windows
+vec2 uv = fragCoord / iResolution.xy;
+
+// Correct — uniform coordinates
+vec2 uv = (fragCoord - 0.5 * iResolution.xy) / iResolution.y;
+```
+
+---
+
+## 6. Symptom Quick Reference
+
+| Symptom | Likely Causes |
+|---------|---------------|
+| **Solid black** | NaN somewhere; coordinates way off; forgot to write to `fragColor`; buffer not connected |
+| **Solid color (not black)** | Returning early or constant; coordinates not varying; function ignoring input |
+| **Flickering** | Numerical instability; inconsistent branching; uninitialized buffer |
+| **Banding / stepping** | Precision loss; using `step` instead of `smoothstep`; not enough raymarch steps |
+| **Ellipses instead of circles** | Missing aspect ratio correction |
+| **Upside down** | Y-axis convention mismatch (Shadertoy has Y up) |
+| **Mirrored** | Sign error in coordinates |
+| **Looks fine then breaks at edges** | Coordinates leaving expected range |
+| **Works in center, wrong at corners** | Aspect ratio or coordinate normalization issue |
+| **Simulation doesn't evolve** | Buffer not connected to itself; reading wrong channel |
+| **Weird colors on first frame** | Buffer uninitialized; add `if (iFrame == 0)` initialization |

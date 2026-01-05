@@ -1,0 +1,388 @@
+# Coordinates
+
+This appendix covers how to get from raw pixel coordinates to the coordinate system you need — whether that's centered 2D, polar, or a 3D ray for raymarching.
+
+---
+
+## 1. Screen Coordinates (2D)
+
+### What You Start With
+
+Shadertoy gives you `fragCoord`, a `vec2` containing the pixel coordinates. The origin is at the bottom-left corner, and values range from `(0.5, 0.5)` at the first pixel to `(iResolution.x - 0.5, iResolution.y - 0.5)` at the last.
+
+For most work, you want:
+- Origin at the center of the screen
+- Coordinates that don't depend on window size
+- Equal scaling in x and y (so circles look circular)
+
+### Step by Step
+
+```glsl
+vec2 uv = fragCoord / iResolution.xy;
+uv = uv - vec2(0.5, 0.5);
+uv.x *= iResolution.x / iResolution.y;
+```
+
+**Line 1: Normalize to [0, 1]**
+
+```glsl
+vec2 uv = fragCoord / iResolution.xy;
+```
+
+Dividing by resolution maps pixel coordinates to the unit square. Now `uv` ranges from $(0, 0)$ at the bottom-left to $(1, 1)$ at the top-right, regardless of window size.
+
+**Line 2: Center the origin**
+
+```glsl
+uv = uv - vec2(0.5, 0.5);
+```
+
+Subtracting $(0.5, 0.5)$ shifts the origin to the center of the screen. Now `uv` ranges from $(-0.5, -0.5)$ to $(0.5, 0.5)$.
+
+**Line 3: Fix aspect ratio**
+
+```glsl
+uv.x *= iResolution.x / iResolution.y;
+```
+
+On a non-square window, the unit square is stretched. Multiplying `uv.x` by the aspect ratio corrects this: circles will be circular, not elliptical. After this, `uv.y` still ranges from $-0.5$ to $0.5$, but `uv.x` extends further on wide screens.
+
+### Compact Form
+
+The three steps can be combined into one line:
+
+```glsl
+vec2 uv = (fragCoord - 0.5 * iResolution.xy) / iResolution.y;
+```
+
+This does the same thing: centers the origin, normalizes, and preserves aspect ratio. The y-range is $[-0.5, 0.5]$; x extends further on wide screens.
+
+### Variations
+
+**Scaling (zoom):**
+
+```glsl
+vec2 uv = (fragCoord - 0.5 * iResolution.xy) / iResolution.y;
+uv *= 2.0;  // zoom out: visible range is now [-1, 1] in y
+uv *= 0.5;  // zoom in: visible range is now [-0.25, 0.25] in y
+```
+
+**Panning (shift the view):**
+
+```glsl
+vec2 uv = (fragCoord - 0.5 * iResolution.xy) / iResolution.y;
+uv += vec2(0.5, 0.0);  // shift view left (origin moves right)
+```
+
+**UV in [0, 1] (for textures):**
+
+```glsl
+vec2 uv = fragCoord / iResolution.xy;  // no centering, no aspect correction
+```
+
+This is useful when sampling textures, but circles will be stretched on non-square windows.
+
+---
+
+## 2. Polar Coordinates
+
+Polar coordinates $(r, \theta)$ describe a point by its distance from the origin and its angle from the positive x-axis.
+
+### Conversion
+
+**Cartesian to polar:**
+
+```glsl
+vec2 p = /* your centered coordinates */;
+float r = length(p);
+float theta = atan(p.y, p.x);  // returns [-π, π]
+```
+
+**Polar to Cartesian:**
+
+```glsl
+float r = /* radius */;
+float theta = /* angle */;
+vec2 p = r * vec2(cos(theta), sin(theta));
+```
+
+### When to Use
+
+- **Radial symmetry**: anything that depends only on distance from center
+- **Spirals**: `r + theta` creates spiral patterns
+- **Angle-based coloring**: color wheel, directional effects
+- **Repeating angular patterns**: `mod(theta, TAU/n)` for n-fold symmetry
+
+### Example: Polar Grid
+
+```glsl
+vec2 uv = (fragCoord - 0.5 * iResolution.xy) / iResolution.y;
+float r = length(uv);
+float theta = atan(uv.y, uv.x);
+
+// Concentric rings
+float rings = fract(r * 10.0);
+
+// Angular wedges (8 sectors)
+float sectors = fract(theta * 4.0 / 6.28318);
+
+vec3 color = vec3(rings * sectors);
+```
+
+---
+
+## 3. 2D Rotation
+
+Rotation by angle $\theta$ counterclockwise is given by:
+
+$$\begin{pmatrix} x' \\ y' \end{pmatrix} = \begin{pmatrix} \cos\theta & -\sin\theta \\ \sin\theta & \cos\theta \end{pmatrix} \begin{pmatrix} x \\ y \end{pmatrix}$$
+
+### A Clean Function
+
+```glsl
+vec2 rotate2D(vec2 p, float angle) {
+    float c = cos(angle);
+    float s = sin(angle);
+    return vec2(c * p.x - s * p.y, s * p.x + c * p.y);
+}
+```
+
+Or using a matrix:
+
+```glsl
+vec2 rotate2D(vec2 p, float angle) {
+    float c = cos(angle);
+    float s = sin(angle);
+    mat2 m = mat2(c, s, -s, c);  // column-major
+    return m * p;
+}
+```
+
+### Usage
+
+```glsl
+vec2 uv = (fragCoord - 0.5 * iResolution.xy) / iResolution.y;
+uv = rotate2D(uv, iTime);  // rotate the whole scene over time
+```
+
+### Rotating Around a Different Point
+
+To rotate around point `center`:
+
+```glsl
+uv = rotate2D(uv - center, angle) + center;
+```
+
+---
+
+## 4. Camera Setup (3D)
+
+For raymarching, you need to generate a ray direction for each pixel. The standard approach: define a camera position, a target point, and construct an orientation frame.
+
+### The lookAt Pattern
+
+```glsl
+vec3 getCameraRay(vec2 uv, vec3 ro, vec3 target, float fov) {
+    vec3 forward = normalize(target - ro);
+    vec3 right = normalize(cross(forward, vec3(0.0, 1.0, 0.0)));
+    vec3 up = cross(right, forward);
+    
+    vec3 rd = normalize(forward * fov + uv.x * right + uv.y * up);
+    return rd;
+}
+```
+
+- `ro`: ray origin (camera position)
+- `target`: point the camera looks at
+- `fov`: controls field of view (typically 1.0 to 2.0; smaller = more zoomed)
+- `uv`: screen coordinates (centered, aspect-corrected)
+
+Returns `rd`, the ray direction for this pixel.
+
+### Standard Raymarching Boilerplate
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    // Screen coordinates
+    vec2 uv = (fragCoord - 0.5 * iResolution.xy) / iResolution.y;
+    
+    // Camera
+    vec3 ro = vec3(0.0, 0.0, -3.0);  // camera position
+    vec3 target = vec3(0.0);          // looking at origin
+    vec3 rd = getCameraRay(uv, ro, target, 1.5);
+    
+    // Raymarch
+    float t = 0.0;
+    for (int i = 0; i < 100; i++) {
+        vec3 p = ro + t * rd;
+        float d = sceneSDF(p);
+        if (d < 0.001) break;
+        t += d;
+        if (t > 100.0) break;
+    }
+    
+    // Shading
+    vec3 color = vec3(0.0);
+    if (t < 100.0) {
+        vec3 p = ro + t * rd;
+        vec3 n = getNormal(p);
+        color = /* lighting calculation */;
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+### Orbiting Camera
+
+A camera that orbits around the origin based on mouse position:
+
+```glsl
+vec2 mouse = iMouse.xy / iResolution.xy;
+float angleX = mouse.x * 6.28318;  // horizontal orbit
+float angleY = mouse.y * 3.14159 - 1.57;  // vertical orbit
+
+float dist = 3.0;
+vec3 ro = vec3(
+    dist * cos(angleY) * sin(angleX),
+    dist * sin(angleY),
+    dist * cos(angleY) * cos(angleX)
+);
+vec3 target = vec3(0.0);
+```
+
+---
+
+## 5. Spherical Coordinates
+
+Spherical coordinates $(r, \theta, \phi)$ describe a point in 3D by distance from origin and two angles.
+
+**Convention used here:**
+- $r$: distance from origin
+- $\theta$: azimuthal angle (in the xy-plane, from positive x-axis)
+- $\phi$: polar angle (from positive z-axis, or "colatitude")
+
+Note: conventions vary between fields. Some swap $\theta$ and $\phi$, some measure from the equator instead of the pole.
+
+### Conversion
+
+**Cartesian to spherical:**
+
+```glsl
+vec3 p = /* your 3D point */;
+float r = length(p);
+float theta = atan(p.y, p.x);              // azimuthal: [-π, π]
+float phi = acos(clamp(p.z / r, -1.0, 1.0)); // polar: [0, π]
+```
+
+The `clamp` prevents NaN from numerical imprecision when `|p.z/r|` slightly exceeds 1.
+
+**Spherical to Cartesian:**
+
+```glsl
+float r = /* radius */;
+float theta = /* azimuthal angle */;
+float phi = /* polar angle */;
+vec3 p = r * vec3(
+    sin(phi) * cos(theta),
+    sin(phi) * sin(theta),
+    cos(phi)
+);
+```
+
+### Uses
+
+**Environment maps:** Given a ray direction `rd`, compute spherical angles to sample a 2D texture as if it wrapped around a sphere:
+
+```glsl
+vec3 rd = normalize(rayDirection);
+float u = atan(rd.y, rd.x) / 6.28318 + 0.5;  // [0, 1]
+float v = acos(rd.z) / 3.14159;               // [0, 1]
+vec3 sky = texture(iChannel0, vec2(u, v)).rgb;
+```
+
+**Procedural planets:** Generate terrain or color based on latitude/longitude.
+
+**Spherical tilings:** Repeat patterns on a sphere by working in angular coordinates.
+
+---
+
+## 6. 3D Rotations
+
+### Rotation Matrices
+
+Rotation by angle $\theta$ around each axis:
+
+**Around X-axis:**
+
+```glsl
+mat3 rotateX(float angle) {
+    float c = cos(angle);
+    float s = sin(angle);
+    return mat3(
+        1.0, 0.0, 0.0,
+        0.0, c, s,
+        0.0, -s, c
+    );
+}
+```
+
+**Around Y-axis:**
+
+```glsl
+mat3 rotateY(float angle) {
+    float c = cos(angle);
+    float s = sin(angle);
+    return mat3(
+        c, 0.0, -s,
+        0.0, 1.0, 0.0,
+        s, 0.0, c
+    );
+}
+```
+
+**Around Z-axis:**
+
+```glsl
+mat3 rotateZ(float angle) {
+    float c = cos(angle);
+    float s = sin(angle);
+    return mat3(
+        c, s, 0.0,
+        -s, c, 0.0,
+        0.0, 0.0, 1.0
+    );
+}
+```
+
+### Combining Rotations
+
+Matrix multiplication combines rotations. **Order matters:**
+
+```glsl
+mat3 rot = rotateY(b) * rotateX(a);  // first X, then Y
+vec3 rotated = rot * p;
+```
+
+Rotations apply right-to-left: the rightmost matrix acts first.
+
+### Rotating the Scene vs. the Camera
+
+In raymarching, you typically rotate the point being tested rather than the camera:
+
+```glsl
+float sceneSDF(vec3 p) {
+    p = rotateY(iTime) * p;  // rotate the scene
+    return length(p) - 1.0;   // sphere at origin
+}
+```
+
+This is equivalent to the camera orbiting the object.
+
+To rotate the camera itself, apply the rotation to the ray direction:
+
+```glsl
+rd = rotateY(iTime) * rd;
+```
+
+Both achieve similar visual results but have different implications for lighting and normals.

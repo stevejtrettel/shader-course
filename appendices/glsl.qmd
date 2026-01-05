@@ -1,0 +1,411 @@
+# GLSL Reference
+
+A quick reference for the GLSL shading language as used in Shadertoy.
+
+---
+
+## 1. Types
+
+### Scalars
+
+```glsl
+float x = 1.0;      // floating point (always use decimal)
+int i = 5;          // integer
+bool b = true;      // boolean
+```
+
+### Vectors
+
+Vectors hold 2, 3, or 4 components of the same type:
+
+```glsl
+vec2 p = vec2(1.0, 2.0);          // 2 floats
+vec3 color = vec3(1.0, 0.5, 0.0); // 3 floats
+vec4 rgba = vec4(1.0, 0.5, 0.0, 1.0); // 4 floats
+
+ivec2 pixel = ivec2(10, 20);      // 2 ints
+ivec3 coords = ivec3(1, 2, 3);    // 3 ints
+
+bvec2 flags = bvec2(true, false); // 2 bools
+```
+
+### Matrices
+
+Matrices are column-major (columns are listed first):
+
+```glsl
+mat2 m2;  // 2×2 matrix
+mat3 m3;  // 3×3 matrix
+mat4 m4;  // 4×4 matrix
+```
+
+A `mat2` holds 4 floats, a `mat3` holds 9, a `mat4` holds 16.
+
+### Samplers
+
+Used to read from textures and buffers:
+
+```glsl
+sampler2D tex;  // 2D texture (you won't declare these yourself in Shadertoy)
+```
+
+---
+
+## 2. Components and Constructors
+
+### Component Access
+
+Vectors have named components. Two naming conventions exist — use whichever fits your context:
+
+```glsl
+vec4 v = vec4(1.0, 2.0, 3.0, 4.0);
+
+// Position names
+v.x, v.y, v.z, v.w  // 1.0, 2.0, 3.0, 4.0
+
+// Color names (equivalent)
+v.r, v.g, v.b, v.a  // 1.0, 2.0, 3.0, 4.0
+```
+
+For `vec2`, only `.xy` or `.rg` are available. For `vec3`, `.xyz` or `.rgb`.
+
+### Rearranging Components
+
+You can read multiple components at once, in any order:
+
+```glsl
+vec3 v = vec3(1.0, 2.0, 3.0);
+
+vec2 a = v.xy;   // (1.0, 2.0)
+vec2 b = v.yx;   // (2.0, 1.0)
+vec3 c = v.zyx;  // (3.0, 2.0, 1.0)
+vec3 d = v.xxx;  // (1.0, 1.0, 1.0)
+```
+
+This also works for assignment:
+
+```glsl
+v.xy = v.yx;  // swap x and y
+```
+
+### Constructors
+
+Vectors can be built from scalars, smaller vectors, or combinations:
+
+```glsl
+vec3 a = vec3(1.0);              // (1.0, 1.0, 1.0)
+vec3 b = vec3(1.0, 2.0, 3.0);    // (1.0, 2.0, 3.0)
+
+vec2 p = vec2(1.0, 2.0);
+vec3 c = vec3(p, 3.0);           // (1.0, 2.0, 3.0)
+vec4 d = vec4(p, p);             // (1.0, 2.0, 1.0, 2.0)
+
+vec3 color = vec3(0.5, 0.7, 1.0);
+vec4 rgba = vec4(color, 1.0);    // (0.5, 0.7, 1.0, 1.0)
+```
+
+---
+
+## 3. Operators
+
+### Arithmetic on Vectors
+
+Arithmetic operators work component-wise:
+
+```glsl
+vec3 a = vec3(1.0, 2.0, 3.0);
+vec3 b = vec3(4.0, 5.0, 6.0);
+
+a + b   // (5.0, 7.0, 9.0)
+a - b   // (-3.0, -3.0, -3.0)
+a * b   // (4.0, 10.0, 18.0)  — component-wise, NOT dot product
+a / b   // (0.25, 0.4, 0.5)
+```
+
+### Scalar-Vector Operations
+
+A scalar operates on each component:
+
+```glsl
+vec3 v = vec3(1.0, 2.0, 3.0);
+
+v * 2.0   // (2.0, 4.0, 6.0)
+v + 1.0   // (2.0, 3.0, 4.0)
+1.0 / v   // (1.0, 0.5, 0.333...)
+```
+
+### Matrix-Vector Multiplication
+
+Matrix times vector applies the linear transformation:
+
+```glsl
+mat2 m = mat2(cos(a), sin(a), -sin(a), cos(a));  // rotation matrix
+vec2 v = vec2(1.0, 0.0);
+vec2 rotated = m * v;  // matrix on the left
+```
+
+For `mat3 * vec3` and `mat4 * vec4`, same pattern.
+
+---
+
+## 4. Built-in Functions
+
+### Trigonometric
+
+All angles are in **radians**.
+
+| Function | Description |
+|----------|-------------|
+| `sin(x)` | Sine |
+| `cos(x)` | Cosine |
+| `tan(x)` | Tangent |
+| `asin(x)` | Arc sine, returns $[-\pi/2, \pi/2]$ |
+| `acos(x)` | Arc cosine, returns $[0, \pi]$ |
+| `atan(y, x)` | Arc tangent of y/x, returns $[-\pi, \pi]$ |
+| `atan(y_over_x)` | Arc tangent, returns $[-\pi/2, \pi/2]$ |
+
+### Exponential
+
+| Function | Description |
+|----------|-------------|
+| `pow(x, y)` | $x^y$ |
+| `exp(x)` | $e^x$ |
+| `log(x)` | $\ln(x)$ |
+| `exp2(x)` | $2^x$ |
+| `log2(x)` | $\log_2(x)$ |
+| `sqrt(x)` | $\sqrt{x}$ |
+| `inversesqrt(x)` | $1/\sqrt{x}$ |
+
+### Common
+
+| Function | Description |
+|----------|-------------|
+| `abs(x)` | Absolute value |
+| `sign(x)` | Returns $-1$, $0$, or $1$ |
+| `floor(x)` | Largest integer $\leq x$ |
+| `ceil(x)` | Smallest integer $\geq x$ |
+| `fract(x)` | $x - \text{floor}(x)$, the fractional part |
+| `mod(x, y)` | $x - y \cdot \text{floor}(x/y)$ |
+| `min(x, y)` | Minimum |
+| `max(x, y)` | Maximum |
+| `clamp(x, lo, hi)` | Clamps x to $[\text{lo}, \text{hi}]$ |
+| `mix(a, b, t)` | Linear interpolation: $a(1-t) + bt$ |
+| `step(edge, x)` | $0$ if $x < \text{edge}$, else $1$ |
+| `smoothstep(e0, e1, x)` | Smooth transition from 0 to 1 |
+
+### Geometric
+
+| Function | Description |
+|----------|-------------|
+| `length(v)` | Euclidean length $\|v\|$ |
+| `distance(a, b)` | Distance $\|a - b\|$ |
+| `dot(a, b)` | Dot product $a \cdot b$ |
+| `cross(a, b)` | Cross product (vec3 only) |
+| `normalize(v)` | Unit vector $v / \|v\|$ |
+| `reflect(I, N)` | Reflection of I about normal N |
+| `refract(I, N, eta)` | Refraction with index ratio eta |
+
+### Gotchas
+
+**`atan(y, x)` not `atan(x, y)`** — The two-argument arctangent takes y first:
+
+```glsl
+float angle = atan(p.y, p.x);  // correct
+float angle = atan(p.x, p.y);  // wrong — rotated 90°
+```
+
+**`mod` on negatives** — The result has the same sign as the divisor:
+
+```glsl
+mod(-0.5, 1.0)   // returns 0.5, not -0.5
+mod(-1.5, 1.0)   // returns 0.5
+```
+
+This is usually what you want for wrapping coordinates, but can surprise you.
+
+**`pow` with negative base** — Undefined for non-integer exponents:
+
+```glsl
+pow(-2.0, 2.0)   // undefined (may return NaN or 0)
+pow(abs(x), y)   // safe alternative
+```
+
+---
+
+## 5. Shadertoy Uniforms
+
+Shadertoy provides these global variables:
+
+### Resolution and Time
+
+| Uniform | Type | Description |
+|---------|------|-------------|
+| `iResolution` | `vec3` | Viewport resolution in pixels (`.xy` is width, height) |
+| `iTime` | `float` | Seconds since shader started |
+| `iTimeDelta` | `float` | Seconds since last frame |
+| `iFrame` | `int` | Frame number (starts at 0) |
+
+### Mouse
+
+`iMouse` is a `vec4`:
+
+| Component | Description |
+|-----------|-------------|
+| `iMouse.xy` | Current mouse position (pixels) while button held, else last click position |
+| `iMouse.zw` | Position where button was pressed (positive if currently held, negative after release) |
+
+Common patterns:
+
+```glsl
+// Normalize mouse to [0, 1]
+vec2 mouse = iMouse.xy / iResolution.xy;
+
+// Check if mouse button is held
+bool mouseDown = iMouse.z > 0.0;
+```
+
+### Channels
+
+| Uniform | Type | Description |
+|---------|------|-------------|
+| `iChannel0` – `iChannel3` | `sampler2D` | Texture or buffer inputs |
+| `iChannelResolution[0–3]` | `vec3` | Resolution of each channel |
+
+### Date
+
+| Uniform | Type | Description |
+|---------|------|-------------|
+| `iDate` | `vec4` | (year, month, day, seconds since midnight) |
+
+---
+
+## 6. Textures & Buffers
+
+### Reading Textures
+
+**Interpolated sampling** — UV coordinates in $[0, 1]$:
+
+```glsl
+vec4 color = texture(iChannel0, uv);
+```
+
+The texture wraps or clamps depending on Shadertoy settings for that channel.
+
+**Exact pixel fetch** — integer coordinates:
+
+```glsl
+vec4 color = texelFetch(iChannel0, ivec2(x, y), 0);
+```
+
+The third argument (0) is the mipmap level; always use 0 in Shadertoy.
+
+### Buffers
+
+Shadertoy provides four buffers: **Buf A**, **Buf B**, **Buf C**, **Buf D**. Each runs its own shader and outputs to a texture you can read from other tabs.
+
+**Reading the previous frame** (for simulations):
+
+1. In Buf A, set `iChannel0` to point to Buf A itself
+2. Read with `texelFetch(iChannel0, ivec2(fragCoord), 0)`
+3. Write new state to `fragColor`
+
+```glsl
+// In Buffer A
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    ivec2 px = ivec2(fragCoord);
+    vec4 prev = texelFetch(iChannel0, px, 0);  // previous frame
+    
+    // ... compute new state ...
+    
+    fragColor = newState;
+}
+```
+
+**Reading a buffer in Image**:
+
+Set `iChannel0` (or any channel) to the buffer, then sample it:
+
+```glsl
+// In Image
+vec4 state = texelFetch(iChannel0, ivec2(fragCoord), 0);
+```
+
+### The Common Tab
+
+Code in the **Common** tab is included in all other tabs. Use it for:
+
+- Shared constants (`const float PI = 3.14159;`)
+- Shared functions (`vec3 hsv2rgb(...)`)
+- Shared struct definitions
+
+```glsl
+// In Common
+const float PI = 3.14159265359;
+const float TAU = 6.28318530718;
+
+vec3 hsv2rgb(vec3 c) {
+    vec3 p = abs(fract(c.xxx + vec3(0.0, 2.0/3.0, 1.0/3.0)) * 6.0 - 3.0);
+    return c.z * mix(vec3(1.0), clamp(p - 1.0, 0.0, 1.0), c.y);
+}
+```
+
+---
+
+## 7. Syntax Pitfalls
+
+### Floats Need Decimals
+
+```glsl
+float x = 1;    // ERROR
+float x = 1.0;  // correct
+
+vec3 v = vec3(1, 2, 3);      // ERROR (in some contexts)
+vec3 v = vec3(1.0, 2.0, 3.0); // correct
+```
+
+### Functions Must Be Declared Before Use
+
+Unlike C, there are no forward declarations. Define helper functions above `mainImage`:
+
+```glsl
+// This must come first
+float sdf(vec3 p) {
+    return length(p) - 1.0;
+}
+
+// Then this can call it
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    // ... sdf(p) works here ...
+}
+```
+
+### No Overloading by Return Type
+
+You can overload by parameter types, but not by return type alone:
+
+```glsl
+float foo(float x) { return x; }
+vec3 foo(float x) { return vec3(x); }  // ERROR — conflicts with above
+```
+
+### Constants
+
+Use `const` for compile-time constants:
+
+```glsl
+const float PI = 3.14159265359;
+const int MAX_STEPS = 100;
+const vec3 LIGHT_DIR = normalize(vec3(1.0, 1.0, 1.0));
+```
+
+These can be used in loop bounds and array sizes (unlike regular variables).
+
+### Integer Division
+
+Division between integers is integer division:
+
+```glsl
+int a = 5 / 2;    // a = 2, not 2.5
+float b = 5 / 2;  // b = 2.0 (still integer division, then converted)
+float c = 5.0 / 2.0;  // c = 2.5 (correct)
+```

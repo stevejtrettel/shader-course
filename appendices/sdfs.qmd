@@ -1,0 +1,544 @@
+# SDF Catalog
+
+A reference catalog of signed distance functions. See Day 5 for concepts; see Inigo Quilez's pages for the complete collection.
+
+---
+
+## 1. 2D Primitives
+
+### Circle
+
+Circle centered at origin.
+
+- `p`: query point
+- `r`: radius
+
+```glsl
+float sdCircle(vec2 p, float r) {
+    return length(p) - r;
+}
+```
+
+### Box
+
+Axis-aligned rectangle centered at origin.
+
+- `p`: query point
+- `b`: half-size (box extends from `-b` to `+b`)
+
+```glsl
+float sdBox(vec2 p, vec2 b) {
+    vec2 d = abs(p) - b;
+    return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
+}
+```
+
+### Rounded Box
+
+Axis-aligned rectangle with rounded corners, centered at origin.
+
+- `p`: query point
+- `b`: half-size before rounding
+- `r`: corner radius
+
+```glsl
+float sdRoundedBox(vec2 p, vec2 b, float r) {
+    vec2 d = abs(p) - b + r;
+    return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0) - r;
+}
+```
+
+### Line Segment
+
+Line segment between two points.
+
+- `p`: query point
+- `a`: start point
+- `b`: end point
+
+```glsl
+float sdSegment(vec2 p, vec2 a, vec2 b) {
+    vec2 pa = p - a, ba = b - a;
+    float h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
+    return length(pa - ba * h);
+}
+```
+
+### Ring / Annulus
+
+Ring (thick circle) centered at origin.
+
+- `p`: query point
+- `r`: center radius (distance from origin to middle of ring)
+- `w`: half-thickness
+
+```glsl
+float sdRing(vec2 p, float r, float w) {
+    return abs(length(p) - r) - w;
+}
+```
+
+### Arc
+
+Circular arc centered at origin.
+
+- `p`: query point
+- `r`: radius
+- `a1`: start angle (radians)
+- `a2`: end angle (radians)
+- `w`: half-thickness
+
+```glsl
+float sdArc(vec2 p, float r, float a1, float a2, float w) {
+    float a = atan(p.y, p.x);
+    a = clamp(a, a1, a2);
+    vec2 q = r * vec2(cos(a), sin(a));
+    return length(p - q) - w;
+}
+```
+
+### Pie / Sector
+
+Pie slice (wedge) centered at origin, symmetric about the y-axis.
+
+- `p`: query point
+- `r`: radius
+- `a`: half-angle (radians) — total wedge spans from `-a` to `+a`
+
+```glsl
+float sdPie(vec2 p, float r, float a) {
+    vec2 c = vec2(sin(a), cos(a));
+    p.x = abs(p.x);
+    float l = length(p) - r;
+    float m = length(p - c * clamp(dot(p, c), 0.0, r));
+    return max(l, m * sign(c.y * p.x - c.x * p.y));
+}
+```
+
+### Equilateral Triangle
+
+Equilateral triangle centered at origin.
+
+- `p`: query point
+- `r`: distance from center to vertex
+
+```glsl
+float sdEquilateralTriangle(vec2 p, float r) {
+    const float k = sqrt(3.0);
+    p.x = abs(p.x) - r;
+    p.y = p.y + r / k;
+    if (p.x + k * p.y > 0.0) p = vec2(p.x - k * p.y, -k * p.x - p.y) / 2.0;
+    p.x -= clamp(p.x, -2.0 * r, 0.0);
+    return -length(p) * sign(p.y);
+}
+```
+
+### Hexagon
+
+Regular hexagon centered at origin.
+
+- `p`: query point
+- `r`: circumradius (center to vertex)
+
+```glsl
+float sdHexagon(vec2 p, float r) {
+    const vec3 k = vec3(-0.866025404, 0.5, 0.577350269);
+    p = abs(p);
+    p -= 2.0 * min(dot(k.xy, p), 0.0) * k.xy;
+    p -= vec2(clamp(p.x, -k.z * r, k.z * r), r);
+    return length(p) * sign(p.y);
+}
+```
+
+### Regular Polygon (n-gon)
+
+Regular polygon centered at origin. Approximate SDF.
+
+- `p`: query point
+- `r`: circumradius (center to vertex)
+- `n`: number of sides
+
+```glsl
+float sdPolygon(vec2 p, float r, int n) {
+    float a = atan(p.x, p.y) + 3.14159265;
+    float s = 6.28318530 / float(n);
+    return length(p) * cos(mod(a, s) - s * 0.5) - r;
+}
+```
+
+---
+
+## 2. 3D Primitives
+
+### Sphere
+
+Sphere centered at origin.
+
+- `p`: query point
+- `r`: radius
+
+```glsl
+float sdSphere(vec3 p, float r) {
+    return length(p) - r;
+}
+```
+
+### Ellipsoid
+
+Ellipsoid centered at origin.
+
+- `p`: query point
+- `r`: radii along each axis
+
+```glsl
+float sdEllipsoid(vec3 p, vec3 r) {
+    float k0 = length(p / r);
+    float k1 = length(p / (r * r));
+    return k0 * (k0 - 1.0) / k1;
+}
+```
+
+### Box
+
+Axis-aligned box centered at origin.
+
+- `p`: query point
+- `b`: half-size (box extends from `-b` to `+b` along each axis)
+
+```glsl
+float sdBox(vec3 p, vec3 b) {
+    vec3 d = abs(p) - b;
+    return length(max(d, 0.0)) + min(max(d.x, max(d.y, d.z)), 0.0);
+}
+```
+
+### Rounded Box
+
+Axis-aligned box with rounded edges, centered at origin.
+
+- `p`: query point
+- `b`: half-size before rounding
+- `r`: edge radius
+
+```glsl
+float sdRoundBox(vec3 p, vec3 b, float r) {
+    vec3 d = abs(p) - b + r;
+    return length(max(d, 0.0)) + min(max(d.x, max(d.y, d.z)), 0.0) - r;
+}
+```
+
+### Plane
+
+Infinite plane.
+
+- `p`: query point
+- `n`: plane normal (will be normalized)
+- `h`: signed distance from origin to plane along normal
+
+```glsl
+float sdPlane(vec3 p, vec3 n, float h) {
+    return dot(p, normalize(n)) + h;
+}
+```
+
+### Torus
+
+Torus centered at origin, lying in the xz-plane.
+
+- `p`: query point
+- `R`: major radius (center of torus to center of tube)
+- `r`: minor radius (tube thickness)
+
+```glsl
+float sdTorus(vec3 p, float R, float r) {
+    vec2 q = vec2(length(p.xz) - R, p.y);
+    return length(q) - r;
+}
+```
+
+### Cylinder (Infinite)
+
+Infinite cylinder along the y-axis, centered at origin.
+
+- `p`: query point
+- `r`: radius
+
+```glsl
+float sdCylinder(vec3 p, float r) {
+    return length(p.xz) - r;
+}
+```
+
+### Capped Cylinder
+
+Finite cylinder along the y-axis, centered at origin.
+
+- `p`: query point
+- `h`: half-height (extends from `-h` to `+h` in y)
+- `r`: radius
+
+```glsl
+float sdCappedCylinder(vec3 p, float h, float r) {
+    vec2 d = abs(vec2(length(p.xz), p.y)) - vec2(r, h);
+    return min(max(d.x, d.y), 0.0) + length(max(d, 0.0));
+}
+```
+
+### Capsule
+
+Capsule (cylinder with hemispherical caps) between two points.
+
+- `p`: query point
+- `a`: start point (center of first hemisphere)
+- `b`: end point (center of second hemisphere)
+- `r`: radius
+
+```glsl
+float sdCapsule(vec3 p, vec3 a, vec3 b, float r) {
+    vec3 pa = p - a, ba = b - a;
+    float h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
+    return length(pa - ba * h) - r;
+}
+```
+
+### Cone (Infinite)
+
+Infinite cone with apex at origin, opening downward along negative y-axis.
+
+- `p`: query point
+- `a`: half-angle (radians)
+
+```glsl
+float sdCone(vec3 p, float a) {
+    vec2 c = vec2(sin(a), cos(a));
+    vec2 q = vec2(length(p.xz), -p.y);
+    float d = length(q - c * max(dot(q, c), 0.0));
+    return d * ((q.x * c.y - q.y * c.x < 0.0) ? -1.0 : 1.0);
+}
+```
+
+### Capped Cone
+
+Finite cone (frustum) along the y-axis, centered at origin.
+
+- `p`: query point
+- `h`: half-height (extends from `-h` to `+h` in y)
+- `r1`: radius at bottom (y = -h)
+- `r2`: radius at top (y = +h)
+
+```glsl
+float sdCappedCone(vec3 p, float h, float r1, float r2) {
+    vec2 q = vec2(length(p.xz), p.y);
+    vec2 k1 = vec2(r2, h);
+    vec2 k2 = vec2(r2 - r1, 2.0 * h);
+    vec2 ca = vec2(q.x - min(q.x, (q.y < 0.0) ? r1 : r2), abs(q.y) - h);
+    vec2 cb = q - k1 + k2 * clamp(dot(k1 - q, k2) / dot(k2, k2), 0.0, 1.0);
+    float s = (cb.x < 0.0 && ca.y < 0.0) ? -1.0 : 1.0;
+    return s * sqrt(min(dot(ca, ca), dot(cb, cb)));
+}
+```
+
+### Octahedron
+
+Regular octahedron centered at origin.
+
+- `p`: query point
+- `s`: vertex-to-center distance
+
+```glsl
+float sdOctahedron(vec3 p, float s) {
+    p = abs(p);
+    return (p.x + p.y + p.z - s) * 0.57735027;
+}
+```
+
+---
+
+## 3. Operations
+
+### Union
+
+The closest surface:
+
+```glsl
+float opUnion(float d1, float d2) {
+    return min(d1, d2);
+}
+```
+
+### Intersection
+
+Where both surfaces overlap:
+
+```glsl
+float opIntersection(float d1, float d2) {
+    return max(d1, d2);
+}
+```
+
+### Subtraction
+
+Cut `d2` out of `d1`:
+
+```glsl
+float opSubtraction(float d1, float d2) {
+    return max(d1, -d2);
+}
+```
+
+### Smooth Union
+
+Blends two surfaces smoothly:
+
+```glsl
+float opSmoothUnion(float d1, float d2, float k) {
+    float h = clamp(0.5 + 0.5 * (d2 - d1) / k, 0.0, 1.0);
+    return mix(d2, d1, h) - k * h * (1.0 - h);
+}
+```
+
+`k` controls the blend radius. Larger `k` means a wider, smoother blend.
+
+### Smooth Intersection
+
+```glsl
+float opSmoothIntersection(float d1, float d2, float k) {
+    float h = clamp(0.5 - 0.5 * (d2 - d1) / k, 0.0, 1.0);
+    return mix(d2, d1, h) + k * h * (1.0 - h);
+}
+```
+
+### Smooth Subtraction
+
+```glsl
+float opSmoothSubtraction(float d1, float d2, float k) {
+    float h = clamp(0.5 - 0.5 * (d2 + d1) / k, 0.0, 1.0);
+    return mix(d1, -d2, h) + k * h * (1.0 - h);
+}
+```
+
+---
+
+## 4. Transformations
+
+### Translation
+
+To move a shape, translate the point in the opposite direction:
+
+```glsl
+float d = sdSphere(p - vec3(1.0, 0.0, 0.0), 1.0);  // sphere at (1, 0, 0)
+```
+
+### Rotation
+
+To rotate a shape, rotate the point by the inverse (or just transpose the rotation matrix for orthogonal matrices):
+
+```glsl
+mat3 rot = rotateY(0.5);  // see Coordinates appendix
+float d = sdBox(rot * p, vec3(1.0));  // rotated box
+```
+
+### Scaling
+
+Scale the point, then scale the result:
+
+```glsl
+float s = 2.0;  // scale factor
+float d = sdSphere(p / s, 1.0) * s;  // sphere scaled by 2
+```
+
+You must multiply the result by `s` to keep it a valid distance field.
+
+### Repetition (Euclidean Grid)
+
+Use `mod` to repeat space infinitely:
+
+```glsl
+float opRep(vec3 p, vec3 c) {
+    vec3 q = mod(p + 0.5 * c, c) - 0.5 * c;
+    return sdPrimitive(q);
+}
+```
+
+`c` is the cell size. This places one copy of the primitive in each cell of a Euclidean grid.
+
+**Note:** This technique uses the Euclidean structure — the cells are rectangles and `mod` wraps coordinates linearly. For non-Euclidean repetition (e.g., hyperbolic tilings), you need different methods; see Day 3.
+
+### Symmetry
+
+Use `abs` to mirror across a plane:
+
+```glsl
+p.x = abs(p.x);  // mirror across the yz-plane
+float d = sdPrimitive(p);
+```
+
+This places the primitive (or whatever part is in $x > 0$) on both sides.
+
+Combine for multi-axis symmetry:
+
+```glsl
+p = abs(p);  // octant symmetry — 8 copies
+```
+
+---
+
+## 5. Normals
+
+The gradient of an SDF points in the direction of steepest increase — away from the surface. This is the surface normal.
+
+### The Formula
+
+For an SDF $f$, the normal at point $\mathbf{p}$ is:
+
+$$\mathbf{n} = \frac{\nabla f}{|\nabla f|} = \text{normalize}\left( \frac{\partial f}{\partial x}, \frac{\partial f}{\partial y}, \frac{\partial f}{\partial z} \right)$$
+
+### Implementation
+
+Approximate the gradient numerically with central differences:
+
+```glsl
+vec3 getNormal(vec3 p) {
+    float e = 0.0001;
+    return normalize(vec3(
+        sceneSDF(p + vec3(e, 0, 0)) - sceneSDF(p - vec3(e, 0, 0)),
+        sceneSDF(p + vec3(0, e, 0)) - sceneSDF(p - vec3(0, e, 0)),
+        sceneSDF(p + vec3(0, 0, e)) - sceneSDF(p - vec3(0, 0, e))
+    ));
+}
+```
+
+This requires 6 SDF evaluations. A cheaper version uses tetrahedral sampling:
+
+```glsl
+vec3 getNormal(vec3 p) {
+    float e = 0.0001;
+    vec2 k = vec2(1, -1);
+    return normalize(
+        k.xyy * sceneSDF(p + k.xyy * e) +
+        k.yyx * sceneSDF(p + k.yyx * e) +
+        k.yxy * sceneSDF(p + k.yxy * e) +
+        k.xxx * sceneSDF(p + k.xxx * e)
+    );
+}
+```
+
+This uses 4 evaluations at the vertices of a tetrahedron centered on `p`.
+
+### Choosing Epsilon
+
+- Too large: normals are smoothed, fine details lost
+- Too small: numerical noise, especially far from origin
+
+A value around `0.0001` to `0.001` works for most scenes. For very small or detailed geometry, scale epsilon accordingly.
+
+---
+
+## 6. Resources
+
+For the complete collection of SDF primitives and operations:
+
+- **2D SDFs**: https://iquilezles.org/articles/distfunctions2d/
+- **3D SDFs**: https://iquilezles.org/articles/distfunctions/
+
+These pages include many more primitives, exact vs. bound SDFs, and advanced operations.

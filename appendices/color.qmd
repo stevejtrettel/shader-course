@@ -1,4 +1,4 @@
-# Appendix: Color
+# Color
 
 This appendix collects techniques for mapping scalar values to colors. These are tools you copy, paste, and tweak as needed.
 

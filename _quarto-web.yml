@@ -59,8 +59,16 @@ website:
       #   href: GPU-Accelerated-Mathematical-Illustration.pdf
       - section: "Appendices"
         contents:
+          - text: "GLSL Reference"
+            href: appendices/glsl.qmd
+          - text: "Coordinates"
+            href: appendices/coordinates.qmd
           - text: "Color"
             href: appendices/color.qmd
+          - text: "SDFs"
+            href: appendices/sdfs.qmd
+          - text: "Debugging"
+            href: appendices/debug.qmd
 
 format:
   html:
