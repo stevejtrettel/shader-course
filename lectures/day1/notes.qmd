@@ -631,7 +631,57 @@ Drag left and right to sweep through the level sets and watch the curve topology
 
 ### Example: Elliptic Curves
 
-Remember the opening demo? We can now build it ourselves. An elliptic curve in Weierstrass form is $y^2 = x^3 + ax + b$. As an implicit curve: $F(x,y) = y^2 - x^3 - ax - b = 0$.
+Remember the opening demo? We can now build it ourselves.
+
+An elliptic curve (over the reals) in Weierstrass form is defined by $y^2 = x^3 + ax + b$. These curves appear throughout mathematics: in number theory, cryptography, and the proof of Fermat's Last Theorem. For us, they're a nice example because their topology varies with the parameters.
+
+Over $\mathbb{R}$, an elliptic curve is either a single connected component (one smooth loop extending to infinity) or two components (a bounded "egg" plus an unbounded piece). The transition between these cases happens at singular curves, where the curve develops a cusp or crosses itself.
+
+The **discriminant** $\Delta = 4a^3 + 27b^2$ detects these cases:
+
+- $\Delta > 0$: one connected component
+- $\Delta < 0$: two components  
+- $\Delta = 0$: singular (the curve has a cusp or node)
+
+As an implicit curve, we write $F(x,y) = y^2 - x^3 - ax - b = 0$. The gradient is $\nabla F = (-3x^2 - a, \, 2y)$.
+
+Let's start with a single curve at fixed parameter values:
+
+```glsl
+vec2 p = normalize_coord(fragCoord);
+
+float a = -1.0;
+float b = 0.5;
+
+float F = p.y * p.y - p.x * p.x * p.x - a * p.x - b;
+vec2 grad = vec2(-3.0 * p.x * p.x - a, 2.0 * p.y);
+float dist = abs(F) / max(length(grad), 0.01);
+
+vec3 color = vec3(0.05, 0.05, 0.1);
+if (dist < 0.05) {
+    color = vec3(1.0, 0.85, 0.3);
+}
+
+fragColor = vec4(color, 1.0);
+```
+
+Now let's color by topology. We compute the discriminant and choose the color accordingly:
+
+```glsl
+float disc = 4.0 * a * a * a + 27.0 * b * b;
+
+if (dist < 0.05) {
+    if (abs(disc) < 0.1) {
+        color = vec3(1.0, 0.2, 0.2);   // red: singular
+    } else if (disc > 0.0) {
+        color = vec3(1.0, 0.85, 0.3);  // gold: one component
+    } else {
+        color = vec3(0.3, 0.5, 0.8);   // blue: two components
+    }
+}
+```
+
+Finally, we let the mouse control the parameters, turning this into an explorer for the $(a, b)$ parameter space:
 
 ```glsl
 vec2 p = normalize_coord(fragCoord);

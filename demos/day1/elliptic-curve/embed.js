@@ -270,7 +270,7 @@ class ge {
     r.viewport(0, 0, this._width, this._height);
     const T = ["BufferA", "BufferB", "BufferC", "BufferD", "Image"];
     for (const E of T) {
-      const x = this._passes.find((_) => _.name === E);
+      const x = this._passes.find((y) => y.name === E);
       x && (this.executePass(x, {
         iResolution: c,
         iTime: p,
@@ -418,7 +418,7 @@ class ge {
             e.getUniformLocation(m, "iChannel2"),
             e.getUniformLocation(m, "iChannel3")
           ]
-        }, T = j(e, this._width, this._height), E = j(e, this._width, this._height), x = Y(e, T), _ = {
+        }, T = j(e, this._width, this._height), E = j(e, this._width, this._height), x = Y(e, T), y = {
           name: c,
           projectChannels: p.channels,
           vao: r,
@@ -427,20 +427,20 @@ class ge {
           currentTexture: T,
           previousTexture: E
         };
-        this._passes.push(_);
+        this._passes.push(y);
       } catch (m) {
         const b = m instanceof Error ? m.message : String(m), T = this.getLineMapping(), E = b.match(/ERROR:\s*\d+:(\d+):/);
-        let x = !1, _ = null;
+        let x = !1, y = null;
         if (E && this.project.commonSource) {
-          const R = parseInt(E[1], 10), y = T.boilerplateLinesBeforeCommon + 2, w = y + T.commonLineCount - 1;
-          R >= y && R <= w && (x = !0, _ = R - y + 1);
+          const R = parseInt(E[1], 10), _ = T.boilerplateLinesBeforeCommon + 2, w = _ + T.commonLineCount - 1;
+          R >= _ && R <= w && (x = !0, y = R - _ + 1);
         }
         this._compilationErrors.push({
           passName: c,
           error: b,
           source: o,
           isFromCommon: x,
-          originalLine: _
+          originalLine: y
         }), console.error(`Failed to compile ${c}:`, b);
       }
     }
@@ -806,14 +806,14 @@ class Ee {
    */
   showErrorOverlay(e) {
     this.errorOverlay || (this.errorOverlay = document.createElement("div"), this.errorOverlay.className = "shader-error-overlay", this.container.appendChild(this.errorOverlay));
-    const t = e.filter((b) => b.isFromCommon), r = e.filter((b) => !b.isFromCommon), o = [...t.length > 0 ? [t[0]] : [], ...r].map(({ passName: b, error: T, source: E, isFromCommon: x, originalLine: _ }) => {
+    const t = e.filter((b) => b.isFromCommon), r = e.filter((b) => !b.isFromCommon), o = [...t.length > 0 ? [t[0]] : [], ...r].map(({ passName: b, error: T, source: E, isFromCommon: x, originalLine: y }) => {
       const R = T.replace(`Shader compilation failed:
 `, "");
-      let y = R;
-      return x && _ !== null && (y = R.replace(/Line \d+:/, `Line ${_}:`), y = y.replace(/ERROR:\s*\d+:(\d+):/, `ERROR: 0:${_}:`)), {
+      let _ = R;
+      return x && y !== null && (_ = R.replace(/Line \d+:/, `Line ${y}:`), _ = _.replace(/ERROR:\s*\d+:(\d+):/, `ERROR: 0:${y}:`)), {
         passName: x ? "common.glsl" : b,
-        error: this.parseShaderError(y),
-        codeContext: x ? this.extractCodeContextFromCommon(_) : this.extractCodeContext(y, E)
+        error: this.parseShaderError(_),
+        codeContext: x ? this.extractCodeContextFromCommon(y) : this.extractCodeContext(_, E)
       };
     }).map(({ passName: b, error: T, codeContext: E }) => `
       <div class="error-section">
@@ -866,8 +866,8 @@ class Ee {
     const i = parseInt(r[1], 10), c = t.split(`
 `), p = 3, o = Math.max(0, i - p - 1), m = Math.min(c.length, i + p);
     return c.slice(o, m).map((E, x) => {
-      const _ = o + x + 1, R = _ === i, y = String(_).padStart(4, " "), w = this.escapeHTML(E);
-      return R ? `<span class="error-line-highlight">${y} │ ${w}</span>` : `<span class="context-line">${y} │ ${w}</span>`;
+      const y = o + x + 1, R = y === i, _ = String(y).padStart(4, " "), w = this.escapeHTML(E);
+      return R ? `<span class="error-line-highlight">${_} │ ${w}</span>` : `<span class="context-line">${_} │ ${w}</span>`;
     }).join("");
   }
   /**
@@ -880,8 +880,8 @@ class Ee {
     const r = t.split(`
 `), i = 3, c = Math.max(0, e - i - 1), p = Math.min(r.length, e + i);
     return r.slice(c, p).map((b, T) => {
-      const E = c + T + 1, x = E === e, _ = String(E).padStart(4, " "), R = this.escapeHTML(b);
-      return x ? `<span class="error-line-highlight">${_} │ ${R}</span>` : `<span class="context-line">${_} │ ${R}</span>`;
+      const E = c + T + 1, x = E === e, y = String(E).padStart(4, " "), R = this.escapeHTML(b);
+      return x ? `<span class="error-line-highlight">${y} │ ${R}</span>` : `<span class="context-line">${y} │ ${R}</span>`;
     }).join("");
   }
   /**
@@ -1574,15 +1574,15 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
                   $--, P = s.slice(B, k), L.index -= B;
                 } else if (L = b(q, 0, P, D), !L)
                   continue;
-                var I = L.index, N = L[0], X = P.slice(0, I), W = P.slice(I + N.length), z = B + P.length;
-                d && z > d.reach && (d.reach = z);
+                var I = L.index, N = L[0], H = P.slice(0, I), W = P.slice(I + N.length), X = B + P.length;
+                d && X > d.reach && (d.reach = X);
                 var O = S.prev;
-                X && (O = x(a, O, X), B += X.length), _(a, O, $);
+                H && (O = x(a, O, H), B += H.length), y(a, O, $);
                 var se = new m(v, M ? o.tokenize(N, M) : N, ne, N);
                 if (S = x(a, O, se), W && x(a, S, W), $ > 1) {
                   var G = {
                     cause: v + "," + F,
-                    reach: z
+                    reach: X
                   };
                   T(s, a, u, S.prev, B, G), d && G.reach > d.reach && (d.reach = G.reach);
                 }
@@ -1599,7 +1599,7 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
       var l = a.next, h = { value: u, prev: a, next: l };
       return a.next = h, l.prev = h, s.length++, h;
     }
-    function _(s, a, u) {
+    function y(s, a, u) {
       for (var l = a.next, h = 0; h < u && l !== s.tail; h++)
         l = l.next;
       a.next = l, l.prev = a, s.length -= h;
@@ -1614,14 +1614,14 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
         var a = JSON.parse(s.data), u = a.language, l = a.code, h = a.immediateClose;
         r.postMessage(o.highlight(l, o.languages[u], u)), h && r.close();
       }, !1)), o;
-    var y = o.util.currentScript();
-    y && (o.filename = y.src, y.hasAttribute("data-manual") && (o.manual = !0));
+    var _ = o.util.currentScript();
+    _ && (o.filename = _.src, _.hasAttribute("data-manual") && (o.manual = !0));
     function w() {
       o.manual || o.highlightAll();
     }
     if (!o.manual) {
       var A = document.readyState;
-      A === "loading" || A === "interactive" && y && y.defer ? document.addEventListener("DOMContentLoaded", w) : window.requestAnimationFrame ? window.requestAnimationFrame(w) : window.setTimeout(w, 16);
+      A === "loading" || A === "interactive" && _ && _.defer ? document.addEventListener("DOMContentLoaded", w) : window.requestAnimationFrame ? window.requestAnimationFrame(w) : window.setTimeout(w, 16);
     }
     return o;
   }(e);
@@ -2003,8 +2003,8 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
     if (typeof t > "u" || typeof document > "u")
       return;
     Element.prototype.matches || (Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector);
-    var r = "Loading…", i = function(y, w) {
-      return "✖ Error " + y + " while fetching file: " + w;
+    var r = "Loading…", i = function(_, w) {
+      return "✖ Error " + _ + " while fetching file: " + w;
     }, c = "✖ Error: File does not exist or is empty", p = {
       js: "javascript",
       py: "python",
@@ -2016,31 +2016,31 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
       h: "c",
       tex: "latex"
     }, o = "data-src-status", m = "loading", b = "loaded", T = "failed", E = "pre[data-src]:not([" + o + '="' + b + '"]):not([' + o + '="' + m + '"])';
-    function x(y, w, A) {
+    function x(_, w, A) {
       var s = new XMLHttpRequest();
-      s.open("GET", y, !0), s.onreadystatechange = function() {
+      s.open("GET", _, !0), s.onreadystatechange = function() {
         s.readyState == 4 && (s.status < 400 && s.responseText ? w(s.responseText) : s.status >= 400 ? A(i(s.status, s.statusText)) : A(c));
       }, s.send(null);
     }
-    function _(y) {
-      var w = /^\s*(\d+)\s*(?:(,)\s*(?:(\d+)\s*)?)?$/.exec(y || "");
+    function y(_) {
+      var w = /^\s*(\d+)\s*(?:(,)\s*(?:(\d+)\s*)?)?$/.exec(_ || "");
       if (w) {
         var A = Number(w[1]), s = w[2], a = w[3];
         return s ? a ? [A, Number(a)] : [A, void 0] : [A, A];
       }
     }
-    t.hooks.add("before-highlightall", function(y) {
-      y.selector += ", " + E;
-    }), t.hooks.add("before-sanity-check", function(y) {
+    t.hooks.add("before-highlightall", function(_) {
+      _.selector += ", " + E;
+    }), t.hooks.add("before-sanity-check", function(_) {
       var w = (
         /** @type {HTMLPreElement} */
-        y.element
+        _.element
       );
       if (w.matches(E)) {
-        y.code = "", w.setAttribute(o, m);
+        _.code = "", w.setAttribute(o, m);
         var A = w.appendChild(document.createElement("CODE"));
         A.textContent = r;
-        var s = w.getAttribute("data-src"), a = y.language;
+        var s = w.getAttribute("data-src"), a = _.language;
         if (a === "none") {
           var u = (/\.(\w+)$/.exec(s) || [, "none"])[1];
           a = p[u] || u;
@@ -2051,7 +2051,7 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
           s,
           function(h) {
             w.setAttribute(o, b);
-            var d = _(w.getAttribute("data-range"));
+            var d = y(w.getAttribute("data-range"));
             if (d) {
               var v = h.split(/\r\n?|\n/g), f = d[0], F = d[1] == null ? v.length : d[1];
               f < 0 && (f += v.length), f = Math.max(0, Math.min(f - 1, v.length)), F < 0 && (F += v.length), F = Math.max(0, Math.min(F, v.length)), h = v.slice(f, F).join(`
@@ -2301,8 +2301,8 @@ class Te {
     `, T = (E) => {
       const x = e[E];
       o = x.source;
-      const _ = document.createElement("pre"), R = document.createElement("code");
-      R.className = "language-cpp", R.textContent = x.source, _.appendChild(R), c.innerHTML = "", c.appendChild(_), te.highlightElement(R);
+      const y = document.createElement("pre"), R = document.createElement("code");
+      R.className = "language-cpp", R.textContent = x.source, y.appendChild(R), c.innerHTML = "", c.appendChild(y), te.highlightElement(R);
     };
     p.addEventListener("click", async () => {
       try {
@@ -2313,10 +2313,10 @@ class Te {
         console.error("Failed to copy:", E);
       }
     }), e.forEach((E, x) => {
-      const _ = document.createElement("button");
-      _.className = "tab-button", _.textContent = E.name, x === 0 && _.classList.add("active"), _.addEventListener("click", () => {
-        i.querySelectorAll(".tab-button").forEach((R) => R.classList.remove("active")), _.classList.add("active"), T(x);
-      }), i.appendChild(_);
+      const y = document.createElement("button");
+      y.className = "tab-button", y.textContent = E.name, x === 0 && y.classList.add("active"), y.addEventListener("click", () => {
+        i.querySelectorAll(".tab-button").forEach((R) => R.classList.remove("active")), y.classList.add("active"), T(x);
+      }), i.appendChild(y);
     }), this.codePanel.appendChild(i), this.codePanel.appendChild(p), this.codePanel.appendChild(c), e.length > 0 && T(0);
   }
 }
@@ -2391,13 +2391,13 @@ class xe {
       else {
         this.canvasContainer.style.visibility = "hidden", this.codeViewer.style.visibility = "visible", this.copyButton.style.visibility = "visible", c = T.source || "";
         const E = c.split(`
-`), x = document.createElement("pre"), _ = document.createElement("div");
-        _.className = "tabbed-line-numbers", _.innerHTML = E.map((w, A) => A + 1).join(`
+`), x = document.createElement("pre"), y = document.createElement("div");
+        y.className = "tabbed-line-numbers", y.innerHTML = E.map((w, A) => A + 1).join(`
 `);
         const R = document.createElement("div");
         R.className = "tabbed-code-content";
-        const y = document.createElement("code");
-        y.className = "language-cpp", y.textContent = c, R.appendChild(y), x.appendChild(_), x.appendChild(R), this.codeViewer.innerHTML = "", this.codeViewer.appendChild(x), te.highlightElement(y);
+        const _ = document.createElement("code");
+        _.className = "language-cpp", _.textContent = c, R.appendChild(_), x.appendChild(y), x.appendChild(R), this.codeViewer.innerHTML = "", this.codeViewer.appendChild(x), te.highlightElement(_);
       }
     };
     return t.forEach((b, T) => {
@@ -2406,7 +2406,7 @@ class xe {
     }), e;
   }
 }
-function ye(n, e) {
+function _e(n, e) {
   switch (n) {
     case "fullscreen":
       return new be(e);
@@ -2418,7 +2418,7 @@ function ye(n, e) {
       return new xe(e);
   }
 }
-async function _e(n, e, t, r) {
+async function ye(n, e, t, r) {
   const i = `/demos/${n}/shadertoy.config.json`, c = `/demos/${n}/config.json`, p = i in t ? i : c in t ? c : null;
   if (p) {
     const o = await t[p]();
@@ -2458,7 +2458,7 @@ async function Q(n, e, t) {
   };
 }
 async function we(n, e, t, r) {
-  var y, w, A, s, a, u, l, h;
+  var _, w, A, s, a, u, l, h;
   let i = null;
   if (e.common) {
     const d = `/demos/${n}/${e.common}`;
@@ -2472,7 +2472,7 @@ async function we(n, e, t, r) {
     const v = e.passes[d];
     if (v)
       for (const f of ["iChannel0", "iChannel1", "iChannel2", "iChannel3"]) {
-        const F = (y = v.channels) == null ? void 0 : y[f];
+        const F = (_ = v.channels) == null ? void 0 : _[f];
         F && "texture" in F && c.add(F.texture);
       }
   }
@@ -2503,10 +2503,10 @@ async function we(n, e, t, r) {
     if (!(C in t))
       throw new Error(`Missing shader file: ${C}`);
     const M = await t[C](), D = [
-      H((w = v.channels) == null ? void 0 : w.iChannel0, m),
-      H((A = v.channels) == null ? void 0 : A.iChannel1, m),
-      H((s = v.channels) == null ? void 0 : s.iChannel2, m),
-      H((a = v.channels) == null ? void 0 : a.iChannel3, m)
+      z((w = v.channels) == null ? void 0 : w.iChannel0, m),
+      z((A = v.channels) == null ? void 0 : A.iChannel1, m),
+      z((s = v.channels) == null ? void 0 : s.iChannel2, m),
+      z((a = v.channels) == null ? void 0 : a.iChannel3, m)
     ];
     b[d] = {
       name: d,
@@ -2516,18 +2516,18 @@ async function we(n, e, t, r) {
   }
   if (!b.Image)
     throw new Error(`Demo '${n}' must have an Image pass`);
-  const T = ((u = e.meta) == null ? void 0 : u.title) || n.split("-").map((d) => d.charAt(0).toUpperCase() + d.slice(1)).join(" "), E = ((l = e.meta) == null ? void 0 : l.author) || null, x = ((h = e.meta) == null ? void 0 : h.description) || null, _ = e.layout || "tabbed", R = e.controls ?? !0;
+  const T = ((u = e.meta) == null ? void 0 : u.title) || n.split("-").map((d) => d.charAt(0).toUpperCase() + d.slice(1)).join(" "), E = ((l = e.meta) == null ? void 0 : l.author) || null, x = ((h = e.meta) == null ? void 0 : h.description) || null, y = e.layout || "tabbed", R = e.controls ?? !0;
   return {
     root: `/demos/${n}`,
     meta: { title: T, author: E, description: x },
-    layout: _,
+    layout: y,
     controls: R,
     commonSource: i,
     passes: b,
     textures: o
   };
 }
-function H(n, e) {
+function z(n, e) {
   return n ? "buffer" in n ? {
     kind: "buffer",
     buffer: n.buffer,
@@ -2539,7 +2539,7 @@ function H(n, e) {
 }
 const Fe = "course/day1/elliptic-curve";
 async function Re() {
-  return _e(Fe, /* @__PURE__ */ Object.assign({
+  return ye(Fe, /* @__PURE__ */ Object.assign({
     "/demos/course/day1/elliptic-curve/image.glsl": () => Promise.resolve().then(() => Ce).then((r) => r.default)
   }), /* @__PURE__ */ Object.assign({}), /* @__PURE__ */ Object.assign({}));
 }
@@ -2547,7 +2547,7 @@ async function Le(n) {
   const e = typeof n.container == "string" ? document.querySelector(n.container) : n.container;
   if (!e || !(e instanceof HTMLElement))
     throw new Error(`Container not found: ${n.container}`);
-  const t = await Re(), r = ye(t.layout, {
+  const t = await Re(), r = _e(t.layout, {
     container: e,
     project: t
   }), i = new Ee({
@@ -2563,12 +2563,18 @@ async function Le(n) {
     }
   };
 }
-const Ae = `void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    vec2 uv = fragCoord / iResolution.xy;
+const Ae = `
+vec2 normalize_coord(vec2 coord) {
+    vec2 uv = coord / iResolution.xy;
     uv = uv - vec2(0.5, 0.5);
     uv.x *= iResolution.x / iResolution.y;
-    vec2 p = uv * 4.0;
+    return uv * 4.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // Normalize coordinates to range [-2, 2] with aspect ratio correction
+    vec2 p = normalize_coord(fragCoord);
     
     // Mouse controls (a, b) parameters
     float a = mix(-2.0, 1.0, iMouse.x / iResolution.x);

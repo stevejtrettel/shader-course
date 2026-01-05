@@ -1,9 +1,15 @@
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    vec2 uv = fragCoord / iResolution.xy;
+
+vec2 normalize_coord(vec2 coord) {
+    vec2 uv = coord / iResolution.xy;
     uv = uv - vec2(0.5, 0.5);
     uv.x *= iResolution.x / iResolution.y;
-    vec2 p = uv * 4.0;
+    return uv * 4.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // Normalize coordinates to range [-2, 2] with aspect ratio correction
+    vec2 p = normalize_coord(fragCoord);
     
     // Mouse controls (a, b) parameters
     float a = mix(-2.0, 1.0, iMouse.x / iResolution.x);
