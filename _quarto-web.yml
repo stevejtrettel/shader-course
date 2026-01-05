@@ -57,6 +57,10 @@ website:
             href: lectures/day5/shaders.qmd
       # - text: "Download PDF"
       #   href: GPU-Accelerated-Mathematical-Illustration.pdf
+      - section: "Appendices"
+        contents:
+          - text: "Color"
+            href: appendices/color.qmd
 
 format:
   html:
