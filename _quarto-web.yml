@@ -55,8 +55,8 @@ website:
           #   href: lectures/day5/slides.html
           - text: "Code"
             href: lectures/day5/shaders.qmd
-      - text: "Download PDF"
-        href: GPU-Accelerated-Mathematical-Illustration.pdf
+      # - text: "Download PDF"
+      #   href: GPU-Accelerated-Mathematical-Illustration.pdf
 
 format:
   html:
