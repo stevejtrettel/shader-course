@@ -301,25 +301,6 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
 Square tiling with checkerboard parity coloring.
 
-::: {.callout-note}
-## GLSL: The Ternary Operator
-
-This shader introduces the **ternary operator**: `condition ? a : b` returns `a` if the condition is true, `b` if false. It's a compact alternative to if/else for simple assignments:
-
-```glsl
-// These are equivalent:
-vec3 color = (parity < 0.5) ? light : dark;
-
-vec3 color;
-if (parity < 0.5) {
-    color = light;
-} else {
-    color = dark;
-}
-```
-
-You'll see this pattern constantly in shader code. We'll use it throughout the rest of the course.
-:::
 
 ```glsl
 // Color palette
