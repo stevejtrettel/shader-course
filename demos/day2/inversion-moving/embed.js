@@ -133,12 +133,12 @@ function he(n) {
   ), n.texParameteri(n.TEXTURE_2D, n.TEXTURE_MIN_FILTER, n.NEAREST), n.texParameteri(n.TEXTURE_2D, n.TEXTURE_MAG_FILTER, n.NEAREST), n.texParameteri(n.TEXTURE_2D, n.TEXTURE_WRAP_S, n.CLAMP_TO_EDGE), n.texParameteri(n.TEXTURE_2D, n.TEXTURE_WRAP_T, n.CLAMP_TO_EDGE), n.bindTexture(n.TEXTURE_2D, null), e;
 }
 function de(n, e, t, r) {
-  const d = new Float32Array(3072);
+  const p = new Float32Array(3072);
   for (let o = 0; o < 256; o++) {
     const m = t.get(o) || !1, b = r.get(o) || 0, T = (0 * 256 + o) * 4;
-    d[T + 0] = m ? 1 : 0, d[T + 1] = m ? 1 : 0, d[T + 2] = m ? 1 : 0, d[T + 3] = 1;
+    p[T + 0] = m ? 1 : 0, p[T + 1] = m ? 1 : 0, p[T + 2] = m ? 1 : 0, p[T + 3] = 1;
     const E = (2 * 256 + o) * 4;
-    d[E + 0] = b, d[E + 1] = b, d[E + 2] = b, d[E + 3] = 1;
+    p[E + 0] = b, p[E + 1] = b, p[E + 2] = b, p[E + 3] = 1;
   }
   n.bindTexture(n.TEXTURE_2D, e), n.texSubImage2D(
     n.TEXTURE_2D,
@@ -150,7 +150,7 @@ function de(n, e, t, r) {
     3,
     n.RGBA,
     n.FLOAT,
-    d
+    p
   ), n.bindTexture(n.TEXTURE_2D, null);
 }
 function pe(n, e) {
@@ -266,14 +266,14 @@ class ge {
   step(e, t) {
     const r = this.gl, s = this._lastStepTime === null ? 0 : e - this._lastStepTime;
     this._lastStepTime = e, this._time = e;
-    const c = [this._width, this._height, 1], d = this._time, o = s, m = this._frame, b = t;
+    const c = [this._width, this._height, 1], p = this._time, o = s, m = this._frame, b = t;
     r.viewport(0, 0, this._width, this._height);
     const T = ["BufferA", "BufferB", "BufferC", "BufferD", "Image"];
     for (const E of T) {
       const _ = this._passes.find((y) => y.name === E);
       _ && (this.executePass(_, {
         iResolution: c,
-        iTime: d,
+        iTime: p,
         iTimeDelta: o,
         iFrame: m,
         iMouse: b
@@ -386,8 +386,8 @@ class ge {
       const c = new Image();
       c.crossOrigin = "anonymous", c.onload = () => {
         e.bindTexture(e.TEXTURE_2D, r), e.texImage2D(e.TEXTURE_2D, 0, e.RGBA, e.RGBA, e.UNSIGNED_BYTE, c);
-        const d = t.filter === "nearest" ? e.NEAREST : e.LINEAR;
-        e.texParameteri(e.TEXTURE_2D, e.TEXTURE_MIN_FILTER, d), e.texParameteri(e.TEXTURE_2D, e.TEXTURE_MAG_FILTER, d);
+        const p = t.filter === "nearest" ? e.NEAREST : e.LINEAR;
+        e.texParameteri(e.TEXTURE_2D, e.TEXTURE_MIN_FILTER, p), e.texParameteri(e.TEXTURE_2D, e.TEXTURE_MAG_FILTER, p);
         const o = t.wrap === "clamp" ? e.CLAMP_TO_EDGE : e.REPEAT;
         e.texParameteri(e.TEXTURE_2D, e.TEXTURE_WRAP_S, o), e.texParameteri(e.TEXTURE_2D, e.TEXTURE_WRAP_T, o), t.filter === "linear" && e.generateMipmap(e.TEXTURE_2D), s.width = c.width, s.height = c.height, console.log(`Loaded texture '${t.name}': ${c.width}x${c.height}`);
       }, c.onerror = () => {
@@ -401,9 +401,9 @@ class ge {
   initRuntimePasses() {
     const e = this.gl, t = this.project, r = ue(e), s = ["BufferA", "BufferB", "BufferC", "BufferD", "Image"];
     for (const c of s) {
-      const d = t.passes[c];
-      if (!d) continue;
-      const o = this.buildFragmentShader(d.glslSource);
+      const p = t.passes[c];
+      if (!p) continue;
+      const o = this.buildFragmentShader(p.glslSource);
       try {
         const m = ce(e, fe, o), b = {
           program: m,
@@ -420,7 +420,7 @@ class ge {
           ]
         }, T = j(e, this._width, this._height), E = j(e, this._width, this._height), _ = Y(e, T), y = {
           name: c,
-          projectChannels: d.channels,
+          projectChannels: p.channels,
           vao: r,
           uniforms: b,
           framebuffer: _,
@@ -507,8 +507,8 @@ void main() {
     for (let r = 0; r < 4; r++) {
       const s = e.projectChannels[r], c = this.resolveChannelTexture(s, e.name);
       t.activeTexture(t.TEXTURE0 + r), t.bindTexture(t.TEXTURE_2D, c);
-      const d = e.uniforms.iChannel[r];
-      d && t.uniform1i(d, r);
+      const p = e.uniforms.iChannel[r];
+      p && t.uniform1i(p, r);
     }
   }
   /**
@@ -521,7 +521,7 @@ void main() {
           throw new Error("Black texture not initialized");
         return this._blackTexture;
       case "buffer": {
-        const s = this._passes.find((d) => d.name === e.buffer);
+        const s = this._passes.find((p) => p.name === e.buffer);
         if (!s)
           throw new Error(`Buffer '${e.buffer}' not found`);
         return e.buffer === t ? s.previousTexture : s.currentTexture;
@@ -693,11 +693,11 @@ class Ee {
   // ===========================================================================
   setupMouseTracking() {
     const e = (r) => {
-      const s = this.canvas.getBoundingClientRect(), c = (r.clientX - s.left) * this.pixelRatio, d = (s.height - (r.clientY - s.top)) * this.pixelRatio;
-      this.mouse[0] = c, this.mouse[1] = d;
+      const s = this.canvas.getBoundingClientRect(), c = (r.clientX - s.left) * this.pixelRatio, p = (s.height - (r.clientY - s.top)) * this.pixelRatio;
+      this.mouse[0] = c, this.mouse[1] = p;
     }, t = (r) => {
-      const s = this.canvas.getBoundingClientRect(), c = (r.clientX - s.left) * this.pixelRatio, d = (s.height - (r.clientY - s.top)) * this.pixelRatio;
-      this.mouse[2] = c, this.mouse[3] = d;
+      const s = this.canvas.getBoundingClientRect(), c = (r.clientX - s.left) * this.pixelRatio, p = (s.height - (r.clientY - s.top)) * this.pixelRatio;
+      this.mouse[2] = c, this.mouse[3] = p;
     };
     this.canvas.addEventListener("mousemove", e), this.canvas.addEventListener("click", t);
   }
@@ -780,8 +780,8 @@ class Ee {
         console.error("Failed to create screenshot blob");
         return;
       }
-      const d = URL.createObjectURL(c), o = document.createElement("a");
-      o.href = d, o.download = s, o.click(), URL.revokeObjectURL(d), console.log(`Screenshot saved: ${s}`);
+      const p = URL.createObjectURL(c), o = document.createElement("a");
+      o.href = p, o.download = s, o.click(), URL.revokeObjectURL(p), console.log(`Screenshot saved: ${s}`);
     }, "image/png");
   }
   /**
@@ -864,7 +864,7 @@ class Ee {
     const r = e.match(/ERROR:\s*\d+:(\d+):/);
     if (!r) return null;
     const s = parseInt(r[1], 10), c = t.split(`
-`), d = 3, o = Math.max(0, s - d - 1), m = Math.min(c.length, s + d);
+`), p = 3, o = Math.max(0, s - p - 1), m = Math.min(c.length, s + p);
     return c.slice(o, m).map((E, _) => {
       const y = o + _ + 1, A = y === s, x = String(y).padStart(4, " "), w = this.escapeHTML(E);
       return A ? `<span class="error-line-highlight">${x} │ ${w}</span>` : `<span class="context-line">${x} │ ${w}</span>`;
@@ -878,8 +878,8 @@ class Ee {
     const t = this.engine.project.commonSource;
     if (!t) return null;
     const r = t.split(`
-`), s = 3, c = Math.max(0, e - s - 1), d = Math.min(r.length, e + s);
-    return r.slice(c, d).map((b, T) => {
+`), s = 3, c = Math.max(0, e - s - 1), p = Math.min(r.length, e + s);
+    return r.slice(c, p).map((b, T) => {
       const E = c + T + 1, _ = E === e, y = String(E).padStart(4, " "), A = this.escapeHTML(b);
       return _ ? `<span class="error-line-highlight">${y} │ ${A}</span>` : `<span class="context-line">${y} │ ${A}</span>`;
     }).join("");
@@ -938,7 +938,7 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
    * @public
    */
   var t = function(r) {
-    var s = /(?:^|\s)lang(?:uage)?-([\w-]+)(?=\s|$)/i, c = 0, d = {}, o = {
+    var s = /(?:^|\s)lang(?:uage)?-([\w-]+)(?=\s|$)/i, c = 0, p = {}, o = {
       /**
        * By default, Prism will attempt to highlight all code elements (by calling {@link Prism.highlightAll}) on the
        * current page after the page finished loading. This might be a problem if e.g. you wanted to asynchronously load
@@ -1043,8 +1043,8 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
                 return u[h];
               l = /** @type {Record<string, any>} */
               {}, u[h] = l;
-              for (var p in a)
-                a.hasOwnProperty(p) && (l[p] = i(a[p], u));
+              for (var d in a)
+                a.hasOwnProperty(d) && (l[d] = i(a[d], u));
               return (
                 /** @type {any} */
                 l
@@ -1157,10 +1157,10 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
         /**
          * The grammar for plain, unformatted text.
          */
-        plain: d,
-        plaintext: d,
-        text: d,
-        txt: d,
+        plain: p,
+        plaintext: p,
+        text: p,
+        txt: p,
         /**
          * Creates a deep copy of the language with the given id and appends the given tokens.
          *
@@ -1273,28 +1273,28 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
         insertBefore: function(i, a, u, l) {
           l = l || /** @type {any} */
           o.languages;
-          var h = l[i], p = {};
+          var h = l[i], d = {};
           for (var v in h)
             if (h.hasOwnProperty(v)) {
               if (v == a)
                 for (var f in u)
-                  u.hasOwnProperty(f) && (p[f] = u[f]);
-              u.hasOwnProperty(v) || (p[v] = h[v]);
+                  u.hasOwnProperty(f) && (d[f] = u[f]);
+              u.hasOwnProperty(v) || (d[v] = h[v]);
             }
           var F = l[i];
-          return l[i] = p, o.languages.DFS(o.languages, function(C, M) {
-            M === F && C != i && (this[C] = p);
-          }), p;
+          return l[i] = d, o.languages.DFS(o.languages, function(C, M) {
+            M === F && C != i && (this[C] = d);
+          }), d;
         },
         // Traverse a language definition with Depth First Search
         DFS: function i(a, u, l, h) {
           h = h || {};
-          var p = o.util.objId;
+          var d = o.util.objId;
           for (var v in a)
             if (a.hasOwnProperty(v)) {
               u.call(a, v, a[v], l || v);
               var f = a[v], F = o.util.type(f);
-              F === "Object" && !h[p(f)] ? (h[p(f)] = !0, i(f, u, null, h)) : F === "Array" && !h[p(f)] && (h[p(f)] = !0, i(f, u, v, h));
+              F === "Object" && !h[d(f)] ? (h[d(f)] = !0, i(f, u, null, h)) : F === "Array" && !h[d(f)] && (h[d(f)] = !0, i(f, u, v, h));
             }
         }
       },
@@ -1336,8 +1336,8 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
           selector: 'code[class*="language-"], [class*="language-"] code, code[class*="lang-"], [class*="lang-"] code'
         };
         o.hooks.run("before-highlightall", l), l.elements = Array.prototype.slice.apply(l.container.querySelectorAll(l.selector)), o.hooks.run("before-all-elements-highlight", l);
-        for (var h = 0, p; p = l.elements[h++]; )
-          o.highlightElement(p, a === !0, l.callback);
+        for (var h = 0, d; d = l.elements[h++]; )
+          o.highlightElement(d, a === !0, l.callback);
       },
       /**
        * Highlights the code inside a single element.
@@ -1370,8 +1370,8 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
       highlightElement: function(i, a, u) {
         var l = o.util.getLanguage(i), h = o.languages[l];
         o.util.setLanguage(i, l);
-        var p = i.parentElement;
-        p && p.nodeName.toLowerCase() === "pre" && o.util.setLanguage(p, l);
+        var d = i.parentElement;
+        d && d.nodeName.toLowerCase() === "pre" && o.util.setLanguage(d, l);
         var v = i.textContent, f = {
           element: i,
           language: l,
@@ -1381,7 +1381,7 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
         function F(M) {
           f.highlightedCode = M, o.hooks.run("before-insert", f), f.element.innerHTML = f.highlightedCode, o.hooks.run("after-highlight", f), o.hooks.run("complete", f), u && u.call(f.element);
         }
-        if (o.hooks.run("before-sanity-check", f), p = f.element.parentElement, p && p.nodeName.toLowerCase() === "pre" && !p.hasAttribute("tabindex") && p.setAttribute("tabindex", "0"), !f.code) {
+        if (o.hooks.run("before-sanity-check", f), d = f.element.parentElement, d && d.nodeName.toLowerCase() === "pre" && !d.hasAttribute("tabindex") && d.setAttribute("tabindex", "0"), !f.code) {
           o.hooks.run("complete", f), u && u.call(f.element);
           return;
         }
@@ -1526,8 +1526,8 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
         classes: ["token", a.type],
         attributes: {},
         language: u
-      }, p = a.alias;
-      p && (Array.isArray(p) ? Array.prototype.push.apply(h.classes, p) : h.classes.push(p)), o.hooks.run("wrap", h);
+      }, d = a.alias;
+      d && (Array.isArray(d) ? Array.prototype.push.apply(h.classes, d) : h.classes.push(d)), o.hooks.run("wrap", h);
       var v = "";
       for (var f in h.attributes)
         v += " " + f + '="' + (h.attributes[f] || "").replace(/"/g, "&quot;") + '"';
@@ -1537,25 +1537,25 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
       i.lastIndex = a;
       var h = i.exec(u);
       if (h && l && h[1]) {
-        var p = h[1].length;
-        h.index += p, h[0] = h[0].slice(p);
+        var d = h[1].length;
+        h.index += d, h[0] = h[0].slice(d);
       }
       return h;
     }
-    function T(i, a, u, l, h, p) {
+    function T(i, a, u, l, h, d) {
       for (var v in u)
         if (!(!u.hasOwnProperty(v) || !u[v])) {
           var f = u[v];
           f = Array.isArray(f) ? f : [f];
           for (var F = 0; F < f.length; ++F) {
-            if (p && p.cause == v + "," + F)
+            if (d && d.cause == v + "," + F)
               return;
             var C = f[F], M = C.inside, D = !!C.lookbehind, V = !!C.greedy, ne = C.alias;
             if (V && !C.pattern.global) {
               var re = C.pattern.toString().match(/[imsuy]*$/)[0];
               C.pattern = RegExp(C.pattern.source, re + "g");
             }
-            for (var q = C.pattern || C, S = l.next, B = h; S !== a.tail && !(p && B >= p.reach); B += S.value.length, S = S.next) {
+            for (var q = C.pattern || C, S = l.next, B = h; S !== a.tail && !(d && B >= d.reach); B += S.value.length, S = S.next) {
               var P = S.value;
               if (a.length > i.length)
                 return;
@@ -1575,7 +1575,7 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
                 } else if (L = b(q, 0, P, D), !L)
                   continue;
                 var I = L.index, N = L[0], H = P.slice(0, I), W = P.slice(I + N.length), X = B + P.length;
-                p && X > p.reach && (p.reach = X);
+                d && X > d.reach && (d.reach = X);
                 var O = S.prev;
                 H && (O = _(a, O, H), B += H.length), y(a, O, $);
                 var ie = new m(v, M ? o.tokenize(N, M) : N, ne, N);
@@ -1584,7 +1584,7 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
                     cause: v + "," + F,
                     reach: X
                   };
-                  T(i, a, u, S.prev, B, G), p && G.reach > p.reach && (p.reach = G.reach);
+                  T(i, a, u, S.prev, B, G), d && G.reach > d.reach && (d.reach = G.reach);
                 }
               }
             }
@@ -1717,16 +1717,16 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
      * addInlined('style', 'css');
      */
     value: function(s, c) {
-      var d = {};
-      d["language-" + c] = {
+      var p = {};
+      p["language-" + c] = {
         pattern: /(^<!\[CDATA\[)[\s\S]+?(?=\]\]>$)/i,
         lookbehind: !0,
         inside: t.languages[c]
-      }, d.cdata = /^<!\[CDATA\[|\]\]>$/i;
+      }, p.cdata = /^<!\[CDATA\[|\]\]>$/i;
       var o = {
         "included-cdata": {
           pattern: /<!\[CDATA\[[\s\S]*?\]\]>/i,
-          inside: d
+          inside: p
         }
       };
       o["language-" + c] = {
@@ -2005,7 +2005,7 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
     Element.prototype.matches || (Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector);
     var r = "Loading…", s = function(x, w) {
       return "✖ Error " + x + " while fetching file: " + w;
-    }, c = "✖ Error: File does not exist or is empty", d = {
+    }, c = "✖ Error: File does not exist or is empty", p = {
       js: "javascript",
       py: "python",
       rb: "ruby",
@@ -2043,7 +2043,7 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
         var i = w.getAttribute("data-src"), a = x.language;
         if (a === "none") {
           var u = (/\.(\w+)$/.exec(i) || [, "none"])[1];
-          a = d[u] || u;
+          a = p[u] || u;
         }
         t.util.setLanguage(R, a), t.util.setLanguage(w, a);
         var l = t.plugins.autoloader;
@@ -2051,9 +2051,9 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
           i,
           function(h) {
             w.setAttribute(o, b);
-            var p = y(w.getAttribute("data-range"));
-            if (p) {
-              var v = h.split(/\r\n?|\n/g), f = p[0], F = p[1] == null ? v.length : p[1];
+            var d = y(w.getAttribute("data-range"));
+            if (d) {
+              var v = h.split(/\r\n?|\n/g), f = d[0], F = d[1] == null ? v.length : d[1];
               f < 0 && (f += v.length), f = Math.max(0, Math.min(f - 1, v.length)), F < 0 && (F += v.length), F = Math.max(0, Math.min(F, v.length)), h = v.slice(f, F).join(`
 `), w.hasAttribute("data-start") || w.setAttribute("data-start", String(f + 1));
             }
@@ -2286,15 +2286,15 @@ class Te {
     s.className = "tab-bar";
     const c = document.createElement("div");
     c.className = "code-viewer";
-    const d = document.createElement("button");
-    d.className = "copy-button", d.innerHTML = `
+    const p = document.createElement("button");
+    p.className = "copy-button", p.innerHTML = `
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
         <path d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V2z" opacity="0.4"/>
         <path d="M2 5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H2zm0 1h7a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1z"/>
       </svg>
-    `, d.title = "Copy code to clipboard";
+    `, p.title = "Copy code to clipboard";
     let o = "";
-    const m = d.innerHTML, b = `
+    const m = p.innerHTML, b = `
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
         <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/>
       </svg>
@@ -2304,10 +2304,10 @@ class Te {
       const y = document.createElement("pre"), A = document.createElement("code");
       A.className = "language-cpp", A.textContent = _.source, y.appendChild(A), c.innerHTML = "", c.appendChild(y), te.highlightElement(A);
     };
-    d.addEventListener("click", async () => {
+    p.addEventListener("click", async () => {
       try {
-        await navigator.clipboard.writeText(o), d.innerHTML = b, d.classList.add("copied"), setTimeout(() => {
-          d.innerHTML = m, d.classList.remove("copied");
+        await navigator.clipboard.writeText(o), p.innerHTML = b, p.classList.add("copied"), setTimeout(() => {
+          p.innerHTML = m, p.classList.remove("copied");
         }, 1500);
       } catch (E) {
         console.error("Failed to copy:", E);
@@ -2317,7 +2317,7 @@ class Te {
       y.className = "tab-button", y.textContent = E.name, _ === 0 && y.classList.add("active"), y.addEventListener("click", () => {
         s.querySelectorAll(".tab-button").forEach((A) => A.classList.remove("active")), y.classList.add("active"), T(_);
       }), s.appendChild(y);
-    }), this.codePanel.appendChild(s), this.codePanel.appendChild(d), this.codePanel.appendChild(c), e.length > 0 && T(0);
+    }), this.codePanel.appendChild(s), this.codePanel.appendChild(p), this.codePanel.appendChild(c), e.length > 0 && T(0);
   }
 }
 class _e {
@@ -2368,7 +2368,7 @@ class _e {
     const s = this.project.passes.Image;
     t.push({ name: "image.glsl", isShader: !1, source: s.glslSource });
     let c = "";
-    const d = this.copyButton.innerHTML, o = `
+    const p = this.copyButton.innerHTML, o = `
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
         <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/>
       </svg>
@@ -2376,7 +2376,7 @@ class _e {
     this.copyButton.addEventListener("click", async () => {
       try {
         await navigator.clipboard.writeText(c), this.copyButton.innerHTML = o, this.copyButton.classList.add("copied"), setTimeout(() => {
-          this.copyButton.innerHTML = d, this.copyButton.classList.remove("copied");
+          this.copyButton.innerHTML = p, this.copyButton.classList.remove("copied");
         }, 1500);
       } catch (b) {
         console.error("Failed to copy:", b);
@@ -2419,10 +2419,10 @@ function xe(n, e) {
   }
 }
 async function ye(n, e, t, r) {
-  const s = `/demos/${n}/shadertoy.config.json`;
-  if (s in t) {
-    const d = await t[s]();
-    return d.passes ? we(n, d, e, r) : Q(n, e, d);
+  const s = `/demos/${n}/shadertoy.config.json`, c = `/demos/${n}/config.json`, p = s in t ? s : c in t ? c : null;
+  if (p) {
+    const o = await t[p]();
+    return o.passes ? we(n, o, e, r) : Q(n, e, o);
   } else
     return Q(n, e);
 }
@@ -2431,7 +2431,7 @@ async function Q(n, e, t) {
   const r = `/demos/${n}/image.glsl`;
   if (!(r in e))
     throw new Error(`Demo '${n}' not found. Expected ${r}`);
-  const s = await e[r](), c = (t == null ? void 0 : t.layout) || "tabbed", d = (t == null ? void 0 : t.controls) ?? !0, o = ((m = t == null ? void 0 : t.meta) == null ? void 0 : m.title) || n.split("-").map((E) => E.charAt(0).toUpperCase() + E.slice(1)).join(" ");
+  const s = await e[r](), c = (t == null ? void 0 : t.layout) || "tabbed", p = (t == null ? void 0 : t.controls) ?? !0, o = ((m = t == null ? void 0 : t.meta) == null ? void 0 : m.title) || n.split("-").map((E) => E.charAt(0).toUpperCase() + E.slice(1)).join(" ");
   return {
     root: `/demos/${n}`,
     meta: {
@@ -2440,7 +2440,7 @@ async function Q(n, e, t) {
       description: ((T = t == null ? void 0 : t.meta) == null ? void 0 : T.description) || null
     },
     layout: c,
-    controls: d,
+    controls: p,
     commonSource: null,
     passes: {
       Image: {
@@ -2461,15 +2461,15 @@ async function we(n, e, t, r) {
   var x, w, R, i, a, u, l, h;
   let s = null;
   if (e.common) {
-    const p = `/demos/${n}/${e.common}`;
-    p in t && (s = await t[p]());
+    const d = `/demos/${n}/${e.common}`;
+    d in t && (s = await t[d]());
   } else {
-    const p = `/demos/${n}/common.glsl`;
-    p in t && (s = await t[p]());
+    const d = `/demos/${n}/common.glsl`;
+    d in t && (s = await t[d]());
   }
-  const c = /* @__PURE__ */ new Set(), d = ["Image", "BufferA", "BufferB", "BufferC", "BufferD"];
-  for (const p of d) {
-    const v = e.passes[p];
+  const c = /* @__PURE__ */ new Set(), p = ["Image", "BufferA", "BufferB", "BufferC", "BufferD"];
+  for (const d of p) {
+    const v = e.passes[d];
     if (v)
       for (const f of ["iChannel0", "iChannel1", "iChannel2", "iChannel3"]) {
         const F = (x = v.channels) == null ? void 0 : x[f];
@@ -2477,21 +2477,21 @@ async function we(n, e, t, r) {
       }
   }
   const o = [], m = /* @__PURE__ */ new Map();
-  for (const p of c) {
-    const v = `/demos/${n}/${p.replace(/^\.\//, "")}`;
+  for (const d of c) {
+    const v = `/demos/${n}/${d.replace(/^\.\//, "")}`;
     if (!(v in r))
-      throw new Error(`Texture not found: ${p} (expected at ${v})`);
-    const f = await r[v](), F = p.split("/").pop().replace(/\.[^.]+$/, "");
+      throw new Error(`Texture not found: ${d} (expected at ${v})`);
+    const f = await r[v](), F = d.split("/").pop().replace(/\.[^.]+$/, "");
     o.push({
       name: F,
       source: f,
       filter: "linear",
       wrap: "repeat"
-    }), m.set(p, F);
+    }), m.set(d, F);
   }
   const b = {};
-  for (const p of d) {
-    const v = e.passes[p];
+  for (const d of p) {
+    const v = e.passes[d];
     if (!v) continue;
     const f = {
       Image: "image.glsl",
@@ -2499,7 +2499,7 @@ async function we(n, e, t, r) {
       BufferB: "bufferB.glsl",
       BufferC: "bufferC.glsl",
       BufferD: "bufferD.glsl"
-    }, F = v.source || f[p], C = `/demos/${n}/${F}`;
+    }, F = v.source || f[d], C = `/demos/${n}/${F}`;
     if (!(C in t))
       throw new Error(`Missing shader file: ${C}`);
     const M = await t[C](), D = [
@@ -2508,15 +2508,15 @@ async function we(n, e, t, r) {
       z((i = v.channels) == null ? void 0 : i.iChannel2, m),
       z((a = v.channels) == null ? void 0 : a.iChannel3, m)
     ];
-    b[p] = {
-      name: p,
+    b[d] = {
+      name: d,
       glslSource: M,
       channels: D
     };
   }
   if (!b.Image)
     throw new Error(`Demo '${n}' must have an Image pass`);
-  const T = ((u = e.meta) == null ? void 0 : u.title) || n.split("-").map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join(" "), E = ((l = e.meta) == null ? void 0 : l.author) || null, _ = ((h = e.meta) == null ? void 0 : h.description) || null, y = e.layout || "tabbed", A = e.controls ?? !0;
+  const T = ((u = e.meta) == null ? void 0 : u.title) || n.split("-").map((d) => d.charAt(0).toUpperCase() + d.slice(1)).join(" "), E = ((l = e.meta) == null ? void 0 : l.author) || null, _ = ((h = e.meta) == null ? void 0 : h.description) || null, y = e.layout || "tabbed", A = e.controls ?? !0;
   return {
     root: `/demos/${n}`,
     meta: { title: T, author: E, description: _ },

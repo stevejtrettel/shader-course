@@ -78,6 +78,8 @@ As you drag the mouse, the parabola should reshape and the root indicators shoul
 ---
 
 
+
+
 ## Project: Grid Patterns
 
 This project introduces a powerful technique—dividing the plane into a grid of cells, each with its own local coordinate system. Master this pattern now; we'll use it again on Day 2 to create grids of Julia sets.
@@ -106,18 +108,18 @@ Why `4.0 * aspect`? Our coordinate system (after aspect correction) spans roughl
 Here's the complete pattern—three lines that we'll reuse throughout the course:
 
 ```glsl
-vec2 cell_id = floor(p / L);              // which cell (integers)
-vec2 cell_center = (cell_id + 0.5) * L;   // world position of cell center
+vec2 cell_id = floor(p / L + 0.5);        // which cell (round to nearest)
+vec2 cell_center = cell_id * L;           // world position of cell center
 vec2 local = p - cell_center;             // offset from center
 ```
 
 **How it works:**
 
-- `floor(p / L)` asks "how many whole cells from the origin?"—giving integer indices $(i, j)$
-- Cell $i$ spans from $iL$ to $(i+1)L$, so its center is at $(i + 0.5)L$
+- `floor(p / L + 0.5)` rounds to the nearest integer—giving the index of the closest cell center
+- Cell $(0, 0)$ is centered at the origin; cell $(i, j)$ is centered at $(iL, jL)$
 - Subtracting the center gives local coordinates in the range $[-L/2, L/2]$
 
-That's it. The geometry is transparent: find the cell, find its center, measure from there.
+That's it. The geometry is clean: cell centers fall at integer multiples of $L$, with the origin at the center of cell $(0,0)$.
 
 ### Drawing in Each Cell
 
@@ -181,8 +183,8 @@ float N = 5.0;                              // columns
 float L = (4.0 * aspect) / N;               // cell size
 
 // Per-pixel grid calculation
-vec2 cell_id = floor(p / L);                // integer cell index
-vec2 cell_center = (cell_id + 0.5) * L;     // center of this cell
+vec2 cell_id = floor(p / L + 0.5);          // integer cell index (nearest)
+vec2 cell_center = cell_id * L;             // center of this cell
 vec2 local = p - cell_center;               // offset from center, in [-L/2, L/2]
 vec2 uv = local / (L * 0.5);                // optional: normalize to [-1, 1]
 ```
@@ -202,7 +204,6 @@ Create a grid-based pattern you find visually compelling. Some directions to exp
 **Complex local drawings:** Use the normalized `uv` coordinates to draw something intricate in each cell—implicit curves, nested shapes, or patterns that vary with `cell_id`.
 
 The goal: produce an image you'd be happy to hang on a wall.
-
 
 
 

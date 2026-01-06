@@ -49,23 +49,13 @@ The minus sign in the real part comes from $i^2 = -1$.
 
 ### Magnitude
 
-The magnitude $|z| = \sqrt{a^2 + b^2}$ measures distance from the origin. We could compute it directly:
+The magnitude $|z| = \sqrt{a^2 + b^2}$ measures distance from the origin. GLSL provides a built-in `length()` function for this:
 
 ```glsl
-float cabs(vec2 z) {
-    return sqrt(z.x * z.x + z.y * z.y);
-}
+length(z)  // computes sqrt(z.x*z.x + z.y*z.y)
 ```
 
-But we'll often want to check conditions like "$|z| > 2$" rather than compute the actual magnitude. Since $|z| > 2$ is equivalent to $|z|^2 > 4$, we can avoid the square root:
-
-```glsl
-float cabs2(vec2 z) {
-    return dot(z, z);  // z.x² + z.y²
-}
-```
-
-The built-in `dot(z, z)` computes $a^2 + b^2$ efficiently. When you're doing this millions of times per frame, skipping unnecessary square roots matters.
+We'll use this to test conditions like $|z| > 2$.
 
 
 ## The Mandelbrot Set
@@ -97,37 +87,28 @@ vec2 cmul(vec2 z, vec2 w) {
     return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);
 }
 
-float cabs2(vec2 z) {
-    return dot(z, z);
+vec2 normalize_coord(vec2 fragCoord) {
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    return uv * 2.5;
 }
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    // Coordinate setup
-    vec2 uv = fragCoord / iResolution.xy;
-    uv = uv - vec2(0.5, 0.5);
-    uv.x *= iResolution.x / iResolution.y;
+    vec2 c = normalize_coord(fragCoord);
+    c.x = c.x - 0.5;  // shift left to center the interesting part
     
-    // Map to a region showing the Mandelbrot set
-    vec2 c = uv * 4.0;
-    c.x -= 0.5;  // shift left—the set isn't centered at the origin
+    vec3 color = vec3(0.0, 0.0, 0.0);
     
-    // Iterate
     vec2 z = vec2(0.0, 0.0);
-    int max_iter = 100;
-    int iter;
     
-    for (iter = 0; iter < max_iter; iter++) {
-        if (cabs2(z) > 4.0) break;  // |z|² > 4 means |z| > 2
+    for (int i = 0; i < 100; i++) {
+        if (length(z) > 2.0) {
+            color = vec3(1.0, 1.0, 1.0);
+            break;
+        }
         z = cmul(z, z) + c;
-    }
-    
-    // Color: black if we never escaped, white otherwise
-    vec3 color;
-    if (iter == max_iter) {
-        color = vec3(0.0, 0.0, 0.0);
-    } else {
-        color = vec3(1.0, 1.0, 1.0);
     }
     
     fragColor = vec4(color, 1.0);
@@ -136,7 +117,59 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
 {{< shader-demo day2/mandelbrot-bw >}}
 
-There's another fractal hiding in the same iteration.
+
+## Coloring Escape-Time Fractals
+
+Black and white shows the set, but we're throwing away information. The iteration count tells us *how quickly* a point escapes—points that escape after 5 iterations are different from points that escape after 50.
+
+### Grayscale
+
+Map the iteration count to brightness. To use the iteration count after the loop, declare it beforehand:
+
+```glsl
+vec3 color = vec3(0.0, 0.0, 0.0);
+
+vec2 z = vec2(0.0, 0.0);
+int i;
+for (i = 0; i < 100; i++) {
+    if (length(z) > 2.0) break;
+    z = cmul(z, z) + c;
+}
+
+if (i < 100) {
+    float t = float(i) / 100.0;
+    float gray = 1.0 - t;
+    color = vec3(gray, gray, gray);
+}
+```
+
+{{< shader-demo day2/mandelbrot-gray >}}
+
+Structure appears: tendrils, spirals, bulbs around the boundary. Points far from the Mandelbrot set escape quickly (white); points near the boundary take many iterations to escape (gray); points in the set never escape (black).
+
+### Color
+
+Grayscale reveals structure, but color can reveal more. We use a cosine palette (see Appendix: Color) to map iteration counts to smooth color gradients:
+
+```glsl
+vec3 palette(float t) {
+    vec3 a = vec3(0.5, 0.5, 0.5);
+    vec3 b = vec3(0.5, 0.5, 0.5);
+    vec3 c = vec3(1.0, 1.0, 1.0);
+    vec3 d = vec3(0.00, 0.33, 0.67);
+    return a + b * cos(6.28318 * (c * t + d));
+}
+
+// in mainImage, after the loop:
+if (i < 100) {
+    float t = float(i) / 100.0;
+    color = palette(t);
+}
+```
+
+{{< shader-demo day2/mandelbrot-color >}}
+
+The color bands correspond to iteration counts. There's another fractal hiding in the same iteration.
 
 
 ## Julia Sets
@@ -148,27 +181,22 @@ $$K_c = \{z_0 \in \mathbb{C} : \text{the orbit of } z_0 \text{ under } z \mapsto
 
 Same iteration, different question. For the Mandelbrot set, we vary $c$ and always start at $z_0 = 0$. For a Julia set, we fix $c$ and vary the starting point.
 
-The code change is minimal:
+The code change is minimal—just swap which variable comes from the pixel and which is fixed. The iteration and coloring logic stay the same:
 
 ```glsl
 // Mandelbrot: c comes from pixel position, z starts at 0
-vec2 c = p;
+vec2 c = normalize_coord(fragCoord);
+c.x = c.x - 0.5;
 vec2 z = vec2(0.0, 0.0);
 
 // Julia: c is fixed, z comes from pixel position
 vec2 c = vec2(-0.7, 0.27015);  // a fixed parameter
-vec2 z = p;
+vec2 z = normalize_coord(fragCoord);
 ```
 
 {{< shader-demo day2/julia-static >}}
 
-### Escape Radius for Julia Sets
-
-**Fact.** For the iteration $z \mapsto z^2 + c$, if $|z_n| > R$ where
-$$R = \frac{1 + \sqrt{1 + 4|c|}}{2}$$
-then the orbit escapes to infinity, so $z_0 \notin K_c$.
-
-This is the Julia set analog of the Mandelbrot escape facts—once outside this disk, you never come back. In practice, the simpler bound $R = \max(2, |c|)$ is also valid and easier to compute. Proving this is Exercise H5.
+The escape condition $|z| > 2$ still works for most Julia sets; the precise escape radius depends on $|c|$ (see Exercise H3).
 
 Different values of $c$ produce very different Julia sets. Some are connected (one piece), others are totally disconnected (Cantor dust). The relationship is governed by a precise theorem.
 
@@ -185,60 +213,6 @@ Points on the *boundary* of $\mathcal{M}$ give the most intricate Julia sets—n
 {{< shader-demo day2/julia-explorer >}}
 
 Drag from inside the Mandelbrot set to outside and watch the Julia set transform. Connected structures with complicated boundaries give way to scattered dust as you cross into the exterior.
-
-
-## Coloring Escape-Time Fractals
-
-Black and white shows the set, but we're throwing away information. The iteration count tells us *how quickly* a point escapes—points that escape after 5 iterations are different from points that escape after 50.
-
-### Grayscale
-
-Map the iteration count to brightness:
-
-```glsl
-vec3 color;
-if (iter == max_iter) {
-    color = vec3(0.0, 0.0, 0.0);  // in the set: black
-} else {
-    float t = float(iter) / float(max_iter);
-    color = vec3(t, t, t);  // escaped: brightness from iteration count
-}
-```
-
-{{< shader-demo day2/mandelbrot-gray >}}
-
-Structure appears: tendrils, spirals, bulbs around the boundary. Points near the boundary of the Mandelbrot set take many iterations to escape (bright); points far from the set escape quickly (dark).
-
-### Color
-
-Grayscale reveals structure, but color can reveal more. We use a cosine palette (see Appendix: Color) to map iteration counts to smooth color gradients:
-
-```glsl
-vec3 palette(float t) {
-    vec3 a = vec3(0.5, 0.5, 0.5);
-    vec3 b = vec3(0.5, 0.5, 0.5);
-    vec3 c = vec3(1.0, 1.0, 1.0);
-    vec3 d = vec3(0.00, 0.33, 0.67);
-    return a + b * cos(6.28318 * (c * t + d));
-}
-
-float t = float(iter) / float(max_iter);
-vec3 color = palette(t);
-```
-
-{{< shader-demo day2/mandelbrot-color >}}
-
-The color bands correspond to iteration counts.
-
-### The Pattern
-
-The Mandelbrot set and Julia sets share the same structure:
-
-1. **Iterate** a function $f(z, c)$
-2. **Check escape**: has $|z|$ exceeded some threshold?
-3. **Color** based on iteration count
-
-Changing the iteration function changes the fractal. The exercises include $z^3 + c$, the Burning Ship, and others.
 
 
 ## Circle Inversion
@@ -391,7 +365,8 @@ The gaps between circles are curvilinear triangles.
 If a point is inside one of the inner circles, invert it through that circle, pushing it out. If it's outside the outer circle, invert through the outer circle—pulling it in. Repeat until the point lands in a gap (inside the outer circle but outside all inner circles) or we hit a maximum iteration count.
 
 ```glsl
-for (iter = 0; iter < max_iter; iter++) {
+int i;
+for (i = 0; i < 50; i++) {
     if (isInside(p, c1)) {
         p = invert(p, c1);
     } else if (isInside(p, c2)) {
@@ -409,7 +384,7 @@ for (iter = 0; iter < max_iter; iter++) {
 Color by iteration count, just like escape-time fractals:
 
 ```glsl
-float t = float(iter) / float(max_iter);
+float t = float(i) / 50.0;
 vec3 color = palette(t);
 ```
 
@@ -457,10 +432,8 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     Circle outer = Circle(vec2(0.0, 0.0), circumradius + r);
     
     // Iterate inversions
-    int max_iter = 50;
-    int iter;
-    
-    for (iter = 0; iter < max_iter; iter++) {
+    int i;
+    for (i = 0; i < 50; i++) {
         if (isInside(p, c1)) {
             p = invert(p, c1);
         } else if (isInside(p, c2)) {
@@ -475,7 +448,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     }
     
     // Color by iteration count
-    float t = float(iter) / float(max_iter);
+    float t = float(i) / 50.0;
     vec3 color = palette(t);
     
     fragColor = vec4(color, 1.0);
@@ -489,8 +462,9 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 Points that land in a gap quickly are dark. Points near the fractal boundary, the **limit set**, take many iterations to settle and appear bright. We can emphasize the limit set with nonlinear coloring:
 
 ```glsl
-float t = float(iter) / float(max_iter);
-vec3 color = 30.0 * vec3(pow(t, 2.0));
+float t = float(i) / 100.0;
+float t2 = pow(t, 2.0);
+vec3 color = 30.0 * vec3(t2, t2, t2);
 ```
 
 The squaring suppresses low iteration counts while the factor of 30 boosts high ones:
@@ -512,7 +486,7 @@ This pattern—per-pixel iteration with no communication between pixels—is ide
 
 ### GLSL Skills
 
-- **Complex arithmetic**: Representing $\mathbb{C}$ as `vec2`, implementing `cmul` and `cabs2`
+- **Complex arithmetic**: Representing $\mathbb{C}$ as `vec2`, implementing `cmul`
 - **Structs**: Bundling related data (`Circle` with center and radius)
 - **Control flow**: `for` loops with early `break`, nested `if/else`
 - **Built-in functions**: `dot`, `length`, `mod`, `step`, `mix`

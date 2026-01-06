@@ -171,16 +171,19 @@ To see the improvement, zoom into a region of the boundary (say, near $c = -0.75
 
 **Project 1: Grid of Julia Sets**
 
-Create a grid where each cell shows the Julia set for a different parameter $c$. Use the grid system from Day 1:
+Create a grid where each cell shows the Julia set for a different parameter $c$. Use the grid formula from Day 1:
 
 ```glsl
-float L = 0.5;  // cell size in coordinate space
-vec2 cell_id = floor(p / L + 0.5);       // which cell (centered at origin)
-vec2 cell_center = cell_id * L;           // center of that cell
-vec2 cell_p = p - cell_center;            // position within cell, in [-L/2, L/2]
+// Grid setup
+float L = 0.5;                            // cell size
+
+// Grid formula
+vec2 cell_id = floor(p / L + 0.5);        // which cell (round to nearest)
+vec2 cell_center = cell_id * L;           // center of this cell
+vec2 local = p - cell_center;             // offset from center, in [-L/2, L/2]
 ```
 
-Map `cell_id` to a parameter $c$ in an interesting region of the complex plane (try the window $[-2, 0.5] \times [-1.25, 1.25]$). Use `cell_p` scaled to $[-2, 2]$ as the starting point $z$ for the Julia iteration.
+Map `cell_center` to a parameter $c$ in an interesting region of the complex plane (try the window $[-2, 0.5] \times [-1.25, 1.25]$). Use `local` scaled to $[-2, 2]$ as the starting point $z$ for the Julia iteration.
 
 Color the Julia sets dark on a light background (inverted from the usual convention). When you zoom out, the grid reveals the Mandelbrot set: cells with $c \in \mathcal{M}$ show connected Julia sets, cells with $c \notin \mathcal{M}$ show scattered dust. This is the Mandelbrot-Julia correspondence made visible.
 

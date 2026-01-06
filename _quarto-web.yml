@@ -27,6 +27,8 @@ website:
             href: lectures/day2/shaders.qmd
           - text: "Homework"
             href: lectures/day2/homework.qmd
+          - text: "Solutions"
+            href: lectures/day2/solutions.qmd
       - section: "Day 3: Tilings"
         contents:
           - text: "Notes"

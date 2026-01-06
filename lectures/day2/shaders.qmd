@@ -13,17 +13,12 @@ vec2 normalize_coord(vec2 fragCoord) {
     vec2 uv = fragCoord / iResolution.xy;
     uv = uv - vec2(0.5, 0.5);
     uv.x *= iResolution.x / iResolution.y;
-    return uv * 4.0;
+    return uv * 2.5;
 }
 
 // Complex multiplication: (a + bi)(c + di)
 vec2 cmul(vec2 z, vec2 w) {
     return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);
-}
-
-// Squared magnitude of complex number (avoids sqrt)
-float cabs2(vec2 z) {
-    return dot(z, z);
 }
 
 // Cosine palette for smooth coloring
@@ -46,10 +41,6 @@ vec2 cmul(vec2 z, vec2 w) {
     return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);
 }
 
-float cabs2(vec2 z) {
-    return dot(z, z);
-}
-
 vec3 palette(float t) {
     vec3 a = vec3(0.5, 0.5, 0.5);
     vec3 b = vec3(0.5, 0.5, 0.5);
@@ -63,36 +54,30 @@ vec2 normalize_coord(vec2 fragCoord) {
     uv = uv - vec2(0.5, 0.5);
     uv.x *= iResolution.x / iResolution.y;
     float zoom = pow(1.5, mod(iTime, 30.0));
-    return uv * 4.0 / zoom;
+    return uv * 2.5 / zoom;
 }
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    vec2 p = normalize_coord(fragCoord);
-    
     // Zoom into the seahorse valley
     vec2 center = vec2(-0.745, 0.186);
-    vec2 c = center + p;
+    vec2 c = center + normalize_coord(fragCoord);
+    
+    vec3 color = vec3(0.0, 0.0, 0.0);
     
     vec2 z = vec2(0.0, 0.0);
-    int max_iter = 200;
-    int iter;
-    
-    for (iter = 0; iter < max_iter; iter++) {
-        if (cabs2(z) > 4.0) break;
+    int i;
+    for (i = 0; i < 200; i++) {
+        if (length(z) > 2.0) {
+            // Smooth coloring
+            float log_zn = log(length(z) * length(z)) / 2.0;
+            float nu = log(log_zn / log(2.0)) / log(2.0);
+            float smooth_iter = float(i) + 1.0 - nu;
+            float t = smooth_iter / 200.0;
+            color = palette(t * 4.0);
+            break;
+        }
         z = cmul(z, z) + c;
-    }
-    
-    vec3 color;
-    if (iter == max_iter) {
-        color = vec3(0.0, 0.0, 0.0);
-    } else {
-        // Smooth coloring
-        float log_zn = log(cabs2(z)) / 2.0;
-        float nu = log(log_zn / log(2.0)) / log(2.0);
-        float smooth_iter = float(iter) + 1.0 - nu;
-        float t = smooth_iter / float(max_iter);
-        color = palette(t * 4.0);
     }
     
     fragColor = vec4(color, 1.0);
@@ -109,38 +94,28 @@ vec2 cmul(vec2 z, vec2 w) {
     return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);
 }
 
-float cabs2(vec2 z) {
-    return dot(z, z);
-}
-
 vec2 normalize_coord(vec2 fragCoord) {
     vec2 uv = fragCoord / iResolution.xy;
     uv = uv - vec2(0.5, 0.5);
     uv.x *= iResolution.x / iResolution.y;
-    return uv * 4.0;
+    return uv * 2.5;
 }
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    vec2 p = normalize_coord(fragCoord);
+    vec2 c = normalize_coord(fragCoord);
+    c.x = c.x - 0.5;  // shift left to center the interesting part
     
-    vec2 c = p;
-    c.x -= 0.5;  // shift left to center the interesting part
+    vec3 color = vec3(0.0, 0.0, 0.0);
     
     vec2 z = vec2(0.0, 0.0);
-    int max_iter = 100;
-    int iter;
     
-    for (iter = 0; iter < max_iter; iter++) {
-        if (cabs2(z) > 4.0) break;
+    for (int i = 0; i < 100; i++) {
+        if (length(z) > 2.0) {
+            color = vec3(1.0, 1.0, 1.0);
+            break;
+        }
         z = cmul(z, z) + c;
-    }
-    
-    vec3 color;
-    if (iter == max_iter) {
-        color = vec3(0.0, 0.0, 0.0);
-    } else {
-        color = vec3(1.0, 1.0, 1.0);
     }
     
     fragColor = vec4(color, 1.0);
@@ -157,39 +132,31 @@ vec2 cmul(vec2 z, vec2 w) {
     return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);
 }
 
-float cabs2(vec2 z) {
-    return dot(z, z);
-}
-
 vec2 normalize_coord(vec2 fragCoord) {
     vec2 uv = fragCoord / iResolution.xy;
     uv = uv - vec2(0.5, 0.5);
     uv.x *= iResolution.x / iResolution.y;
-    return uv * 4.0;
+    return uv * 2.5;
 }
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    vec2 p = normalize_coord(fragCoord);
+    vec2 c = normalize_coord(fragCoord);
+    c.x = c.x - 0.5;
     
-    vec2 c = p;
-    c.x -= 0.5;
+    vec3 color = vec3(0.0, 0.0, 0.0);
     
     vec2 z = vec2(0.0, 0.0);
-    int max_iter = 100;
-    int iter;
-    
-    for (iter = 0; iter < max_iter; iter++) {
-        if (cabs2(z) > 4.0) break;
+    int i;
+    for (i = 0; i < 100; i++) {
+        if (length(z) > 2.0) break;
         z = cmul(z, z) + c;
     }
     
-    vec3 color;
-    if (iter == max_iter) {
-        color = vec3(0.0, 0.0, 0.0);
-    } else {
-        float t = float(iter) / float(max_iter);
-        color = vec3(t, t, t);
+    if (i < 100) {
+        float t = float(i) / 100.0;
+        float gray = 1.0 - t;
+        color = vec3(gray, gray, gray);
     }
     
     fragColor = vec4(color, 1.0);
@@ -206,10 +173,6 @@ vec2 cmul(vec2 z, vec2 w) {
     return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);
 }
 
-float cabs2(vec2 z) {
-    return dot(z, z);
-}
-
 vec3 palette(float t) {
     vec3 a = vec3(0.5, 0.5, 0.5);
     vec3 b = vec3(0.5, 0.5, 0.5);
@@ -222,30 +185,25 @@ vec2 normalize_coord(vec2 fragCoord) {
     vec2 uv = fragCoord / iResolution.xy;
     uv = uv - vec2(0.5, 0.5);
     uv.x *= iResolution.x / iResolution.y;
-    return uv * 4.0;
+    return uv * 2.5;
 }
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    vec2 p = normalize_coord(fragCoord);
+    vec2 c = normalize_coord(fragCoord);
+    c.x = c.x - 0.5;
     
-    vec2 c = p;
-    c.x -= 0.5;
+    vec3 color = vec3(0.0, 0.0, 0.0);
     
     vec2 z = vec2(0.0, 0.0);
-    int max_iter = 100;
-    int iter;
-    
-    for (iter = 0; iter < max_iter; iter++) {
-        if (cabs2(z) > 4.0) break;
+    int i;
+    for (i = 0; i < 100; i++) {
+        if (length(z) > 2.0) break;
         z = cmul(z, z) + c;
     }
     
-    vec3 color;
-    if (iter == max_iter) {
-        color = vec3(0.0, 0.0, 0.0);
-    } else {
-        float t = float(iter) / float(max_iter);
+    if (i < 100) {
+        float t = float(i) / 100.0;
         color = palette(t);
     }
     
@@ -263,40 +221,33 @@ vec2 cmul(vec2 z, vec2 w) {
     return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);
 }
 
-float cabs2(vec2 z) {
-    return dot(z, z);
-}
-
 vec2 normalize_coord(vec2 fragCoord) {
     vec2 uv = fragCoord / iResolution.xy;
     uv = uv - vec2(0.5, 0.5);
     uv.x *= iResolution.x / iResolution.y;
-    return uv * 4.0;
+    return uv * 2.5;
 }
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    vec2 p = normalize_coord(fragCoord);
-    
     // Fixed parameter
     vec2 c = vec2(-0.7, 0.27015);
     
     // z starts at pixel position
-    vec2 z = p;
+    vec2 z = normalize_coord(fragCoord);
     
-    int max_iter = 100;
-    int iter;
+    vec3 color = vec3(0.0, 0.0, 0.0);
     
-    for (iter = 0; iter < max_iter; iter++) {
-        if (cabs2(z) > 4.0) break;
+    int i;
+    for (i = 0; i < 100; i++) {
+        if (length(z) > 2.0) break;
         z = cmul(z, z) + c;
     }
     
-    vec3 color;
-    if (iter == max_iter) {
-        color = vec3(0.0, 0.0, 0.0);
-    } else {
-        color = vec3(1.0, 1.0, 1.0);
+    if (i < 100) {
+        float t = float(i) / 100.0;
+        float gray = 1.0 - t;
+        color = vec3(gray, gray, gray);
     }
     
     fragColor = vec4(color, 1.0);
@@ -313,15 +264,11 @@ vec2 cmul(vec2 z, vec2 w) {
     return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);
 }
 
-float cabs2(vec2 z) {
-    return dot(z, z);
-}
-
 vec2 normalize_coord(vec2 fragCoord) {
     vec2 uv = fragCoord / iResolution.xy;
     uv = uv - vec2(0.5, 0.5);
     uv.x *= iResolution.x / iResolution.y;
-    return uv * 4.0;
+    return uv * 2.5;
 }
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
@@ -330,7 +277,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     
     // Get c from mouse position
     vec2 c = normalize_coord(iMouse.xy);
-    c.x -= 0.5;
+    c.x = c.x - 0.5;
     
     // Default to interesting value if no mouse
     if (iMouse.x < 1.0) {
@@ -339,34 +286,44 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     
     // Mandelbrot iteration (for background)
     vec2 mc = p;
-    mc.x -= 0.5;
+    mc.x = mc.x - 0.5;
     vec2 mz = vec2(0.0, 0.0);
-    int m_iter;
-    for (m_iter = 0; m_iter < 100; m_iter++) {
-        if (cabs2(mz) > 4.0) break;
+    int m_i;
+    for (m_i = 0; m_i < 100; m_i++) {
+        if (length(mz) > 2.0) break;
         mz = cmul(mz, mz) + mc;
     }
     
     // Julia iteration (for foreground)
     vec2 jz = p;
-    int j_iter;
-    for (j_iter = 0; j_iter < 100; j_iter++) {
-        if (cabs2(jz) > 4.0) break;
+    int j_i;
+    for (j_i = 0; j_i < 100; j_i++) {
+        if (length(jz) > 2.0) break;
         jz = cmul(jz, jz) + c;
     }
     
-    // Color: light background, Mandelbrot in gray, Julia in black
-    vec3 color = vec3(0.9, 0.9, 0.9);
-    if (m_iter == 100) {
-        color = vec3(0.6, 0.6, 0.6);
+    // Mandelbrot grayscale (faded to serve as background)
+    vec3 color = vec3(1.0, 1.0, 1.0);
+    if (m_i < 100) {
+        float t = float(m_i) / 100.0;
+        float gray = 0.6 + 0.4 * (1.0 - t);  // range [0.6, 1.0]
+        color = vec3(gray, gray, gray);
+    } else {
+        color = vec3(0.5, 0.5, 0.5);  // Mandelbrot interior
     }
-    if (j_iter == 100) {
-        color = vec3(0.0, 0.0, 0.0);
+    
+    // Julia grayscale (overlaid)
+    if (j_i < 100) {
+        float t = float(j_i) / 100.0;
+        float gray = 1.0 - t;
+        color = vec3(gray, gray, gray);
+    } else {
+        color = vec3(0.0, 0.0, 0.0);  // Julia interior
     }
     
     // Draw red dot at c position
     vec2 c_pos = c;
-    c_pos.x += 0.5;
+    c_pos.x = c_pos.x + 0.5;
     if (length(p - c_pos) < 0.05) {
         color = vec3(1.0, 0.0, 0.0);
     }
@@ -617,10 +574,8 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     Circle c3 = Circle(vec2(circumradius * sqrt(3.0)/2.0, -circumradius * 0.5), r);
     Circle outer = Circle(vec2(0.0, 0.0), circumradius + r);
     
-    int max_iter = 50;
-    int iter;
-    
-    for (iter = 0; iter < max_iter; iter++) {
+    int i;
+    for (i = 0; i < 50; i++) {
         if (isInside(p, c1)) {
             p = invert(p, c1);
         } else if (isInside(p, c2)) {
@@ -634,7 +589,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
         }
     }
     
-    float t = float(iter) / float(max_iter);
+    float t = float(i) / 50.0;
     vec3 color = palette(t);
     
     float dMin = min(min(distToCircle(p, c1), distToCircle(p, c2)), 
@@ -685,10 +640,8 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     Circle c3 = Circle(vec2(circumradius * sqrt(3.0)/2.0, -circumradius * 0.5), r);
     Circle outer = Circle(vec2(0.0, 0.0), circumradius + r);
     
-    int max_iter = 100;
-    int iter;
-    
-    for (iter = 0; iter < max_iter; iter++) {
+    int i;
+    for (i = 0; i < 100; i++) {
         if (isInside(p, c1)) {
             p = invert(p, c1);
         } else if (isInside(p, c2)) {
@@ -702,8 +655,9 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
         }
     }
     
-    float t = float(iter) / float(max_iter);
-    vec3 color = 30.0 * vec3(pow(t, 2.0));
+    float t = float(i) / 100.0;
+    float t2 = pow(t, 2.0);
+    vec3 color = 30.0 * vec3(t2, t2, t2);
     
     fragColor = vec4(color, 1.0);
 }

@@ -972,8 +972,8 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     float L = (4.0 * aspect) / N;
     
     // Grid formula
-    vec2 cell_id = floor(p / L);
-    vec2 cell_center = (cell_id + 0.5) * L;
+    vec2 cell_id = floor(p / L + 0.5);
+    vec2 cell_center = cell_id * L;
     vec2 local = p - cell_center;
     
     // Pseudo-random per cell (determines arc orientation)
@@ -1015,7 +1015,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 }
 ```
 
-**Teaching note:** This creates the classic Truchet tile pattern where quarter-circle arcs connect across cell boundaries to form continuous meandering paths. The pseudo-random function determines each cell's orientation.
+**Teaching note:** This creates the classic Truchet tile pattern where quarter-circle arcs connect across cell boundaries to form continuous meandering paths. The pseudo-random function determines each cell's orientation. Notice how naming the corner positions (`TL`, `TR`, `BL`, `BR`) makes the geometry self-documenting.
 
 ---
 
