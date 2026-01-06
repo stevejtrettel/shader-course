@@ -238,17 +238,28 @@ float neighbors = north + south + east + west + ne + nw + se + sw;
 With the neighbor count in hand, we apply Conway's rules:
 
 ```glsl
-float alive;
-if (self > 0.5) {
-    // Currently alive: survive with 2 or 3 neighbors
-    alive = (neighbors > 1.5 && neighbors < 3.5) ? 1.0 : 0.0;
+float alive = 0.0;
+
+if (self == 1.0) {
+    // Live cell survives with 2 or 3 neighbors
+    if (neighbors == 2.0 || neighbors == 3.0) {
+        alive = 1.0;
+    }
 } else {
-    // Currently dead: birth with exactly 3 neighbors
-    alive = (neighbors > 2.5 && neighbors < 3.5) ? 1.0 : 0.0;
+    // Dead cell becomes alive with exactly 3 neighbors
+    if (neighbors == 3.0) {
+        alive = 1.0;
+    }
 }
 ```
 
-Why `> 0.5` instead of `== 1.0`? Floating-point comparisons can be tricky, and thresholding at 0.5 is more robust. Similarly, `> 1.5 && < 3.5` checks for 2 or 3 neighbors without exact equality tests.
+Since each cell stores exactly `0.0` or `1.0`, the neighbor sum is always exactly `0.0`, `1.0`, `2.0`, etc. Small integers are represented exactly in floating point, so direct comparison works perfectly here.
+
+::: {.callout-note}
+## When Can You Compare Floats for Equality?
+
+You may have heard "never compare floats for equality." That's good advice when dealing with *computed* values that might accumulate rounding errors. But here we control the data — cells are always set to exactly `1.0` or `0.0`, never something like `0.9999`. When you're comparing values you explicitly stored, equality is safe.
+:::
 
 ### Initialization
 
@@ -355,11 +366,18 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
         texelFetch(iChannel0, p + ivec2( 1,  1), 0).r;
     
     // Apply Conway's rules
-    float alive;
-    if (self > 0.5) {
-        alive = (neighbors > 1.5 && neighbors < 3.5) ? 1.0 : 0.0;
+    float alive = 0.0;
+    
+    if (self == 1.0) {
+        // Live cell survives with 2 or 3 neighbors
+        if (neighbors == 2.0 || neighbors == 3.0) {
+            alive = 1.0;
+        }
     } else {
-        alive = (neighbors > 2.5 && neighbors < 3.5) ? 1.0 : 0.0;
+        // Dead cell becomes alive with exactly 3 neighbors
+        if (neighbors == 3.0) {
+            alive = 1.0;
+        }
     }
     
     fragColor = vec4(alive, alive, alive, 1.0);
@@ -416,6 +434,8 @@ This is the **simulation loop pattern**, and we'll use it for every simulation i
 4. **Write** the new state
 
 The heat equation and wave equation will follow exactly this structure. Only the update rule changes — everything else stays the same.
+
+
 
 
 ## The Heat Equation

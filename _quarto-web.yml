@@ -27,14 +27,14 @@ website:
             href: lectures/day2/shaders.qmd
           - text: "Homework"
             href: lectures/day2/homework.qmd
-          # - text: "Solutions"
-          #   href: lectures/day2/solutions.qmd
       - section: "Day 3: Tilings"
         contents:
           - text: "Notes"
             href: lectures/day3/notes.qmd
           - text: "Code"
             href: lectures/day3/shaders.qmd
+          - text: "Homework"
+            href: lectures/day3/homework.qmd
       - section: "Day 4: Simulations"
         contents:
           - text: "Notes"

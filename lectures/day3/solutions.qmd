@@ -1,22 +1,444 @@
-# Day 3: Exercise Solutions
-
-Complete shader solutions for the Day 3 exercises.
-
----
+# Day 3: Hyperbolic Tilings — Solutions
 
 ## Checkpoints
 
-### C1. Hyperbolic Circles
+### C1. Custom Palette
 
-Draw hyperbolic circles of radius 0.1 and 0.5 around the mouse position.
+Simply change the color constants at the top of any tiling shader:
 
 ```glsl
+// High contrast option
+const vec3 CREAM = vec3(1.0, 1.0, 1.0);
+const vec3 SLATE = vec3(0.0, 0.0, 0.0);
+
+// Complementary colors
+const vec3 CREAM = vec3(1.0, 0.6, 0.2);  // orange
+const vec3 SLATE = vec3(0.2, 0.4, 1.0);  // blue
+
+// Low contrast, earthy
+const vec3 CREAM = vec3(0.76, 0.70, 0.62);
+const vec3 SLATE = vec3(0.55, 0.52, 0.48);
+
+// Neon
+const vec3 CREAM = vec3(0.0, 1.0, 0.8);  // cyan
+const vec3 SLATE = vec3(1.0, 0.0, 0.5);  // magenta
+```
+
+---
+
+### C2. Growing Tiling
+
+```glsl
+// Color palette
+const vec3 CREAM = vec3(0.85, 0.8, 0.75);
+const vec3 SLATE = vec3(0.35, 0.4, 0.45);
+const vec3 BLACK = vec3(0.05, 0.05, 0.05);
+
+struct HalfSpaceVert {
+    float x;
+    float side;
+};
+
+struct HalfSpaceCirc {
+    float center;
+    float radius;
+    float side;
+};
+
+vec2 reflectInto(vec2 z, HalfSpaceVert h, inout int count) {
+    if ((z.x - h.x) * h.side < 0.0) return z;
+    z.x = 2.0 * h.x - z.x;
+    count++;
+    return z;
+}
+
+vec2 reflectInto(vec2 z, HalfSpaceCirc h, inout int count) {
+    vec2 rel = z - vec2(h.center, 0.0);
+    float dist2 = dot(rel, rel);
+    
+    if ((dist2 - h.radius * h.radius) * h.side > 0.0) return z;
+    
+    z.x -= h.center;
+    z = z / h.radius;
+    z = z / dot(z, z);
+    z = z * h.radius;
+    z.x += h.center;
+    count++;
+    return z;
+}
+
+vec2 cmul(vec2 a, vec2 b) {
+    return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);
+}
+
+vec2 cdiv(vec2 a, vec2 b) {
+    float denom = dot(b, b);
+    return vec2(a.x * b.x + a.y * b.y, a.y * b.x - a.x * b.y) / denom;
+}
+
+vec2 diskToUHP(vec2 w) {
+    vec2 i = vec2(0.0, 1.0);
+    vec2 one = vec2(1.0, 0.0);
+    return cmul(i, cdiv(one + w, one - w));
+}
+
+vec2 normalize_coord(vec2 fragCoord) {
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    return uv * 2.5;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 w = normalize_coord(fragCoord);
+    vec2 z = diskToUHP(w);
+    
+    HalfSpaceVert left = HalfSpaceVert(0.0, -1.0);
+    HalfSpaceVert right = HalfSpaceVert(0.5, 1.0);
+    HalfSpaceCirc bottom = HalfSpaceCirc(0.0, 1.0, 1.0);
+    
+    // Animated iteration limit
+    int max_iter = int(mod(iTime * 10.0, 100.0)) + 1;
+    
+    int foldCount = 0;
+    for (int i = 0; i < 100; i++) {
+        if (i >= max_iter) break;
+        vec2 z0 = z;
+        z = reflectInto(z, left, foldCount);
+        z = reflectInto(z, right, foldCount);
+        z = reflectInto(z, bottom, foldCount);
+        if (length(z - z0) < 0.0001) break;
+    }
+    
+    float parity = mod(float(foldCount), 2.0);
+    vec3 color = (parity < 0.5) ? CREAM : SLATE;
+    
+    if (length(w) > 1.0) {
+        color = BLACK;
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+### C3. The (2,4,5) Triangle
+
+```glsl
+// Color palette
+const vec3 CREAM = vec3(0.85, 0.8, 0.75);
+const vec3 SLATE = vec3(0.35, 0.4, 0.45);
+const vec3 BLACK = vec3(0.05, 0.05, 0.05);
+
+struct HalfSpaceVert {
+    float x;
+    float side;
+};
+
+struct HalfSpaceCirc {
+    float center;
+    float radius;
+    float side;
+};
+
+vec2 reflectInto(vec2 z, HalfSpaceVert h, inout int count) {
+    if ((z.x - h.x) * h.side < 0.0) return z;
+    z.x = 2.0 * h.x - z.x;
+    count++;
+    return z;
+}
+
+vec2 reflectInto(vec2 z, HalfSpaceCirc h, inout int count) {
+    vec2 rel = z - vec2(h.center, 0.0);
+    float dist2 = dot(rel, rel);
+    
+    if ((dist2 - h.radius * h.radius) * h.side > 0.0) return z;
+    
+    z.x -= h.center;
+    z = z / h.radius;
+    z = z / dot(z, z);
+    z = z * h.radius;
+    z.x += h.center;
+    count++;
+    return z;
+}
+
+vec2 cmul(vec2 a, vec2 b) {
+    return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);
+}
+
+vec2 cdiv(vec2 a, vec2 b) {
+    float denom = dot(b, b);
+    return vec2(a.x * b.x + a.y * b.y, a.y * b.x - a.x * b.y) / denom;
+}
+
+vec2 diskToUHP(vec2 w) {
+    vec2 i = vec2(0.0, 1.0);
+    vec2 one = vec2(1.0, 0.0);
+    return cmul(i, cdiv(one + w, one - w));
+}
+
+vec2 normalize_coord(vec2 fragCoord) {
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    return uv * 2.5;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 w = normalize_coord(fragCoord);
+    vec2 z = diskToUHP(w);
+    
+    // The (2,4,5) triangle
+    HalfSpaceVert left = HalfSpaceVert(0.0, -1.0);           // x > 0
+    HalfSpaceCirc bottom = HalfSpaceCirc(0.0, 1.0, 1.0);     // outside unit circle
+    HalfSpaceCirc third = HalfSpaceCirc(-1.70, 2.40, -1.0);  // inside this circle
+    
+    int foldCount = 0;
+    for (int i = 0; i < 100; i++) {
+        vec2 z0 = z;
+        z = reflectInto(z, left, foldCount);
+        z = reflectInto(z, bottom, foldCount);
+        z = reflectInto(z, third, foldCount);
+        if (length(z - z0) < 0.0001) break;
+    }
+    
+    float parity = mod(float(foldCount), 2.0);
+    vec3 color = (parity < 0.5) ? CREAM : SLATE;
+    
+    if (length(w) > 1.0) {
+        color = BLACK;
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+The (2,4,5) tiling has larger triangles than (2,3,7) because the angle sum is closer to π. Fewer triangles fit around each vertex.
+
+---
+
+### C4. F Markers in (2,3,7)
+
+```glsl
+// Color palette
+const vec3 CREAM = vec3(0.85, 0.8, 0.75);
+const vec3 SLATE = vec3(0.35, 0.4, 0.45);
+const vec3 MAROON = vec3(0.6, 0.2, 0.2);
+const vec3 NAVY = vec3(0.2, 0.2, 0.6);
+const vec3 BLACK = vec3(0.05, 0.05, 0.05);
+
+struct HalfSpaceVert {
+    float x;
+    float side;
+};
+
+struct HalfSpaceCirc {
+    float center;
+    float radius;
+    float side;
+};
+
+vec2 reflectInto(vec2 z, HalfSpaceVert h, inout int count) {
+    if ((z.x - h.x) * h.side < 0.0) return z;
+    z.x = 2.0 * h.x - z.x;
+    count++;
+    return z;
+}
+
+vec2 reflectInto(vec2 z, HalfSpaceCirc h, inout int count) {
+    vec2 rel = z - vec2(h.center, 0.0);
+    float dist2 = dot(rel, rel);
+    
+    if ((dist2 - h.radius * h.radius) * h.side > 0.0) return z;
+    
+    z.x -= h.center;
+    z = z / h.radius;
+    z = z / dot(z, z);
+    z = z * h.radius;
+    z.x += h.center;
+    count++;
+    return z;
+}
+
+vec2 cmul(vec2 a, vec2 b) {
+    return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);
+}
+
+vec2 cdiv(vec2 a, vec2 b) {
+    float denom = dot(b, b);
+    return vec2(a.x * b.x + a.y * b.y, a.y * b.x - a.x * b.y) / denom;
+}
+
+vec2 diskToUHP(vec2 w) {
+    vec2 i = vec2(0.0, 1.0);
+    vec2 one = vec2(1.0, 0.0);
+    return cmul(i, cdiv(one + w, one - w));
+}
+
+vec3 drawF(vec2 p, vec3 bgColor, vec3 fgColor) {
+    vec3 color = bgColor;
+    // Small F for the (2,3,7) fundamental domain
+    if (p.x > -0.04 && p.x < -0.01 && p.y > -0.06 && p.y < 0.06) color = fgColor;
+    if (p.x > -0.04 && p.x < 0.04 && p.y > 0.03 && p.y < 0.06) color = fgColor;
+    if (p.x > -0.04 && p.x < 0.02 && p.y > -0.01 && p.y < 0.02) color = fgColor;
+    return color;
+}
+
+vec2 normalize_coord(vec2 fragCoord) {
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    return uv * 2.5;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 w = normalize_coord(fragCoord);
+    vec2 z = diskToUHP(w);
+    
+    // The (2,3,7) triangle
+    HalfSpaceVert left = HalfSpaceVert(0.0, -1.0);
+    HalfSpaceCirc bottom = HalfSpaceCirc(0.0, 1.0, 1.0);
+    HalfSpaceCirc third = HalfSpaceCirc(-0.7665, 1.533, -1.0);
+    
+    int foldCount = 0;
+    for (int i = 0; i < 100; i++) {
+        vec2 z0 = z;
+        z = reflectInto(z, left, foldCount);
+        z = reflectInto(z, bottom, foldCount);
+        z = reflectInto(z, third, foldCount);
+        if (length(z - z0) < 0.0001) break;
+    }
+    
+    float parity = mod(float(foldCount), 2.0);
+    vec3 bg = (parity < 0.5) ? CREAM : SLATE;
+    vec3 fg = (parity < 0.5) ? MAROON : NAVY;
+    
+    // Position F in the fundamental domain
+    vec3 color = drawF(z - vec2(0.15, 1.15), bg, fg);
+    
+    if (length(w) > 1.0) {
+        color = BLACK;
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+### C5. Rainbow Tiling
+
+```glsl
+const vec3 BLACK = vec3(0.05, 0.05, 0.05);
+
+struct HalfSpaceVert {
+    float x;
+    float side;
+};
+
+struct HalfSpaceCirc {
+    float center;
+    float radius;
+    float side;
+};
+
+vec2 reflectInto(vec2 z, HalfSpaceVert h, inout int count) {
+    if ((z.x - h.x) * h.side < 0.0) return z;
+    z.x = 2.0 * h.x - z.x;
+    count++;
+    return z;
+}
+
+vec2 reflectInto(vec2 z, HalfSpaceCirc h, inout int count) {
+    vec2 rel = z - vec2(h.center, 0.0);
+    float dist2 = dot(rel, rel);
+    
+    if ((dist2 - h.radius * h.radius) * h.side > 0.0) return z;
+    
+    z.x -= h.center;
+    z = z / h.radius;
+    z = z / dot(z, z);
+    z = z * h.radius;
+    z.x += h.center;
+    count++;
+    return z;
+}
+
+vec2 cmul(vec2 a, vec2 b) {
+    return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);
+}
+
+vec2 cdiv(vec2 a, vec2 b) {
+    float denom = dot(b, b);
+    return vec2(a.x * b.x + a.y * b.y, a.y * b.x - a.x * b.y) / denom;
+}
+
+vec2 diskToUHP(vec2 w) {
+    vec2 i = vec2(0.0, 1.0);
+    vec2 one = vec2(1.0, 0.0);
+    return cmul(i, cdiv(one + w, one - w));
+}
+
+vec2 normalize_coord(vec2 fragCoord) {
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    return uv * 2.5;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 w = normalize_coord(fragCoord);
+    vec2 z = diskToUHP(w);
+    
+    HalfSpaceVert left = HalfSpaceVert(0.0, -1.0);
+    HalfSpaceVert right = HalfSpaceVert(0.5, 1.0);
+    HalfSpaceCirc bottom = HalfSpaceCirc(0.0, 1.0, 1.0);
+    
+    int foldCount = 0;
+    for (int i = 0; i < 100; i++) {
+        vec2 z0 = z;
+        z = reflectInto(z, left, foldCount);
+        z = reflectInto(z, right, foldCount);
+        z = reflectInto(z, bottom, foldCount);
+        if (length(z - z0) < 0.0001) break;
+    }
+    
+    // Rainbow coloring by fold count
+    float t = float(foldCount) / 20.0;
+    vec3 color = 0.5 + 0.5 * cos(6.28318 * (t + vec3(0.0, 0.33, 0.67)));
+    
+    if (length(w) > 1.0) {
+        color = BLACK;
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+Rainbow coloring reveals the "layers" of the tiling—tiles that require the same number of reflections to reach have the same color. You can see concentric rings of color radiating from the fundamental domain.
+
+---
+
+## Explorations
+
+### E1. Hyperbolic Circles
+
+```glsl
+float acosh(float x) {
+    return log(x + sqrt(x * x - 1.0));
+}
+
 float hypDist(vec2 z1, vec2 z2) {
     vec2 diff = z1 - z2;
     float num = dot(diff, diff);
     float denom = 2.0 * z1.y * z2.y;
-    float arg = 1.0 + num / denom;
-    return log(arg + sqrt(arg * arg - 1.0));  // acosh
+    return acosh(1.0 + num / denom);
 }
 
 vec2 normalize_coord(vec2 fragCoord) {
@@ -29,38 +451,42 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
     vec2 z = normalize_coord(fragCoord);
     
-    // Get mouse position in same coordinates
-    vec2 center = normalize_coord(iMouse.xy);
+    // Mouse position as center (mapped to upper half-plane)
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    mouse.y *= iResolution.y / iResolution.x;
+    mouse = mouse * 4.0;
     
-    // Default center when not clicking
-    if (iMouse.z < 0.5) {
-        center = vec2(2.0, 2.0);
+    // Default center if no mouse input
+    if (iMouse.x < 1.0) {
+        mouse = vec2(1.0, 1.0);
     }
     
-    // Hyperbolic distance from center
-    float d = hypDist(z, center);
+    // Ensure center is in upper half-plane
+    mouse.y = max(mouse.y, 0.1);
     
-    // Background
     vec3 color = vec3(0.1, 0.1, 0.15);
     
-    // Draw circle at radius 0.1
-    if (abs(d - 0.1) < 0.02) {
-        color = vec3(0.3, 0.7, 0.9);
+    // Only compute for upper half-plane
+    if (z.y > 0.0) {
+        float d = hypDist(z, mouse);
+        
+        // Draw circles at hyperbolic radii 0.5 and 1.0
+        if (abs(d - 0.5) < 0.02) {
+            color = vec3(1.0, 0.8, 0.3);
+        }
+        if (abs(d - 1.0) < 0.02) {
+            color = vec3(0.3, 0.8, 1.0);
+        }
+        
+        // Mark center
+        if (length(z - mouse) < 0.05) {
+            color = vec3(1.0, 0.3, 0.3);
+        }
     }
     
-    // Draw circle at radius 0.5
-    if (abs(d - 0.5) < 0.02) {
-        color = vec3(0.9, 0.5, 0.3);
-    }
-    
-    // Mark center
-    if (length(z - center) < 0.03) {
-        color = vec3(1.0, 1.0, 1.0);
-    }
-    
-    // Darken below real axis
-    if (z.y < 0.01) {
-        color = vec3(0.05);
+    // Draw real axis
+    if (z.y < 0.02) {
+        color = vec3(0.2, 0.2, 0.2);
     }
     
     fragColor = vec4(color, 1.0);
@@ -69,177 +495,84 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
 ---
 
-### C2. Edges of the (2,3,∞) Tiling
-
-Add edge drawing using hyperbolic distance to geodesics.
+### E2. Dragging a Hyperbolic Ball
 
 ```glsl
-struct HalfSpaceVert {
-    float x;
-    float side;
-};
-
-struct HalfSpaceCirc {
-    float center;
-    float radius;
-    float side;
-};
-
-vec2 cdiv(vec2 a, vec2 b) {
-    float denom = dot(b, b);
-    return vec2(a.x * b.x + a.y * b.y, a.y * b.x - a.x * b.y) / denom;
-}
-
-vec2 reflectInto(vec2 z, HalfSpaceVert h, inout int count) {
-    float val = z.x - h.x;
-    if (val * h.side < 0.0) return z;
-    z.x = 2.0 * h.x - z.x;
-    count++;
-    return z;
-}
-
-vec2 reflectInto(vec2 z, HalfSpaceCirc h, inout int count) {
-    vec2 rel = z - vec2(h.center, 0.0);
-    float dist2 = dot(rel, rel);
-    
-    if ((dist2 - h.radius * h.radius) * h.side > 0.0) return z;
-    
-    z.x -= h.center;
-    z /= h.radius;
-    z /= dot(z, z);
-    z *= h.radius;
-    z.x += h.center;
-    
-    count++;
-    return z;
-}
-
-float distToGeodesic(vec2 z, HalfSpaceVert h) {
-    z.x -= h.x;
-    return acosh(length(z) / z.y);
-}
-
-float distToGeodesic(vec2 z, HalfSpaceCirc h) {
-    vec2 num = z - vec2(h.center + h.radius, 0.0);
-    vec2 denom = z - vec2(h.center - h.radius, 0.0);
-    vec2 w = cdiv(num, denom);
-    return acosh(length(w) / w.y);
-}
-
-vec2 normalize_coord(vec2 fragCoord) {
-    vec2 uv = fragCoord / iResolution.xy;
-    uv.y *= iResolution.y / iResolution.x;
-    return uv * 4.0 - vec2(0.75, 0.0);
-}
-
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    vec2 z = normalize_coord(fragCoord);
-    vec2 z_orig = z;
-    
-    HalfSpaceVert left = HalfSpaceVert(0.0, -1.0);
-    HalfSpaceVert right = HalfSpaceVert(0.5, 1.0);
-    HalfSpaceCirc bottom = HalfSpaceCirc(0.0, 1.0, 1.0);
-    
-    int foldCount = 0;
-    for (int i = 0; i < 100; i++) {
-        vec2 z0 = z;
-        z = reflectInto(z, left, foldCount);
-        z = reflectInto(z, right, foldCount);
-        z = reflectInto(z, bottom, foldCount);
-        if (length(z - z0) < 0.0001) break;
-    }
-    
-    float parity = mod(float(foldCount), 2.0);
-    vec3 color = (parity < 0.5) ? vec3(0.85, 0.8, 0.75) : vec3(0.35, 0.4, 0.45);
-    
-    // Draw edges using hyperbolic distance
-    float edgeThickness = 0.03;
-    float d1 = distToGeodesic(z, left);
-    float d2 = distToGeodesic(z, right);
-    float d3 = distToGeodesic(z, bottom);
-    
-    if (d1 < edgeThickness || d2 < edgeThickness || d3 < edgeThickness) {
-        color = vec3(1.0);
-    }
-    
-    if (z_orig.y < 0.01) color = vec3(0.15);
-    
-    fragColor = vec4(color, 1.0);
-}
-```
-
----
-
-## Explorations
-
-### E1. Vertices and Edges in Both Models
-
-Drawing vertices and edges, in both UHP and Poincaré disk.
-
-```glsl
-struct HalfSpaceVert {
-    float x;
-    float side;
-};
-
-struct HalfSpaceCirc {
-    float center;
-    float radius;
-    float side;
-};
-
-vec2 cdiv(vec2 a, vec2 b) {
-    float denom = dot(b, b);
-    return vec2(a.x * b.x + a.y * b.y, a.y * b.x - a.x * b.y) / denom;
-}
-
-vec2 cmul(vec2 a, vec2 b) {
-    return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);
-}
-
-vec2 reflectInto(vec2 z, HalfSpaceVert h, inout int count) {
-    float val = z.x - h.x;
-    if (val * h.side < 0.0) return z;
-    z.x = 2.0 * h.x - z.x;
-    count++;
-    return z;
-}
-
-vec2 reflectInto(vec2 z, HalfSpaceCirc h, inout int count) {
-    vec2 rel = z - vec2(h.center, 0.0);
-    float dist2 = dot(rel, rel);
-    
-    if ((dist2 - h.radius * h.radius) * h.side > 0.0) return z;
-    
-    z.x -= h.center;
-    z /= h.radius;
-    z /= dot(z, z);
-    z *= h.radius;
-    z.x += h.center;
-    
-    count++;
-    return z;
-}
-
-float distToGeodesic(vec2 z, HalfSpaceVert h) {
-    z.x -= h.x;
-    return acosh(length(z) / z.y);
-}
-
-float distToGeodesic(vec2 z, HalfSpaceCirc h) {
-    vec2 num = z - vec2(h.center + h.radius, 0.0);
-    vec2 denom = z - vec2(h.center - h.radius, 0.0);
-    vec2 w = cdiv(num, denom);
-    return acosh(length(w) / w.y);
+float acosh(float x) {
+    return log(x + sqrt(x * x - 1.0));
 }
 
 float hypDist(vec2 z1, vec2 z2) {
     vec2 diff = z1 - z2;
     float num = dot(diff, diff);
     float denom = 2.0 * z1.y * z2.y;
-    float arg = 1.0 + num / denom;
-    return log(arg + sqrt(arg * arg - 1.0));
+    return acosh(1.0 + num / denom);
+}
+
+vec2 normalize_coord(vec2 fragCoord) {
+    vec2 uv = fragCoord / iResolution.xy;
+    uv.y *= iResolution.y / iResolution.x;
+    return uv * 4.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 z = normalize_coord(fragCoord);
+    
+    // Mouse position as ball center
+    vec2 center = iMouse.xy / iResolution.xy;
+    center.y *= iResolution.y / iResolution.x;
+    center = center * 4.0;
+    
+    // Default position
+    if (iMouse.x < 1.0) {
+        center = vec2(1.0, 1.0);
+    }
+    
+    // Keep in upper half-plane
+    center.y = max(center.y, 0.1);
+    
+    vec3 color = vec3(0.1, 0.1, 0.15);
+    
+    if (z.y > 0.0) {
+        float d = hypDist(z, center);
+        
+        // Filled hyperbolic disk of radius 0.3
+        if (d < 0.3) {
+            // Gradient from center to edge
+            float t = d / 0.3;
+            color = mix(vec3(1.0, 0.5, 0.2), vec3(0.8, 0.3, 0.1), t);
+        }
+        
+        // Edge highlight
+        if (abs(d - 0.3) < 0.01) {
+            color = vec3(1.0, 1.0, 1.0);
+        }
+    }
+    
+    // Real axis
+    if (z.y < 0.02) {
+        color = vec3(0.2, 0.2, 0.2);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+**Extension: Poincaré disk version**
+
+```glsl
+float acosh(float x) {
+    return log(x + sqrt(x * x - 1.0));
+}
+
+vec2 cmul(vec2 a, vec2 b) {
+    return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);
+}
+
+vec2 cdiv(vec2 a, vec2 b) {
+    float denom = dot(b, b);
+    return vec2(a.x * b.x + a.y * b.y, a.y * b.x - a.x * b.y) / denom;
 }
 
 vec2 diskToUHP(vec2 w) {
@@ -248,11 +581,210 @@ vec2 diskToUHP(vec2 w) {
     return cmul(i, cdiv(one + w, one - w));
 }
 
+float hypDist(vec2 z1, vec2 z2) {
+    vec2 diff = z1 - z2;
+    float num = dot(diff, diff);
+    float denom = 2.0 * z1.y * z2.y;
+    return acosh(1.0 + num / denom);
+}
+
 vec2 normalize_coord(vec2 fragCoord) {
     vec2 uv = fragCoord / iResolution.xy;
-    uv = (uv - 0.5) * 2.5;
+    uv = uv - vec2(0.5, 0.5);
     uv.x *= iResolution.x / iResolution.y;
-    return uv;
+    return uv * 2.5;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 w = normalize_coord(fragCoord);
+    
+    // Mouse in disk coordinates
+    vec2 mouse_w = iMouse.xy / iResolution.xy;
+    mouse_w = mouse_w - vec2(0.5, 0.5);
+    mouse_w.x *= iResolution.x / iResolution.y;
+    mouse_w = mouse_w * 2.5;
+    
+    // Default to center
+    if (iMouse.x < 1.0) {
+        mouse_w = vec2(0.0, 0.0);
+    }
+    
+    // Clamp inside disk
+    if (length(mouse_w) > 0.95) {
+        mouse_w = normalize(mouse_w) * 0.95;
+    }
+    
+    vec3 color = vec3(0.1, 0.1, 0.15);
+    
+    if (length(w) < 1.0) {
+        // Convert to UHP for distance calculation
+        vec2 z = diskToUHP(w);
+        vec2 center_z = diskToUHP(mouse_w);
+        
+        float d = hypDist(z, center_z);
+        
+        if (d < 0.5) {
+            float t = d / 0.5;
+            color = mix(vec3(1.0, 0.5, 0.2), vec3(0.8, 0.3, 0.1), t);
+        }
+        
+        if (abs(d - 0.5) < 0.02) {
+            color = vec3(1.0, 1.0, 1.0);
+        }
+    } else {
+        color = vec3(0.05, 0.05, 0.05);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+### E3. Edge Highlighting (Euclidean Triangle)
+
+```glsl
+// Color palette
+const vec3 WHITE = vec3(1.0, 1.0, 1.0);
+const vec3 SLATE = vec3(0.35, 0.4, 0.45);
+
+struct HalfSpace {
+    vec2 normal;
+    float offset;
+    float side;
+};
+
+vec2 reflectInto(vec2 p, HalfSpace h, inout int count) {
+    float val = dot(h.normal, p) - h.offset;
+    if (val * h.side < 0.0) return p;
+    count++;
+    return p - 2.0 * val * h.normal;
+}
+
+float distToLine(vec2 p, vec2 normal, float offset) {
+    return abs(dot(normal, p) - offset);
+}
+
+vec2 normalize_coord(vec2 fragCoord) {
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    return uv * 6.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 p = normalize_coord(fragCoord);
+    
+    // Equilateral triangle half-spaces
+    HalfSpace h1 = HalfSpace(vec2(0.0, 1.0),       -0.5, -1.0);  // Bottom
+    HalfSpace h2 = HalfSpace(vec2(0.866, -0.5),    -0.5, -1.0);  // Upper-right
+    HalfSpace h3 = HalfSpace(vec2(-0.866, -0.5),   -0.5, -1.0);  // Upper-left
+    
+    int foldCount = 0;
+    for (int i = 0; i < 30; i++) {
+        vec2 p0 = p;
+        p = reflectInto(p, h1, foldCount);
+        p = reflectInto(p, h2, foldCount);
+        p = reflectInto(p, h3, foldCount);
+        if (length(p - p0) < 0.0001) break;
+    }
+    
+    // Distance to bottom edge (the one with normal (0, 1))
+    float distToEdge = distToLine(p, vec2(0.0, 1.0), -0.5);
+    
+    // Color by distance to edge
+    float brightness = smoothstep(0.0, 0.4, distToEdge);
+    vec3 color = mix(WHITE, SLATE, brightness);
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+This reveals hexagonal patterns! The white "stripes" form hexagon boundaries.
+
+---
+
+### E4. Edges of the Tiling
+
+```glsl
+const vec3 CREAM = vec3(0.85, 0.8, 0.75);
+const vec3 SLATE = vec3(0.35, 0.4, 0.45);
+const vec3 WHITE = vec3(1.0, 1.0, 1.0);
+const vec3 BLACK = vec3(0.05, 0.05, 0.05);
+
+struct HalfSpaceVert {
+    float x;
+    float side;
+};
+
+struct HalfSpaceCirc {
+    float center;
+    float radius;
+    float side;
+};
+
+float acosh(float x) {
+    return log(x + sqrt(x * x - 1.0));
+}
+
+vec2 cmul(vec2 a, vec2 b) {
+    return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);
+}
+
+vec2 cdiv(vec2 a, vec2 b) {
+    float denom = dot(b, b);
+    return vec2(a.x * b.x + a.y * b.y, a.y * b.x - a.x * b.y) / denom;
+}
+
+vec2 diskToUHP(vec2 w) {
+    vec2 i = vec2(0.0, 1.0);
+    vec2 one = vec2(1.0, 0.0);
+    return cmul(i, cdiv(one + w, one - w));
+}
+
+vec2 reflectInto(vec2 z, HalfSpaceVert h, inout int count) {
+    if ((z.x - h.x) * h.side < 0.0) return z;
+    z.x = 2.0 * h.x - z.x;
+    count++;
+    return z;
+}
+
+vec2 reflectInto(vec2 z, HalfSpaceCirc h, inout int count) {
+    vec2 rel = z - vec2(h.center, 0.0);
+    float dist2 = dot(rel, rel);
+    
+    if ((dist2 - h.radius * h.radius) * h.side > 0.0) return z;
+    
+    z.x -= h.center;
+    z = z / h.radius;
+    z = z / dot(z, z);
+    z = z * h.radius;
+    z.x += h.center;
+    count++;
+    return z;
+}
+
+// Distance to vertical geodesic at x = c
+float distToVert(vec2 z, float c) {
+    z.x -= c;
+    return acosh(length(z) / z.y);
+}
+
+// Distance to semicircular geodesic
+float distToCirc(vec2 z, float center, float radius) {
+    vec2 num = z - vec2(center + radius, 0.0);
+    vec2 denom = z - vec2(center - radius, 0.0);
+    vec2 w = cdiv(num, denom);
+    return acosh(length(w) / w.y);
+}
+
+vec2 normalize_coord(vec2 fragCoord) {
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    return uv * 2.5;
 }
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
@@ -273,32 +805,23 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
         if (length(z - z0) < 0.0001) break;
     }
     
+    // Background by parity
     float parity = mod(float(foldCount), 2.0);
-    vec3 color = (parity < 0.5) ? vec3(0.85, 0.8, 0.75) : vec3(0.35, 0.4, 0.45);
+    vec3 color = (parity < 0.5) ? CREAM : SLATE;
     
     // Draw edges
-    float edgeThickness = 0.02;
-    float d1 = distToGeodesic(z, left);
-    float d2 = distToGeodesic(z, right);
-    float d3 = distToGeodesic(z, bottom);
+    float d1 = distToVert(z, 0.0);
+    float d2 = distToVert(z, 0.5);
+    float d3 = distToCirc(z, 0.0, 1.0);
     
-    if (d1 < edgeThickness || d2 < edgeThickness || d3 < edgeThickness) {
-        color = vec3(0.2);
+    float minDist = min(d1, min(d2, d3));
+    if (minDist < 0.03) {
+        color = WHITE;
     }
     
-    // Draw vertices
-    vec2 v1 = vec2(0.0, 1.0);                    // i (angle pi/2)
-    vec2 v2 = vec2(0.5, 0.866);                  // 1/2 + sqrt(3)/2 * i (angle pi/3)
-    
-    float vertexRadius = 0.08;
-    if (hypDist(z, v1) < vertexRadius) {
-        color = vec3(0.9, 0.3, 0.3);
+    if (length(w) > 1.0) {
+        color = BLACK;
     }
-    if (hypDist(z, v2) < vertexRadius) {
-        color = vec3(0.3, 0.9, 0.3);
-    }
-    
-    if (length(w) > 1.0) color = vec3(0.05);
     
     fragColor = vec4(color, 1.0);
 }
@@ -306,11 +829,13 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
 ---
 
-### E2. The Klein Disk Model
-
-Display the tiling in the Klein disk where geodesics are straight lines.
+### E5. Soccer Ball Coloring
 
 ```glsl
+const vec3 WHITE = vec3(1.0, 1.0, 1.0);
+const vec3 DARK = vec3(0.15, 0.15, 0.15);
+const vec3 BLACK = vec3(0.05, 0.05, 0.05);
+
 struct HalfSpaceVert {
     float x;
     float side;
@@ -322,18 +847,34 @@ struct HalfSpaceCirc {
     float side;
 };
 
-vec2 cdiv(vec2 a, vec2 b) {
-    float denom = dot(b, b);
-    return vec2(a.x * b.x + a.y * b.y, a.y * b.x - a.x * b.y) / denom;
+float acosh(float x) {
+    return log(x + sqrt(x * x - 1.0));
 }
 
 vec2 cmul(vec2 a, vec2 b) {
     return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);
 }
 
+vec2 cdiv(vec2 a, vec2 b) {
+    float denom = dot(b, b);
+    return vec2(a.x * b.x + a.y * b.y, a.y * b.x - a.x * b.y) / denom;
+}
+
+vec2 diskToUHP(vec2 w) {
+    vec2 i = vec2(0.0, 1.0);
+    vec2 one = vec2(1.0, 0.0);
+    return cmul(i, cdiv(one + w, one - w));
+}
+
+float hypDist(vec2 z1, vec2 z2) {
+    vec2 diff = z1 - z2;
+    float num = dot(diff, diff);
+    float denom = 2.0 * z1.y * z2.y;
+    return acosh(1.0 + num / denom);
+}
+
 vec2 reflectInto(vec2 z, HalfSpaceVert h, inout int count) {
-    float val = z.x - h.x;
-    if (val * h.side < 0.0) return z;
+    if ((z.x - h.x) * h.side < 0.0) return z;
     z.x = 2.0 * h.x - z.x;
     count++;
     return z;
@@ -346,82 +887,84 @@ vec2 reflectInto(vec2 z, HalfSpaceCirc h, inout int count) {
     if ((dist2 - h.radius * h.radius) * h.side > 0.0) return z;
     
     z.x -= h.center;
-    z /= h.radius;
-    z /= dot(z, z);
-    z *= h.radius;
+    z = z / h.radius;
+    z = z / dot(z, z);
+    z = z * h.radius;
     z.x += h.center;
-    
     count++;
     return z;
 }
 
-// Klein disk to Poincaré disk
-vec2 kleinToPoincare(vec2 k) {
-    float k_mag2 = dot(k, k);
-    float denom = 1.0 + sqrt(1.0 - k_mag2);
-    return k / denom;
-}
-
-// Poincaré disk to upper half-plane
-vec2 diskToUHP(vec2 w) {
-    vec2 i = vec2(0.0, 1.0);
-    vec2 one = vec2(1.0, 0.0);
-    return cmul(i, cdiv(one + w, one - w));
-}
-
 vec2 normalize_coord(vec2 fragCoord) {
     vec2 uv = fragCoord / iResolution.xy;
-    uv = (uv - 0.5) * 2.5;
+    uv = uv - vec2(0.5, 0.5);
     uv.x *= iResolution.x / iResolution.y;
-    return uv;
+    return uv * 2.5;
 }
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    vec2 k = normalize_coord(fragCoord);  // Klein disk coordinates
-    
-    // Convert Klein -> Poincaré -> UHP
-    vec2 w = kleinToPoincare(k);
+    vec2 w = normalize_coord(fragCoord);
     vec2 z = diskToUHP(w);
     
+    // (2,3,7) triangle
     HalfSpaceVert left = HalfSpaceVert(0.0, -1.0);
-    HalfSpaceVert right = HalfSpaceVert(0.5, 1.0);
     HalfSpaceCirc bottom = HalfSpaceCirc(0.0, 1.0, 1.0);
+    HalfSpaceCirc third = HalfSpaceCirc(-0.7665, 1.533, -1.0);
     
     int foldCount = 0;
     for (int i = 0; i < 100; i++) {
         vec2 z0 = z;
         z = reflectInto(z, left, foldCount);
-        z = reflectInto(z, right, foldCount);
         z = reflectInto(z, bottom, foldCount);
+        z = reflectInto(z, third, foldCount);
         if (length(z - z0) < 0.0001) break;
     }
     
-    float parity = mod(float(foldCount), 2.0);
-    vec3 color = (parity < 0.5) ? vec3(0.85, 0.8, 0.75) : vec3(0.35, 0.4, 0.45);
+    // Vertices of the (2,3,7) triangle:
+    // pi/2 vertex at i (where vertical meets unit circle)
+    // pi/3 vertex at approximately 0.5 + 0.866i
+    // pi/7 vertex at approximately 0.1234 + 1.073i (on the third geodesic)
     
-    if (length(k) > 1.0) color = vec3(0.05);
+    vec2 v_pi2 = vec2(0.0, 1.0);
+    vec2 v_pi3 = vec2(0.5, 0.866);
+    vec2 v_pi7 = vec2(0.1234, 1.073);
+    
+    // Find which vertex is closest (hyperbolic distance)
+    float d_pi2 = hypDist(z, v_pi2);
+    float d_pi3 = hypDist(z, v_pi3);
+    float d_pi7 = hypDist(z, v_pi7);
+    
+    vec3 color;
+    if (d_pi2 < d_pi3 && d_pi2 < d_pi7) {
+        color = WHITE;  // Near pi/2 vertex
+    } else if (d_pi3 < d_pi7) {
+        color = DARK;   // Near pi/3 vertex (black pentagons... err wait, triangles)
+    } else {
+        color = WHITE;  // Near pi/7 vertex
+    }
+    
+    if (length(w) > 1.0) {
+        color = BLACK;
+    }
     
     fragColor = vec4(color, 1.0);
 }
 ```
 
----
-
-### E3. The Band Model
-
-::: {.callout-warning}
-## Solution TODO
-The band model solution needs to be written. The conversion uses `ctanh` to map from band to Poincaré disk, then the standard disk-to-UHP conversion.
-:::
+Note: The vertex positions need adjustment for perfect results. The pi/7 vertex can be computed from the geodesic equations.
 
 ---
 
-### E4. Interactive Möbius Transformations
+## Challenges
 
-Use mouse to translate and scale the tiling.
+### H1. The Klein Disk Model
 
 ```glsl
+const vec3 CREAM = vec3(0.85, 0.8, 0.75);
+const vec3 SLATE = vec3(0.35, 0.4, 0.45);
+const vec3 BLACK = vec3(0.05, 0.05, 0.05);
+
 struct HalfSpaceVert {
     float x;
     float side;
@@ -433,18 +976,30 @@ struct HalfSpaceCirc {
     float side;
 };
 
+vec2 cmul(vec2 a, vec2 b) {
+    return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);
+}
+
 vec2 cdiv(vec2 a, vec2 b) {
     float denom = dot(b, b);
     return vec2(a.x * b.x + a.y * b.y, a.y * b.x - a.x * b.y) / denom;
 }
 
-vec2 cmul(vec2 a, vec2 b) {
-    return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);
+// Klein to Poincaré
+vec2 kleinToPoincare(vec2 k) {
+    float r2 = dot(k, k);
+    return k / (1.0 + sqrt(1.0 - r2));
+}
+
+// Poincaré to UHP
+vec2 poincareToUHP(vec2 w) {
+    vec2 i = vec2(0.0, 1.0);
+    vec2 one = vec2(1.0, 0.0);
+    return cmul(i, cdiv(one + w, one - w));
 }
 
 vec2 reflectInto(vec2 z, HalfSpaceVert h, inout int count) {
-    float val = z.x - h.x;
-    if (val * h.side < 0.0) return z;
+    if ((z.x - h.x) * h.side < 0.0) return z;
     z.x = 2.0 * h.x - z.x;
     count++;
     return z;
@@ -457,13 +1012,191 @@ vec2 reflectInto(vec2 z, HalfSpaceCirc h, inout int count) {
     if ((dist2 - h.radius * h.radius) * h.side > 0.0) return z;
     
     z.x -= h.center;
-    z /= h.radius;
-    z /= dot(z, z);
-    z *= h.radius;
+    z = z / h.radius;
+    z = z / dot(z, z);
+    z = z * h.radius;
     z.x += h.center;
-    
     count++;
     return z;
+}
+
+vec2 normalize_coord(vec2 fragCoord) {
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    return uv * 2.5;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 k = normalize_coord(fragCoord);  // Klein coordinates
+    
+    vec3 color = BLACK;
+    
+    if (length(k) < 0.999) {
+        vec2 w = kleinToPoincare(k);
+        vec2 z = poincareToUHP(w);
+        
+        HalfSpaceVert left = HalfSpaceVert(0.0, -1.0);
+        HalfSpaceVert right = HalfSpaceVert(0.5, 1.0);
+        HalfSpaceCirc bottom = HalfSpaceCirc(0.0, 1.0, 1.0);
+        
+        int foldCount = 0;
+        for (int i = 0; i < 100; i++) {
+            vec2 z0 = z;
+            z = reflectInto(z, left, foldCount);
+            z = reflectInto(z, right, foldCount);
+            z = reflectInto(z, bottom, foldCount);
+            if (length(z - z0) < 0.0001) break;
+        }
+        
+        float parity = mod(float(foldCount), 2.0);
+        color = (parity < 0.5) ? CREAM : SLATE;
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+In the Klein model, all geodesics appear as straight lines! The triangles look like ordinary Euclidean triangles.
+
+---
+
+### H2. The Band Model
+
+```glsl
+const vec3 CREAM = vec3(0.85, 0.8, 0.75);
+const vec3 SLATE = vec3(0.35, 0.4, 0.45);
+const vec3 BLACK = vec3(0.05, 0.05, 0.05);
+
+struct HalfSpaceVert {
+    float x;
+    float side;
+};
+
+struct HalfSpaceCirc {
+    float center;
+    float radius;
+    float side;
+};
+
+vec2 cmul(vec2 a, vec2 b) {
+    return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);
+}
+
+vec2 cdiv(vec2 a, vec2 b) {
+    float denom = dot(b, b);
+    return vec2(a.x * b.x + a.y * b.y, a.y * b.x - a.x * b.y) / denom;
+}
+
+// Band to Poincaré (inverse of log transform)
+vec2 bandToPoincare(vec2 b) {
+    // b = log((1+w)/(1-w))
+    // exp(b) = (1+w)/(1-w)
+    // exp(b)(1-w) = 1+w
+    // exp(b) - 1 = w(1 + exp(b))
+    // w = (exp(b) - 1)/(exp(b) + 1) = tanh(b/2)
+    
+    vec2 eb = vec2(exp(b.x) * cos(b.y), exp(b.x) * sin(b.y));
+    vec2 one = vec2(1.0, 0.0);
+    return cdiv(eb - one, eb + one);
+}
+
+vec2 poincareToUHP(vec2 w) {
+    vec2 i = vec2(0.0, 1.0);
+    vec2 one = vec2(1.0, 0.0);
+    return cmul(i, cdiv(one + w, one - w));
+}
+
+vec2 reflectInto(vec2 z, HalfSpaceVert h, inout int count) {
+    if ((z.x - h.x) * h.side < 0.0) return z;
+    z.x = 2.0 * h.x - z.x;
+    count++;
+    return z;
+}
+
+vec2 reflectInto(vec2 z, HalfSpaceCirc h, inout int count) {
+    vec2 rel = z - vec2(h.center, 0.0);
+    float dist2 = dot(rel, rel);
+    
+    if ((dist2 - h.radius * h.radius) * h.side > 0.0) return z;
+    
+    z.x -= h.center;
+    z = z / h.radius;
+    z = z / dot(z, z);
+    z = z * h.radius;
+    z.x += h.center;
+    count++;
+    return z;
+}
+
+vec2 normalize_coord(vec2 fragCoord) {
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    // Band model: x from -inf to inf, y from 0 to pi
+    return vec2(uv.x * 8.0, uv.y * 3.14159 + 1.5708);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 b = normalize_coord(fragCoord);  // Band coordinates
+    
+    vec3 color = BLACK;
+    
+    // Band is valid for y in (0, pi)
+    if (b.y > 0.01 && b.y < 3.13) {
+        vec2 w = bandToPoincare(b);
+        vec2 z = poincareToUHP(w);
+        
+        HalfSpaceVert left = HalfSpaceVert(0.0, -1.0);
+        HalfSpaceVert right = HalfSpaceVert(0.5, 1.0);
+        HalfSpaceCirc bottom = HalfSpaceCirc(0.0, 1.0, 1.0);
+        
+        int foldCount = 0;
+        for (int i = 0; i < 100; i++) {
+            vec2 z0 = z;
+            z = reflectInto(z, left, foldCount);
+            z = reflectInto(z, right, foldCount);
+            z = reflectInto(z, bottom, foldCount);
+            if (length(z - z0) < 0.0001) break;
+        }
+        
+        float parity = mod(float(foldCount), 2.0);
+        color = (parity < 0.5) ? CREAM : SLATE;
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+### H3. Interactive Möbius Transformations
+
+```glsl
+const vec3 CREAM = vec3(0.85, 0.8, 0.75);
+const vec3 SLATE = vec3(0.35, 0.4, 0.45);
+const vec3 BLACK = vec3(0.05, 0.05, 0.05);
+
+struct HalfSpaceVert {
+    float x;
+    float side;
+};
+
+struct HalfSpaceCirc {
+    float center;
+    float radius;
+    float side;
+};
+
+vec2 cmul(vec2 a, vec2 b) {
+    return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);
+}
+
+vec2 cdiv(vec2 a, vec2 b) {
+    float denom = dot(b, b);
+    return vec2(a.x * b.x + a.y * b.y, a.y * b.x - a.x * b.y) / denom;
 }
 
 vec2 diskToUHP(vec2 w) {
@@ -472,18 +1205,40 @@ vec2 diskToUHP(vec2 w) {
     return cmul(i, cdiv(one + w, one - w));
 }
 
-// Apply Möbius transformation (a*z + b) / (c*z + d) with real coefficients
+// Möbius transformation (az + b)/(cz + d)
 vec2 mobius(vec2 z, float a, float b, float c, float d) {
     vec2 num = vec2(a * z.x + b, a * z.y);
     vec2 denom = vec2(c * z.x + d, c * z.y);
     return cdiv(num, denom);
 }
 
+vec2 reflectInto(vec2 z, HalfSpaceVert h, inout int count) {
+    if ((z.x - h.x) * h.side < 0.0) return z;
+    z.x = 2.0 * h.x - z.x;
+    count++;
+    return z;
+}
+
+vec2 reflectInto(vec2 z, HalfSpaceCirc h, inout int count) {
+    vec2 rel = z - vec2(h.center, 0.0);
+    float dist2 = dot(rel, rel);
+    
+    if ((dist2 - h.radius * h.radius) * h.side > 0.0) return z;
+    
+    z.x -= h.center;
+    z = z / h.radius;
+    z = z / dot(z, z);
+    z = z * h.radius;
+    z.x += h.center;
+    count++;
+    return z;
+}
+
 vec2 normalize_coord(vec2 fragCoord) {
     vec2 uv = fragCoord / iResolution.xy;
-    uv = (uv - 0.5) * 2.5;
+    uv = uv - vec2(0.5, 0.5);
     uv.x *= iResolution.x / iResolution.y;
-    return uv;
+    return uv * 2.5;
 }
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
@@ -491,19 +1246,23 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     vec2 w = normalize_coord(fragCoord);
     vec2 z = diskToUHP(w);
     
-    // Get mouse position for transformation parameters
-    vec2 mouse = iMouse.xy / iResolution.xy;
-    if (iMouse.z < 0.5) {
-        mouse = vec2(0.5, 0.5);
+    // Mouse controls transformation
+    float mx = iMouse.x / iResolution.x;
+    float my = iMouse.y / iResolution.y;
+    
+    // Default values if no mouse
+    if (iMouse.x < 1.0) {
+        mx = 0.5;
+        my = 0.5;
     }
     
-    // Horizontal translation: z -> z + t (positive t moves tiling left, so add t)
-    float t = (mouse.x - 0.5) * 4.0;
-    z.x += t;
+    // Horizontal translation: z -> z + t
+    float translation = (mx - 0.5) * 4.0;
+    z.x += translation;
     
-    // Scaling: z -> k*z (k > 1 zooms in, so divide)
-    float k = exp((mouse.y - 0.5) * 2.0);
-    z /= k;
+    // Scaling: z -> k*z
+    float scale = exp((my - 0.5) * 2.0);
+    z = z * scale;
     
     HalfSpaceVert left = HalfSpaceVert(0.0, -1.0);
     HalfSpaceVert right = HalfSpaceVert(0.5, 1.0);
@@ -519,9 +1278,11 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     }
     
     float parity = mod(float(foldCount), 2.0);
-    vec3 color = (parity < 0.5) ? vec3(0.85, 0.8, 0.75) : vec3(0.35, 0.4, 0.45);
+    vec3 color = (parity < 0.5) ? CREAM : SLATE;
     
-    if (length(w) > 1.0) color = vec3(0.05);
+    if (length(w) > 1.0) {
+        color = BLACK;
+    }
     
     fragColor = vec4(color, 1.0);
 }
@@ -529,17 +1290,19 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
 ---
 
-## Challenges
+## Project: General Triangle Tilings
 
-### H1. Animated Model Transitions
-
-Smoothly morph between upper half-plane and Poincaré disk.
-
-The key insight is to interpolate at the level of matrices. The Cayley transform $C(z) = \frac{z-i}{z+i}$ has matrix $M = \begin{pmatrix} 1 & -i \\ 1 & i \end{pmatrix}$, and identity has matrix $I$. The linear interpolation $M_t = (1-t)I + tM$ has determinant $1 - t + it \neq 0$ for $t \in [0,1]$, so each $M_t$ is invertible.
-
-This gives us: $f_t(z) = \frac{z - it}{tz + (1-t+it)}$
+### Complete Solution
 
 ```glsl
+// Color palette
+const vec3 CREAM = vec3(0.85, 0.8, 0.75);
+const vec3 SLATE = vec3(0.35, 0.4, 0.45);
+const vec3 WHITE = vec3(1.0, 1.0, 1.0);
+const vec3 BLACK = vec3(0.05, 0.05, 0.05);
+
+const float PI = 3.14159265359;
+
 struct HalfSpaceVert {
     float x;
     float side;
@@ -551,159 +1314,17 @@ struct HalfSpaceCirc {
     float side;
 };
 
-vec2 cdiv(vec2 a, vec2 b) {
-    float denom = dot(b, b);
-    return vec2(a.x * b.x + a.y * b.y, a.y * b.x - a.x * b.y) / denom;
+float acosh(float x) {
+    return log(x + sqrt(x * x - 1.0));
 }
 
 vec2 cmul(vec2 a, vec2 b) {
     return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);
 }
 
-vec2 reflectInto(vec2 z, HalfSpaceVert h, inout int count) {
-    float val = z.x - h.x;
-    if (val * h.side < 0.0) return z;
-    z.x = 2.0 * h.x - z.x;
-    count++;
-    return z;
-}
-
-vec2 reflectInto(vec2 z, HalfSpaceCirc h, inout int count) {
-    vec2 rel = z - vec2(h.center, 0.0);
-    float dist2 = dot(rel, rel);
-    
-    if ((dist2 - h.radius * h.radius) * h.side > 0.0) return z;
-    
-    z.x -= h.center;
-    z /= h.radius;
-    z /= dot(z, z);
-    z *= h.radius;
-    z.x += h.center;
-    
-    count++;
-    return z;
-}
-
-// Interpolated Cayley transform: f_t(z) = (z - it) / (tz + (1-t+it))
-vec2 partialCayley(vec2 z, float t) {
-    vec2 num = z - vec2(0.0, t);                    // z - it
-    vec2 denom = t * z + vec2(1.0 - t, t);          // tz + (1-t+it)
-    return cdiv(num, denom);
-}
-
-// Inverse of partial Cayley: solve w = (z - it) / (tz + (1-t+it)) for z
-// w(tz + (1-t+it)) = z - it
-// wtz + w(1-t+it) = z - it
-// wtz - z = -it - w(1-t+it)
-// z(wt - 1) = -it - w(1-t+it)
-// z = (it + w(1-t+it)) / (1 - wt)
-vec2 invPartialCayley(vec2 w, float t) {
-    vec2 it = vec2(0.0, t);
-    vec2 coef = vec2(1.0 - t, t);                   // (1-t+it)
-    vec2 num = it + cmul(w, coef);                  // it + w(1-t+it)
-    vec2 denom = vec2(1.0, 0.0) - t * w;            // 1 - wt
-    return cdiv(num, denom);
-}
-
-vec2 normalize_coord(vec2 fragCoord) {
-    vec2 uv = fragCoord / iResolution.xy;
-    uv = (uv - 0.5) * 2.5;
-    uv.x *= iResolution.x / iResolution.y;
-    return uv;
-}
-
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    float t = 0.5 + 0.5 * sin(iTime * 0.5);
-    
-    // Screen shows a disk-like region
-    vec2 w = normalize_coord(fragCoord);
-    
-    // Apply inverse partial Cayley to get UHP coordinates
-    vec2 z = invPartialCayley(w, t);
-    
-    HalfSpaceVert left = HalfSpaceVert(0.0, -1.0);
-    HalfSpaceVert right = HalfSpaceVert(0.5, 1.0);
-    HalfSpaceCirc bottom = HalfSpaceCirc(0.0, 1.0, 1.0);
-    
-    int foldCount = 0;
-    for (int i = 0; i < 100; i++) {
-        vec2 z0 = z;
-        z = reflectInto(z, left, foldCount);
-        z = reflectInto(z, right, foldCount);
-        z = reflectInto(z, bottom, foldCount);
-        if (length(z - z0) < 0.0001) break;
-    }
-    
-    float parity = mod(float(foldCount), 2.0);
-    vec3 color = (parity < 0.5) ? vec3(0.85, 0.8, 0.75) : vec3(0.35, 0.4, 0.45);
-    
-    // Always black in lower half-plane (z.y < 0 in UHP)
-    if (z.y < 0.0) {
-        color = vec3(0.05);
-    }
-    
-    fragColor = vec4(color, 1.0);
-}
-```
-
----
-
-### H2. Dual Tiling
-
-Draw geodesics connecting centers of adjacent triangles.
-
-```glsl
-struct HalfSpaceVert {
-    float x;
-    float side;
-};
-
-struct HalfSpaceCirc {
-    float center;
-    float radius;
-    float side;
-};
-
 vec2 cdiv(vec2 a, vec2 b) {
     float denom = dot(b, b);
     return vec2(a.x * b.x + a.y * b.y, a.y * b.x - a.x * b.y) / denom;
-}
-
-vec2 cmul(vec2 a, vec2 b) {
-    return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);
-}
-
-vec2 reflectInto(vec2 z, HalfSpaceVert h, inout int count) {
-    float val = z.x - h.x;
-    if (val * h.side < 0.0) return z;
-    z.x = 2.0 * h.x - z.x;
-    count++;
-    return z;
-}
-
-vec2 reflectInto(vec2 z, HalfSpaceCirc h, inout int count) {
-    vec2 rel = z - vec2(h.center, 0.0);
-    float dist2 = dot(rel, rel);
-    
-    if ((dist2 - h.radius * h.radius) * h.side > 0.0) return z;
-    
-    z.x -= h.center;
-    z /= h.radius;
-    z /= dot(z, z);
-    z *= h.radius;
-    z.x += h.center;
-    
-    count++;
-    return z;
-}
-
-float hypDist(vec2 z1, vec2 z2) {
-    vec2 diff = z1 - z2;
-    float num = dot(diff, diff);
-    float denom = 2.0 * z1.y * z2.y;
-    float arg = 1.0 + num / denom;
-    return log(arg + sqrt(arg * arg - 1.0));
 }
 
 vec2 diskToUHP(vec2 w) {
@@ -712,115 +1333,8 @@ vec2 diskToUHP(vec2 w) {
     return cmul(i, cdiv(one + w, one - w));
 }
 
-vec2 normalize_coord(vec2 fragCoord) {
-    vec2 uv = fragCoord / iResolution.xy;
-    uv = (uv - 0.5) * 2.5;
-    uv.x *= iResolution.x / iResolution.y;
-    return uv;
-}
-
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    vec2 w = normalize_coord(fragCoord);
-    vec2 z = diskToUHP(w);
-    
-    HalfSpaceVert left = HalfSpaceVert(0.0, -1.0);
-    HalfSpaceVert right = HalfSpaceVert(0.5, 1.0);
-    HalfSpaceCirc bottom = HalfSpaceCirc(0.0, 1.0, 1.0);
-    
-    int foldCount = 0;
-    for (int i = 0; i < 100; i++) {
-        vec2 z0 = z;
-        z = reflectInto(z, left, foldCount);
-        z = reflectInto(z, right, foldCount);
-        z = reflectInto(z, bottom, foldCount);
-        if (length(z - z0) < 0.0001) break;
-    }
-    
-    float parity = mod(float(foldCount), 2.0);
-    vec3 color = (parity < 0.5) ? vec3(0.85, 0.8, 0.75) : vec3(0.35, 0.4, 0.45);
-    
-    // Triangle incenter (approximate center of fundamental domain)
-    vec2 incenter = vec2(0.25, 1.1);
-    
-    // Draw dual edges: geodesic segments from incenter perpendicular to each edge
-    // These are the only three segments we draw; reflections tile the rest
-    
-    // Edge 1: perpendicular to left edge (x=0)
-    // The perpendicular geodesic from incenter to x=0 is a semicircle 
-    // centered at origin passing through incenter
-    // It hits x=0 at y = |incenter| (the radius)
-    float r1 = length(incenter);
-    float d1 = abs(length(z) - r1);
-    // Only draw between incenter and the edge (y <= incenter.y, x near 0 side)
-    bool onSeg1 = (z.y <= r1) && (z.x >= 0.0) && (z.x <= incenter.x);
-    
-    // Edge 2: perpendicular to right edge (x=0.5)
-    // Semicircle centered at (0.5, 0) passing through incenter
-    vec2 c2 = vec2(0.5, 0.0);
-    float r2 = length(incenter - c2);
-    float d2 = abs(length(z - c2) - r2);
-    // Only draw between incenter and x=0.5
-    bool onSeg2 = (z.x >= incenter.x) && (z.x <= 0.5);
-    
-    // Edge 3: perpendicular to bottom (unit circle centered at origin)
-    // The perpendicular from incenter to unit circle is a vertical line x = incenter.x
-    // (since unit circle is centered at origin, radial lines are perpendicular)
-    float d3 = abs(z.x - incenter.x);
-    // Only draw from incenter down to unit circle (y between 1 and incenter.y)
-    float yOnCircle = sqrt(1.0 - incenter.x * incenter.x);
-    bool onSeg3 = (z.y >= yOnCircle) && (z.y <= incenter.y);
-    
-    // Draw dual edges with hyperbolic-ish thickness
-    float thickness = 0.02;
-    if ((d1 < thickness && onSeg1) || 
-        (d2 < thickness && onSeg2) || 
-        (d3 < thickness && onSeg3)) {
-        color = vec3(0.8, 0.2, 0.2);
-    }
-    
-    // Draw dual vertex (incenter)
-    float dv = hypDist(z, incenter);
-    if (dv < 0.05) {
-        color = vec3(0.2, 0.2, 0.8);
-    }
-    
-    if (length(w) > 1.0) color = vec3(0.05);
-    
-    fragColor = vec4(color, 1.0);
-}
-```
-
----
-
-### H3. Single-Edge Tilings
-
-Draw only the circular geodesic edge.
-
-```glsl
-struct HalfSpaceVert {
-    float x;
-    float side;
-};
-
-struct HalfSpaceCirc {
-    float center;
-    float radius;
-    float side;
-};
-
-vec2 cdiv(vec2 a, vec2 b) {
-    float denom = dot(b, b);
-    return vec2(a.x * b.x + a.y * b.y, a.y * b.x - a.x * b.y) / denom;
-}
-
-vec2 cmul(vec2 a, vec2 b) {
-    return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);
-}
-
 vec2 reflectInto(vec2 z, HalfSpaceVert h, inout int count) {
-    float val = z.x - h.x;
-    if (val * h.side < 0.0) return z;
+    if ((z.x - h.x) * h.side < 0.0) return z;
     z.x = 2.0 * h.x - z.x;
     count++;
     return z;
@@ -833,33 +1347,48 @@ vec2 reflectInto(vec2 z, HalfSpaceCirc h, inout int count) {
     if ((dist2 - h.radius * h.radius) * h.side > 0.0) return z;
     
     z.x -= h.center;
-    z /= h.radius;
-    z /= dot(z, z);
-    z *= h.radius;
+    z = z / h.radius;
+    z = z / dot(z, z);
+    z = z * h.radius;
     z.x += h.center;
-    
     count++;
     return z;
 }
 
-float distToGeodesic(vec2 z, HalfSpaceCirc h) {
-    vec2 num = z - vec2(h.center + h.radius, 0.0);
-    vec2 denom = z - vec2(h.center - h.radius, 0.0);
+// Distance to vertical geodesic
+float distToVert(vec2 z, float c) {
+    z.x -= c;
+    return acosh(length(z) / z.y);
+}
+
+// Distance to circular geodesic
+float distToCirc(vec2 z, float center, float radius) {
+    vec2 num = z - vec2(center + radius, 0.0);
+    vec2 denom = z - vec2(center - radius, 0.0);
     vec2 w = cdiv(num, denom);
     return acosh(length(w) / w.y);
 }
 
-vec2 diskToUHP(vec2 w) {
-    vec2 i = vec2(0.0, 1.0);
-    vec2 one = vec2(1.0, 0.0);
-    return cmul(i, cdiv(one + w, one - w));
+// Compute third geodesic for (2, q, r) triangle
+void computeTriangle(float q, float r, out float center, out float radius) {
+    float p = 2.0;
+    
+    float num = cos(PI/r) + cos(PI/p) * cos(PI/q);
+    float denom = sin(PI/p) * sin(PI/q);
+    float sr = acosh(num / denom);
+    
+    float eucH = sin(PI/p) * exp(sr);
+    float want = eucH / tan(PI/q);
+    
+    center = -cos(PI/p) - want;
+    radius = sqrt(want * want + eucH * eucH);
 }
 
 vec2 normalize_coord(vec2 fragCoord) {
     vec2 uv = fragCoord / iResolution.xy;
-    uv = (uv - 0.5) * 2.5;
+    uv = uv - vec2(0.5, 0.5);
     uv.x *= iResolution.x / iResolution.y;
-    return uv;
+    return uv * 2.5;
 }
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
@@ -867,132 +1396,77 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     vec2 w = normalize_coord(fragCoord);
     vec2 z = diskToUHP(w);
     
+    // Triangle parameters - change these!
+    float q = 3.0;
+    float r = 7.0;
+    
+    // Compute the three half-spaces
     HalfSpaceVert left = HalfSpaceVert(0.0, -1.0);
-    HalfSpaceVert right = HalfSpaceVert(0.5, 1.0);
     HalfSpaceCirc bottom = HalfSpaceCirc(0.0, 1.0, 1.0);
     
+    float center, radius;
+    computeTriangle(q, r, center, radius);
+    HalfSpaceCirc third = HalfSpaceCirc(center, radius, -1.0);
+    
+    // Fold into fundamental domain
     int foldCount = 0;
     for (int i = 0; i < 100; i++) {
         vec2 z0 = z;
         z = reflectInto(z, left, foldCount);
-        z = reflectInto(z, right, foldCount);
         z = reflectInto(z, bottom, foldCount);
+        z = reflectInto(z, third, foldCount);
         if (length(z - z0) < 0.0001) break;
     }
     
+    // Background by parity
     float parity = mod(float(foldCount), 2.0);
-    vec3 color = (parity < 0.5) ? vec3(0.85, 0.8, 0.75) : vec3(0.35, 0.4, 0.45);
+    vec3 color = (parity < 0.5) ? CREAM : SLATE;
     
-    // Draw ONLY the circular edge
-    float d = distToGeodesic(z, bottom);
-    if (d < 0.03) {
-        color = vec3(1.0);
+    // Draw edges
+    float d1 = distToVert(z, 0.0);
+    float d2 = distToCirc(z, 0.0, 1.0);
+    float d3 = distToCirc(z, center, radius);
+    
+    float minDist = min(d1, min(d2, d3));
+    if (minDist < 0.02) {
+        color = WHITE;
     }
     
-    if (length(w) > 1.0) color = vec3(0.05);
+    // Mask outside disk
+    if (length(w) > 1.0) {
+        color = BLACK;
+    }
     
     fragColor = vec4(color, 1.0);
 }
 ```
 
----
+### Verification
 
-## Projects
+Running the `computeTriangle` function:
 
-### P1. General (p,q,r) Triangle Tilings
+**For (2,3,7):**
+- q=3, r=7
+- num = cos(π/7) + 0 ≈ 0.901
+- denom = 1 × sin(π/3) ≈ 0.866
+- sr = acosh(1.04) ≈ 0.284
+- eucH = 1 × exp(0.284) ≈ 1.328
+- want = 1.328 / tan(π/3) ≈ 0.767
+- center = 0 - 0.767 = -0.767 ✓
+- radius = sqrt(0.588 + 1.764) ≈ 1.533 ✓
 
-This is a more substantial project. Here's a starting point for the (2,3,7) tiling—a compact hyperbolic triangle with all finite vertices.
+**For (2,4,5):**
+- q=4, r=5
+- num = cos(π/5) + 0 ≈ 0.809
+- denom = 1 × sin(π/4) ≈ 0.707
+- sr = acosh(1.144) ≈ 0.531
+- eucH = 1 × exp(0.531) ≈ 1.70
+- want = 1.70 / tan(π/4) = 1.70
+- center = 0 - 1.70 = -1.70 ✓
+- radius = sqrt(2.89 + 2.89) ≈ 2.40 ✓
 
-The key challenge is computing the geodesic positions from the angle constraints. For (2,3,7):
-- Angle at vertex A: π/2
-- Angle at vertex B: π/3  
-- Angle at vertex C: π/7
-
-```glsl
-// Note: This is a simplified solution showing the structure.
-// Computing exact vertex positions for arbitrary (p,q,r) requires
-// solving hyperbolic trigonometry equations.
-
-struct HalfSpaceCirc {
-    float center;
-    float radius;
-    float side;
-};
-
-vec2 cdiv(vec2 a, vec2 b) {
-    float denom = dot(b, b);
-    return vec2(a.x * b.x + a.y * b.y, a.y * b.x - a.x * b.y) / denom;
-}
-
-vec2 cmul(vec2 a, vec2 b) {
-    return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);
-}
-
-vec2 reflectInCircle(vec2 z, HalfSpaceCirc h, inout int count) {
-    vec2 rel = z - vec2(h.center, 0.0);
-    float dist2 = dot(rel, rel);
-    
-    if ((dist2 - h.radius * h.radius) * h.side > 0.0) return z;
-    
-    z.x -= h.center;
-    z /= h.radius;
-    z /= dot(z, z);
-    z *= h.radius;
-    z.x += h.center;
-    
-    count++;
-    return z;
-}
-
-vec2 diskToUHP(vec2 w) {
-    vec2 i = vec2(0.0, 1.0);
-    vec2 one = vec2(1.0, 0.0);
-    return cmul(i, cdiv(one + w, one - w));
-}
-
-vec2 normalize_coord(vec2 fragCoord) {
-    vec2 uv = fragCoord / iResolution.xy;
-    uv = (uv - 0.5) * 2.5;
-    uv.x *= iResolution.x / iResolution.y;
-    return uv;
-}
-
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    vec2 w = normalize_coord(fragCoord);
-    vec2 z = diskToUHP(w);
-    
-    // (2,3,7) triangle - precomputed geodesics
-    // These values are approximate - exact computation requires
-    // solving cosh(a) = cos(pi/p) + cos(pi/q)*cos(pi/r) / (sin(pi/q)*sin(pi/r))
-    // for the side lengths, then positioning the geodesics.
-    
-    HalfSpaceCirc edge1 = HalfSpaceCirc(-0.3, 1.1, 1.0);
-    HalfSpaceCirc edge2 = HalfSpaceCirc(0.5, 0.9, 1.0);
-    HalfSpaceCirc edge3 = HalfSpaceCirc(0.0, 0.7, 1.0);
-    
-    int foldCount = 0;
-    for (int i = 0; i < 100; i++) {
-        vec2 z0 = z;
-        z = reflectInCircle(z, edge1, foldCount);
-        z = reflectInCircle(z, edge2, foldCount);
-        z = reflectInCircle(z, edge3, foldCount);
-        if (length(z - z0) < 0.0001) break;
-    }
-    
-    float parity = mod(float(foldCount), 2.0);
-    vec3 color = (parity < 0.5) ? vec3(0.85, 0.8, 0.75) : vec3(0.35, 0.4, 0.45);
-    
-    if (length(w) > 1.0) color = vec3(0.05);
-    
-    fragColor = vec4(color, 1.0);
-}
-```
-
-**To complete this project:**
-
-1. Implement the hyperbolic law of cosines to compute side lengths from angles
-2. Position three geodesics (semicircles) that meet at the correct angles
-3. Add edge and vertex drawing
-4. Make p, q, r adjustable via uniforms
-5. Add validation that 1/p + 1/q + 1/r < 1 (hyperbolic condition)
+**For (2,3,∞):**
+As r → ∞, cos(π/r) → 1, so num → 1 + 0 = 1.
+sr → acosh(1/sin(π/3)) = acosh(1.155) ≈ 0.505
+eucH → exp(0.505) ≈ 1.66
+The third geodesic moves further left and becomes approximately vertical at x = 0.5 (requires limit analysis).

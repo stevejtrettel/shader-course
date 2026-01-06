@@ -299,9 +299,6 @@ vec4 dcAdd(vec4 a, vec4 b) {
 
 Then the iteration is just `z = dcAdd(dcSqr(z), c)` where `c = vec4(c.xy, 1.0, 0.0)`.
 
-This is *automatic differentiation*—a technique that extends far beyond fractals. The dual number approach generalizes to higher derivatives, gradients in higher dimensions, and forms the basis of modern machine learning frameworks.
-
-
 **Project 3: Orbit Visualization**
 
 Instead of coloring by iteration count, visualize the actual orbit. Let the mouse control the starting point $z_0$:
