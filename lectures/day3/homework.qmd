@@ -153,32 +153,19 @@ For $(2, q, r)$ triangles, $\cos(\pi/2) = 0$, so the vertical edge is the imagin
 
 ### Part B: Computing the Third Geodesic
 
-The hyperbolic law of cosines gives the side length opposite angle $\pi/r$:
-$$s_r = \text{arccosh}\left(\frac{\cos(\pi/r) + \cos(\pi/p)\cos(\pi/q)}{\sin(\pi/p)\sin(\pi/q)}\right)$$
+The hyperbolic law of cosines gives the side length $s_r$ opposite angle $\pi/r$:
+$$\cosh(s_r) = \frac{\cos(\pi/r) + \cos(\pi/p)\cos(\pi/q)}{\sin(\pi/p)\sin(\pi/q)}$$
 
-From here, we can find the Euclidean height of the third vertex:
-```glsl
-float sr = acosh((cos(PI/r) + cos(PI/p)*cos(PI/q)) / (sin(PI/p)*sin(PI/q)));
-float eucH = sin(PI/p) * exp(sr);
-```
+From here, we can find the Euclidean height of the third vertex (it lies hyperbolic distance $s_r$ above $i$ on the vertical geodesic), and then the center and radius of the third geodesic (as we know the angle it makes with the vertical: and this angle is the same in both hyperbolic and Euclidean geometry sinc the upper half plane is conformal.)
 
-And the center and radius of the third geodesic:
-```glsl
-float want = eucH / tan(PI/q);
-float center = -cos(PI/p) - want;
-float radius = sqrt(want*want + eucH*eucH);
-```
+*Hint: draw yourself some constructions in Eulidean geometry!*
 
-**Exercise:** Work through this calculation by hand for $(2,3,7)$ and verify you get `center ≈ -0.7665` and `radius ≈ 1.533`.
+**Exercise:** Given your general formula, work through this calculation for $(2,3,7)$ and verify you get `center ≈ -0.7665` and `radius ≈ 1.533`.
 
 ### Part C: Implementation
 
-Write a function that takes `p`, `q`, `r` as parameters and returns the three half-spaces. Then build the tiling with adjustable parameters (use constants or uniforms).
+Write a function that takes `2`, `q`, `r` as parameters and returns the third half space. Then build the tiling with adjustable parameters (say, constants that are set at the top of the file? Or animated by iTime? Or controlled by iMouse?)
 
-Validate that your formula reproduces the known values:
-- $(2,3,7)$: center $\approx -0.7665$, radius $\approx 1.533$
-- $(2,4,5)$: center $\approx -1.70$, radius $\approx 2.40$
-- $(2,3,\infty)$: should give a vertical line at $x = 0.5$ (what happens to the formula as $r \to \infty$?)
 
 ### Part D: Visualization
 
@@ -199,4 +186,4 @@ Which parameters produce the most visually striking tilings? What happens as one
 
 When $p \neq 2$, the first edge is no longer the imaginary axis—it's a vertical geodesic at $x = -\cos(\pi/p)$. The unit circle edge stays the same, but the geometry of finding the third geodesic becomes more involved.
 
-Generalize your implementation to handle arbitrary $(p,q,r)$ triangles. Test with $(3,3,4)$: all three edges are semicircles, and the triangle has no right angles.
+Generalize your implementation to handle arbitrary $(p,q,r)$ triangles. Test with $(3,3,4)$, for a tiling with no right angles.
