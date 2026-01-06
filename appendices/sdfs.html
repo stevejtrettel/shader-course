@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Steve Trettel">
+
+<title>sdfs – GPU-Accelerated Mathematical Illustration</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-e62aa0a8c28b52a0e19b1cebeabd7fd3.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-f0463eacbf7faa50df92658b97a72515.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-e62aa0a8c28b52a0e19b1cebeabd7fd3.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-d72af2198ff6241fba5e91235accbade.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-9ba55aa6988265aad246d48a0606a5a7.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-d72af2198ff6241fba5e91235accbade.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../appendices/glsl.html">Appendices</a></li><li class="breadcrumb-item"><a href="../appendices/sdfs.html">SDFs</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">GPU-Accelerated Mathematical Illustration</a> 
+        <div class="sidebar-tools-main">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">About</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Day 1: Pixels</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/day1/notes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Notes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/day1/shaders.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Code</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/day1/homework.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Day 2: Fractals</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/day2/notes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Notes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/day2/shaders.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Code</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/day2/homework.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Day 3: Tilings</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/day3/notes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Notes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/day3/shaders.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Code</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Day 4: Simulations</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/day4/notes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Notes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/day4/shaders.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Code</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Day 5: Rendering</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/day5/notes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Notes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/day5/shaders.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Code</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/glsl.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">GLSL Reference</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/coordinates.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Coordinates</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/color.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Color</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/sdfs.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">SDFs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/debug.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Debugging</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#sdf-catalog" id="toc-sdf-catalog" class="nav-link active" data-scroll-target="#sdf-catalog"><span class="header-section-number">1</span> SDF Catalog</a>
+  <ul class="collapse">
+  <li><a href="#d-primitives" id="toc-d-primitives" class="nav-link" data-scroll-target="#d-primitives"><span class="header-section-number">1.1</span> 1. 2D Primitives</a>
+  <ul class="collapse">
+  <li><a href="#circle" id="toc-circle" class="nav-link" data-scroll-target="#circle">Circle</a></li>
+  <li><a href="#box" id="toc-box" class="nav-link" data-scroll-target="#box">Box</a></li>
+  <li><a href="#rounded-box" id="toc-rounded-box" class="nav-link" data-scroll-target="#rounded-box">Rounded Box</a></li>
+  <li><a href="#line-segment" id="toc-line-segment" class="nav-link" data-scroll-target="#line-segment">Line Segment</a></li>
+  <li><a href="#ring-annulus" id="toc-ring-annulus" class="nav-link" data-scroll-target="#ring-annulus">Ring / Annulus</a></li>
+  <li><a href="#arc" id="toc-arc" class="nav-link" data-scroll-target="#arc">Arc</a></li>
+  <li><a href="#pie-sector" id="toc-pie-sector" class="nav-link" data-scroll-target="#pie-sector">Pie / Sector</a></li>
+  <li><a href="#equilateral-triangle" id="toc-equilateral-triangle" class="nav-link" data-scroll-target="#equilateral-triangle">Equilateral Triangle</a></li>
+  <li><a href="#hexagon" id="toc-hexagon" class="nav-link" data-scroll-target="#hexagon">Hexagon</a></li>
+  <li><a href="#regular-polygon-n-gon" id="toc-regular-polygon-n-gon" class="nav-link" data-scroll-target="#regular-polygon-n-gon">Regular Polygon (n-gon)</a></li>
+  </ul></li>
+  <li><a href="#d-primitives-1" id="toc-d-primitives-1" class="nav-link" data-scroll-target="#d-primitives-1"><span class="header-section-number">1.2</span> 2. 3D Primitives</a>
+  <ul class="collapse">
+  <li><a href="#sphere" id="toc-sphere" class="nav-link" data-scroll-target="#sphere">Sphere</a></li>
+  <li><a href="#ellipsoid" id="toc-ellipsoid" class="nav-link" data-scroll-target="#ellipsoid">Ellipsoid</a></li>
+  <li><a href="#box-1" id="toc-box-1" class="nav-link" data-scroll-target="#box-1">Box</a></li>
+  <li><a href="#rounded-box-1" id="toc-rounded-box-1" class="nav-link" data-scroll-target="#rounded-box-1">Rounded Box</a></li>
+  <li><a href="#plane" id="toc-plane" class="nav-link" data-scroll-target="#plane">Plane</a></li>
+  <li><a href="#torus" id="toc-torus" class="nav-link" data-scroll-target="#torus">Torus</a></li>
+  <li><a href="#cylinder-infinite" id="toc-cylinder-infinite" class="nav-link" data-scroll-target="#cylinder-infinite">Cylinder (Infinite)</a></li>
+  <li><a href="#capped-cylinder" id="toc-capped-cylinder" class="nav-link" data-scroll-target="#capped-cylinder">Capped Cylinder</a></li>
+  <li><a href="#capsule" id="toc-capsule" class="nav-link" data-scroll-target="#capsule">Capsule</a></li>
+  <li><a href="#cone-infinite" id="toc-cone-infinite" class="nav-link" data-scroll-target="#cone-infinite">Cone (Infinite)</a></li>
+  <li><a href="#capped-cone" id="toc-capped-cone" class="nav-link" data-scroll-target="#capped-cone">Capped Cone</a></li>
+  <li><a href="#octahedron" id="toc-octahedron" class="nav-link" data-scroll-target="#octahedron">Octahedron</a></li>
+  </ul></li>
+  <li><a href="#operations" id="toc-operations" class="nav-link" data-scroll-target="#operations"><span class="header-section-number">1.3</span> 3. Operations</a>
+  <ul class="collapse">
+  <li><a href="#union" id="toc-union" class="nav-link" data-scroll-target="#union">Union</a></li>
+  <li><a href="#intersection" id="toc-intersection" class="nav-link" data-scroll-target="#intersection">Intersection</a></li>
+  <li><a href="#subtraction" id="toc-subtraction" class="nav-link" data-scroll-target="#subtraction">Subtraction</a></li>
+  <li><a href="#smooth-union" id="toc-smooth-union" class="nav-link" data-scroll-target="#smooth-union">Smooth Union</a></li>
+  <li><a href="#smooth-intersection" id="toc-smooth-intersection" class="nav-link" data-scroll-target="#smooth-intersection">Smooth Intersection</a></li>
+  <li><a href="#smooth-subtraction" id="toc-smooth-subtraction" class="nav-link" data-scroll-target="#smooth-subtraction">Smooth Subtraction</a></li>
+  </ul></li>
+  <li><a href="#transformations" id="toc-transformations" class="nav-link" data-scroll-target="#transformations"><span class="header-section-number">1.4</span> 4. Transformations</a>
+  <ul class="collapse">
+  <li><a href="#translation" id="toc-translation" class="nav-link" data-scroll-target="#translation">Translation</a></li>
+  <li><a href="#rotation" id="toc-rotation" class="nav-link" data-scroll-target="#rotation">Rotation</a></li>
+  <li><a href="#scaling" id="toc-scaling" class="nav-link" data-scroll-target="#scaling">Scaling</a></li>
+  <li><a href="#repetition-euclidean-grid" id="toc-repetition-euclidean-grid" class="nav-link" data-scroll-target="#repetition-euclidean-grid">Repetition (Euclidean Grid)</a></li>
+  <li><a href="#symmetry" id="toc-symmetry" class="nav-link" data-scroll-target="#symmetry">Symmetry</a></li>
+  </ul></li>
+  <li><a href="#normals" id="toc-normals" class="nav-link" data-scroll-target="#normals"><span class="header-section-number">1.5</span> 5. Normals</a>
+  <ul class="collapse">
+  <li><a href="#the-formula" id="toc-the-formula" class="nav-link" data-scroll-target="#the-formula">The Formula</a></li>
+  <li><a href="#implementation" id="toc-implementation" class="nav-link" data-scroll-target="#implementation">Implementation</a></li>
+  <li><a href="#choosing-epsilon" id="toc-choosing-epsilon" class="nav-link" data-scroll-target="#choosing-epsilon">Choosing Epsilon</a></li>
+  </ul></li>
+  <li><a href="#resources" id="toc-resources" class="nav-link" data-scroll-target="#resources"><span class="header-section-number">1.6</span> 6. Resources</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../appendices/glsl.html">Appendices</a></li><li class="breadcrumb-item"><a href="../appendices/sdfs.html">SDFs</a></li></ol></nav>
+<div class="quarto-title">
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Steve Trettel </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">January 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="sdf-catalog" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> SDF Catalog</h1>
+<p>A reference catalog of signed distance functions. See Day 5 for concepts; see Inigo Quilez’s pages for the complete collection.</p>
+<hr>
+<section id="d-primitives" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="d-primitives"><span class="header-section-number">1.1</span> 1. 2D Primitives</h2>
+<section id="circle" class="level3">
+<h3 class="anchored" data-anchor-id="circle">Circle</h3>
+<p>Circle centered at origin.</p>
+<ul>
+<li><code>p</code>: query point</li>
+<li><code>r</code>: radius</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">sdCircle</span><span class="op">(</span><span class="dt">vec2</span> p<span class="op">,</span> <span class="dt">float</span> r<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">length</span><span class="op">(</span>p<span class="op">)</span> <span class="op">-</span> r<span class="op">;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="box" class="level3">
+<h3 class="anchored" data-anchor-id="box">Box</h3>
+<p>Axis-aligned rectangle centered at origin.</p>
+<ul>
+<li><code>p</code>: query point</li>
+<li><code>b</code>: half-size (box extends from <code>-b</code> to <code>+b</code>)</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">sdBox</span><span class="op">(</span><span class="dt">vec2</span> p<span class="op">,</span> <span class="dt">vec2</span> b<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> d <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span>p<span class="op">)</span> <span class="op">-</span> b<span class="op">;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">length</span><span class="op">(</span><span class="bu">max</span><span class="op">(</span>d<span class="op">,</span> <span class="fl">0.0</span><span class="op">))</span> <span class="op">+</span> <span class="bu">min</span><span class="op">(</span><span class="bu">max</span><span class="op">(</span>d<span class="op">.</span><span class="fu">x</span><span class="op">,</span> d<span class="op">.</span><span class="fu">y</span><span class="op">),</span> <span class="fl">0.0</span><span class="op">);</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="rounded-box" class="level3">
+<h3 class="anchored" data-anchor-id="rounded-box">Rounded Box</h3>
+<p>Axis-aligned rectangle with rounded corners, centered at origin.</p>
+<ul>
+<li><code>p</code>: query point</li>
+<li><code>b</code>: half-size before rounding</li>
+<li><code>r</code>: corner radius</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">sdRoundedBox</span><span class="op">(</span><span class="dt">vec2</span> p<span class="op">,</span> <span class="dt">vec2</span> b<span class="op">,</span> <span class="dt">float</span> r<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> d <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span>p<span class="op">)</span> <span class="op">-</span> b <span class="op">+</span> r<span class="op">;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">length</span><span class="op">(</span><span class="bu">max</span><span class="op">(</span>d<span class="op">,</span> <span class="fl">0.0</span><span class="op">))</span> <span class="op">+</span> <span class="bu">min</span><span class="op">(</span><span class="bu">max</span><span class="op">(</span>d<span class="op">.</span><span class="fu">x</span><span class="op">,</span> d<span class="op">.</span><span class="fu">y</span><span class="op">),</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">-</span> r<span class="op">;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="line-segment" class="level3">
+<h3 class="anchored" data-anchor-id="line-segment">Line Segment</h3>
+<p>Line segment between two points.</p>
+<ul>
+<li><code>p</code>: query point</li>
+<li><code>a</code>: start point</li>
+<li><code>b</code>: end point</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">sdSegment</span><span class="op">(</span><span class="dt">vec2</span> p<span class="op">,</span> <span class="dt">vec2</span> a<span class="op">,</span> <span class="dt">vec2</span> b<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> pa <span class="op">=</span> p <span class="op">-</span> a<span class="op">,</span> ba <span class="op">=</span> b <span class="op">-</span> a<span class="op">;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> h <span class="op">=</span> <span class="bu">clamp</span><span class="op">(</span><span class="bu">dot</span><span class="op">(</span>pa<span class="op">,</span> ba<span class="op">)</span> <span class="op">/</span> <span class="bu">dot</span><span class="op">(</span>ba<span class="op">,</span> ba<span class="op">),</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">length</span><span class="op">(</span>pa <span class="op">-</span> ba <span class="op">*</span> h<span class="op">);</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="ring-annulus" class="level3">
+<h3 class="anchored" data-anchor-id="ring-annulus">Ring / Annulus</h3>
+<p>Ring (thick circle) centered at origin.</p>
+<ul>
+<li><code>p</code>: query point</li>
+<li><code>r</code>: center radius (distance from origin to middle of ring)</li>
+<li><code>w</code>: half-thickness</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">sdRing</span><span class="op">(</span><span class="dt">vec2</span> p<span class="op">,</span> <span class="dt">float</span> r<span class="op">,</span> <span class="dt">float</span> w<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">abs</span><span class="op">(</span><span class="bu">length</span><span class="op">(</span>p<span class="op">)</span> <span class="op">-</span> r<span class="op">)</span> <span class="op">-</span> w<span class="op">;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="arc" class="level3">
+<h3 class="anchored" data-anchor-id="arc">Arc</h3>
+<p>Circular arc centered at origin.</p>
+<ul>
+<li><code>p</code>: query point</li>
+<li><code>r</code>: radius</li>
+<li><code>a1</code>: start angle (radians)</li>
+<li><code>a2</code>: end angle (radians)</li>
+<li><code>w</code>: half-thickness</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">sdArc</span><span class="op">(</span><span class="dt">vec2</span> p<span class="op">,</span> <span class="dt">float</span> r<span class="op">,</span> <span class="dt">float</span> a1<span class="op">,</span> <span class="dt">float</span> a2<span class="op">,</span> <span class="dt">float</span> w<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> a <span class="op">=</span> <span class="bu">atan</span><span class="op">(</span>p<span class="op">.</span><span class="fu">y</span><span class="op">,</span> p<span class="op">.</span><span class="fu">x</span><span class="op">);</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    a <span class="op">=</span> <span class="bu">clamp</span><span class="op">(</span>a<span class="op">,</span> a1<span class="op">,</span> a2<span class="op">);</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> q <span class="op">=</span> r <span class="op">*</span> <span class="dt">vec2</span><span class="op">(</span><span class="bu">cos</span><span class="op">(</span>a<span class="op">),</span> <span class="bu">sin</span><span class="op">(</span>a<span class="op">));</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">length</span><span class="op">(</span>p <span class="op">-</span> q<span class="op">)</span> <span class="op">-</span> w<span class="op">;</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="pie-sector" class="level3">
+<h3 class="anchored" data-anchor-id="pie-sector">Pie / Sector</h3>
+<p>Pie slice (wedge) centered at origin, symmetric about the y-axis.</p>
+<ul>
+<li><code>p</code>: query point</li>
+<li><code>r</code>: radius</li>
+<li><code>a</code>: half-angle (radians) — total wedge spans from <code>-a</code> to <code>+a</code></li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">sdPie</span><span class="op">(</span><span class="dt">vec2</span> p<span class="op">,</span> <span class="dt">float</span> r<span class="op">,</span> <span class="dt">float</span> a<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> c <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span><span class="bu">sin</span><span class="op">(</span>a<span class="op">),</span> <span class="bu">cos</span><span class="op">(</span>a<span class="op">));</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    p<span class="op">.</span><span class="fu">x</span> <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span>p<span class="op">.</span><span class="fu">x</span><span class="op">);</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> l <span class="op">=</span> <span class="bu">length</span><span class="op">(</span>p<span class="op">)</span> <span class="op">-</span> r<span class="op">;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> m <span class="op">=</span> <span class="bu">length</span><span class="op">(</span>p <span class="op">-</span> c <span class="op">*</span> <span class="bu">clamp</span><span class="op">(</span><span class="bu">dot</span><span class="op">(</span>p<span class="op">,</span> c<span class="op">),</span> <span class="fl">0.0</span><span class="op">,</span> r<span class="op">));</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">max</span><span class="op">(</span>l<span class="op">,</span> m <span class="op">*</span> <span class="bu">sign</span><span class="op">(</span>c<span class="op">.</span><span class="fu">y</span> <span class="op">*</span> p<span class="op">.</span><span class="fu">x</span> <span class="op">-</span> c<span class="op">.</span><span class="fu">x</span> <span class="op">*</span> p<span class="op">.</span><span class="fu">y</span><span class="op">));</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="equilateral-triangle" class="level3">
+<h3 class="anchored" data-anchor-id="equilateral-triangle">Equilateral Triangle</h3>
+<p>Equilateral triangle centered at origin.</p>
+<ul>
+<li><code>p</code>: query point</li>
+<li><code>r</code>: distance from center to vertex</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">sdEquilateralTriangle</span><span class="op">(</span><span class="dt">vec2</span> p<span class="op">,</span> <span class="dt">float</span> r<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">const</span> <span class="dt">float</span> k <span class="op">=</span> <span class="bu">sqrt</span><span class="op">(</span><span class="fl">3.0</span><span class="op">);</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    p<span class="op">.</span><span class="fu">x</span> <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span>p<span class="op">.</span><span class="fu">x</span><span class="op">)</span> <span class="op">-</span> r<span class="op">;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    p<span class="op">.</span><span class="fu">y</span> <span class="op">=</span> p<span class="op">.</span><span class="fu">y</span> <span class="op">+</span> r <span class="op">/</span> k<span class="op">;</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">if</span> <span class="op">(</span>p<span class="op">.</span><span class="fu">x</span> <span class="op">+</span> k <span class="op">*</span> p<span class="op">.</span><span class="fu">y</span> <span class="op">&gt;</span> <span class="fl">0.0</span><span class="op">)</span> p <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span>p<span class="op">.</span><span class="fu">x</span> <span class="op">-</span> k <span class="op">*</span> p<span class="op">.</span><span class="fu">y</span><span class="op">,</span> <span class="op">-</span>k <span class="op">*</span> p<span class="op">.</span><span class="fu">x</span> <span class="op">-</span> p<span class="op">.</span><span class="fu">y</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2.0</span><span class="op">;</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    p<span class="op">.</span><span class="fu">x</span> <span class="op">-=</span> <span class="bu">clamp</span><span class="op">(</span>p<span class="op">.</span><span class="fu">x</span><span class="op">,</span> <span class="op">-</span><span class="fl">2.0</span> <span class="op">*</span> r<span class="op">,</span> <span class="fl">0.0</span><span class="op">);</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="op">-</span><span class="bu">length</span><span class="op">(</span>p<span class="op">)</span> <span class="op">*</span> <span class="bu">sign</span><span class="op">(</span>p<span class="op">.</span><span class="fu">y</span><span class="op">);</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="hexagon" class="level3">
+<h3 class="anchored" data-anchor-id="hexagon">Hexagon</h3>
+<p>Regular hexagon centered at origin.</p>
+<ul>
+<li><code>p</code>: query point</li>
+<li><code>r</code>: circumradius (center to vertex)</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">sdHexagon</span><span class="op">(</span><span class="dt">vec2</span> p<span class="op">,</span> <span class="dt">float</span> r<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">const</span> <span class="dt">vec3</span> k <span class="op">=</span> <span class="dt">vec3</span><span class="op">(-</span><span class="fl">0.866025404</span><span class="op">,</span> <span class="fl">0.5</span><span class="op">,</span> <span class="fl">0.577350269</span><span class="op">);</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    p <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span>p<span class="op">);</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    p <span class="op">-=</span> <span class="fl">2.0</span> <span class="op">*</span> <span class="bu">min</span><span class="op">(</span><span class="bu">dot</span><span class="op">(</span>k<span class="op">.</span><span class="fu">xy</span><span class="op">,</span> p<span class="op">),</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">*</span> k<span class="op">.</span><span class="fu">xy</span><span class="op">;</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    p <span class="op">-=</span> <span class="dt">vec2</span><span class="op">(</span><span class="bu">clamp</span><span class="op">(</span>p<span class="op">.</span><span class="fu">x</span><span class="op">,</span> <span class="op">-</span>k<span class="op">.</span><span class="fu">z</span> <span class="op">*</span> r<span class="op">,</span> k<span class="op">.</span><span class="fu">z</span> <span class="op">*</span> r<span class="op">),</span> r<span class="op">);</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">length</span><span class="op">(</span>p<span class="op">)</span> <span class="op">*</span> <span class="bu">sign</span><span class="op">(</span>p<span class="op">.</span><span class="fu">y</span><span class="op">);</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="regular-polygon-n-gon" class="level3">
+<h3 class="anchored" data-anchor-id="regular-polygon-n-gon">Regular Polygon (n-gon)</h3>
+<p>Regular polygon centered at origin. Approximate SDF.</p>
+<ul>
+<li><code>p</code>: query point</li>
+<li><code>r</code>: circumradius (center to vertex)</li>
+<li><code>n</code>: number of sides</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">sdPolygon</span><span class="op">(</span><span class="dt">vec2</span> p<span class="op">,</span> <span class="dt">float</span> r<span class="op">,</span> <span class="dt">int</span> n<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> a <span class="op">=</span> <span class="bu">atan</span><span class="op">(</span>p<span class="op">.</span><span class="fu">x</span><span class="op">,</span> p<span class="op">.</span><span class="fu">y</span><span class="op">)</span> <span class="op">+</span> <span class="fl">3.14159265</span><span class="op">;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> s <span class="op">=</span> <span class="fl">6.28318530</span> <span class="op">/</span> <span class="dt">float</span><span class="op">(</span>n<span class="op">);</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">length</span><span class="op">(</span>p<span class="op">)</span> <span class="op">*</span> <span class="bu">cos</span><span class="op">(</span><span class="bu">mod</span><span class="op">(</span>a<span class="op">,</span> s<span class="op">)</span> <span class="op">-</span> s <span class="op">*</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">-</span> r<span class="op">;</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+</section>
+</section>
+<section id="d-primitives-1" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="d-primitives-1"><span class="header-section-number">1.2</span> 2. 3D Primitives</h2>
+<section id="sphere" class="level3">
+<h3 class="anchored" data-anchor-id="sphere">Sphere</h3>
+<p>Sphere centered at origin.</p>
+<ul>
+<li><code>p</code>: query point</li>
+<li><code>r</code>: radius</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">sdSphere</span><span class="op">(</span><span class="dt">vec3</span> p<span class="op">,</span> <span class="dt">float</span> r<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">length</span><span class="op">(</span>p<span class="op">)</span> <span class="op">-</span> r<span class="op">;</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="ellipsoid" class="level3">
+<h3 class="anchored" data-anchor-id="ellipsoid">Ellipsoid</h3>
+<p>Ellipsoid centered at origin.</p>
+<ul>
+<li><code>p</code>: query point</li>
+<li><code>r</code>: radii along each axis</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">sdEllipsoid</span><span class="op">(</span><span class="dt">vec3</span> p<span class="op">,</span> <span class="dt">vec3</span> r<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> k0 <span class="op">=</span> <span class="bu">length</span><span class="op">(</span>p <span class="op">/</span> r<span class="op">);</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> k1 <span class="op">=</span> <span class="bu">length</span><span class="op">(</span>p <span class="op">/</span> <span class="op">(</span>r <span class="op">*</span> r<span class="op">));</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> k0 <span class="op">*</span> <span class="op">(</span>k0 <span class="op">-</span> <span class="fl">1.0</span><span class="op">)</span> <span class="op">/</span> k1<span class="op">;</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="box-1" class="level3">
+<h3 class="anchored" data-anchor-id="box-1">Box</h3>
+<p>Axis-aligned box centered at origin.</p>
+<ul>
+<li><code>p</code>: query point</li>
+<li><code>b</code>: half-size (box extends from <code>-b</code> to <code>+b</code> along each axis)</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">sdBox</span><span class="op">(</span><span class="dt">vec3</span> p<span class="op">,</span> <span class="dt">vec3</span> b<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span> d <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span>p<span class="op">)</span> <span class="op">-</span> b<span class="op">;</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">length</span><span class="op">(</span><span class="bu">max</span><span class="op">(</span>d<span class="op">,</span> <span class="fl">0.0</span><span class="op">))</span> <span class="op">+</span> <span class="bu">min</span><span class="op">(</span><span class="bu">max</span><span class="op">(</span>d<span class="op">.</span><span class="fu">x</span><span class="op">,</span> <span class="bu">max</span><span class="op">(</span>d<span class="op">.</span><span class="fu">y</span><span class="op">,</span> d<span class="op">.</span><span class="fu">z</span><span class="op">)),</span> <span class="fl">0.0</span><span class="op">);</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="rounded-box-1" class="level3">
+<h3 class="anchored" data-anchor-id="rounded-box-1">Rounded Box</h3>
+<p>Axis-aligned box with rounded edges, centered at origin.</p>
+<ul>
+<li><code>p</code>: query point</li>
+<li><code>b</code>: half-size before rounding</li>
+<li><code>r</code>: edge radius</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">sdRoundBox</span><span class="op">(</span><span class="dt">vec3</span> p<span class="op">,</span> <span class="dt">vec3</span> b<span class="op">,</span> <span class="dt">float</span> r<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span> d <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span>p<span class="op">)</span> <span class="op">-</span> b <span class="op">+</span> r<span class="op">;</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">length</span><span class="op">(</span><span class="bu">max</span><span class="op">(</span>d<span class="op">,</span> <span class="fl">0.0</span><span class="op">))</span> <span class="op">+</span> <span class="bu">min</span><span class="op">(</span><span class="bu">max</span><span class="op">(</span>d<span class="op">.</span><span class="fu">x</span><span class="op">,</span> <span class="bu">max</span><span class="op">(</span>d<span class="op">.</span><span class="fu">y</span><span class="op">,</span> d<span class="op">.</span><span class="fu">z</span><span class="op">)),</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">-</span> r<span class="op">;</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="plane" class="level3">
+<h3 class="anchored" data-anchor-id="plane">Plane</h3>
+<p>Infinite plane.</p>
+<ul>
+<li><code>p</code>: query point</li>
+<li><code>n</code>: plane normal (will be normalized)</li>
+<li><code>h</code>: signed distance from origin to plane along normal</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">sdPlane</span><span class="op">(</span><span class="dt">vec3</span> p<span class="op">,</span> <span class="dt">vec3</span> n<span class="op">,</span> <span class="dt">float</span> h<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">dot</span><span class="op">(</span>p<span class="op">,</span> <span class="bu">normalize</span><span class="op">(</span>n<span class="op">))</span> <span class="op">+</span> h<span class="op">;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="torus" class="level3">
+<h3 class="anchored" data-anchor-id="torus">Torus</h3>
+<p>Torus centered at origin, lying in the xz-plane.</p>
+<ul>
+<li><code>p</code>: query point</li>
+<li><code>R</code>: major radius (center of torus to center of tube)</li>
+<li><code>r</code>: minor radius (tube thickness)</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">sdTorus</span><span class="op">(</span><span class="dt">vec3</span> p<span class="op">,</span> <span class="dt">float</span> R<span class="op">,</span> <span class="dt">float</span> r<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> q <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span><span class="bu">length</span><span class="op">(</span>p<span class="op">.</span><span class="fu">xz</span><span class="op">)</span> <span class="op">-</span> R<span class="op">,</span> p<span class="op">.</span><span class="fu">y</span><span class="op">);</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">length</span><span class="op">(</span>q<span class="op">)</span> <span class="op">-</span> r<span class="op">;</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="cylinder-infinite" class="level3">
+<h3 class="anchored" data-anchor-id="cylinder-infinite">Cylinder (Infinite)</h3>
+<p>Infinite cylinder along the y-axis, centered at origin.</p>
+<ul>
+<li><code>p</code>: query point</li>
+<li><code>r</code>: radius</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">sdCylinder</span><span class="op">(</span><span class="dt">vec3</span> p<span class="op">,</span> <span class="dt">float</span> r<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">length</span><span class="op">(</span>p<span class="op">.</span><span class="fu">xz</span><span class="op">)</span> <span class="op">-</span> r<span class="op">;</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="capped-cylinder" class="level3">
+<h3 class="anchored" data-anchor-id="capped-cylinder">Capped Cylinder</h3>
+<p>Finite cylinder along the y-axis, centered at origin.</p>
+<ul>
+<li><code>p</code>: query point</li>
+<li><code>h</code>: half-height (extends from <code>-h</code> to <code>+h</code> in y)</li>
+<li><code>r</code>: radius</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">sdCappedCylinder</span><span class="op">(</span><span class="dt">vec3</span> p<span class="op">,</span> <span class="dt">float</span> h<span class="op">,</span> <span class="dt">float</span> r<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> d <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span><span class="dt">vec2</span><span class="op">(</span><span class="bu">length</span><span class="op">(</span>p<span class="op">.</span><span class="fu">xz</span><span class="op">),</span> p<span class="op">.</span><span class="fu">y</span><span class="op">))</span> <span class="op">-</span> <span class="dt">vec2</span><span class="op">(</span>r<span class="op">,</span> h<span class="op">);</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">min</span><span class="op">(</span><span class="bu">max</span><span class="op">(</span>d<span class="op">.</span><span class="fu">x</span><span class="op">,</span> d<span class="op">.</span><span class="fu">y</span><span class="op">),</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">+</span> <span class="bu">length</span><span class="op">(</span><span class="bu">max</span><span class="op">(</span>d<span class="op">,</span> <span class="fl">0.0</span><span class="op">));</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="capsule" class="level3">
+<h3 class="anchored" data-anchor-id="capsule">Capsule</h3>
+<p>Capsule (cylinder with hemispherical caps) between two points.</p>
+<ul>
+<li><code>p</code>: query point</li>
+<li><code>a</code>: start point (center of first hemisphere)</li>
+<li><code>b</code>: end point (center of second hemisphere)</li>
+<li><code>r</code>: radius</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">sdCapsule</span><span class="op">(</span><span class="dt">vec3</span> p<span class="op">,</span> <span class="dt">vec3</span> a<span class="op">,</span> <span class="dt">vec3</span> b<span class="op">,</span> <span class="dt">float</span> r<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span> pa <span class="op">=</span> p <span class="op">-</span> a<span class="op">,</span> ba <span class="op">=</span> b <span class="op">-</span> a<span class="op">;</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> h <span class="op">=</span> <span class="bu">clamp</span><span class="op">(</span><span class="bu">dot</span><span class="op">(</span>pa<span class="op">,</span> ba<span class="op">)</span> <span class="op">/</span> <span class="bu">dot</span><span class="op">(</span>ba<span class="op">,</span> ba<span class="op">),</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">length</span><span class="op">(</span>pa <span class="op">-</span> ba <span class="op">*</span> h<span class="op">)</span> <span class="op">-</span> r<span class="op">;</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="cone-infinite" class="level3">
+<h3 class="anchored" data-anchor-id="cone-infinite">Cone (Infinite)</h3>
+<p>Infinite cone with apex at origin, opening downward along negative y-axis.</p>
+<ul>
+<li><code>p</code>: query point</li>
+<li><code>a</code>: half-angle (radians)</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">sdCone</span><span class="op">(</span><span class="dt">vec3</span> p<span class="op">,</span> <span class="dt">float</span> a<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> c <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span><span class="bu">sin</span><span class="op">(</span>a<span class="op">),</span> <span class="bu">cos</span><span class="op">(</span>a<span class="op">));</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> q <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span><span class="bu">length</span><span class="op">(</span>p<span class="op">.</span><span class="fu">xz</span><span class="op">),</span> <span class="op">-</span>p<span class="op">.</span><span class="fu">y</span><span class="op">);</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> d <span class="op">=</span> <span class="bu">length</span><span class="op">(</span>q <span class="op">-</span> c <span class="op">*</span> <span class="bu">max</span><span class="op">(</span><span class="bu">dot</span><span class="op">(</span>q<span class="op">,</span> c<span class="op">),</span> <span class="fl">0.0</span><span class="op">));</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> d <span class="op">*</span> <span class="op">((</span>q<span class="op">.</span><span class="fu">x</span> <span class="op">*</span> c<span class="op">.</span><span class="fu">y</span> <span class="op">-</span> q<span class="op">.</span><span class="fu">y</span> <span class="op">*</span> c<span class="op">.</span><span class="fu">x</span> <span class="op">&lt;</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">?</span> <span class="op">-</span><span class="fl">1.0</span> <span class="op">:</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="capped-cone" class="level3">
+<h3 class="anchored" data-anchor-id="capped-cone">Capped Cone</h3>
+<p>Finite cone (frustum) along the y-axis, centered at origin.</p>
+<ul>
+<li><code>p</code>: query point</li>
+<li><code>h</code>: half-height (extends from <code>-h</code> to <code>+h</code> in y)</li>
+<li><code>r1</code>: radius at bottom (y = -h)</li>
+<li><code>r2</code>: radius at top (y = +h)</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">sdCappedCone</span><span class="op">(</span><span class="dt">vec3</span> p<span class="op">,</span> <span class="dt">float</span> h<span class="op">,</span> <span class="dt">float</span> r1<span class="op">,</span> <span class="dt">float</span> r2<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> q <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span><span class="bu">length</span><span class="op">(</span>p<span class="op">.</span><span class="fu">xz</span><span class="op">),</span> p<span class="op">.</span><span class="fu">y</span><span class="op">);</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> k1 <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span>r2<span class="op">,</span> h<span class="op">);</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> k2 <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span>r2 <span class="op">-</span> r1<span class="op">,</span> <span class="fl">2.0</span> <span class="op">*</span> h<span class="op">);</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> ca <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span>q<span class="op">.</span><span class="fu">x</span> <span class="op">-</span> <span class="bu">min</span><span class="op">(</span>q<span class="op">.</span><span class="fu">x</span><span class="op">,</span> <span class="op">(</span>q<span class="op">.</span><span class="fu">y</span> <span class="op">&lt;</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">?</span> r1 <span class="op">:</span> r2<span class="op">),</span> <span class="bu">abs</span><span class="op">(</span>q<span class="op">.</span><span class="fu">y</span><span class="op">)</span> <span class="op">-</span> h<span class="op">);</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> cb <span class="op">=</span> q <span class="op">-</span> k1 <span class="op">+</span> k2 <span class="op">*</span> <span class="bu">clamp</span><span class="op">(</span><span class="bu">dot</span><span class="op">(</span>k1 <span class="op">-</span> q<span class="op">,</span> k2<span class="op">)</span> <span class="op">/</span> <span class="bu">dot</span><span class="op">(</span>k2<span class="op">,</span> k2<span class="op">),</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> s <span class="op">=</span> <span class="op">(</span>cb<span class="op">.</span><span class="fu">x</span> <span class="op">&lt;</span> <span class="fl">0.0</span> <span class="op">&amp;&amp;</span> ca<span class="op">.</span><span class="fu">y</span> <span class="op">&lt;</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">?</span> <span class="op">-</span><span class="fl">1.0</span> <span class="op">:</span> <span class="fl">1.0</span><span class="op">;</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> s <span class="op">*</span> <span class="bu">sqrt</span><span class="op">(</span><span class="bu">min</span><span class="op">(</span><span class="bu">dot</span><span class="op">(</span>ca<span class="op">,</span> ca<span class="op">),</span> <span class="bu">dot</span><span class="op">(</span>cb<span class="op">,</span> cb<span class="op">)));</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="octahedron" class="level3">
+<h3 class="anchored" data-anchor-id="octahedron">Octahedron</h3>
+<p>Regular octahedron centered at origin.</p>
+<ul>
+<li><code>p</code>: query point</li>
+<li><code>s</code>: vertex-to-center distance</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">sdOctahedron</span><span class="op">(</span><span class="dt">vec3</span> p<span class="op">,</span> <span class="dt">float</span> s<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    p <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span>p<span class="op">);</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="op">(</span>p<span class="op">.</span><span class="fu">x</span> <span class="op">+</span> p<span class="op">.</span><span class="fu">y</span> <span class="op">+</span> p<span class="op">.</span><span class="fu">z</span> <span class="op">-</span> s<span class="op">)</span> <span class="op">*</span> <span class="fl">0.57735027</span><span class="op">;</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+</section>
+</section>
+<section id="operations" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="operations"><span class="header-section-number">1.3</span> 3. Operations</h2>
+<section id="union" class="level3">
+<h3 class="anchored" data-anchor-id="union">Union</h3>
+<p>The closest surface:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">opUnion</span><span class="op">(</span><span class="dt">float</span> d1<span class="op">,</span> <span class="dt">float</span> d2<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">min</span><span class="op">(</span>d1<span class="op">,</span> d2<span class="op">);</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="intersection" class="level3">
+<h3 class="anchored" data-anchor-id="intersection">Intersection</h3>
+<p>Where both surfaces overlap:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">opIntersection</span><span class="op">(</span><span class="dt">float</span> d1<span class="op">,</span> <span class="dt">float</span> d2<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">max</span><span class="op">(</span>d1<span class="op">,</span> d2<span class="op">);</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="subtraction" class="level3">
+<h3 class="anchored" data-anchor-id="subtraction">Subtraction</h3>
+<p>Cut <code>d2</code> out of <code>d1</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">opSubtraction</span><span class="op">(</span><span class="dt">float</span> d1<span class="op">,</span> <span class="dt">float</span> d2<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">max</span><span class="op">(</span>d1<span class="op">,</span> <span class="op">-</span>d2<span class="op">);</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="smooth-union" class="level3">
+<h3 class="anchored" data-anchor-id="smooth-union">Smooth Union</h3>
+<p>Blends two surfaces smoothly:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">opSmoothUnion</span><span class="op">(</span><span class="dt">float</span> d1<span class="op">,</span> <span class="dt">float</span> d2<span class="op">,</span> <span class="dt">float</span> k<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> h <span class="op">=</span> <span class="bu">clamp</span><span class="op">(</span><span class="fl">0.5</span> <span class="op">+</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="op">(</span>d2 <span class="op">-</span> d1<span class="op">)</span> <span class="op">/</span> k<span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">mix</span><span class="op">(</span>d2<span class="op">,</span> d1<span class="op">,</span> h<span class="op">)</span> <span class="op">-</span> k <span class="op">*</span> h <span class="op">*</span> <span class="op">(</span><span class="fl">1.0</span> <span class="op">-</span> h<span class="op">);</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>k</code> controls the blend radius. Larger <code>k</code> means a wider, smoother blend.</p>
+</section>
+<section id="smooth-intersection" class="level3">
+<h3 class="anchored" data-anchor-id="smooth-intersection">Smooth Intersection</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">opSmoothIntersection</span><span class="op">(</span><span class="dt">float</span> d1<span class="op">,</span> <span class="dt">float</span> d2<span class="op">,</span> <span class="dt">float</span> k<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> h <span class="op">=</span> <span class="bu">clamp</span><span class="op">(</span><span class="fl">0.5</span> <span class="op">-</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="op">(</span>d2 <span class="op">-</span> d1<span class="op">)</span> <span class="op">/</span> k<span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">mix</span><span class="op">(</span>d2<span class="op">,</span> d1<span class="op">,</span> h<span class="op">)</span> <span class="op">+</span> k <span class="op">*</span> h <span class="op">*</span> <span class="op">(</span><span class="fl">1.0</span> <span class="op">-</span> h<span class="op">);</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="smooth-subtraction" class="level3">
+<h3 class="anchored" data-anchor-id="smooth-subtraction">Smooth Subtraction</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">opSmoothSubtraction</span><span class="op">(</span><span class="dt">float</span> d1<span class="op">,</span> <span class="dt">float</span> d2<span class="op">,</span> <span class="dt">float</span> k<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> h <span class="op">=</span> <span class="bu">clamp</span><span class="op">(</span><span class="fl">0.5</span> <span class="op">-</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="op">(</span>d2 <span class="op">+</span> d1<span class="op">)</span> <span class="op">/</span> k<span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">mix</span><span class="op">(</span>d1<span class="op">,</span> <span class="op">-</span>d2<span class="op">,</span> h<span class="op">)</span> <span class="op">+</span> k <span class="op">*</span> h <span class="op">*</span> <span class="op">(</span><span class="fl">1.0</span> <span class="op">-</span> h<span class="op">);</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+</section>
+</section>
+<section id="transformations" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="transformations"><span class="header-section-number">1.4</span> 4. Transformations</h2>
+<section id="translation" class="level3">
+<h3 class="anchored" data-anchor-id="translation">Translation</h3>
+<p>To move a shape, translate the point in the opposite direction:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> d <span class="op">=</span> <span class="fu">sdSphere</span><span class="op">(</span>p <span class="op">-</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">),</span> <span class="fl">1.0</span><span class="op">);</span>  <span class="co">// sphere at (1, 0, 0)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="rotation" class="level3">
+<h3 class="anchored" data-anchor-id="rotation">Rotation</h3>
+<p>To rotate a shape, rotate the point by the inverse (or just transpose the rotation matrix for orthogonal matrices):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="dt">mat3</span> rot <span class="op">=</span> <span class="fu">rotateY</span><span class="op">(</span><span class="fl">0.5</span><span class="op">);</span>  <span class="co">// see Coordinates appendix</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> d <span class="op">=</span> <span class="fu">sdBox</span><span class="op">(</span>rot <span class="op">*</span> p<span class="op">,</span> <span class="dt">vec3</span><span class="op">(</span><span class="fl">1.0</span><span class="op">));</span>  <span class="co">// rotated box</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="scaling" class="level3">
+<h3 class="anchored" data-anchor-id="scaling">Scaling</h3>
+<p>Scale the point, then scale the result:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb31"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> s <span class="op">=</span> <span class="fl">2.0</span><span class="op">;</span>  <span class="co">// scale factor</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> d <span class="op">=</span> <span class="fu">sdSphere</span><span class="op">(</span>p <span class="op">/</span> s<span class="op">,</span> <span class="fl">1.0</span><span class="op">)</span> <span class="op">*</span> s<span class="op">;</span>  <span class="co">// sphere scaled by 2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>You must multiply the result by <code>s</code> to keep it a valid distance field.</p>
+</section>
+<section id="repetition-euclidean-grid" class="level3">
+<h3 class="anchored" data-anchor-id="repetition-euclidean-grid">Repetition (Euclidean Grid)</h3>
+<p>Use <code>mod</code> to repeat space infinitely:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> <span class="fu">opRep</span><span class="op">(</span><span class="dt">vec3</span> p<span class="op">,</span> <span class="dt">vec3</span> c<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec3</span> q <span class="op">=</span> <span class="bu">mod</span><span class="op">(</span>p <span class="op">+</span> <span class="fl">0.5</span> <span class="op">*</span> c<span class="op">,</span> c<span class="op">)</span> <span class="op">-</span> <span class="fl">0.5</span> <span class="op">*</span> c<span class="op">;</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="fu">sdPrimitive</span><span class="op">(</span>q<span class="op">);</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>c</code> is the cell size. This places one copy of the primitive in each cell of a Euclidean grid.</p>
+<p><strong>Note:</strong> This technique uses the Euclidean structure — the cells are rectangles and <code>mod</code> wraps coordinates linearly. For non-Euclidean repetition (e.g., hyperbolic tilings), you need different methods; see Day 3.</p>
+</section>
+<section id="symmetry" class="level3">
+<h3 class="anchored" data-anchor-id="symmetry">Symmetry</h3>
+<p>Use <code>abs</code> to mirror across a plane:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>p<span class="op">.</span><span class="fu">x</span> <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span>p<span class="op">.</span><span class="fu">x</span><span class="op">);</span>  <span class="co">// mirror across the yz-plane</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> d <span class="op">=</span> <span class="fu">sdPrimitive</span><span class="op">(</span>p<span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This places the primitive (or whatever part is in <span class="math inline">\(x &gt; 0\)</span>) on both sides.</p>
+<p>Combine for multi-axis symmetry:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb34"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> <span class="bu">abs</span><span class="op">(</span>p<span class="op">);</span>  <span class="co">// octant symmetry — 8 copies</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+</section>
+</section>
+<section id="normals" class="level2" data-number="1.5">
+<h2 data-number="1.5" class="anchored" data-anchor-id="normals"><span class="header-section-number">1.5</span> 5. Normals</h2>
+<p>The gradient of an SDF points in the direction of steepest increase — away from the surface. This is the surface normal.</p>
+<section id="the-formula" class="level3">
+<h3 class="anchored" data-anchor-id="the-formula">The Formula</h3>
+<p>For an SDF <span class="math inline">\(f\)</span>, the normal at point <span class="math inline">\(\mathbf{p}\)</span> is:</p>
+<p><span class="math display">\[\mathbf{n} = \frac{\nabla f}{|\nabla f|} = \text{normalize}\left( \frac{\partial f}{\partial x}, \frac{\partial f}{\partial y}, \frac{\partial f}{\partial z} \right)\]</span></p>
+</section>
+<section id="implementation" class="level3">
+<h3 class="anchored" data-anchor-id="implementation">Implementation</h3>
+<p>Approximate the gradient numerically with central differences:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb35"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> <span class="fu">getNormal</span><span class="op">(</span><span class="dt">vec3</span> p<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> e <span class="op">=</span> <span class="fl">0.0001</span><span class="op">;</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">normalize</span><span class="op">(</span><span class="dt">vec3</span><span class="op">(</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sceneSDF</span><span class="op">(</span>p <span class="op">+</span> <span class="dt">vec3</span><span class="op">(</span>e<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">))</span> <span class="op">-</span> <span class="fu">sceneSDF</span><span class="op">(</span>p <span class="op">-</span> <span class="dt">vec3</span><span class="op">(</span>e<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">)),</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sceneSDF</span><span class="op">(</span>p <span class="op">+</span> <span class="dt">vec3</span><span class="op">(</span><span class="dv">0</span><span class="op">,</span> e<span class="op">,</span> <span class="dv">0</span><span class="op">))</span> <span class="op">-</span> <span class="fu">sceneSDF</span><span class="op">(</span>p <span class="op">-</span> <span class="dt">vec3</span><span class="op">(</span><span class="dv">0</span><span class="op">,</span> e<span class="op">,</span> <span class="dv">0</span><span class="op">)),</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sceneSDF</span><span class="op">(</span>p <span class="op">+</span> <span class="dt">vec3</span><span class="op">(</span><span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> e<span class="op">))</span> <span class="op">-</span> <span class="fu">sceneSDF</span><span class="op">(</span>p <span class="op">-</span> <span class="dt">vec3</span><span class="op">(</span><span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> e<span class="op">))</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">));</span></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This requires 6 SDF evaluations. A cheaper version uses tetrahedral sampling:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb36"><pre class="sourceCode glsl code-with-copy"><code class="sourceCode glsl"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="dt">vec3</span> <span class="fu">getNormal</span><span class="op">(</span><span class="dt">vec3</span> p<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> e <span class="op">=</span> <span class="fl">0.0001</span><span class="op">;</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">vec2</span> k <span class="op">=</span> <span class="dt">vec2</span><span class="op">(</span><span class="dv">1</span><span class="op">,</span> <span class="op">-</span><span class="dv">1</span><span class="op">);</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="bu">normalize</span><span class="op">(</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>        k<span class="op">.</span><span class="fu">xyy</span> <span class="op">*</span> <span class="fu">sceneSDF</span><span class="op">(</span>p <span class="op">+</span> k<span class="op">.</span><span class="fu">xyy</span> <span class="op">*</span> e<span class="op">)</span> <span class="op">+</span></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>        k<span class="op">.</span><span class="fu">yyx</span> <span class="op">*</span> <span class="fu">sceneSDF</span><span class="op">(</span>p <span class="op">+</span> k<span class="op">.</span><span class="fu">yyx</span> <span class="op">*</span> e<span class="op">)</span> <span class="op">+</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>        k<span class="op">.</span><span class="fu">yxy</span> <span class="op">*</span> <span class="fu">sceneSDF</span><span class="op">(</span>p <span class="op">+</span> k<span class="op">.</span><span class="fu">yxy</span> <span class="op">*</span> e<span class="op">)</span> <span class="op">+</span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>        k<span class="op">.</span><span class="fu">xxx</span> <span class="op">*</span> <span class="fu">sceneSDF</span><span class="op">(</span>p <span class="op">+</span> k<span class="op">.</span><span class="fu">xxx</span> <span class="op">*</span> e<span class="op">)</span></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">);</span></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This uses 4 evaluations at the vertices of a tetrahedron centered on <code>p</code>.</p>
+</section>
+<section id="choosing-epsilon" class="level3">
+<h3 class="anchored" data-anchor-id="choosing-epsilon">Choosing Epsilon</h3>
+<ul>
+<li>Too large: normals are smoothed, fine details lost</li>
+<li>Too small: numerical noise, especially far from origin</li>
+</ul>
+<p>A value around <code>0.0001</code> to <code>0.001</code> works for most scenes. For very small or detailed geometry, scale epsilon accordingly.</p>
+<hr>
+</section>
+</section>
+<section id="resources" class="level2" data-number="1.6">
+<h2 data-number="1.6" class="anchored" data-anchor-id="resources"><span class="header-section-number">1.6</span> 6. Resources</h2>
+<p>For the complete collection of SDF primitives and operations:</p>
+<ul>
+<li><strong>2D SDFs</strong>: https://iquilezles.org/articles/distfunctions2d/</li>
+<li><strong>3D SDFs</strong>: https://iquilezles.org/articles/distfunctions/</li>
+</ul>
+<p>These pages include many more primitives, exact vs.&nbsp;bound SDFs, and advanced operations.</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>
