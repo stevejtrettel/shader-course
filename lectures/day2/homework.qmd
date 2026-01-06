@@ -209,6 +209,12 @@ $$d \approx \frac{|z_n| \log|z_n|}{|z'_n|}$$
 
 The $\log|z|$ factor comes from the potential theory of the Mandelbrot set (the Green's function of the complement).
 
+To read more, see
+
+[Distance Estimation Method for Fractals, Lindsay Robert Wilson](http://www.imajeenyus.com/mathematics/20121112_distance_estimates/distance_estimation_method_for_fractals.pdf)
+
+[Distance to Fractals, Inigo Quilez](https://iquilezles.org/articles/distancefractals/)
+
 **Part C: Implementation**
 
 Track `z` and `dz` as two `vec2`s. **Important**: update `dz` before `z` in the loop, since the derivative formula uses the current `z`. Use a large escape radius (256) for numerical stability in the log formula:
