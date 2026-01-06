@@ -57,7 +57,7 @@ function le(n) {
     // offset
   ), n.bindVertexArray(null), n.bindBuffer(n.ARRAY_BUFFER, null), e;
 }
-function z(n, e, t) {
+function N(n, e, t) {
   const r = n.createTexture();
   if (!r)
     throw new Error("Failed to create texture");
@@ -289,7 +289,7 @@ class Ee {
     this._width = e, this._height = t;
     const r = this.gl;
     for (const i of this._passes)
-      r.deleteTexture(i.currentTexture), r.deleteTexture(i.previousTexture), r.deleteFramebuffer(i.framebuffer), i.currentTexture = z(r, e, t), i.previousTexture = z(r, e, t), i.framebuffer = Z(r, i.currentTexture);
+      r.deleteTexture(i.currentTexture), r.deleteTexture(i.previousTexture), r.deleteFramebuffer(i.framebuffer), i.currentTexture = N(r, e, t), i.previousTexture = N(r, e, t), i.framebuffer = Z(r, i.currentTexture);
   }
   /**
    * Reset frame counter and clear all render targets.
@@ -418,7 +418,7 @@ class Ee {
             e.getUniformLocation(m, "iChannel2"),
             e.getUniformLocation(m, "iChannel3")
           ]
-        }, T = z(e, this._width, this._height), E = z(e, this._width, this._height), x = Z(e, T), y = {
+        }, T = N(e, this._width, this._height), E = N(e, this._width, this._height), x = Z(e, T), y = {
           name: c,
           projectChannels: p.channels,
           vao: r,
@@ -1574,12 +1574,12 @@ var Y = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
                   $--, P = s.slice(B, k), L.index -= B;
                 } else if (L = b(q, 0, P, D), !L)
                   continue;
-                var I = L.index, O = L[0], H = P.slice(0, I), W = P.slice(I + O.length), X = B + P.length;
+                var I = L.index, z = L[0], H = P.slice(0, I), W = P.slice(I + z.length), X = B + P.length;
                 d && X > d.reach && (d.reach = X);
-                var N = S.prev;
-                H && (N = x(a, N, H), B += H.length), y(a, N, $);
-                var ie = new m(v, M ? o.tokenize(O, M) : O, re, O);
-                if (S = x(a, N, ie), W && x(a, S, W), $ > 1) {
+                var O = S.prev;
+                H && (O = x(a, O, H), B += H.length), y(a, O, $);
+                var ie = new m(v, M ? o.tokenize(z, M) : z, re, z);
+                if (S = x(a, O, ie), W && x(a, S, W), $ > 1) {
                   var G = {
                     cause: v + "," + F,
                     reach: X
@@ -2577,35 +2577,54 @@ vec3 palette(float t) {
     return a + b * cos(6.28318 * (c * t + d));
 }
 
-vec2 normalize_coord(vec2 fragCoord) {
+vec2 normalize_coord(vec2 fragCoord, float zoom) {
     vec2 uv = fragCoord / iResolution.xy;
     uv = uv - vec2(0.5, 0.5);
     uv.x *= iResolution.x / iResolution.y;
-    float zoom = pow(1.5, mod(iTime, 30.0));
     return uv * 2.5 / zoom;
 }
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    // Zoom into the seahorse valley
-    vec2 center = vec2(-0.745, 0.186);
-    vec2 c = center + normalize_coord(fragCoord);
+    // Zoom parameters
+    float zoom = pow(2.0, iTime * 0.5);
+    vec2 center = vec2(-0.745, 0.186);  // seahorse valley
+    vec2 c = center + normalize_coord(fragCoord, zoom);
+    
+    vec2 z = vec2(0.0, 0.0);
+    vec2 dz = vec2(0.0, 0.0);
+    
+    int i;
+    for (i = 0; i < 512; i++) {
+        if (length(z) > 256.0) break;
+        
+        dz = 2.0 * cmul(z, dz) + vec2(1.0, 0.0);
+        z = cmul(z, z) + c;
+    }
     
     vec3 color = vec3(0.0, 0.0, 0.0);
     
-    vec2 z = vec2(0.0, 0.0);
-    int i;
-    for (i = 0; i < 200; i++) {
-        if (length(z) > 2.0) {
+    if (i < 512) {
+        float r = length(z);
+        float dr = length(dz);
+        
+        if (dr > 0.0001) {
+            // Distance estimation
+            float dist = 0.5 * r * log(r) / dr;
+            float scaled_dist = dist * zoom;
+            
             // Smooth coloring
-            float log_zn = log(length(z) * length(z)) / 2.0;
+            float log_zn = log(r);
             float nu = log(log_zn / log(2.0)) / log(2.0);
             float smooth_iter = float(i) + 1.0 - nu;
-            float t = smooth_iter / 200.0;
-            color = palette(t * 4.0);
-            break;
+            float t = smooth_iter / 512.0;
+            
+            color = palette(t * 5.0);
+            
+            // Glow near boundary
+            float glow = exp(-scaled_dist * 200.0);
+            color = mix(color, vec3(1.0, 1.0, 1.0), glow * 0.7);
         }
-        z = cmul(z, z) + c;
     }
     
     fragColor = vec4(color, 1.0);

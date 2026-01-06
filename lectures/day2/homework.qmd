@@ -24,16 +24,27 @@ vec2 cpow(vec2 z, float n) {
 
 Try $n = 3, 4, 5$—what rotational symmetry does each have? Why? Try $n = 2.5$ and look for the discontinuity.
 
-**C3. Smooth Coloring.** The discrete iteration count creates visible color bands. This formula gives a fractional escape time that removes them:
+**C3. Animated Zoom.** Animate a zoom into the Mandelbrot set. To zoom smoothly, the magnification factor $m(t)$ should satisfy $\frac{dm}{dt} = k \cdot m$ for constant $k$—that is, the rate of magnification is proportional to current magnification. The solution is $m(t) = a^t$ for some base $a > 1$.
 
+Modify `normalize_coord` to incorporate zoom:
 ```glsl
-// After the loop, if escaped:
-float log_zn = log(cabs2(z)) / 2.0;
-float nu = log(log_zn / log(2.0)) / log(2.0);
-float smooth_iter = float(iter) + 1.0 - nu;
+vec2 normalize_coord(vec2 fragCoord) {
+    vec2 uv = fragCoord / iResolution.xy;
+    uv = uv - vec2(0.5, 0.5);
+    uv.x *= iResolution.x / iResolution.y;
+    
+    float zoom = pow(2.0, iTime);  // doubles every second
+    return uv * 2.5 / zoom;
+}
 ```
 
-Apply this to your Mandelbrot or Julia shader. The bands should vanish. For best results, run 2-3 extra iterations after detecting escape before computing `smooth_iter`.
+Then zoom into a specific point by adding an offset:
+```glsl
+vec2 center = vec2(-0.745, 0.186);  // seahorse valley
+vec2 c = center + normalize_coord(fragCoord);
+```
+
+Try different zoom rates (change the base from 2.0) and different center points. What happens to the boundary as you zoom past $10^6\times$ magnification?
 
 **C4. Apollonian Animation.** Animate the Apollonian gasket by letting the iteration count grow with time:
 ```glsl
@@ -50,7 +61,7 @@ These extend the day's topics in interesting directions.
 ```glsl
 vec2 cardioid(float t) {
     vec2 eit = vec2(cos(t), sin(t));
-    return cmul(eit, (vec2(2.0, 0.0) - eit) / 4.0);
+    return cmul(eit, (vec2(2.0, 0.0) - eit)) / 4.0;
 }
 vec2 c = cardioid(iTime * 0.5);
 ```
@@ -62,7 +73,7 @@ Every point on the cardioid gives a Julia set with a parabolic fixed point—rig
 - **Tricorn**: $z_{n+1} = \bar{z}_n^2 + c$ where $\bar{z} = x - iy$ is the complex conjugate. Also called the "Mandelbar."
 - **Celtic**: $z_{n+1} = (|\text{Re}(z_n^2)| + i\,\text{Im}(z_n^2)) + c$ — absolute value of real part *after* squaring.
 
-The escape condition $|z| > 2$ still applies. Use smooth coloring (C3) and experiment with different palette parameters to make these look good—they can be just as beautiful as the Mandelbrot set with the right coloring.
+The escape condition $|z| > 2$ still applies. Experiment with different palette parameters to make these look good.
 
 **E3. Sierpinski Carpet.** Render the Sierpinski carpet using the same iterate-and-test approach as the Apollonian gasket.
 
@@ -152,21 +163,6 @@ Experiment with coloring: `palette(trap_dist * 5.0)` or glow effects like `exp(-
 
 The results reveal structure invisible in standard escape-time coloring.
 
-**H6. Distance Estimation.** The escape-time algorithm gives blocky boundaries at high zoom. Distance estimation produces smooth, resolution-independent boundaries by tracking the derivative of the orbit.
-
-Let $z'_n = \frac{\partial z_n}{\partial c}$. Starting from $z_0 = 0$ and $z'_0 = 0$, derive the recurrence for $z'_{n+1}$ using the chain rule on $z_{n+1} = z_n^2 + c$.
-
-When the orbit escapes, the distance to the Mandelbrot boundary is approximately:
-$$d \approx \frac{|z_n| \log|z_n|}{|z'_n|}$$
-
-Implement distance estimation and use it to visualize the boundary:
-- **Sharp boundary**: `d < 0.002 ? white : black`
-- **Glow effect**: `exp(-d * 200.0)`
-- **Contour lines**: `fract(log(d) * 5.0)`
-
-To see the improvement, zoom into a region of the boundary (say, near $c = -0.75 + 0.1i$ at 100× magnification) and compare escape-time coloring to distance-based rendering. The distance estimator gives crisp edges at any zoom level.
-
-
 ## Projects
 
 **Project 1: Grid of Julia Sets**
@@ -187,7 +183,120 @@ Map `cell_center` to a parameter $c$ in an interesting region of the complex pla
 
 Color the Julia sets dark on a light background (inverted from the usual convention). When you zoom out, the grid reveals the Mandelbrot set: cells with $c \in \mathcal{M}$ show connected Julia sets, cells with $c \notin \mathcal{M}$ show scattered dust. This is the Mandelbrot-Julia correspondence made visible.
 
-**Project 2: Orbit Visualization**
+
+**Project 2: Deep Zoom with Distance Estimation**
+
+The escape-time algorithm breaks down at high magnification: boundaries become blocky staircases of iteration bands. Increasing `max_iter` helps but never fully solves it. Distance estimation produces smooth, resolution-independent boundaries by computing the actual distance to the Mandelbrot set.
+
+**Part A: The Problem**
+
+Implement an animated zoom (C3) targeting the seahorse valley at $c = -0.745 + 0.186i$. Watch the boundary as magnification passes $10^3$, $10^6$, $10^9$. The curves degrade into chunky steps—this is fundamental to the escape-time method, not a bug you can fix by iterating more.
+
+**Part B: Distance to an Implicit Curve**
+
+For any implicit curve $f(\mathbf{x}) = 0$, the distance from a nearby point to the curve is approximately
+$$d \approx \frac{|f(\mathbf{x})|}{|\nabla f(\mathbf{x})|}$$
+
+This is the first-order Taylor approximation: $f(\mathbf{x} + \boldsymbol{\epsilon}) \approx f(\mathbf{x}) + \nabla f \cdot \boldsymbol{\epsilon}$. Setting this to zero and solving for $|\boldsymbol{\epsilon}|$ gives the formula above.
+
+For the Mandelbrot set, we need the gradient of the escape-time function with respect to $c$. Let $z'_n = \frac{\partial z_n}{\partial c}$. Starting from $z_0 = 0$ and $z'_0 = 0$, differentiate $z_{n+1} = z_n^2 + c$:
+$$z'_{n+1} = 2 z_n z'_n + 1$$
+
+This is just the chain rule. Track $z'$ alongside $z$ during iteration.
+
+When the orbit escapes, the distance to the Mandelbrot boundary is:
+$$d \approx \frac{|z_n| \log|z_n|}{|z'_n|}$$
+
+The $\log|z|$ factor comes from the potential theory of the Mandelbrot set (the Green's function of the complement).
+
+**Part C: Implementation**
+
+Track `z` and `dz` as two `vec2`s. **Important**: update `dz` before `z` in the loop, since the derivative formula uses the current `z`. Use a large escape radius (256) for numerical stability in the log formula:
+
+```glsl
+vec2 z = vec2(0.0, 0.0);
+vec2 dz = vec2(0.0, 0.0);
+
+for (int i = 0; i < 256; i++) {
+    if (length(z) > 256.0) break;
+    
+    // Update dz BEFORE z (uses current z)
+    dz = 2.0 * cmul(z, dz) + vec2(1.0, 0.0);
+    z = cmul(z, z) + c;
+}
+
+float r = length(z);
+float dr = length(dz);
+float d = 0.5 * r * log(r) / dr;
+```
+
+Build a complete shader that renders the Mandelbrot set using distance estimation with a glow effect: `exp(-d * scale)`. Start with the standard view (no zoom) and adjust `scale` until you see a bright glow near the boundary that fades to dark farther away. Protect against division by zero when `dr` is very small.
+
+**Part D: Adding Zoom**
+
+Add animated zoom to your Part C shader using the exponential zoom from C3. The challenge: as you zoom in, the glow becomes invisibly thin (the distance shrinks in world coordinates).
+
+The fix: multiply `d` by the zoom factor before computing the glow. This keeps the visual thickness constant:
+
+```glsl
+float zoom = pow(2.0, iTime);
+// ... compute d as before ...
+float scaled_d = d * zoom;
+float glow = exp(-scaled_d * 200.0);
+```
+
+Target the seahorse valley at $c = -0.745 + 0.186i$. Watch the boundary stay crisp as you zoom past $10^6\times$ magnification—compare this to your C3 result.
+
+**Part E: Smooth Coloring for the Exterior**
+
+Distance estimation handles the boundary, but the exterior still shows discrete iteration bands. A fractional escape time removes them.
+
+When the orbit escapes at iteration $n$, the "true" escape time is slightly less than $n$. The correction comes from the potential function $G(z) = \lim_{n\to\infty} \frac{1}{2^n}\log|z_n|$:
+
+```glsl
+// After the loop, if escaped:
+float log_zn = log(length(z));
+float nu = log(log_zn / log(2.0)) / log(2.0);
+float smooth_iter = float(i) + 1.0 - nu;
+```
+
+Use `smooth_iter` instead of `i` for coloring. The bands vanish.
+
+**Part F: Putting It Together**
+
+Build a polished deep zoom combining:
+1. Distance estimation for crisp boundaries at any magnification
+2. Smooth coloring for the exterior
+3. Animated exponential zoom (C3)
+4. A visually interesting target (minibrots, spirals, dendrites)
+
+Compare your result to pure escape-time rendering at the same magnification. The difference is dramatic.
+
+**Extension: Dual Complex Numbers**
+
+Instead of tracking `z` and `dz` separately, pack them into a `vec4` where `.xy` is the value and `.zw` is the derivative. Define arithmetic so derivatives propagate automatically:
+
+```glsl
+vec4 dcSqr(vec4 a) {
+    return vec4(
+        a.x*a.x - a.y*a.y,            // z²: real
+        2.0*a.x*a.y,                   // z²: imag
+        2.0*(a.x*a.z - a.y*a.w),      // (z²)': real
+        2.0*(a.x*a.w + a.y*a.z)       // (z²)': imag
+    );
+}
+
+vec4 dcAdd(vec4 a, vec4 b) {
+    return a + b;
+}
+```
+
+Then the iteration is just `z = dcAdd(dcSqr(z), c)` where `c = vec4(c.xy, 1.0, 0.0)`.
+
+This is *automatic differentiation*—a technique that extends far beyond fractals. The dual number approach generalizes to higher derivatives, gradients in higher dimensions, and forms the basis of modern machine learning frameworks.
+
+
+**Project 3: Orbit Visualization**
 
 Instead of coloring by iteration count, visualize the actual orbit. Let the mouse control the starting point $z_0$:
 
