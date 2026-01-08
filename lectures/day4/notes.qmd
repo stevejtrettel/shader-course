@@ -1,25 +1,209 @@
 # Day 4: Simulation
 
-Today we are learning about buffers — shaders that remember their previous frame. This lets us simulate things that evolve over time: like the game of life, or these waves trapped in the mandelbrot set.
+Today we learn how shaders can read from images — and eventually, from themselves. This lets us simulate things that evolve over time: like the game of life, or these waves trapped in the Mandelbrot set.
 
 {{< shader-demo day4/mandelbrot-waves-hook >}}
 
 Click to add ripples.
 
 
+## Textures
+
+So far, our shaders have generated everything procedurally — every color computed from coordinates and math. But shaders can also read from images. In Shadertoy, we load images into **channels** that our shader can sample.
+
+To load a texture:
+
+1. Click `iChannel0` at the bottom of the editor
+2. Select the "Textures" tab
+3. Choose an image (try "Abstract 1" or any photograph)
+
+Now `iChannel0` holds your image, and you can read from it in your shader.
+
+### Displaying a Texture
+
+The simplest thing: read the texture and display it.
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    fragColor = texture(iChannel0, uv);
+}
+```
+
+{{< shader-demo day4/texture-basic >}}
+
+The `texture` function takes a channel and **UV coordinates** — coordinates normalized to the range [0, 1]. We compute `uv` by dividing pixel position by resolution: bottom-left is (0, 0), top-right is (1, 1).
+
+Why normalized coordinates? They're resolution-independent. A point at UV (0.5, 0.5) is always the center of the image, whether the image is 256×256 or 4096×2048.
+
+::: {.callout-note}
+## GLSL: texture vs texelFetch
+
+GLSL gives us two ways to read from images:
+
+- `texture(channel, uv)` — Takes normalized UV coordinates [0, 1]. Interpolates between pixels for smooth results.
+- `texelFetch(channel, ivec2(x, y), 0)` — Takes exact integer pixel coordinates. Returns that precise pixel, no interpolation. The third argument is the mipmap level (use 0).
+
+Use `texture` when you want smooth sampling at arbitrary positions. Use `texelFetch` when you need exact pixel values — like reading simulation state from a buffer.
+:::
+
+### Pixel Coordinates with texelFetch
+
+We can also read using pixel coordinates directly:
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    fragColor = texelFetch(iChannel0, ivec2(fragCoord), 0);
+}
+```
+
+This reads the pixel at exactly `fragCoord` — no interpolation, no coordinate conversion. The result looks the same, but the texture won't scale smoothly if the shader resolution differs from the image resolution.
+
+
+## Image Distortion
+
+Here's where it gets fun. The coordinates we sample don't have to match where we're writing. If we modify the UV coordinates before sampling, we distort the image.
+
+### Flipping
+
+Flip horizontally by inverting the x coordinate:
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    uv.x = 1.0 - uv.x;  // Mirror horizontally
+    fragColor = texture(iChannel0, uv);
+}
+```
+
+{{< shader-demo day4/texture-flip >}}
+
+Each pixel asks: "What color should I be?" And we answer: "Whatever color is on the opposite side of the image."
+
+### Wavy Distortion
+
+Add a sine wave to the coordinates:
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    
+    // Offset x based on y position and time
+    uv.x += 0.03 * sin(uv.y * 20.0 + iTime * 2.0);
+    
+    fragColor = texture(iChannel0, uv);
+}
+```
+
+{{< shader-demo day4/texture-wavy >}}
+
+The distortion ripples through the image. Notice how `texture` smoothly interpolates — we're sampling at positions between pixels, and it blends them together.
+
+### Swirl
+
+Rotate coordinates around the center, with the rotation angle depending on distance:
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    vec2 center = vec2(0.5);
+    
+    vec2 offset = uv - center;
+    float dist = length(offset);
+    float angle = atan(offset.y, offset.x);
+    
+    // Rotate more near the center
+    float swirl = 2.0 * exp(-dist * 3.0);
+    angle += swirl;
+    
+    uv = center + dist * vec2(cos(angle), sin(angle));
+    fragColor = texture(iChannel0, uv);
+}
+```
+
+{{< shader-demo day4/texture-swirl >}}
+
+The center twists while the edges stay mostly fixed.
+
+### Magnifying Glass
+
+Sample from a smaller region around the mouse to create a zoom effect:
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    
+    float dist = length(uv - mouse);
+    float radius = 0.15;
+    
+    if (dist < radius) {
+        // Inside lens: sample closer to mouse position (zoom in)
+        float zoom = 2.0;
+        uv = mouse + (uv - mouse) / zoom;
+    }
+    
+    fragColor = texture(iChannel0, uv);
+}
+```
+
+{{< shader-demo day4/texture-magnify >}}
+
+Click and drag to move the lens. Inside the circle, we sample from a compressed region — making things appear larger.
+
+::: {.callout-tip}
+## The Key Insight
+
+Distortion shaders work by lying about coordinates. Each pixel asks the texture "what color is here?" — but "here" can be anywhere we want. Move "here" in interesting ways, and the image warps.
+:::
+
+
 ## Buffers
 
-Until now, our shaders have written directly to the screen. A **buffer** is a shader that writes to a stored image instead. That image persists between frames, and any shader — including the buffer itself — can read from it.
+Let's make a painting program. When you click and drag, you leave a mark. Simple enough:
 
-In Shadertoy, we get four buffers (A through D) plus the Image shader. To set up a buffer that can see its own previous output:
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    float d = length(fragCoord - iMouse.xy);
+    
+    if (iMouse.z > 0.0 && d < 10.0) {
+        fragColor = vec4(1.0);  // White brush
+    } else {
+        fragColor = vec4(0.0, 0.0, 0.0, 1.0);  // Black background
+    }
+}
+```
+
+{{< shader-demo day4/paint-broken >}}
+
+Try it. You get a white dot that follows the mouse — but it doesn't leave a trail. Each frame, we redraw from scratch: white near the mouse, black everywhere else. The shader has no memory.
+
+What we want: pixels that stay white *after* we paint them. Each frame, we need to ask "was this pixel painted before?" But we can't — last frame's output is gone.
+
+Unless we save it.
+
+A **buffer** is a shader that writes to a stored image instead of the screen. That image persists between frames, and any shader — including the buffer itself — can read from it via `iChannel0`. Same sampling functions you just learned, but now pointing at your own previous output.
+
+Think about what this means: the buffer reads last frame's image, decides what to change, and writes the new image. Next frame, it reads *that* image. It's a feedback loop — and feedback loops can remember.
+
+### Setting Up a Buffer
+
+In Shadertoy, we get four buffers (A through D) plus the Image shader. To create a buffer that sees itself:
 
 1. Click the **+** tab next to "Image" and select "Buffer A"
-2. In Buffer A, click `iChannel0` at the bottom and select "Buffer A" from the Misc tab
+2. In Buffer A, click `iChannel0` and select "Buffer A" from the Misc tab
 3. In Image, click `iChannel0` and select "Buffer A"
 
-Now Buffer A can read what it wrote last frame, and Image displays the result. Let's use this to make a simple painting program.
+Now Buffer A reads its own previous frame, and Image displays whatever Buffer A produces.
 
-### A Painting Program
+### The Painting Program, Fixed
 
 **Buffer A:**
 ```glsl
@@ -28,8 +212,13 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     // Read what was here last frame
     vec4 prev = texelFetch(iChannel0, ivec2(fragCoord), 0);
     
-    // Keep it
-    fragColor = prev;
+    float d = length(fragCoord - iMouse.xy);
+    
+    if (iMouse.z > 0.0 && d < 10.0) {
+        fragColor = vec4(1.0);  // Paint white
+    } else {
+        fragColor = prev;       // Keep what was there
+    }
 }
 ```
 
@@ -41,37 +230,13 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 }
 ```
 
-Run this and nothing happens — the screen stays black. But the buffer *is* working: each pixel reads its previous value and writes it back. There's just nothing interesting there yet.
-
-The function `texelFetch(iChannel0, ivec2(fragCoord), 0)` reads from the buffer at exact integer coordinates. The third argument is the mipmap level — always use 0 for buffers.
-
-::: {.callout-note}
-## GLSL: Integer Vectors
-
-We convert `fragCoord` to `ivec2` — an integer vector. We've been using `vec2` for coordinates, which holds floats. But `texelFetch` wants exact pixel locations, so it takes integers. GLSL provides `ivec2`, `ivec3`, and `ivec4` for this. The conversion `ivec2(fragCoord)` truncates the fractional part.
-:::
-
-Let's add a brush:
-
-**Buffer A:**
-```glsl
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    vec4 prev = texelFetch(iChannel0, ivec2(fragCoord), 0);
-    
-    float d = length(fragCoord - iMouse.xy);
-    
-    if (iMouse.z > 0.0 && d < 10.0) {
-        fragColor = vec4(1.0);  // Paint white
-    } else {
-        fragColor = prev;       // Keep previous
-    }
-}
-```
-
 {{< shader-demo day4/paint-basic >}}
 
-Click and drag to draw. The marks stay. Each frame, every pixel reads what it wrote last frame and writes it back. When you click, pixels near the mouse become white — and they stay white because they keep copying themselves forward.
+Click and drag to draw. The marks stay.
+
+Each frame, every pixel reads what it wrote last frame. Most pixels just write that value back — nothing changes. But pixels near the mouse write white instead. And next frame, they read that white and keep it.
+
+We use `texelFetch` because we want exact pixel values, no interpolation. When preserving state across frames, precision matters.
 
 Now let's make the paint fade:
 
@@ -83,6 +248,12 @@ prev *= 0.99;  // Fade toward black
 {{< shader-demo day4/paint-fade >}}
 
 Each frame, every pixel dims slightly. Draw fast enough and you get bright trails; stop and they fade away.
+
+::: {.callout-tip}
+## The Rewind Button
+
+When working with buffers, the rewind button (⏮) resets `iFrame` to 0 and clears the buffer. If you modify your shader and the display looks wrong, hit rewind to start fresh.
+:::
 
 
 ## Game of Life
@@ -194,12 +365,6 @@ Buffer A does the simulation: read the previous generation, apply the rules, wri
 
 {{< shader-demo day4/game-of-life >}}
 
-::: {.callout-tip}
-## The Rewind Button
-
-When working with buffers, the rewind button (⏮) resets `iFrame` to 0, which re-runs your initialization. If you modify your shader and things look wrong, hit rewind.
-:::
-
 
 ## The Wave Equation
 
@@ -265,7 +430,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     if (iFrame == 0) {
         vec2 center = iResolution.xy * 0.5;
         float d = length(fragCoord - center);
-        float u = exp(-d * d / 1800.0);
+        float u = 3.0 * exp(-d * d / 100.0);
         fragColor = vec4(u, 0.0, 0.0, 1.0);
         return;
     }
@@ -334,9 +499,8 @@ We can add ripples interactively by giving a velocity kick where the mouse click
 ```glsl
 if (iMouse.z > 0.0) {
     float d = length(fragCoord - iMouse.xy);
-    if (d < 20.0) {
-        newV += 0.5;
-    }
+    float sigma = 10.0;
+    newV += 0.01 * exp(-d * d / (2.0 * sigma * sigma));
 }
 ```
 

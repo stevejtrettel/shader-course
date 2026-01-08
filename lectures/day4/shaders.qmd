@@ -2,13 +2,143 @@
 
 Complete, standalone code for each shader in Day 4. Copy any of these directly into [Shadertoy](https://www.shadertoy.com/new).
 
+## Texture Setup
+
+The texture examples require loading an image into iChannel0:
+
+1. Click `iChannel0` at the bottom of the editor
+2. Select the "Textures" tab
+3. Choose an image (try "Abstract 1" or any photograph)
+
 ## Buffer Setup
 
-Day 4 uses buffer shaders. To set up:
+The buffer examples (painting, Game of Life, waves) require a self-referencing buffer:
 
 1. Click the **+** tab next to "Image" and select "Buffer A"
 2. In Buffer A, click `iChannel0` at the bottom and select "Buffer A" from the Misc tab
 3. In Image, click `iChannel0` and select "Buffer A"
+
+---
+
+## texture-basic
+
+Display a texture using UV coordinates.
+
+**Image:**
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    fragColor = texture(iChannel0, uv);
+}
+```
+
+---
+
+## texture-flip
+
+Flip an image horizontally.
+
+**Image:**
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    uv.x = 1.0 - uv.x;
+    fragColor = texture(iChannel0, uv);
+}
+```
+
+---
+
+## texture-wavy
+
+Animated wavy distortion.
+
+**Image:**
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    
+    // Offset x based on y position and time
+    uv.x += 0.03 * sin(uv.y * 20.0 + iTime * 2.0);
+    
+    fragColor = texture(iChannel0, uv);
+}
+```
+
+---
+
+## texture-swirl
+
+Swirl distortion centered on the image.
+
+**Image:**
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    vec2 center = vec2(0.5);
+    
+    vec2 offset = uv - center;
+    float dist = length(offset);
+    float angle = atan(offset.y, offset.x);
+    
+    // Rotate more near the center
+    float swirl = 2.0 * exp(-dist * 3.0);
+    angle += swirl;
+    
+    uv = center + dist * vec2(cos(angle), sin(angle));
+    fragColor = texture(iChannel0, uv);
+}
+```
+
+---
+
+## texture-magnify
+
+Magnifying glass that follows the mouse. Click and drag to move.
+
+**Image:**
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = fragCoord / iResolution.xy;
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    
+    float dist = length(uv - mouse);
+    float radius = 0.15;
+    
+    if (dist < radius) {
+        // Inside lens: sample closer to mouse position (zoom in)
+        float zoom = 2.0;
+        uv = mouse + (uv - mouse) / zoom;
+    }
+    
+    fragColor = texture(iChannel0, uv);
+}
+```
+
+---
+
+## paint-broken
+
+The broken painting program — no persistence. Demonstrates why we need buffers.
+
+**Image:**
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    float d = length(fragCoord - iMouse.xy);
+    
+    if (iMouse.z > 0.0 && d < 10.0) {
+        fragColor = vec4(1.0);  // White brush
+    } else {
+        fragColor = vec4(0.0, 0.0, 0.0, 1.0);  // Black background
+    }
+}
+```
 
 ---
 

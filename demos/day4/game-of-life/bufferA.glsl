@@ -11,11 +11,11 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
         fragColor = vec4(step(0.5, random));
         return;
     }
-    
+
     ivec2 p = ivec2(fragCoord);
-    
+
     float self = texelFetch(iChannel0, p, 0).r;
-    float neighbors = 
+    float neighbors =
         texelFetch(iChannel0, p + ivec2(-1, -1), 0).r +
         texelFetch(iChannel0, p + ivec2( 0, -1), 0).r +
         texelFetch(iChannel0, p + ivec2( 1, -1), 0).r +
@@ -24,7 +24,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
         texelFetch(iChannel0, p + ivec2(-1,  1), 0).r +
         texelFetch(iChannel0, p + ivec2( 0,  1), 0).r +
         texelFetch(iChannel0, p + ivec2( 1,  1), 0).r;
-    
+
     float alive = 0.0;
     if (self == 1.0) {
         if (neighbors == 2.0 || neighbors == 3.0) {
@@ -35,6 +35,6 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
             alive = 1.0;
         }
     }
-    
+
     fragColor = vec4(vec3(alive), 1.0);
 }

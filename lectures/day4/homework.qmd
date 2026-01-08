@@ -367,6 +367,5 @@ This creates focusing without any sharp boundary.
 
 **Extensions:**
 - Add absorption (multiply $u$ by a decay factor in the glass region)
-- Create a prism (triangular glass region) and watch dispersion... wait, our waves don't have wavelength-dependent speed. Can you fake it?
 - Build a Fresnel lens (concentric rings of glass)
 - Simulate total internal reflection by sending waves from inside glass to outside at a steep angle

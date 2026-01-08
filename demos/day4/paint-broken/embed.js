@@ -1,34 +1,34 @@
 (function(){"use strict";try{if(typeof document<"u"){var e=document.createElement("style");e.appendChild(document.createTextNode(".shader-demo{position:relative;width:100%}.shader-demo canvas{display:block;width:100%;height:100%}.fps-counter{position:absolute;bottom:8px;left:8px;padding:6px 10px;background:#000000bf;color:#fff;font-family:Monaco,Menlo,Courier New,monospace;font-size:12px;font-weight:500;border-radius:4px;pointer-events:none;-webkit-user-select:none;user-select:none;z-index:1000;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);box-shadow:0 2px 8px #0000004d}.playback-controls{position:absolute;bottom:8px;right:8px;display:flex;gap:8px;z-index:1000}.control-button{padding:6px 8px;background:#000000bf;color:#fff;border:none;border-radius:4px;cursor:pointer;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);box-shadow:0 2px 8px #0000004d;transition:all .2s ease;display:flex;align-items:center;justify-content:center;width:32px;height:32px}.control-button:hover{background:#000000d9;transform:scale(1.05)}.control-button:active{transform:scale(.95)}.control-button svg{width:16px;height:16px;fill:currentColor}.shader-error-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:#000000f2;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:2000;padding:60px;overflow-y:auto}.error-overlay-content{background:#1a1a1a;border-radius:6px;max-width:900px;width:100%;display:flex;flex-direction:column;box-shadow:0 20px 60px #000c,0 0 1px #ffffff1a;border:1px solid #2a2a2a;max-height:calc(100vh - 120px)}.error-header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;background:linear-gradient(135deg,#c62828,#b71c1c);color:#fff;border-radius:6px 6px 0 0;border-bottom:1px solid rgba(0,0,0,.3);box-shadow:0 2px 8px #0003}.error-title{font-size:15px;font-weight:600;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;display:flex;align-items:center;gap:8px;letter-spacing:-.01em}.error-close{background:transparent;border:none;color:#ffffffe6;font-size:24px;line-height:1;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all .2s ease;opacity:.8}.error-close:hover{background:#ffffff26;opacity:1;transform:scale(1.05)}.error-body{padding:24px;overflow-y:auto;flex:1}.error-section{margin-bottom:24px}.error-section:last-child{margin-bottom:0}.error-pass-name{font-size:13px;font-weight:600;color:#ffa726;font-family:Monaco,Menlo,Courier New,monospace;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #2a2a2a;letter-spacing:.02em}.error-content{margin:0;padding:14px 16px;background:#0f0f0f;border-radius:4px;color:#ff6b6b;font-size:13px;font-family:Monaco,Menlo,Courier New,monospace;line-height:1.6;overflow-x:auto;border:1px solid #2a2a2a;white-space:pre-wrap;word-break:break-word}.error-code-context{margin:12px 0 0;padding:14px 16px;background:#0d0d0d;border-radius:4px;color:#b0b0b0;font-size:12px;font-family:Monaco,Menlo,Courier New,monospace;line-height:1.6;overflow-x:auto;border:1px solid #2a2a2a;white-space:pre}.error-code-context .context-line{color:#666;display:block}.error-code-context .error-line-highlight{color:#fff;background:#c6282840;display:block;font-weight:600;border-left:3px solid #c62828;margin-left:-16px;padding-left:13px}.layout-fullscreen{width:100%;height:100%}.layout-fullscreen .canvas-container{position:relative;width:100%;height:100%;background:#000}.layout-centered{width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:60px}.layout-centered .canvas-container{position:relative;width:800px;height:600px;background:#000;border-radius:8px;box-shadow:0 20px 60px #00000040,0 5px 15px #00000026;overflow:hidden}.layout-split{width:100%;height:100%;display:flex;gap:40px;padding:120px 140px}.layout-split .canvas-container{position:relative;flex:1;background:#000;border-radius:8px;box-shadow:0 10px 30px #0003,0 3px 8px #0000001f;overflow:hidden}.layout-split .code-panel{position:relative;flex:1;display:flex;flex-direction:column;background:#fff;border-radius:8px;box-shadow:0 10px 30px #0003,0 3px 8px #0000001f;overflow:hidden}.tab-bar{display:flex;background:#f8f8f8;border-bottom:1px solid #e0e0e0;padding:8px 8px 0;gap:4px}.tab-button{padding:8px 16px;background:transparent;border:none;border-radius:6px 6px 0 0;font-size:13px;font-family:Monaco,Menlo,Courier New,monospace;cursor:pointer;transition:background .2s;color:#666}.tab-button:hover{background:#e8e8e8}.tab-button.active{background:#fff;color:#000;font-weight:500}.copy-button{position:absolute;top:12px;right:12px;padding:6px;background:transparent;border:none;border-radius:4px;color:#666;cursor:pointer;transition:all .2s;z-index:10;display:flex;align-items:center;justify-content:center}.copy-button:hover{background:#0000000d;color:#333}.copy-button:active{transform:scale(.9)}.copy-button.copied{color:#4caf50}.code-viewer{flex:1;min-height:0;overflow:auto;position:relative;background:#fff}.code-viewer pre{margin:0;padding:16px;font-size:13px;line-height:1.5;font-family:Monaco,Menlo,Courier New,monospace;background:#fff}.code-viewer code{font-family:inherit;font-size:inherit}.token.comment{color:#6a9955}.token.keyword{color:#00f}.token.string{color:#a31515}.token.number{color:#098658}.token.operator{color:#000}.token.function{color:#795e26}.token.class-name{color:#267f99}.token.punctuation{color:#000}.tab-button.image-tab,.tab-button.image-tab.active{color:#7c4dff}.image-viewer{display:flex;align-items:center;justify-content:center;height:100%;padding:16px;background:#f5f5f5}.image-viewer img{max-width:100%;max-height:100%;object-fit:contain;border-radius:4px;box-shadow:0 2px 8px #0000001a}@media (max-width: 1800px){.layout-split{padding:100px 120px}}@media (max-width: 1600px){.layout-split{padding:80px 100px}}@media (max-width: 1400px){.layout-split{padding:60px 80px}}@media (max-width: 1200px){.layout-split{padding:50px 60px}}@media (max-width: 1000px){.layout-split{padding:40px 50px}}@media (max-width: 800px){.layout-split{flex-direction:column;padding:30px;gap:30px}}.layout-tabbed{--tab-border: #e0e0e0;--code-bg: white;--code-text: #000;--line-number-text: #999}.layout-tabbed{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px;box-sizing:border-box}.tabbed-wrapper{display:flex;flex-direction:column;width:800px;max-width:100%;height:650px;max-height:100%;border-radius:8px;box-shadow:0 20px 60px #00000040,0 5px 15px #00000026;overflow:hidden}.tabbed-toolbar{display:flex;align-items:center;flex-shrink:0;background:#f8f8f8;border-bottom:1px solid #e0e0e0;padding-right:8px}.tabbed-tab-bar{display:flex;flex:1;gap:4px;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin}.tabbed-tab-bar::-webkit-scrollbar{height:4px}.tabbed-tab-bar::-webkit-scrollbar-thumb{background:#ccc;border-radius:2px}.tabbed-tab-button{padding:10px 16px;background:transparent;border:none;border-bottom:2px solid transparent;font-size:12px;font-family:Monaco,Menlo,Courier New,monospace;cursor:pointer;transition:color .15s,border-color .15s;color:#666;white-space:nowrap;flex-shrink:0}.tabbed-tab-button:hover{color:#333}.tabbed-tab-button.active{color:#000;border-bottom-color:#4a9eff}.tabbed-tab-button.shader-tab{font-family:system-ui,-apple-system,sans-serif}.tabbed-tab-button.image-tab{color:#7c4dff}.tabbed-tab-button.image-tab.active{color:#7c4dff;border-bottom-color:#7c4dff}.tabbed-content{flex:1;min-height:0;position:relative;background:#000;overflow:hidden}.tabbed-canvas-container{position:absolute;top:0;left:0;width:100%;height:100%}.tabbed-code-viewer{position:absolute;top:0;left:0;width:100%;height:100%;overflow:auto;background:var(--code-bg)}.tabbed-code-viewer pre{margin:0;padding:16px 16px 16px 0;font-size:13px;line-height:1.6;font-family:Monaco,Menlo,Courier New,monospace;background:var(--code-bg);color:var(--code-text);display:flex}.tabbed-code-viewer code{font-family:inherit;font-size:inherit}.tabbed-line-numbers{text-align:right;padding-right:16px;margin-right:16px;border-right:1px solid var(--tab-border);color:var(--line-number-text);-webkit-user-select:none;user-select:none;flex-shrink:0;padding-left:16px}.tabbed-code-content{flex:1;overflow-x:auto}.tabbed-image-viewer{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f5f5f5;padding:20px;box-sizing:border-box}.tabbed-image-viewer img{max-width:100%;max-height:100%;object-fit:contain;border-radius:4px;box-shadow:0 2px 8px #00000026}.tabbed-code-viewer .token.comment{color:#6a9955}.tabbed-code-viewer .token.keyword{color:#00f}.tabbed-code-viewer .token.string{color:#a31515}.tabbed-code-viewer .token.number{color:#098658}.tabbed-code-viewer .token.operator{color:#000}.tabbed-code-viewer .token.function{color:#795e26}.tabbed-code-viewer .token.class-name{color:#267f99}.tabbed-code-viewer .token.punctuation{color:#000}[data-bs-theme=dark] .tabbed-code-viewer .token.comment,.dark .tabbed-code-viewer .token.comment{color:#6a9955}[data-bs-theme=dark] .tabbed-code-viewer .token.keyword,.dark .tabbed-code-viewer .token.keyword{color:#569cd6}[data-bs-theme=dark] .tabbed-code-viewer .token.string,.dark .tabbed-code-viewer .token.string{color:#ce9178}[data-bs-theme=dark] .tabbed-code-viewer .token.number,.dark .tabbed-code-viewer .token.number{color:#b5cea8}[data-bs-theme=dark] .tabbed-code-viewer .token.operator,.dark .tabbed-code-viewer .token.operator{color:#d4d4d4}[data-bs-theme=dark] .tabbed-code-viewer .token.function,.dark .tabbed-code-viewer .token.function{color:#dcdcaa}[data-bs-theme=dark] .tabbed-code-viewer .token.class-name,.dark .tabbed-code-viewer .token.class-name{color:#4ec9b0}[data-bs-theme=dark] .tabbed-code-viewer .token.punctuation,.dark .tabbed-code-viewer .token.punctuation{color:#d4d4d4}@media (max-width: 1200px){.layout-tabbed{padding:40px 60px}}@media (max-width: 900px){.layout-tabbed{padding:30px 40px}}@media (max-width: 600px){.layout-tabbed{padding:20px}.tabbed-tab-button{padding:8px 12px;font-size:12px}}.tabbed-editor-container{position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden;background:#fff}.tabbed-button-container{display:flex;align-items:center;gap:6px;flex-shrink:0}.tabbed-copy-button{display:flex;align-items:center;justify-content:center;background:transparent;border:1px solid #ccc;color:#666;width:32px;height:32px;border-radius:4px;cursor:pointer;transition:background .15s,border-color .15s,color .15s}.tabbed-copy-button:hover{background:#f0f0f0;border-color:#999;color:#333}.tabbed-copy-button:active{background:#e0e0e0}.tabbed-copy-button.copied{background:#e8f5e9;border-color:#4caf50;color:#4caf50}.tabbed-recompile-button{display:flex;align-items:center;gap:6px;background:#4a9eff;border:none;color:#fff;padding:6px 12px;border-radius:4px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;transition:background .15s}.tabbed-recompile-button:hover{background:#3a8eef}.tabbed-recompile-button:active{background:#2a7edf}.tabbed-recompile-button svg{flex-shrink:0}.tabbed-error-display{position:absolute;bottom:0;left:0;right:0;background:#fff0f0;color:#c00;padding:10px 14px;font-family:Monaco,Menlo,Courier New,monospace;font-size:12px;white-space:pre-wrap;overflow:auto;max-height:120px;border-top:1px solid #fcc;z-index:10}.tabbed-fallback-textarea{width:100%;height:100%;background:#fff;color:#000;border:none;padding:12px;font-family:Monaco,Menlo,Courier New,monospace;font-size:13px;resize:none;outline:none}.editor-toolbar{display:flex;align-items:center;background:#f8f8f8;border-bottom:1px solid #e0e0e0;padding-right:8px}.editor-tab-bar{display:flex;flex:1;overflow-x:auto;scrollbar-width:thin}.editor-tab-button{background:transparent;border:none;color:#666;padding:10px 16px;cursor:pointer;font-family:Monaco,Menlo,Courier New,monospace;font-size:12px;white-space:nowrap;border-bottom:2px solid transparent;transition:color .15s,border-color .15s}.editor-tab-button:hover{color:#333}.editor-tab-button.active{color:#000;border-bottom-color:#4a9eff}.editor-tab-button.image-tab{color:#7c4dff}.editor-tab-button.image-tab.active{color:#7c4dff;border-bottom-color:#7c4dff}.editor-copy-button{display:flex;align-items:center;justify-content:center;background:transparent;border:1px solid #ccc;color:#666;width:32px;height:32px;border-radius:4px;cursor:pointer;transition:background .15s,border-color .15s,color .15s;flex-shrink:0;margin-right:6px}.editor-copy-button:hover{background:#f0f0f0;border-color:#999;color:#333}.editor-copy-button:active{background:#e0e0e0}.editor-copy-button.copied{background:#e8f5e9;border-color:#4caf50;color:#4caf50}.editor-copy-button svg{flex-shrink:0}.editor-recompile-button{display:flex;align-items:center;gap:6px;background:#4a9eff;border:none;color:#fff;padding:6px 12px;border-radius:4px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;transition:background .15s;flex-shrink:0}.editor-recompile-button:hover{background:#3a8eef}.editor-recompile-button:active{background:#2a7edf}.editor-recompile-button svg{flex-shrink:0}.editor-content-area{flex:1;overflow:hidden;position:relative;background:#fff}.editor-prism-container{height:100%;width:100%}.editor-fallback-textarea{width:100%;height:100%;background:#fff;color:#000;border:none;padding:12px;font-family:Monaco,Menlo,Courier New,monospace;font-size:13px;resize:none;outline:none}.editor-image-viewer{display:flex;align-items:center;justify-content:center;height:100%;background:#f5f5f5;padding:20px}.editor-image-viewer img{max-width:100%;max-height:100%;object-fit:contain;border-radius:4px;box-shadow:0 2px 8px #00000026}.editor-error-display{background:#fff0f0;color:#c00;padding:10px 14px;font-family:Monaco,Menlo,Courier New,monospace;font-size:12px;white-space:pre-wrap;overflow:auto;max-height:120px;border-top:1px solid #fcc}.prism-editor-wrapper{display:flex;height:100%;background:#fff;font-family:Monaco,Menlo,Courier New,monospace;font-size:13px;line-height:1.6}.prism-editor-line-numbers{flex-shrink:0;padding:16px 12px 16px 16px;text-align:right;color:#999;border-right:1px solid #e0e0e0;-webkit-user-select:none;user-select:none;overflow:hidden}.prism-editor-line-numbers span{display:block}.prism-editor-area{flex:1;position:relative;overflow:hidden}.prism-editor-textarea,.prism-editor-highlight{position:absolute;top:0;left:0;width:100%;height:100%;padding:16px;margin:0;border:none;outline:none;font-family:inherit;font-size:inherit;line-height:inherit;white-space:pre-wrap;word-wrap:break-word;overflow:auto;box-sizing:border-box}.prism-editor-textarea{background:transparent;color:transparent;caret-color:#000;resize:none;z-index:1;-webkit-text-fill-color:transparent}.prism-editor-textarea::selection{background:#add6ff66}.prism-editor-textarea::-moz-selection{background:#add6ff66}.prism-editor-highlight{background:#fff;color:#000;pointer-events:none;z-index:0}.prism-editor-highlight code{font-family:inherit;font-size:inherit;background:none;padding:0}.prism-editor-highlight .token.comment{color:#6a9955}.prism-editor-highlight .token.keyword{color:#00f}.prism-editor-highlight .token.string{color:#a31515}.prism-editor-highlight .token.number{color:#098658}.prism-editor-highlight .token.operator{color:#000}.prism-editor-highlight .token.function{color:#795e26}.prism-editor-highlight .token.class-name{color:#267f99}.prism-editor-highlight .token.punctuation{color:#000}")),document.head.appendChild(e)}}catch(o){console.error("vite-plugin-css-injected-by-js",o)}})();
-var fe = Object.defineProperty;
-var me = (r, e, t) => e in r ? fe(r, e, { enumerable: !0, configurable: !0, writable: !0, value: t }) : r[e] = t;
-var h = (r, e, t) => me(r, typeof e != "symbol" ? e + "" : e, t);
-function Y(r, e, t) {
-  const n = r.createShader(e);
-  if (!n)
+var pe = Object.defineProperty;
+var me = (n, e, t) => e in n ? pe(n, e, { enumerable: !0, configurable: !0, writable: !0, value: t }) : n[e] = t;
+var h = (n, e, t) => me(n, typeof e != "symbol" ? e + "" : e, t);
+function Y(n, e, t) {
+  const r = n.createShader(e);
+  if (!r)
     throw new Error("Failed to create shader object");
-  if (r.shaderSource(n, t), r.compileShader(n), !r.getShaderParameter(n, r.COMPILE_STATUS)) {
-    const l = r.getShaderInfoLog(n);
-    throw r.deleteShader(n), new Error(`Shader compilation failed:
+  if (n.shaderSource(r, t), n.compileShader(r), !n.getShaderParameter(r, n.COMPILE_STATUS)) {
+    const l = n.getShaderInfoLog(r);
+    throw n.deleteShader(r), new Error(`Shader compilation failed:
 ${l}`);
   }
-  return n;
+  return r;
 }
-function Z(r, e, t) {
-  const n = Y(r, r.VERTEX_SHADER, e), i = Y(r, r.FRAGMENT_SHADER, t), l = r.createProgram();
+function Z(n, e, t) {
+  const r = Y(n, n.VERTEX_SHADER, e), s = Y(n, n.FRAGMENT_SHADER, t), l = n.createProgram();
   if (!l)
     throw new Error("Failed to create program object");
-  if (r.attachShader(l, n), r.attachShader(l, i), r.linkProgram(l), !r.getProgramParameter(l, r.LINK_STATUS)) {
-    const a = r.getProgramInfoLog(l);
-    throw r.deleteProgram(l), r.deleteShader(n), r.deleteShader(i), new Error(`Program linking failed:
+  if (n.attachShader(l, r), n.attachShader(l, s), n.linkProgram(l), !n.getProgramParameter(l, n.LINK_STATUS)) {
+    const a = n.getProgramInfoLog(l);
+    throw n.deleteProgram(l), n.deleteShader(r), n.deleteShader(s), new Error(`Program linking failed:
 ${a}`);
   }
-  return r.detachShader(l, n), r.detachShader(l, i), r.deleteShader(n), r.deleteShader(i), l;
+  return n.detachShader(l, r), n.detachShader(l, s), n.deleteShader(r), n.deleteShader(s), l;
 }
-function ge(r) {
-  const e = r.createVertexArray();
+function fe(n) {
+  const e = n.createVertexArray();
   if (!e)
     throw new Error("Failed to create VAO");
-  r.bindVertexArray(e);
+  n.bindVertexArray(e);
   const t = new Float32Array([
     -1,
     -1,
@@ -39,15 +39,15 @@ function ge(r) {
     -1,
     3
     // Top-left (extends beyond viewport)
-  ]), n = r.createBuffer();
-  if (!n)
+  ]), r = n.createBuffer();
+  if (!r)
     throw new Error("Failed to create VBO");
-  return r.bindBuffer(r.ARRAY_BUFFER, n), r.bufferData(r.ARRAY_BUFFER, t, r.STATIC_DRAW), r.enableVertexAttribArray(0), r.vertexAttribPointer(
+  return n.bindBuffer(n.ARRAY_BUFFER, r), n.bufferData(n.ARRAY_BUFFER, t, n.STATIC_DRAW), n.enableVertexAttribArray(0), n.vertexAttribPointer(
     0,
     // attribute location
     2,
     // size (vec2)
-    r.FLOAT,
+    n.FLOAT,
     // type
     !1,
     // normalized
@@ -55,115 +55,115 @@ function ge(r) {
     // stride
     0
     // offset
-  ), r.bindVertexArray(null), r.bindBuffer(r.ARRAY_BUFFER, null), e;
+  ), n.bindVertexArray(null), n.bindBuffer(n.ARRAY_BUFFER, null), e;
 }
-function O(r, e, t) {
-  const n = r.createTexture();
-  if (!n)
+function O(n, e, t) {
+  const r = n.createTexture();
+  if (!r)
     throw new Error("Failed to create texture");
-  return r.bindTexture(r.TEXTURE_2D, n), r.texImage2D(
-    r.TEXTURE_2D,
+  return n.bindTexture(n.TEXTURE_2D, r), n.texImage2D(
+    n.TEXTURE_2D,
     0,
     // mip level
-    r.RGBA32F,
+    n.RGBA32F,
     // internal format (32-bit float per channel)
     e,
     t,
     0,
     // border (must be 0)
-    r.RGBA,
+    n.RGBA,
     // format
-    r.FLOAT,
+    n.FLOAT,
     // type
     null
     // no data (allocate only)
-  ), r.texParameteri(r.TEXTURE_2D, r.TEXTURE_MIN_FILTER, r.NEAREST), r.texParameteri(r.TEXTURE_2D, r.TEXTURE_MAG_FILTER, r.NEAREST), r.texParameteri(r.TEXTURE_2D, r.TEXTURE_WRAP_S, r.CLAMP_TO_EDGE), r.texParameteri(r.TEXTURE_2D, r.TEXTURE_WRAP_T, r.CLAMP_TO_EDGE), r.bindTexture(r.TEXTURE_2D, null), n;
+  ), n.texParameteri(n.TEXTURE_2D, n.TEXTURE_MIN_FILTER, n.NEAREST), n.texParameteri(n.TEXTURE_2D, n.TEXTURE_MAG_FILTER, n.NEAREST), n.texParameteri(n.TEXTURE_2D, n.TEXTURE_WRAP_S, n.CLAMP_TO_EDGE), n.texParameteri(n.TEXTURE_2D, n.TEXTURE_WRAP_T, n.CLAMP_TO_EDGE), n.bindTexture(n.TEXTURE_2D, null), r;
 }
-function J(r, e) {
-  const t = r.createFramebuffer();
+function J(n, e) {
+  const t = n.createFramebuffer();
   if (!t)
     throw new Error("Failed to create framebuffer");
-  r.bindFramebuffer(r.FRAMEBUFFER, t), r.framebufferTexture2D(
-    r.FRAMEBUFFER,
-    r.COLOR_ATTACHMENT0,
-    r.TEXTURE_2D,
+  n.bindFramebuffer(n.FRAMEBUFFER, t), n.framebufferTexture2D(
+    n.FRAMEBUFFER,
+    n.COLOR_ATTACHMENT0,
+    n.TEXTURE_2D,
     e,
     0
     // mip level
   );
-  const n = r.checkFramebufferStatus(r.FRAMEBUFFER);
-  if (n !== r.FRAMEBUFFER_COMPLETE)
-    throw r.deleteFramebuffer(t), new Error(`Framebuffer incomplete: ${ye(r, n)}`);
-  return r.bindFramebuffer(r.FRAMEBUFFER, null), t;
+  const r = n.checkFramebufferStatus(n.FRAMEBUFFER);
+  if (r !== n.FRAMEBUFFER_COMPLETE)
+    throw n.deleteFramebuffer(t), new Error(`Framebuffer incomplete: ${ve(n, r)}`);
+  return n.bindFramebuffer(n.FRAMEBUFFER, null), t;
 }
-function be(r) {
-  const e = r.createTexture();
+function ge(n) {
+  const e = n.createTexture();
   if (!e)
     throw new Error("Failed to create black texture");
-  r.bindTexture(r.TEXTURE_2D, e);
+  n.bindTexture(n.TEXTURE_2D, e);
   const t = new Float32Array([0, 0, 0, 1]);
-  return r.texImage2D(
-    r.TEXTURE_2D,
+  return n.texImage2D(
+    n.TEXTURE_2D,
     0,
-    r.RGBA32F,
+    n.RGBA32F,
     1,
     1,
     0,
-    r.RGBA,
-    r.FLOAT,
+    n.RGBA,
+    n.FLOAT,
     t
-  ), r.texParameteri(r.TEXTURE_2D, r.TEXTURE_MIN_FILTER, r.NEAREST), r.texParameteri(r.TEXTURE_2D, r.TEXTURE_MAG_FILTER, r.NEAREST), r.texParameteri(r.TEXTURE_2D, r.TEXTURE_WRAP_S, r.CLAMP_TO_EDGE), r.texParameteri(r.TEXTURE_2D, r.TEXTURE_WRAP_T, r.CLAMP_TO_EDGE), r.bindTexture(r.TEXTURE_2D, null), e;
+  ), n.texParameteri(n.TEXTURE_2D, n.TEXTURE_MIN_FILTER, n.NEAREST), n.texParameteri(n.TEXTURE_2D, n.TEXTURE_MAG_FILTER, n.NEAREST), n.texParameteri(n.TEXTURE_2D, n.TEXTURE_WRAP_S, n.CLAMP_TO_EDGE), n.texParameteri(n.TEXTURE_2D, n.TEXTURE_WRAP_T, n.CLAMP_TO_EDGE), n.bindTexture(n.TEXTURE_2D, null), e;
 }
-function Ee(r) {
-  const e = r.createTexture();
+function be(n) {
+  const e = n.createTexture();
   if (!e)
     throw new Error("Failed to create keyboard texture");
-  r.bindTexture(r.TEXTURE_2D, e);
-  const t = 256, n = 3, i = new Float32Array(t * n * 4);
-  return r.texImage2D(
-    r.TEXTURE_2D,
+  n.bindTexture(n.TEXTURE_2D, e);
+  const t = 256, r = 3, s = new Float32Array(t * r * 4);
+  return n.texImage2D(
+    n.TEXTURE_2D,
     0,
-    r.RGBA32F,
+    n.RGBA32F,
     t,
-    n,
+    r,
     0,
-    r.RGBA,
-    r.FLOAT,
-    i
-  ), r.texParameteri(r.TEXTURE_2D, r.TEXTURE_MIN_FILTER, r.NEAREST), r.texParameteri(r.TEXTURE_2D, r.TEXTURE_MAG_FILTER, r.NEAREST), r.texParameteri(r.TEXTURE_2D, r.TEXTURE_WRAP_S, r.CLAMP_TO_EDGE), r.texParameteri(r.TEXTURE_2D, r.TEXTURE_WRAP_T, r.CLAMP_TO_EDGE), r.bindTexture(r.TEXTURE_2D, null), e;
+    n.RGBA,
+    n.FLOAT,
+    s
+  ), n.texParameteri(n.TEXTURE_2D, n.TEXTURE_MIN_FILTER, n.NEAREST), n.texParameteri(n.TEXTURE_2D, n.TEXTURE_MAG_FILTER, n.NEAREST), n.texParameteri(n.TEXTURE_2D, n.TEXTURE_WRAP_S, n.CLAMP_TO_EDGE), n.texParameteri(n.TEXTURE_2D, n.TEXTURE_WRAP_T, n.CLAMP_TO_EDGE), n.bindTexture(n.TEXTURE_2D, null), e;
 }
-function ve(r, e, t, n) {
-  const s = new Float32Array(3072);
+function Ee(n, e, t, r) {
+  const i = new Float32Array(3072);
   for (let a = 0; a < 256; a++) {
-    const f = t.get(a) || !1, g = n.get(a) || 0, v = (0 * 256 + a) * 4;
-    s[v + 0] = f ? 1 : 0, s[v + 1] = f ? 1 : 0, s[v + 2] = f ? 1 : 0, s[v + 3] = 1;
-    const C = (2 * 256 + a) * 4;
-    s[C + 0] = g, s[C + 1] = g, s[C + 2] = g, s[C + 3] = 1;
+    const m = t.get(a) || !1, g = r.get(a) || 0, v = (0 * 256 + a) * 4;
+    i[v + 0] = m ? 1 : 0, i[v + 1] = m ? 1 : 0, i[v + 2] = m ? 1 : 0, i[v + 3] = 1;
+    const w = (2 * 256 + a) * 4;
+    i[w + 0] = g, i[w + 1] = g, i[w + 2] = g, i[w + 3] = 1;
   }
-  r.bindTexture(r.TEXTURE_2D, e), r.texSubImage2D(
-    r.TEXTURE_2D,
+  n.bindTexture(n.TEXTURE_2D, e), n.texSubImage2D(
+    n.TEXTURE_2D,
     0,
     0,
     0,
     // x, y offset
     256,
     3,
-    r.RGBA,
-    r.FLOAT,
-    s
-  ), r.bindTexture(r.TEXTURE_2D, null);
+    n.RGBA,
+    n.FLOAT,
+    i
+  ), n.bindTexture(n.TEXTURE_2D, null);
 }
-function ye(r, e) {
+function ve(n, e) {
   switch (e) {
-    case r.FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+    case n.FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
       return "FRAMEBUFFER_INCOMPLETE_ATTACHMENT";
-    case r.FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+    case n.FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
       return "FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT";
-    case r.FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
+    case n.FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
       return "FRAMEBUFFER_INCOMPLETE_DIMENSIONS";
-    case r.FRAMEBUFFER_UNSUPPORTED:
+    case n.FRAMEBUFFER_UNSUPPORTED:
       return "FRAMEBUFFER_UNSUPPORTED";
-    case r.FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
+    case n.FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
       return "FRAMEBUFFER_INCOMPLETE_MULTISAMPLE";
     default:
       return `Unknown status: ${e}`;
@@ -177,7 +177,7 @@ layout(location = 0) in vec2 position;
 void main() {
   gl_Position = vec4(position, 0.0, 1.0);
 }
-`, ne = `#version 300 es
+`, re = `#version 300 es
 precision highp float;
 
 // Shadertoy compatibility: equirectangular texture sampling
@@ -188,9 +188,9 @@ vec2 _st_dirToEquirect(vec3 dir) {
   float theta = asin(dir.y);
   return vec2(phi / ST_TWOPI + 0.5, theta / ST_PI + 0.5);
 }
-`, Te = ne.split(`
+`, Te = re.split(`
 `).length - 1;
-class xe {
+class ye {
   constructor(e) {
     h(this, "project");
     h(this, "gl");
@@ -210,8 +210,8 @@ class xe {
     // 0.0 or 1.0
     // Compilation errors (if any occurred during initialization)
     h(this, "_compilationErrors", []);
-    this.gl = e.gl, this.project = e.project, this._width = this.gl.drawingBufferWidth, this._height = this.gl.drawingBufferHeight, this.initExtensions(), this._blackTexture = be(this.gl);
-    const t = Ee(this.gl);
+    this.gl = e.gl, this.project = e.project, this._width = this.gl.drawingBufferWidth, this._height = this.gl.drawingBufferHeight, this.initExtensions(), this._blackTexture = ge(this.gl);
+    const t = be(this.gl);
     this._keyboardTexture = {
       texture: t,
       width: 256,
@@ -264,18 +264,18 @@ class xe {
    * @param mouse - iMouse as [x, y, clickX, clickY]
    */
   step(e, t) {
-    const n = this.gl, i = this._lastStepTime === null ? 0 : e - this._lastStepTime;
+    const r = this.gl, s = this._lastStepTime === null ? 0 : e - this._lastStepTime;
     this._lastStepTime = e, this._time = e;
-    const l = [this._width, this._height, 1], s = this._time, a = i, f = this._frame, g = t;
-    n.viewport(0, 0, this._width, this._height);
+    const l = [this._width, this._height, 1], i = this._time, a = s, m = this._frame, g = t;
+    r.viewport(0, 0, this._width, this._height);
     const v = ["BufferA", "BufferB", "BufferC", "BufferD", "Image"];
-    for (const C of v) {
-      const x = this._passes.find((w) => w.name === C);
+    for (const w of v) {
+      const x = this._passes.find((C) => C.name === w);
       x && (this.executePass(x, {
         iResolution: l,
-        iTime: s,
+        iTime: i,
         iTimeDelta: a,
-        iFrame: f,
+        iFrame: m,
         iMouse: g
       }), this.swapPassTextures(x));
     }
@@ -287,9 +287,9 @@ class xe {
    */
   resize(e, t) {
     this._width = e, this._height = t;
-    const n = this.gl;
-    for (const i of this._passes)
-      n.deleteTexture(i.currentTexture), n.deleteTexture(i.previousTexture), n.deleteFramebuffer(i.framebuffer), i.currentTexture = O(n, e, t), i.previousTexture = O(n, e, t), i.framebuffer = J(n, i.currentTexture);
+    const r = this.gl;
+    for (const s of this._passes)
+      r.deleteTexture(s.currentTexture), r.deleteTexture(s.previousTexture), r.deleteFramebuffer(s.framebuffer), s.currentTexture = O(r, e, t), s.previousTexture = O(r, e, t), s.framebuffer = J(r, s.currentTexture);
   }
   /**
    * Reset frame counter and clear all render targets.
@@ -321,10 +321,10 @@ class xe {
    * @param isDown true if key pressed, false if released
    */
   updateKeyState(e, t) {
-    const n = this._keyStates.get(e) || !1;
-    if (this._keyStates.set(e, t), t && !n) {
-      const i = this._toggleStates.get(e) || 0;
-      this._toggleStates.set(e, i === 0 ? 1 : 0);
+    const r = this._keyStates.get(e) || !1;
+    if (this._keyStates.set(e, t), t && !r) {
+      const s = this._toggleStates.get(e) || 0;
+      this._toggleStates.set(e, s === 0 ? 1 : 0);
     }
   }
   /**
@@ -332,7 +332,7 @@ class xe {
    * Should be called once per frame before rendering.
    */
   updateKeyboardTexture() {
-    this._keyboardTexture && ve(
+    this._keyboardTexture && Ee(
       this.gl,
       this._keyboardTexture.texture,
       this._keyStates,
@@ -348,31 +348,31 @@ class xe {
    * @returns Object with success status and error message if failed
    */
   recompilePass(e, t) {
-    const n = this.gl, i = this._passes.find((a) => a.name === e);
-    if (!i)
+    const r = this.gl, s = this._passes.find((a) => a.name === e);
+    if (!s)
       return { success: !1, error: `Pass '${e}' not found` };
     const l = this.project.passes[e];
     if (!l)
       return { success: !1, error: `Project pass '${e}' not found` };
-    const s = this.buildFragmentShader(t, l.channels);
+    const i = this.buildFragmentShader(t, l.channels);
     try {
-      const a = Z(n, Q, s);
-      n.deleteProgram(i.uniforms.program);
-      const f = {
+      const a = Z(r, Q, i);
+      r.deleteProgram(s.uniforms.program);
+      const m = {
         program: a,
-        iResolution: n.getUniformLocation(a, "iResolution"),
-        iTime: n.getUniformLocation(a, "iTime"),
-        iTimeDelta: n.getUniformLocation(a, "iTimeDelta"),
-        iFrame: n.getUniformLocation(a, "iFrame"),
-        iMouse: n.getUniformLocation(a, "iMouse"),
+        iResolution: r.getUniformLocation(a, "iResolution"),
+        iTime: r.getUniformLocation(a, "iTime"),
+        iTimeDelta: r.getUniformLocation(a, "iTimeDelta"),
+        iFrame: r.getUniformLocation(a, "iFrame"),
+        iMouse: r.getUniformLocation(a, "iMouse"),
         iChannel: [
-          n.getUniformLocation(a, "iChannel0"),
-          n.getUniformLocation(a, "iChannel1"),
-          n.getUniformLocation(a, "iChannel2"),
-          n.getUniformLocation(a, "iChannel3")
+          r.getUniformLocation(a, "iChannel0"),
+          r.getUniformLocation(a, "iChannel1"),
+          r.getUniformLocation(a, "iChannel2"),
+          r.getUniformLocation(a, "iChannel3")
         ]
       };
-      return i.uniforms = f, l.glslSource = t, this._compilationErrors = this._compilationErrors.filter((g) => g.passName !== e), { success: !0 };
+      return s.uniforms = m, l.glslSource = t, this._compilationErrors = this._compilationErrors.filter((g) => g.passName !== e), { success: !0 };
     } catch (a) {
       return { success: !1, error: a instanceof Error ? a.message : String(a) };
     }
@@ -387,20 +387,20 @@ class xe {
   recompileCommon(e) {
     const t = this.project.commonSource;
     this.project.commonSource = e;
-    const n = [], i = ["BufferA", "BufferB", "BufferC", "BufferD", "Image"];
-    for (const l of i) {
-      const s = this.project.passes[l];
-      if (!s) continue;
-      const a = this.recompilePass(l, s.glslSource);
-      a.success || n.push({ passName: l, error: a.error || "Unknown error" });
+    const r = [], s = ["BufferA", "BufferB", "BufferC", "BufferD", "Image"];
+    for (const l of s) {
+      const i = this.project.passes[l];
+      if (!i) continue;
+      const a = this.recompilePass(l, i.glslSource);
+      a.success || r.push({ passName: l, error: a.error || "Unknown error" });
     }
-    if (n.length > 0) {
+    if (r.length > 0) {
       this.project.commonSource = t;
-      for (const l of i) {
-        const s = this.project.passes[l];
-        s && (n.some((a) => a.passName === l) || this.recompilePass(l, s.glslSource));
+      for (const l of s) {
+        const i = this.project.passes[l];
+        i && (r.some((a) => a.passName === l) || this.recompilePass(l, i.glslSource));
       }
-      return { success: !1, errors: n };
+      return { success: !1, errors: r };
     }
     return { success: !0, errors: [] };
   }
@@ -437,24 +437,24 @@ class xe {
     const e = this.gl;
     this._textures = [];
     for (const t of this.project.textures) {
-      const n = e.createTexture();
-      if (!n)
+      const r = e.createTexture();
+      if (!r)
         throw new Error("Failed to create texture");
-      e.bindTexture(e.TEXTURE_2D, n), e.texImage2D(e.TEXTURE_2D, 0, e.RGBA, 1, 1, 0, e.RGBA, e.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 255]));
-      const i = {
+      e.bindTexture(e.TEXTURE_2D, r), e.texImage2D(e.TEXTURE_2D, 0, e.RGBA, 1, 1, 0, e.RGBA, e.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 255]));
+      const s = {
         name: t.name,
-        texture: n,
+        texture: r,
         width: 1,
         height: 1
       };
-      this._textures.push(i);
+      this._textures.push(s);
       const l = new Image();
       l.crossOrigin = "anonymous", l.onload = () => {
-        e.bindTexture(e.TEXTURE_2D, n), e.texImage2D(e.TEXTURE_2D, 0, e.RGBA, e.RGBA, e.UNSIGNED_BYTE, l);
-        const s = t.filter === "nearest" ? e.NEAREST : e.LINEAR;
-        e.texParameteri(e.TEXTURE_2D, e.TEXTURE_MIN_FILTER, s), e.texParameteri(e.TEXTURE_2D, e.TEXTURE_MAG_FILTER, s);
+        e.bindTexture(e.TEXTURE_2D, r), e.texImage2D(e.TEXTURE_2D, 0, e.RGBA, e.RGBA, e.UNSIGNED_BYTE, l);
+        const i = t.filter === "nearest" ? e.NEAREST : e.LINEAR;
+        e.texParameteri(e.TEXTURE_2D, e.TEXTURE_MIN_FILTER, i), e.texParameteri(e.TEXTURE_2D, e.TEXTURE_MAG_FILTER, i);
         const a = t.wrap === "clamp" ? e.CLAMP_TO_EDGE : e.REPEAT;
-        e.texParameteri(e.TEXTURE_2D, e.TEXTURE_WRAP_S, a), e.texParameteri(e.TEXTURE_2D, e.TEXTURE_WRAP_T, a), t.filter === "linear" && e.generateMipmap(e.TEXTURE_2D), i.width = l.width, i.height = l.height, console.log(`Loaded texture '${t.name}': ${l.width}x${l.height}`);
+        e.texParameteri(e.TEXTURE_2D, e.TEXTURE_WRAP_S, a), e.texParameteri(e.TEXTURE_2D, e.TEXTURE_WRAP_T, a), t.filter === "linear" && e.generateMipmap(e.TEXTURE_2D), s.width = l.width, s.height = l.height, console.log(`Loaded texture '${t.name}': ${l.width}x${l.height}`);
       }, l.onerror = () => {
         console.error(`Failed to load texture '${t.name}' from ${t.source}`);
       }, l.src = t.source;
@@ -464,48 +464,48 @@ class xe {
    * Compile shaders, create VAOs/FBOs/textures, and build RuntimePass array.
    */
   initRuntimePasses() {
-    const e = this.gl, t = this.project, n = ge(e), i = ["BufferA", "BufferB", "BufferC", "BufferD", "Image"];
-    for (const l of i) {
-      const s = t.passes[l];
-      if (!s) continue;
-      const a = this.buildFragmentShader(s.glslSource, s.channels);
+    const e = this.gl, t = this.project, r = fe(e), s = ["BufferA", "BufferB", "BufferC", "BufferD", "Image"];
+    for (const l of s) {
+      const i = t.passes[l];
+      if (!i) continue;
+      const a = this.buildFragmentShader(i.glslSource, i.channels);
       try {
-        const f = Z(e, Q, a), g = {
-          program: f,
-          iResolution: e.getUniformLocation(f, "iResolution"),
-          iTime: e.getUniformLocation(f, "iTime"),
-          iTimeDelta: e.getUniformLocation(f, "iTimeDelta"),
-          iFrame: e.getUniformLocation(f, "iFrame"),
-          iMouse: e.getUniformLocation(f, "iMouse"),
+        const m = Z(e, Q, a), g = {
+          program: m,
+          iResolution: e.getUniformLocation(m, "iResolution"),
+          iTime: e.getUniformLocation(m, "iTime"),
+          iTimeDelta: e.getUniformLocation(m, "iTimeDelta"),
+          iFrame: e.getUniformLocation(m, "iFrame"),
+          iMouse: e.getUniformLocation(m, "iMouse"),
           iChannel: [
-            e.getUniformLocation(f, "iChannel0"),
-            e.getUniformLocation(f, "iChannel1"),
-            e.getUniformLocation(f, "iChannel2"),
-            e.getUniformLocation(f, "iChannel3")
+            e.getUniformLocation(m, "iChannel0"),
+            e.getUniformLocation(m, "iChannel1"),
+            e.getUniformLocation(m, "iChannel2"),
+            e.getUniformLocation(m, "iChannel3")
           ]
-        }, v = O(e, this._width, this._height), C = O(e, this._width, this._height), x = J(e, v), w = {
+        }, v = O(e, this._width, this._height), w = O(e, this._width, this._height), x = J(e, v), C = {
           name: l,
-          projectChannels: s.channels,
-          vao: n,
+          projectChannels: i.channels,
+          vao: r,
           uniforms: g,
           framebuffer: x,
           currentTexture: v,
-          previousTexture: C
+          previousTexture: w
         };
-        this._passes.push(w);
-      } catch (f) {
-        const g = f instanceof Error ? f.message : String(f), v = this.getLineMapping(), C = g.match(/ERROR:\s*\d+:(\d+):/);
-        let x = !1, w = null;
-        if (C && this.project.commonSource) {
-          const A = parseInt(C[1], 10), y = v.boilerplateLinesBeforeCommon + 2, E = y + v.commonLineCount - 1;
-          A >= y && A <= E && (x = !0, w = A - y + 1);
+        this._passes.push(C);
+      } catch (m) {
+        const g = m instanceof Error ? m.message : String(m), v = this.getLineMapping(), w = g.match(/ERROR:\s*\d+:(\d+):/);
+        let x = !1, C = null;
+        if (w && this.project.commonSource) {
+          const A = parseInt(w[1], 10), T = v.boilerplateLinesBeforeCommon + 2, E = T + v.commonLineCount - 1;
+          A >= T && A <= E && (x = !0, C = A - T + 1);
         }
         this._compilationErrors.push({
           passName: l,
           error: g,
           source: a,
           isFromCommon: x,
-          originalLine: w
+          originalLine: C
         }), console.error(`Failed to compile ${l}:`, g);
       }
     }
@@ -526,8 +526,8 @@ class xe {
    * @param channels - Channel configuration for this pass (to detect cubemap textures)
    */
   buildFragmentShader(e, t) {
-    const n = [ne];
-    this.project.commonSource && (n.push("// Common code"), n.push(this.project.commonSource), n.push("")), n.push(`// Shadertoy built-in uniforms
+    const r = [re];
+    this.project.commonSource && (r.push("// Common code"), r.push(this.project.commonSource), r.push("")), r.push(`// Shadertoy built-in uniforms
 uniform vec3  iResolution;
 uniform float iTime;
 uniform float iTimeDelta;
@@ -538,13 +538,13 @@ uniform sampler2D iChannel1;
 uniform sampler2D iChannel2;
 uniform sampler2D iChannel3;
 `);
-    const i = this.preprocessCubemapTextures(e, t);
-    return n.push("// User shader code"), n.push(i), n.push(""), n.push(`// Main wrapper
+    const s = this.preprocessCubemapTextures(e, t);
+    return r.push("// User shader code"), r.push(s), r.push(""), r.push(`// Main wrapper
 out vec4 fragColor;
 
 void main() {
   mainImage(fragColor, gl_FragCoord.xy);
-}`), n.join(`
+}`), r.join(`
 `);
   }
   /**
@@ -558,32 +558,32 @@ void main() {
    * @param channels - Channel configuration for this pass
    */
   preprocessCubemapTextures(e, t) {
-    const n = /* @__PURE__ */ new Set();
-    if (t.forEach((l, s) => {
-      l.kind === "texture" && l.cubemap && n.add(`iChannel${s}`);
-    }), n.size === 0)
+    const r = /* @__PURE__ */ new Set();
+    if (t.forEach((l, i) => {
+      l.kind === "texture" && l.cubemap && r.add(`iChannel${i}`);
+    }), r.size === 0)
       return e;
-    const i = /texture\s*\(\s*(iChannel[0-3])\s*,\s*([^)]+)\)/g;
-    return e.replace(i, (l, s, a) => n.has(s) ? `texture(${s}, _st_dirToEquirect(${a}))` : l);
+    const s = /texture\s*\(\s*(iChannel[0-3])\s*,\s*([^)]+)\)/g;
+    return e.replace(s, (l, i, a) => r.has(i) ? `texture(${i}, _st_dirToEquirect(${a}))` : l);
   }
   // ===========================================================================
   // Pass Execution
   // ===========================================================================
   executePass(e, t) {
-    const n = this.gl;
-    n.bindFramebuffer(n.FRAMEBUFFER, e.framebuffer), n.useProgram(e.uniforms.program), n.bindVertexArray(e.vao), this.bindBuiltinUniforms(e.uniforms, t), this.bindChannelTextures(e), n.drawArrays(n.TRIANGLES, 0, 3), n.bindVertexArray(null), n.useProgram(null), n.bindFramebuffer(n.FRAMEBUFFER, null);
+    const r = this.gl;
+    r.bindFramebuffer(r.FRAMEBUFFER, e.framebuffer), r.useProgram(e.uniforms.program), r.bindVertexArray(e.vao), this.bindBuiltinUniforms(e.uniforms, t), this.bindChannelTextures(e), r.drawArrays(r.TRIANGLES, 0, 3), r.bindVertexArray(null), r.useProgram(null), r.bindFramebuffer(r.FRAMEBUFFER, null);
   }
   bindBuiltinUniforms(e, t) {
-    const n = this.gl;
-    e.iResolution && n.uniform3f(e.iResolution, t.iResolution[0], t.iResolution[1], t.iResolution[2]), e.iTime && n.uniform1f(e.iTime, t.iTime), e.iTimeDelta && n.uniform1f(e.iTimeDelta, t.iTimeDelta), e.iFrame && n.uniform1i(e.iFrame, t.iFrame), e.iMouse && n.uniform4f(e.iMouse, t.iMouse[0], t.iMouse[1], t.iMouse[2], t.iMouse[3]);
+    const r = this.gl;
+    e.iResolution && r.uniform3f(e.iResolution, t.iResolution[0], t.iResolution[1], t.iResolution[2]), e.iTime && r.uniform1f(e.iTime, t.iTime), e.iTimeDelta && r.uniform1f(e.iTimeDelta, t.iTimeDelta), e.iFrame && r.uniform1i(e.iFrame, t.iFrame), e.iMouse && r.uniform4f(e.iMouse, t.iMouse[0], t.iMouse[1], t.iMouse[2], t.iMouse[3]);
   }
   bindChannelTextures(e) {
     const t = this.gl;
-    for (let n = 0; n < 4; n++) {
-      const i = e.projectChannels[n], l = this.resolveChannelTexture(i);
-      t.activeTexture(t.TEXTURE0 + n), t.bindTexture(t.TEXTURE_2D, l);
-      const s = e.uniforms.iChannel[n];
-      s && t.uniform1i(s, n);
+    for (let r = 0; r < 4; r++) {
+      const s = e.projectChannels[r], l = this.resolveChannelTexture(s);
+      t.activeTexture(t.TEXTURE0 + r), t.bindTexture(t.TEXTURE_2D, l);
+      const i = e.uniforms.iChannel[r];
+      i && t.uniform1i(i, r);
     }
   }
   /**
@@ -596,16 +596,16 @@ void main() {
           throw new Error("Black texture not initialized");
         return this._blackTexture;
       case "buffer": {
-        const n = this._passes.find((i) => i.name === e.buffer);
-        if (!n)
+        const r = this._passes.find((s) => s.name === e.buffer);
+        if (!r)
           throw new Error(`Buffer '${e.buffer}' not found`);
-        return e.current ? n.currentTexture : n.previousTexture;
+        return e.current ? r.currentTexture : r.previousTexture;
       }
       case "texture": {
-        const n = this._textures.find((i) => i.name === e.name);
-        if (!n)
+        const r = this._textures.find((s) => s.name === e.name);
+        if (!r)
           throw new Error(`Texture '${e.name}' not found`);
-        return n.texture;
+        return r.texture;
       }
       case "keyboard":
         if (!this._keyboardTexture)
@@ -621,8 +621,8 @@ void main() {
    * Also reattach framebuffer to new current texture.
    */
   swapPassTextures(e) {
-    const t = this.gl, n = e.currentTexture;
-    e.currentTexture = e.previousTexture, e.previousTexture = n, t.bindFramebuffer(t.FRAMEBUFFER, e.framebuffer), t.framebufferTexture2D(
+    const t = this.gl, r = e.currentTexture;
+    e.currentTexture = e.previousTexture, e.previousTexture = r, t.bindFramebuffer(t.FRAMEBUFFER, e.framebuffer), t.framebufferTexture2D(
       t.FRAMEBUFFER,
       t.COLOR_ATTACHMENT0,
       t.TEXTURE_2D,
@@ -631,7 +631,7 @@ void main() {
     ), t.bindFramebuffer(t.FRAMEBUFFER, null);
   }
 }
-class _e {
+class xe {
   constructor(e) {
     h(this, "container");
     h(this, "canvas");
@@ -665,8 +665,8 @@ class _e {
     h(this, "animate", (e) => {
       if (this.animationId = requestAnimationFrame(this.animate), this.isPaused || !this.isVisible)
         return;
-      const t = e / 1e3, n = t - this.startTime;
-      this.updateFps(t), this.engine.updateKeyboardTexture(), this.engine.step(n, this.mouse), this.presentToScreen();
+      const t = e / 1e3, r = t - this.startTime;
+      this.updateFps(t), this.engine.updateKeyboardTexture(), this.engine.step(r, this.mouse), this.presentToScreen();
     });
     this.container = e.container, this.project = e.project, this.pixelRatio = e.pixelRatio ?? window.devicePixelRatio, this.canvas = document.createElement("canvas"), this.canvas.style.width = "100%", this.canvas.style.height = "100%", this.canvas.style.display = "block", this.container.appendChild(this.canvas), this.fpsDisplay = document.createElement("div"), this.fpsDisplay.className = "fps-counter", this.fpsDisplay.textContent = "0 FPS", this.container.appendChild(this.fpsDisplay), e.project.controls && this.createControls();
     const t = this.canvas.getContext("webgl2", {
@@ -680,15 +680,15 @@ class _e {
     });
     if (!t)
       throw new Error("WebGL2 not supported");
-    this.gl = t, this.updateCanvasSize(), this.engine = new xe({
+    this.gl = t, this.updateCanvasSize(), this.engine = new ye({
       gl: this.gl,
       project: e.project
     }), this.engine.hasErrors() && this.showErrorOverlay(this.engine.getCompilationErrors()), this.resizeObserver = new ResizeObserver(() => {
       this.updateCanvasSize(), this.engine.resize(this.canvas.width, this.canvas.height), this.startTime = performance.now() / 1e3, this.engine.reset();
     }), this.resizeObserver.observe(this.container), this.intersectionObserver = new IntersectionObserver(
-      (n) => {
-        const i = n[0];
-        this.isVisible = i.isIntersecting;
+      (r) => {
+        const s = r[0];
+        this.isVisible = s.isIntersecting;
       },
       { threshold: 0.1 }
       // Trigger when 10% visible
@@ -767,19 +767,19 @@ class _e {
   // Resize Handling
   // ===========================================================================
   updateCanvasSize() {
-    const e = this.container.getBoundingClientRect(), t = Math.floor(e.width * this.pixelRatio), n = Math.floor(e.height * this.pixelRatio);
-    (this.canvas.width !== t || this.canvas.height !== n) && (this.canvas.width = t, this.canvas.height = n);
+    const e = this.container.getBoundingClientRect(), t = Math.floor(e.width * this.pixelRatio), r = Math.floor(e.height * this.pixelRatio);
+    (this.canvas.width !== t || this.canvas.height !== r) && (this.canvas.width = t, this.canvas.height = r);
   }
   // ===========================================================================
   // Mouse Tracking
   // ===========================================================================
   setupMouseTracking() {
-    const e = (n) => {
-      const i = this.canvas.getBoundingClientRect(), l = (n.clientX - i.left) * this.pixelRatio, s = (i.height - (n.clientY - i.top)) * this.pixelRatio;
-      this.mouse[0] = l, this.mouse[1] = s;
-    }, t = (n) => {
-      const i = this.canvas.getBoundingClientRect(), l = (n.clientX - i.left) * this.pixelRatio, s = (i.height - (n.clientY - i.top)) * this.pixelRatio;
-      this.mouse[2] = l, this.mouse[3] = s;
+    const e = (r) => {
+      const s = this.canvas.getBoundingClientRect(), l = (r.clientX - s.left) * this.pixelRatio, i = (s.height - (r.clientY - s.top)) * this.pixelRatio;
+      this.mouse[0] = l, this.mouse[1] = i;
+    }, t = (r) => {
+      const s = this.canvas.getBoundingClientRect(), l = (r.clientX - s.left) * this.pixelRatio, i = (s.height - (r.clientY - s.top)) * this.pixelRatio;
+      this.mouse[2] = l, this.mouse[3] = i;
     };
     this.canvas.addEventListener("mousemove", e), this.canvas.addEventListener("click", t);
   }
@@ -856,14 +856,14 @@ class _e {
    * Filename format: shadertoy-{folderName}-{timestamp}.png
    */
   screenshot() {
-    const e = this.project.root.split("/").pop() || "shader", t = /* @__PURE__ */ new Date(), n = t.getFullYear().toString() + (t.getMonth() + 1).toString().padStart(2, "0") + t.getDate().toString().padStart(2, "0") + "-" + t.getHours().toString().padStart(2, "0") + t.getMinutes().toString().padStart(2, "0") + t.getSeconds().toString().padStart(2, "0"), i = `shadertoy-${e}-${n}.png`;
+    const e = this.project.root.split("/").pop() || "shader", t = /* @__PURE__ */ new Date(), r = t.getFullYear().toString() + (t.getMonth() + 1).toString().padStart(2, "0") + t.getDate().toString().padStart(2, "0") + "-" + t.getHours().toString().padStart(2, "0") + t.getMinutes().toString().padStart(2, "0") + t.getSeconds().toString().padStart(2, "0"), s = `shadertoy-${e}-${r}.png`;
     this.canvas.toBlob((l) => {
       if (!l) {
         console.error("Failed to create screenshot blob");
         return;
       }
-      const s = URL.createObjectURL(l), a = document.createElement("a");
-      a.href = s, a.download = i, a.click(), URL.revokeObjectURL(s), console.log(`Screenshot saved: ${i}`);
+      const i = URL.createObjectURL(l), a = document.createElement("a");
+      a.href = i, a.download = s, a.click(), URL.revokeObjectURL(i), console.log(`Screenshot saved: ${s}`);
     }, "image/png");
   }
   /**
@@ -888,20 +888,20 @@ class _e {
    */
   showErrorOverlay(e) {
     this.errorOverlay || (this.errorOverlay = document.createElement("div"), this.errorOverlay.className = "shader-error-overlay", this.container.appendChild(this.errorOverlay));
-    const t = e.filter((g) => g.isFromCommon), n = e.filter((g) => !g.isFromCommon), a = [...t.length > 0 ? [t[0]] : [], ...n].map(({ passName: g, error: v, source: C, isFromCommon: x, originalLine: w }) => {
+    const t = e.filter((g) => g.isFromCommon), r = e.filter((g) => !g.isFromCommon), a = [...t.length > 0 ? [t[0]] : [], ...r].map(({ passName: g, error: v, source: w, isFromCommon: x, originalLine: C }) => {
       const A = v.replace(`Shader compilation failed:
 `, "");
-      let y = A;
-      return x && w !== null && (y = A.replace(/Line \d+:/, `Line ${w}:`), y = y.replace(/ERROR:\s*\d+:(\d+):/, `ERROR: 0:${w}:`)), {
+      let T = A;
+      return x && C !== null && (T = A.replace(/Line \d+:/, `Line ${C}:`), T = T.replace(/ERROR:\s*\d+:(\d+):/, `ERROR: 0:${C}:`)), {
         passName: x ? "common.glsl" : g,
-        error: this.parseShaderError(y),
-        codeContext: x ? this.extractCodeContextFromCommon(w) : this.extractCodeContext(y, C)
+        error: this.parseShaderError(T),
+        codeContext: x ? this.extractCodeContextFromCommon(C) : this.extractCodeContext(T, w)
       };
-    }).map(({ passName: g, error: v, codeContext: C }) => `
+    }).map(({ passName: g, error: v, codeContext: w }) => `
       <div class="error-section">
         <div class="error-pass-name">${g}</div>
         <pre class="error-content">${this.escapeHTML(v)}</pre>
-        ${C ? `<pre class="error-code-context">${C}</pre>` : ""}
+        ${w ? `<pre class="error-code-context">${w}</pre>` : ""}
       </div>
     `).join("");
     this.errorOverlay.innerHTML = `
@@ -920,8 +920,8 @@ class _e {
         </div>
       </div>
     `;
-    const f = this.errorOverlay.querySelector(".error-close");
-    f && f.addEventListener("click", () => this.hideErrorOverlay());
+    const m = this.errorOverlay.querySelector(".error-close");
+    m && m.addEventListener("click", () => this.hideErrorOverlay());
   }
   /**
    * Parse and improve WebGL shader error messages.
@@ -929,10 +929,10 @@ class _e {
   parseShaderError(e) {
     return e.split(`
 `).map((t) => {
-      const n = t.match(/^ERROR:\s*(\d+):(\d+):\s*(.+)$/);
-      if (n) {
-        const [, , i, l] = n;
-        return `Line ${i}: ${l}`;
+      const r = t.match(/^ERROR:\s*(\d+):(\d+):\s*(.+)$/);
+      if (r) {
+        const [, , s, l] = r;
+        return `Line ${s}: ${l}`;
       }
       return t;
     }).join(`
@@ -943,13 +943,13 @@ class _e {
    * Returns HTML with the error line highlighted.
    */
   extractCodeContext(e, t) {
-    const n = e.match(/ERROR:\s*\d+:(\d+):/);
-    if (!n) return null;
-    const i = parseInt(n[1], 10), l = t.split(`
-`), s = 3, a = Math.max(0, i - s - 1), f = Math.min(l.length, i + s);
-    return l.slice(a, f).map((C, x) => {
-      const w = a + x + 1, A = w === i, y = String(w).padStart(4, " "), E = this.escapeHTML(C);
-      return A ? `<span class="error-line-highlight">${y} │ ${E}</span>` : `<span class="context-line">${y} │ ${E}</span>`;
+    const r = e.match(/ERROR:\s*\d+:(\d+):/);
+    if (!r) return null;
+    const s = parseInt(r[1], 10), l = t.split(`
+`), i = 3, a = Math.max(0, s - i - 1), m = Math.min(l.length, s + i);
+    return l.slice(a, m).map((w, x) => {
+      const C = a + x + 1, A = C === s, T = String(C).padStart(4, " "), E = this.escapeHTML(w);
+      return A ? `<span class="error-line-highlight">${T} │ ${E}</span>` : `<span class="context-line">${T} │ ${E}</span>`;
     }).join("");
   }
   /**
@@ -959,11 +959,11 @@ class _e {
   extractCodeContextFromCommon(e) {
     const t = this.engine.project.commonSource;
     if (!t) return null;
-    const n = t.split(`
-`), i = 3, l = Math.max(0, e - i - 1), s = Math.min(n.length, e + i);
-    return n.slice(l, s).map((g, v) => {
-      const C = l + v + 1, x = C === e, w = String(C).padStart(4, " "), A = this.escapeHTML(g);
-      return x ? `<span class="error-line-highlight">${w} │ ${A}</span>` : `<span class="context-line">${w} │ ${A}</span>`;
+    const r = t.split(`
+`), s = 3, l = Math.max(0, e - s - 1), i = Math.min(r.length, e + s);
+    return r.slice(l, i).map((g, v) => {
+      const w = l + v + 1, x = w === e, C = String(w).padStart(4, " "), A = this.escapeHTML(g);
+      return x ? `<span class="error-line-highlight">${C} │ ${A}</span>` : `<span class="context-line">${C} │ ${A}</span>`;
     }).join("");
   }
   /**
@@ -980,7 +980,7 @@ class _e {
     this.errorOverlay && (this.errorOverlay.remove(), this.errorOverlay = null);
   }
 }
-class Ce {
+class _e {
   constructor(e) {
     h(this, "container");
     h(this, "root");
@@ -1008,7 +1008,7 @@ class we {
     this.container.innerHTML = "";
   }
 }
-class Fe {
+class Ce {
   constructor(e) {
     h(this, "container");
     h(this, "project");
@@ -1033,14 +1033,14 @@ class Fe {
    */
   async buildEditorPanel() {
     try {
-      const { EditorPanel: e } = await Promise.resolve().then(() => De);
+      const { EditorPanel: e } = await Promise.resolve().then(() => Pe);
       this.editorPanel = new e(this.codePanel, this.project), this.recompileHandler && this.editorPanel.setRecompileHandler(this.recompileHandler);
     } catch (e) {
       console.error("Failed to load editor panel:", e);
     }
   }
 }
-class Ae {
+class Fe {
   constructor(e) {
     h(this, "container");
     h(this, "project");
@@ -1071,8 +1071,8 @@ class Ae {
       </svg>
       Recompile
     `, this.recompileButton.title = "Recompile shader (Ctrl+Enter)", this.recompileButton.addEventListener("click", () => this.recompile()), this.buttonContainer.appendChild(this.recompileButton), this.errorDisplay = document.createElement("div"), this.errorDisplay.className = "tabbed-error-display", this.errorDisplay.style.display = "none", this.contentArea.appendChild(this.errorDisplay), this.setupKeyboardShortcut();
-    const n = this.buildTabBar();
-    t.appendChild(n), t.appendChild(this.contentArea), this.root.appendChild(t), this.container.appendChild(this.root);
+    const r = this.buildTabBar();
+    t.appendChild(r), t.appendChild(this.contentArea), this.root.appendChild(t), this.container.appendChild(this.root);
   }
   getCanvasContainer() {
     return this.canvasContainer;
@@ -1105,8 +1105,8 @@ class Ae {
     this.saveCurrentEditorContent();
     const e = this.tabs[this.activeTabIndex];
     if (e.kind !== "code") return;
-    const t = this.modifiedSources.get(e.passName) ?? e.source, n = this.recompileHandler(e.passName, t);
-    n.success ? (this.hideError(), e.source = t) : this.showError(n.error || "Compilation failed");
+    const t = this.modifiedSources.get(e.passName) ?? e.source, r = this.recompileHandler(e.passName, t);
+    r.success ? (this.hideError(), e.source = t) : this.showError(r.error || "Compilation failed");
   }
   showError(e) {
     this.errorDisplay && (this.errorDisplay.textContent = e, this.errorDisplay.style.display = "block");
@@ -1120,16 +1120,16 @@ class Ae {
     const t = this.editorInstance ? this.editorInstance.getSource() : this.modifiedSources.get(e.passName) ?? e.source;
     try {
       await navigator.clipboard.writeText(t);
-      const n = this.copyButton.innerHTML;
+      const r = this.copyButton.innerHTML;
       this.copyButton.innerHTML = `
         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
           <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/>
         </svg>
       `, this.copyButton.classList.add("copied"), setTimeout(() => {
-        this.copyButton.innerHTML = n, this.copyButton.classList.remove("copied");
+        this.copyButton.innerHTML = r, this.copyButton.classList.remove("copied");
       }, 1500);
-    } catch (n) {
-      console.error("Failed to copy:", n);
+    } catch (r) {
+      console.error("Failed to copy:", r);
     }
   }
   buildTabBar() {
@@ -1142,118 +1142,118 @@ class Ae {
       passName: "common",
       source: this.project.commonSource
     });
-    const n = [
+    const r = [
       "BufferA",
       "BufferB",
       "BufferC",
       "BufferD"
     ];
-    for (const s of n) {
-      const a = this.project.passes[s];
+    for (const i of r) {
+      const a = this.project.passes[i];
       a && this.tabs.push({
         kind: "code",
-        name: `${s.toLowerCase()}.glsl`,
-        passName: s,
+        name: `${i.toLowerCase()}.glsl`,
+        passName: i,
         source: a.glslSource
       });
     }
-    const i = this.project.passes.Image;
+    const s = this.project.passes.Image;
     this.tabs.push({
       kind: "code",
       name: "image.glsl",
       passName: "Image",
-      source: i.glslSource
+      source: s.glslSource
     });
-    for (const s of this.project.textures) {
-      const a = s.source.split("/").pop() || s.source;
+    for (const i of this.project.textures) {
+      const a = i.source.split("/").pop() || i.source;
       this.tabs.push({
         kind: "image",
         name: a,
-        url: s.source
+        url: i.source
       });
     }
-    const l = async (s) => {
+    const l = async (i) => {
       this.saveCurrentEditorContent();
-      const a = this.tabs[s];
-      if (this.activeTabIndex = s, t.querySelectorAll(".tabbed-tab-button").forEach((f, g) => {
-        f.classList.toggle("active", g === s);
+      const a = this.tabs[i];
+      if (this.activeTabIndex = i, t.querySelectorAll(".tabbed-tab-button").forEach((m, g) => {
+        m.classList.toggle("active", g === i);
       }), this.canvasContainer.style.visibility = "hidden", this.imageViewer.style.visibility = "hidden", this.editorContainer.style.visibility = "hidden", this.buttonContainer.style.display = "none", this.editorInstance && (this.editorInstance.destroy(), this.editorInstance = null), a.kind === "shader")
         this.canvasContainer.style.visibility = "visible";
       else if (a.kind === "code") {
         this.editorContainer.style.visibility = "visible", this.buttonContainer.style.display = "flex";
-        const f = this.modifiedSources.get(a.passName) ?? a.source;
+        const m = this.modifiedSources.get(a.passName) ?? a.source;
         this.editorContainer.innerHTML = "";
         try {
-          const { createEditor: g } = await Promise.resolve().then(() => ie);
-          this.editorInstance = g(this.editorContainer, f, (v) => {
+          const { createEditor: g } = await Promise.resolve().then(() => se);
+          this.editorInstance = g(this.editorContainer, m, (v) => {
             this.modifiedSources.set(a.passName, v);
           });
         } catch (g) {
           console.error("Failed to load editor:", g);
           const v = document.createElement("textarea");
-          v.className = "tabbed-fallback-textarea", v.value = f, v.addEventListener("input", () => {
+          v.className = "tabbed-fallback-textarea", v.value = m, v.addEventListener("input", () => {
             this.modifiedSources.set(a.passName, v.value);
           }), this.editorContainer.appendChild(v);
         }
       } else {
         this.imageViewer.style.visibility = "visible";
-        const f = document.createElement("img");
-        f.src = a.url, f.alt = a.name, this.imageViewer.innerHTML = "", this.imageViewer.appendChild(f);
+        const m = document.createElement("img");
+        m.src = a.url, m.alt = a.name, this.imageViewer.innerHTML = "", this.imageViewer.appendChild(m);
       }
     };
-    return this.tabs.forEach((s, a) => {
-      const f = document.createElement("button");
-      f.className = "tabbed-tab-button", s.kind === "shader" ? f.classList.add("shader-tab") : s.kind === "image" && f.classList.add("image-tab"), f.textContent = s.name, a === 0 && f.classList.add("active"), f.addEventListener("click", () => l(a)), t.appendChild(f);
+    return this.tabs.forEach((i, a) => {
+      const m = document.createElement("button");
+      m.className = "tabbed-tab-button", i.kind === "shader" ? m.classList.add("shader-tab") : i.kind === "image" && m.classList.add("image-tab"), m.textContent = i.name, a === 0 && m.classList.add("active"), m.addEventListener("click", () => l(a)), t.appendChild(m);
     }), e.appendChild(t), e.appendChild(this.buttonContainer), e;
   }
 }
-function Se(r, e) {
-  switch (r) {
+function Ae(n, e) {
+  switch (n) {
     case "fullscreen":
-      return new Ce(e);
+      return new _e(e);
     case "centered":
       return new we(e);
     case "split":
-      return new Fe(e);
+      return new Ce(e);
     case "tabbed":
-      return new Ae(e);
+      return new Fe(e);
   }
 }
-function I(r, e) {
-  if (e in r) return e;
+function I(n, e) {
+  if (e in n) return e;
   const t = e.toLowerCase();
-  for (const n of Object.keys(r))
-    if (n.toLowerCase() === t)
-      return n;
+  for (const r of Object.keys(n))
+    if (r.toLowerCase() === t)
+      return r;
   return null;
 }
-function Re(r) {
-  return r === "Image" || r === "BufferA" || r === "BufferB" || r === "BufferC" || r === "BufferD";
+function Se(n) {
+  return n === "Image" || n === "BufferA" || n === "BufferB" || n === "BufferC" || n === "BufferD";
 }
-function re(r) {
-  return typeof r == "string" ? Re(r) ? { buffer: r } : r === "keyboard" ? { keyboard: !0 } : { texture: r } : r;
+function ne(n) {
+  return typeof n == "string" ? Se(n) ? { buffer: n } : n === "keyboard" ? { keyboard: !0 } : { texture: n } : n;
 }
-async function Be(r, e, t, n) {
-  const i = `/demos/${r}/config.json`;
-  if (i in t) {
-    const s = await t[i]();
-    return s.Image || s.BufferA || s.BufferB || s.BufferC || s.BufferD ? Le(r, s, e, n) : ee(r, e, s);
+async function Re(n, e, t, r) {
+  const s = `/demos/${n}/config.json`;
+  if (s in t) {
+    const i = await t[s]();
+    return i.Image || i.BufferA || i.BufferB || i.BufferC || i.BufferD ? Be(n, i, e, r) : ee(n, e, i);
   } else
-    return ee(r, e);
+    return ee(n, e);
 }
-async function ee(r, e, t) {
-  const n = `/demos/${r}/image.glsl`, i = I(e, n);
-  if (!i)
-    throw new Error(`Demo '${r}' not found. Expected ${n}`);
-  const l = await e[i](), s = (t == null ? void 0 : t.layout) || "tabbed", a = (t == null ? void 0 : t.controls) ?? !0, f = (t == null ? void 0 : t.title) || r.split("-").map((g) => g.charAt(0).toUpperCase() + g.slice(1)).join(" ");
+async function ee(n, e, t) {
+  const r = `/demos/${n}/image.glsl`, s = I(e, r);
+  if (!s)
+    throw new Error(`Demo '${n}' not found. Expected ${r}`);
+  const l = await e[s](), i = (t == null ? void 0 : t.layout) || "tabbed", a = (t == null ? void 0 : t.controls) ?? !0, m = (t == null ? void 0 : t.title) || n.split("-").map((g) => g.charAt(0).toUpperCase() + g.slice(1)).join(" ");
   return {
-    root: `/demos/${r}`,
+    root: `/demos/${n}`,
     meta: {
-      title: f,
+      title: m,
       author: (t == null ? void 0 : t.author) || null,
       description: (t == null ? void 0 : t.description) || null
     },
-    layout: s,
+    layout: i,
     controls: a,
     commonSource: null,
     passes: {
@@ -1271,8 +1271,8 @@ async function ee(r, e, t) {
     textures: []
   };
 }
-async function Le(r, e, t, n) {
-  const i = {
+async function Be(n, e, t, r) {
+  const s = {
     Image: e.Image,
     BufferA: e.BufferA,
     BufferB: e.BufferB,
@@ -1281,30 +1281,30 @@ async function Le(r, e, t, n) {
   };
   let l = null;
   if (e.common) {
-    const E = `/demos/${r}/${e.common}`, T = I(t, E);
-    T && (l = await t[T]());
+    const E = `/demos/${n}/${e.common}`, y = I(t, E);
+    y && (l = await t[y]());
   } else {
-    const E = `/demos/${r}/common.glsl`, T = I(t, E);
-    T && (l = await t[T]());
+    const E = `/demos/${n}/common.glsl`, y = I(t, E);
+    y && (l = await t[y]());
   }
-  const s = /* @__PURE__ */ new Set(), a = ["Image", "BufferA", "BufferB", "BufferC", "BufferD"];
+  const i = /* @__PURE__ */ new Set(), a = ["Image", "BufferA", "BufferB", "BufferC", "BufferD"];
   for (const E of a) {
-    const T = i[E];
-    if (T)
+    const y = s[E];
+    if (y)
       for (const c of ["iChannel0", "iChannel1", "iChannel2", "iChannel3"]) {
-        const o = T[c];
+        const o = y[c];
         if (!o) continue;
-        const u = re(o);
-        u && "texture" in u && s.add(u.texture);
+        const u = ne(o);
+        u && "texture" in u && i.add(u.texture);
       }
   }
-  const f = [], g = /* @__PURE__ */ new Map();
-  for (const E of s) {
-    const T = `/demos/${r}/${E.replace(/^\.\//, "")}`, c = I(n, T);
+  const m = [], g = /* @__PURE__ */ new Map();
+  for (const E of i) {
+    const y = `/demos/${n}/${E.replace(/^\.\//, "")}`, c = I(r, y);
     if (!c)
-      throw new Error(`Texture not found: ${E} (expected at ${T})`);
-    const o = await n[c](), u = E.split("/").pop().replace(/\.[^.]+$/, "");
-    f.push({
+      throw new Error(`Texture not found: ${E} (expected at ${y})`);
+    const o = await r[c](), u = E.split("/").pop().replace(/\.[^.]+$/, "");
+    m.push({
       name: u,
       source: o,
       filter: "linear",
@@ -1313,46 +1313,46 @@ async function Le(r, e, t, n) {
   }
   const v = {};
   for (const E of a) {
-    const T = i[E];
-    if (!T) continue;
+    const y = s[E];
+    if (!y) continue;
     const c = {
       Image: "image.glsl",
       BufferA: "bufferA.glsl",
       BufferB: "bufferB.glsl",
       BufferC: "bufferC.glsl",
       BufferD: "bufferD.glsl"
-    }, o = T.source || c[E], u = `/demos/${r}/${o}`, d = I(t, u);
+    }, o = y.source || c[E], u = `/demos/${n}/${o}`, d = I(t, u);
     if (!d)
       throw new Error(`Missing shader file: ${u}`);
-    const p = await t[d](), m = [
-      H(T.iChannel0, g),
-      H(T.iChannel1, g),
-      H(T.iChannel2, g),
-      H(T.iChannel3, g)
+    const p = await t[d](), f = [
+      H(y.iChannel0, g),
+      H(y.iChannel1, g),
+      H(y.iChannel2, g),
+      H(y.iChannel3, g)
     ];
     v[E] = {
       name: E,
       glslSource: p,
-      channels: m
+      channels: f
     };
   }
   if (!v.Image)
-    throw new Error(`Demo '${r}' must have an Image pass`);
-  const C = e.title || r.split("-").map((E) => E.charAt(0).toUpperCase() + E.slice(1)).join(" "), x = e.author || null, w = e.description || null, A = e.layout || "tabbed", y = e.controls ?? !0;
+    throw new Error(`Demo '${n}' must have an Image pass`);
+  const w = e.title || n.split("-").map((E) => E.charAt(0).toUpperCase() + E.slice(1)).join(" "), x = e.author || null, C = e.description || null, A = e.layout || "tabbed", T = e.controls ?? !0;
   return {
-    root: `/demos/${r}`,
-    meta: { title: C, author: x, description: w },
+    root: `/demos/${n}`,
+    meta: { title: w, author: x, description: C },
     layout: A,
-    controls: y,
+    controls: T,
     commonSource: l,
     passes: v,
-    textures: f
+    textures: m
   };
 }
-function H(r, e) {
-  if (!r)
+function H(n, e) {
+  if (!n)
     return { kind: "none" };
-  const t = re(r);
+  const t = ne(n);
   return t ? "buffer" in t ? {
     kind: "buffer",
     buffer: t.buffer,
@@ -1363,37 +1363,35 @@ function H(r, e) {
     cubemap: t.type === "cubemap"
   } : "keyboard" in t ? { kind: "keyboard" } : { kind: "none" } : { kind: "none" };
 }
-const ke = "course/day4/mandelbrot-waves";
-async function Me() {
-  return Be(ke, /* @__PURE__ */ Object.assign({
-    "/demos/course/day4/mandelbrot-waves/bufferA.glsl": () => Promise.resolve().then(() => $e).then((n) => n.default),
-    "/demos/course/day4/mandelbrot-waves/common.glsl": () => Promise.resolve().then(() => Oe).then((n) => n.default),
-    "/demos/course/day4/mandelbrot-waves/image.glsl": () => Promise.resolve().then(() => ze).then((n) => n.default)
+const Le = "course/day4/paint-broken";
+async function ke() {
+  return Re(Le, /* @__PURE__ */ Object.assign({
+    "/demos/course/day4/paint-broken/image.glsl": () => Promise.resolve().then(() => Ne).then((r) => r.default)
   }), /* @__PURE__ */ Object.assign({
-    "/demos/course/day4/mandelbrot-waves/config.json": () => Promise.resolve().then(() => Ge).then((n) => n.default)
+    "/demos/course/day4/paint-broken/config.json": () => Promise.resolve().then(() => je).then((r) => r.default)
   }), /* @__PURE__ */ Object.assign({}));
 }
-async function Ke(r) {
-  const e = typeof r.container == "string" ? document.querySelector(r.container) : r.container;
+async function He(n) {
+  const e = typeof n.container == "string" ? document.querySelector(n.container) : n.container;
   if (!e || !(e instanceof HTMLElement))
-    throw new Error(`Container not found: ${r.container}`);
-  const t = await Me(), n = Se(t.layout, {
+    throw new Error(`Container not found: ${n.container}`);
+  const t = await ke(), r = Ae(t.layout, {
     container: e,
     project: t
-  }), i = new _e({
-    container: n.getCanvasContainer(),
+  }), s = new xe({
+    container: r.getCanvasContainer(),
     project: t,
-    pixelRatio: r.pixelRatio ?? window.devicePixelRatio
+    pixelRatio: n.pixelRatio ?? window.devicePixelRatio
   });
-  return i.hasErrors() || i.start(), {
-    app: i,
+  return s.hasErrors() || s.start(), {
+    app: s,
     destroy: () => {
       var l;
-      (l = i.stop) == null || l.call(i);
+      (l = s.stop) == null || l.call(s);
     }
   };
 }
-class Pe {
+class Me {
   constructor(e, t) {
     h(this, "container");
     h(this, "project");
@@ -1420,8 +1418,8 @@ class Pe {
       </svg>
       Recompile
     `, this.recompileButton.title = "Recompile shader (Ctrl+Enter)", this.recompileButton.addEventListener("click", () => this.recompile()), this.errorDisplay = document.createElement("div"), this.errorDisplay.className = "editor-error-display", this.errorDisplay.style.display = "none";
-    const n = document.createElement("div");
-    n.className = "editor-toolbar", n.appendChild(this.tabBar), n.appendChild(this.copyButton), n.appendChild(this.recompileButton), this.container.appendChild(n), this.container.appendChild(this.contentArea), this.container.appendChild(this.errorDisplay), this.setupKeyboardShortcut(), this.showTab(0);
+    const r = document.createElement("div");
+    r.className = "editor-toolbar", r.appendChild(this.tabBar), r.appendChild(this.copyButton), r.appendChild(this.recompileButton), this.container.appendChild(r), this.container.appendChild(this.contentArea), this.container.appendChild(this.errorDisplay), this.setupKeyboardShortcut(), this.showTab(0);
   }
   setRecompileHandler(e) {
     this.recompileHandler = e;
@@ -1442,13 +1440,13 @@ class Pe {
       "BufferC",
       "BufferD"
     ];
-    for (const n of e) {
-      const i = this.project.passes[n];
-      i && this.tabs.push({
+    for (const r of e) {
+      const s = this.project.passes[r];
+      s && this.tabs.push({
         kind: "code",
-        name: `${n.toLowerCase()}.glsl`,
-        passName: n,
-        source: i.glslSource
+        name: `${r.toLowerCase()}.glsl`,
+        passName: r,
+        source: s.glslSource
       });
     }
     const t = this.project.passes.Image;
@@ -1458,48 +1456,48 @@ class Pe {
       passName: "Image",
       source: t.glslSource
     });
-    for (const n of this.project.textures) {
-      const i = n.source.split("/").pop() || n.source;
+    for (const r of this.project.textures) {
+      const s = r.source.split("/").pop() || r.source;
       this.tabs.push({
         kind: "image",
-        name: i,
-        url: n.source
+        name: s,
+        url: r.source
       });
     }
   }
   buildTabBar() {
     this.tabBar.innerHTML = "", this.tabs.forEach((e, t) => {
-      const n = document.createElement("button");
-      n.className = "editor-tab-button", e.kind === "image" && n.classList.add("image-tab"), n.textContent = e.name, t === this.activeTabIndex && n.classList.add("active"), n.addEventListener("click", () => this.showTab(t)), this.tabBar.appendChild(n);
+      const r = document.createElement("button");
+      r.className = "editor-tab-button", e.kind === "image" && r.classList.add("image-tab"), r.textContent = e.name, t === this.activeTabIndex && r.classList.add("active"), r.addEventListener("click", () => this.showTab(t)), this.tabBar.appendChild(r);
     });
   }
   async showTab(e) {
     this.saveCurrentEditorContent(), this.activeTabIndex = e;
     const t = this.tabs[e];
-    if (this.tabBar.querySelectorAll(".editor-tab-button").forEach((n, i) => {
-      n.classList.toggle("active", i === e);
+    if (this.tabBar.querySelectorAll(".editor-tab-button").forEach((r, s) => {
+      r.classList.toggle("active", s === e);
     }), this.contentArea.innerHTML = "", this.editorInstance && (this.editorInstance.destroy(), this.editorInstance = null), t.kind === "code") {
       this.copyButton.style.display = "", this.recompileButton.style.display = "";
-      const n = this.modifiedSources.get(t.passName) ?? t.source, i = document.createElement("div");
-      i.className = "editor-prism-container", this.contentArea.appendChild(i);
+      const r = this.modifiedSources.get(t.passName) ?? t.source, s = document.createElement("div");
+      s.className = "editor-prism-container", this.contentArea.appendChild(s);
       try {
-        const { createEditor: l } = await Promise.resolve().then(() => ie);
-        this.editorInstance = l(i, n, (s) => {
-          this.modifiedSources.set(t.passName, s);
+        const { createEditor: l } = await Promise.resolve().then(() => se);
+        this.editorInstance = l(s, r, (i) => {
+          this.modifiedSources.set(t.passName, i);
         });
       } catch (l) {
         console.error("Failed to load editor:", l);
-        const s = document.createElement("textarea");
-        s.className = "editor-fallback-textarea", s.value = n, s.addEventListener("input", () => {
-          this.modifiedSources.set(t.passName, s.value);
-        }), i.appendChild(s);
+        const i = document.createElement("textarea");
+        i.className = "editor-fallback-textarea", i.value = r, i.addEventListener("input", () => {
+          this.modifiedSources.set(t.passName, i.value);
+        }), s.appendChild(i);
       }
     } else {
       this.copyButton.style.display = "none", this.recompileButton.style.display = "none";
-      const n = document.createElement("div");
-      n.className = "editor-image-viewer";
-      const i = document.createElement("img");
-      i.src = t.url, i.alt = t.name, n.appendChild(i), this.contentArea.appendChild(n);
+      const r = document.createElement("div");
+      r.className = "editor-image-viewer";
+      const s = document.createElement("img");
+      s.src = t.url, s.alt = t.name, r.appendChild(s), this.contentArea.appendChild(r);
     }
   }
   saveCurrentEditorContent() {
@@ -1520,8 +1518,8 @@ class Pe {
     const e = this.tabs[this.activeTabIndex];
     if (e.kind !== "code")
       return;
-    const t = this.modifiedSources.get(e.passName) ?? e.source, n = this.recompileHandler(e.passName, t);
-    n.success ? (this.hideError(), e.source = t) : this.showError(n.error || "Compilation failed");
+    const t = this.modifiedSources.get(e.passName) ?? e.source, r = this.recompileHandler(e.passName, t);
+    r.success ? (this.hideError(), e.source = t) : this.showError(r.error || "Compilation failed");
   }
   showError(e) {
     this.errorDisplay.textContent = e, this.errorDisplay.style.display = "block";
@@ -1535,16 +1533,16 @@ class Pe {
     const t = this.editorInstance ? this.editorInstance.getSource() : this.modifiedSources.get(e.passName) ?? e.source;
     try {
       await navigator.clipboard.writeText(t);
-      const n = this.copyButton.innerHTML;
+      const r = this.copyButton.innerHTML;
       this.copyButton.innerHTML = `
         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
           <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/>
         </svg>
       `, this.copyButton.classList.add("copied"), setTimeout(() => {
-        this.copyButton.innerHTML = n, this.copyButton.classList.remove("copied");
+        this.copyButton.innerHTML = r, this.copyButton.classList.remove("copied");
       }, 1500);
-    } catch (n) {
-      console.error("Failed to copy:", n);
+    } catch (r) {
+      console.error("Failed to copy:", r);
     }
   }
   setupKeyboardShortcut() {
@@ -1553,12 +1551,12 @@ class Pe {
     });
   }
 }
-const De = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const Pe = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  EditorPanel: Pe
+  EditorPanel: Me
 }, Symbol.toStringTag, { value: "Module" }));
 var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : typeof global < "u" ? global : typeof self < "u" ? self : {}, ae = { exports: {} };
-(function(r) {
+(function(n) {
   var e = typeof window < "u" ? window : typeof WorkerGlobalScope < "u" && self instanceof WorkerGlobalScope ? self : {};
   /**
    * Prism: Lightweight, robust, elegant syntax highlighting
@@ -1568,8 +1566,8 @@ var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
    * @namespace
    * @public
    */
-  var t = function(n) {
-    var i = /(?:^|\s)lang(?:uage)?-([\w-]+)(?=\s|$)/i, l = 0, s = {}, a = {
+  var t = function(r) {
+    var s = /(?:^|\s)lang(?:uage)?-([\w-]+)(?=\s|$)/i, l = 0, i = {}, a = {
       /**
        * By default, Prism will attempt to highlight all code elements (by calling {@link Prism.highlightAll}) on the
        * current page after the page finished loading. This might be a problem if e.g. you wanted to asynchronously load
@@ -1591,7 +1589,7 @@ var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
        * @memberof Prism
        * @public
        */
-      manual: n.Prism && n.Prism.manual,
+      manual: r.Prism && r.Prism.manual,
       /**
        * By default, if Prism is in a web worker, it assumes that it is in a worker it created itself, so it uses
        * `addEventListener` to communicate with its parent instance. However, if you're using Prism manually in your
@@ -1613,7 +1611,7 @@ var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
        * @memberof Prism
        * @public
        */
-      disableWorkerMessageHandler: n.Prism && n.Prism.disableWorkerMessageHandler,
+      disableWorkerMessageHandler: r.Prism && r.Prism.disableWorkerMessageHandler,
       /**
        * A namespace for utility methods.
        *
@@ -1625,7 +1623,7 @@ var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
        */
       util: {
         encode: function c(o) {
-          return o instanceof f ? new f(o.type, c(o.content), o.alias) : Array.isArray(o) ? o.map(c) : o.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/\u00a0/g, " ");
+          return o instanceof m ? new m(o.type, c(o.content), o.alias) : Array.isArray(o) ? o.map(c) : o.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/\u00a0/g, " ");
         },
         /**
          * Returns the name of the type of the given value.
@@ -1674,8 +1672,8 @@ var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
                 return u[p];
               d = /** @type {Record<string, any>} */
               {}, u[p] = d;
-              for (var m in o)
-                o.hasOwnProperty(m) && (d[m] = c(o[m], u));
+              for (var f in o)
+                o.hasOwnProperty(f) && (d[f] = c(o[f], u));
               return (
                 /** @type {any} */
                 d
@@ -1701,7 +1699,7 @@ var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
          */
         getLanguage: function(c) {
           for (; c; ) {
-            var o = i.exec(c.className);
+            var o = s.exec(c.className);
             if (o)
               return o[1].toLowerCase();
             c = c.parentElement;
@@ -1716,7 +1714,7 @@ var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
          * @returns {void}
          */
         setLanguage: function(c, o) {
-          c.className = c.className.replace(RegExp(i, "gi"), ""), c.classList.add("language-" + o);
+          c.className = c.className.replace(RegExp(s, "gi"), ""), c.classList.add("language-" + o);
         },
         /**
          * Returns the script element that is currently executing.
@@ -1788,10 +1786,10 @@ var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
         /**
          * The grammar for plain, unformatted text.
          */
-        plain: s,
-        plaintext: s,
-        text: s,
-        txt: s,
+        plain: i,
+        plaintext: i,
+        text: i,
+        txt: i,
         /**
          * Creates a deep copy of the language with the given id and appends the given tokens.
          *
@@ -1904,28 +1902,28 @@ var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
         insertBefore: function(c, o, u, d) {
           d = d || /** @type {any} */
           a.languages;
-          var p = d[c], m = {};
+          var p = d[c], f = {};
           for (var _ in p)
             if (p.hasOwnProperty(_)) {
               if (_ == o)
                 for (var b in u)
-                  u.hasOwnProperty(b) && (m[b] = u[b]);
-              u.hasOwnProperty(_) || (m[_] = p[_]);
+                  u.hasOwnProperty(b) && (f[b] = u[b]);
+              u.hasOwnProperty(_) || (f[_] = p[_]);
             }
           var F = d[c];
-          return d[c] = m, a.languages.DFS(a.languages, function(S, k) {
-            k === F && S != c && (this[S] = m);
-          }), m;
+          return d[c] = f, a.languages.DFS(a.languages, function(S, k) {
+            k === F && S != c && (this[S] = f);
+          }), f;
         },
         // Traverse a language definition with Depth First Search
         DFS: function c(o, u, d, p) {
           p = p || {};
-          var m = a.util.objId;
+          var f = a.util.objId;
           for (var _ in o)
             if (o.hasOwnProperty(_)) {
               u.call(o, _, o[_], d || _);
               var b = o[_], F = a.util.type(b);
-              F === "Object" && !p[m(b)] ? (p[m(b)] = !0, c(b, u, null, p)) : F === "Array" && !p[m(b)] && (p[m(b)] = !0, c(b, u, _, p));
+              F === "Object" && !p[f(b)] ? (p[f(b)] = !0, c(b, u, null, p)) : F === "Array" && !p[f(b)] && (p[f(b)] = !0, c(b, u, _, p));
             }
         }
       },
@@ -1967,8 +1965,8 @@ var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
           selector: 'code[class*="language-"], [class*="language-"] code, code[class*="lang-"], [class*="lang-"] code'
         };
         a.hooks.run("before-highlightall", d), d.elements = Array.prototype.slice.apply(d.container.querySelectorAll(d.selector)), a.hooks.run("before-all-elements-highlight", d);
-        for (var p = 0, m; m = d.elements[p++]; )
-          a.highlightElement(m, o === !0, d.callback);
+        for (var p = 0, f; f = d.elements[p++]; )
+          a.highlightElement(f, o === !0, d.callback);
       },
       /**
        * Highlights the code inside a single element.
@@ -2001,8 +1999,8 @@ var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
       highlightElement: function(c, o, u) {
         var d = a.util.getLanguage(c), p = a.languages[d];
         a.util.setLanguage(c, d);
-        var m = c.parentElement;
-        m && m.nodeName.toLowerCase() === "pre" && a.util.setLanguage(m, d);
+        var f = c.parentElement;
+        f && f.nodeName.toLowerCase() === "pre" && a.util.setLanguage(f, d);
         var _ = c.textContent, b = {
           element: c,
           language: d,
@@ -2012,7 +2010,7 @@ var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
         function F(k) {
           b.highlightedCode = k, a.hooks.run("before-insert", b), b.element.innerHTML = b.highlightedCode, a.hooks.run("after-highlight", b), a.hooks.run("complete", b), u && u.call(b.element);
         }
-        if (a.hooks.run("before-sanity-check", b), m = b.element.parentElement, m && m.nodeName.toLowerCase() === "pre" && !m.hasAttribute("tabindex") && m.setAttribute("tabindex", "0"), !b.code) {
+        if (a.hooks.run("before-sanity-check", b), f = b.element.parentElement, f && f.nodeName.toLowerCase() === "pre" && !f.hasAttribute("tabindex") && f.setAttribute("tabindex", "0"), !b.code) {
           a.hooks.run("complete", b), u && u.call(b.element);
           return;
         }
@@ -2020,7 +2018,7 @@ var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
           F(a.util.encode(b.code));
           return;
         }
-        if (o && n.Worker) {
+        if (o && r.Worker) {
           var S = new Worker(a.filename);
           S.onmessage = function(k) {
             F(k.data);
@@ -2060,7 +2058,7 @@ var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
         };
         if (a.hooks.run("before-tokenize", d), !d.grammar)
           throw new Error('The language "' + d.language + '" has no grammar.');
-        return d.tokens = a.tokenize(d.code, d.grammar), a.hooks.run("after-tokenize", d), f.stringify(a.util.encode(d.tokens), d.language);
+        return d.tokens = a.tokenize(d.code, d.grammar), a.hooks.run("after-tokenize", d), m.stringify(a.util.encode(d.tokens), d.language);
       },
       /**
        * This is the heart of Prism, and the most low-level function you can use. It accepts a string of text as input
@@ -2093,7 +2091,7 @@ var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
             o[d] = u[d];
           delete o.rest;
         }
-        var p = new C();
+        var p = new w();
         return x(p, p.head, c), v(c, p, o, p.head, 0), A(p);
       },
       /**
@@ -2135,13 +2133,13 @@ var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
               p(o);
         }
       },
-      Token: f
+      Token: m
     };
-    n.Prism = a;
-    function f(c, o, u, d) {
+    r.Prism = a;
+    function m(c, o, u, d) {
       this.type = c, this.content = o, this.alias = u, this.length = (d || "").length | 0;
     }
-    f.stringify = function c(o, u) {
+    m.stringify = function c(o, u) {
       if (typeof o == "string")
         return o;
       if (Array.isArray(o)) {
@@ -2157,8 +2155,8 @@ var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
         classes: ["token", o.type],
         attributes: {},
         language: u
-      }, m = o.alias;
-      m && (Array.isArray(m) ? Array.prototype.push.apply(p.classes, m) : p.classes.push(m)), a.hooks.run("wrap", p);
+      }, f = o.alias;
+      f && (Array.isArray(f) ? Array.prototype.push.apply(p.classes, f) : p.classes.push(f)), a.hooks.run("wrap", p);
       var _ = "";
       for (var b in p.attributes)
         _ += " " + b + '="' + (p.attributes[b] || "").replace(/"/g, "&quot;") + '"';
@@ -2168,61 +2166,61 @@ var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
       c.lastIndex = o;
       var p = c.exec(u);
       if (p && d && p[1]) {
-        var m = p[1].length;
-        p.index += m, p[0] = p[0].slice(m);
+        var f = p[1].length;
+        p.index += f, p[0] = p[0].slice(f);
       }
       return p;
     }
-    function v(c, o, u, d, p, m) {
+    function v(c, o, u, d, p, f) {
       for (var _ in u)
         if (!(!u.hasOwnProperty(_) || !u[_])) {
           var b = u[_];
           b = Array.isArray(b) ? b : [b];
           for (var F = 0; F < b.length; ++F) {
-            if (m && m.cause == _ + "," + F)
+            if (f && f.cause == _ + "," + F)
               return;
-            var S = b[F], k = S.inside, V = !!S.lookbehind, K = !!S.greedy, ue = S.alias;
+            var S = b[F], k = S.inside, V = !!S.lookbehind, K = !!S.greedy, le = S.alias;
             if (K && !S.pattern.global) {
-              var de = S.pattern.toString().match(/[imsuy]*$/)[0];
-              S.pattern = RegExp(S.pattern.source, de + "g");
+              var ue = S.pattern.toString().match(/[imsuy]*$/)[0];
+              S.pattern = RegExp(S.pattern.source, ue + "g");
             }
-            for (var q = S.pattern || S, R = d.next, L = p; R !== o.tail && !(m && L >= m.reach); L += R.value.length, R = R.next) {
+            for (var q = S.pattern || S, R = d.next, L = p; R !== o.tail && !(f && L >= f.reach); L += R.value.length, R = R.next) {
               var P = R.value;
               if (o.length > c.length)
                 return;
-              if (!(P instanceof f)) {
+              if (!(P instanceof m)) {
                 var U = 1, B;
                 if (K) {
                   if (B = g(q, L, c, V), !B || B.index >= c.length)
                     break;
-                  var N = B.index, he = B.index + B[0].length, M = L;
+                  var N = B.index, de = B.index + B[0].length, M = L;
                   for (M += R.value.length; N >= M; )
                     R = R.next, M += R.value.length;
-                  if (M -= R.value.length, L = M, R.value instanceof f)
+                  if (M -= R.value.length, L = M, R.value instanceof m)
                     continue;
-                  for (var D = R; D !== o.tail && (M < he || typeof D.value == "string"); D = D.next)
+                  for (var D = R; D !== o.tail && (M < de || typeof D.value == "string"); D = D.next)
                     U++, M += D.value.length;
                   U--, P = c.slice(L, M), B.index -= L;
                 } else if (B = g(q, 0, P, V), !B)
                   continue;
                 var N = B.index, $ = B[0], z = P.slice(0, N), W = P.slice(N + $.length), X = L + P.length;
-                m && X > m.reach && (m.reach = X);
+                f && X > f.reach && (f.reach = X);
                 var j = R.prev;
-                z && (j = x(o, j, z), L += z.length), w(o, j, U);
-                var pe = new f(_, k ? a.tokenize($, k) : $, ue, $);
-                if (R = x(o, j, pe), W && x(o, R, W), U > 1) {
+                z && (j = x(o, j, z), L += z.length), C(o, j, U);
+                var he = new m(_, k ? a.tokenize($, k) : $, le, $);
+                if (R = x(o, j, he), W && x(o, R, W), U > 1) {
                   var G = {
                     cause: _ + "," + F,
                     reach: X
                   };
-                  v(c, o, u, R.prev, L, G), m && G.reach > m.reach && (m.reach = G.reach);
+                  v(c, o, u, R.prev, L, G), f && G.reach > f.reach && (f.reach = G.reach);
                 }
               }
             }
           }
         }
     }
-    function C() {
+    function w() {
       var c = { value: null, prev: null, next: null }, o = { value: null, prev: c, next: null };
       c.next = o, this.head = c, this.tail = o, this.length = 0;
     }
@@ -2230,7 +2228,7 @@ var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
       var d = o.next, p = { value: u, prev: o, next: d };
       return o.next = p, d.prev = p, c.length++, p;
     }
-    function w(c, o, u) {
+    function C(c, o, u) {
       for (var d = o.next, p = 0; p < u && d !== c.tail; p++)
         d = d.next;
       o.next = d, d.prev = o, c.length -= p;
@@ -2240,23 +2238,23 @@ var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
         o.push(u.value), u = u.next;
       return o;
     }
-    if (!n.document)
-      return n.addEventListener && (a.disableWorkerMessageHandler || n.addEventListener("message", function(c) {
+    if (!r.document)
+      return r.addEventListener && (a.disableWorkerMessageHandler || r.addEventListener("message", function(c) {
         var o = JSON.parse(c.data), u = o.language, d = o.code, p = o.immediateClose;
-        n.postMessage(a.highlight(d, a.languages[u], u)), p && n.close();
+        r.postMessage(a.highlight(d, a.languages[u], u)), p && r.close();
       }, !1)), a;
-    var y = a.util.currentScript();
-    y && (a.filename = y.src, y.hasAttribute("data-manual") && (a.manual = !0));
+    var T = a.util.currentScript();
+    T && (a.filename = T.src, T.hasAttribute("data-manual") && (a.manual = !0));
     function E() {
       a.manual || a.highlightAll();
     }
     if (!a.manual) {
-      var T = document.readyState;
-      T === "loading" || T === "interactive" && y && y.defer ? document.addEventListener("DOMContentLoaded", E) : window.requestAnimationFrame ? window.requestAnimationFrame(E) : window.setTimeout(E, 16);
+      var y = document.readyState;
+      y === "loading" || y === "interactive" && T && T.defer ? document.addEventListener("DOMContentLoaded", E) : window.requestAnimationFrame ? window.requestAnimationFrame(E) : window.setTimeout(E, 16);
     }
     return a;
   }(e);
-  r.exports && (r.exports = t), typeof te < "u" && (te.Prism = t), t.languages.markup = {
+  n.exports && (n.exports = t), typeof te < "u" && (te.Prism = t), t.languages.markup = {
     comment: {
       pattern: /<!--(?:(?!<!--)[\s\S])*?-->/,
       greedy: !0
@@ -2333,8 +2331,8 @@ var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
       },
       /&#x?[\da-f]{1,8};/i
     ]
-  }, t.languages.markup.tag.inside["attr-value"].inside.entity = t.languages.markup.entity, t.languages.markup.doctype.inside["internal-subset"].inside = t.languages.markup, t.hooks.add("wrap", function(n) {
-    n.type === "entity" && (n.attributes.title = n.content.replace(/&amp;/, "&"));
+  }, t.languages.markup.tag.inside["attr-value"].inside.entity = t.languages.markup.entity, t.languages.markup.doctype.inside["internal-subset"].inside = t.languages.markup, t.hooks.add("wrap", function(r) {
+    r.type === "entity" && (r.attributes.title = r.content.replace(/&amp;/, "&"));
   }), Object.defineProperty(t.languages.markup.tag, "addInlined", {
     /**
      * Adds an inlined language to markup.
@@ -2347,32 +2345,32 @@ var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
      * @example
      * addInlined('style', 'css');
      */
-    value: function(i, l) {
-      var s = {};
-      s["language-" + l] = {
+    value: function(s, l) {
+      var i = {};
+      i["language-" + l] = {
         pattern: /(^<!\[CDATA\[)[\s\S]+?(?=\]\]>$)/i,
         lookbehind: !0,
         inside: t.languages[l]
-      }, s.cdata = /^<!\[CDATA\[|\]\]>$/i;
+      }, i.cdata = /^<!\[CDATA\[|\]\]>$/i;
       var a = {
         "included-cdata": {
           pattern: /<!\[CDATA\[[\s\S]*?\]\]>/i,
-          inside: s
+          inside: i
         }
       };
       a["language-" + l] = {
         pattern: /[\s\S]+/,
         inside: t.languages[l]
       };
-      var f = {};
-      f[i] = {
+      var m = {};
+      m[s] = {
         pattern: RegExp(/(<__[^>]*>)(?:<!\[CDATA\[(?:[^\]]|\](?!\]>))*\]\]>|(?!<!\[CDATA\[)[\s\S])*?(?=<\/__>)/.source.replace(/__/g, function() {
-          return i;
+          return s;
         }), "i"),
         lookbehind: !0,
         greedy: !0,
         inside: a
-      }, t.languages.insertBefore("markup", "cdata", f);
+      }, t.languages.insertBefore("markup", "cdata", m);
     }
   }), Object.defineProperty(t.languages.markup.tag, "addAttribute", {
     /**
@@ -2386,10 +2384,10 @@ var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
      * @example
      * addAttribute('style', 'css');
      */
-    value: function(n, i) {
+    value: function(r, s) {
       t.languages.markup.tag.inside["special-attr"].push({
         pattern: RegExp(
-          /(^|["'\s])/.source + "(?:" + n + ")" + /\s*=\s*(?:"[^"]*"|'[^']*'|[^\s'">=]+(?=[\s>]))/.source,
+          /(^|["'\s])/.source + "(?:" + r + ")" + /\s*=\s*(?:"[^"]*"|'[^']*'|[^\s'">=]+(?=[\s>]))/.source,
           "i"
         ),
         lookbehind: !0,
@@ -2401,8 +2399,8 @@ var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
               value: {
                 pattern: /(^=\s*(["']|(?!["'])))\S[\s\S]*(?=\2$)/,
                 lookbehind: !0,
-                alias: [i, "language-" + i],
-                inside: t.languages[i]
+                alias: [s, "language-" + s],
+                inside: t.languages[s]
               },
               punctuation: [
                 {
@@ -2416,12 +2414,12 @@ var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
         }
       });
     }
-  }), t.languages.html = t.languages.markup, t.languages.mathml = t.languages.markup, t.languages.svg = t.languages.markup, t.languages.xml = t.languages.extend("markup", {}), t.languages.ssml = t.languages.xml, t.languages.atom = t.languages.xml, t.languages.rss = t.languages.xml, function(n) {
-    var i = /(?:"(?:\\(?:\r\n|[\s\S])|[^"\\\r\n])*"|'(?:\\(?:\r\n|[\s\S])|[^'\\\r\n])*')/;
-    n.languages.css = {
+  }), t.languages.html = t.languages.markup, t.languages.mathml = t.languages.markup, t.languages.svg = t.languages.markup, t.languages.xml = t.languages.extend("markup", {}), t.languages.ssml = t.languages.xml, t.languages.atom = t.languages.xml, t.languages.rss = t.languages.xml, function(r) {
+    var s = /(?:"(?:\\(?:\r\n|[\s\S])|[^"\\\r\n])*"|'(?:\\(?:\r\n|[\s\S])|[^'\\\r\n])*')/;
+    r.languages.css = {
       comment: /\/\*[\s\S]*?\*\//,
       atrule: {
-        pattern: RegExp("@[\\w-](?:" + /[^;{\s"']|\s+(?!\s)/.source + "|" + i.source + ")*?" + /(?:;|(?=\s*\{))/.source),
+        pattern: RegExp("@[\\w-](?:" + /[^;{\s"']|\s+(?!\s)/.source + "|" + s.source + ")*?" + /(?:;|(?=\s*\{))/.source),
         inside: {
           rule: /^@[\w-]+/,
           "selector-function-argument": {
@@ -2438,23 +2436,23 @@ var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
       },
       url: {
         // https://drafts.csswg.org/css-values-3/#urls
-        pattern: RegExp("\\burl\\((?:" + i.source + "|" + /(?:[^\\\r\n()"']|\\[\s\S])*/.source + ")\\)", "i"),
+        pattern: RegExp("\\burl\\((?:" + s.source + "|" + /(?:[^\\\r\n()"']|\\[\s\S])*/.source + ")\\)", "i"),
         greedy: !0,
         inside: {
           function: /^url/i,
           punctuation: /^\(|\)$/,
           string: {
-            pattern: RegExp("^" + i.source + "$"),
+            pattern: RegExp("^" + s.source + "$"),
             alias: "url"
           }
         }
       },
       selector: {
-        pattern: RegExp(`(^|[{}\\s])[^{}\\s](?:[^{};"'\\s]|\\s+(?![\\s{])|` + i.source + ")*(?=\\s*\\{)"),
+        pattern: RegExp(`(^|[{}\\s])[^{}\\s](?:[^{};"'\\s]|\\s+(?![\\s{])|` + s.source + ")*(?=\\s*\\{)"),
         lookbehind: !0
       },
       string: {
-        pattern: i,
+        pattern: s,
         greedy: !0
       },
       property: {
@@ -2467,8 +2465,8 @@ var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
         lookbehind: !0
       },
       punctuation: /[(){};:,]/
-    }, n.languages.css.atrule.inside.rest = n.languages.css;
-    var l = n.languages.markup;
+    }, r.languages.css.atrule.inside.rest = r.languages.css;
+    var l = r.languages.markup;
     l && (l.tag.addInlined("style", "css"), l.tag.addAttribute("style", "css"));
   }(t), t.languages.clike = {
     comment: [
@@ -2634,9 +2632,9 @@ var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
     if (typeof t > "u" || typeof document > "u")
       return;
     Element.prototype.matches || (Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector);
-    var n = "Loading…", i = function(y, E) {
-      return "✖ Error " + y + " while fetching file: " + E;
-    }, l = "✖ Error: File does not exist or is empty", s = {
+    var r = "Loading…", s = function(T, E) {
+      return "✖ Error " + T + " while fetching file: " + E;
+    }, l = "✖ Error: File does not exist or is empty", i = {
       js: "javascript",
       py: "python",
       rb: "ruby",
@@ -2646,52 +2644,52 @@ var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
       bat: "batch",
       h: "c",
       tex: "latex"
-    }, a = "data-src-status", f = "loading", g = "loaded", v = "failed", C = "pre[data-src]:not([" + a + '="' + g + '"]):not([' + a + '="' + f + '"])';
-    function x(y, E, T) {
+    }, a = "data-src-status", m = "loading", g = "loaded", v = "failed", w = "pre[data-src]:not([" + a + '="' + g + '"]):not([' + a + '="' + m + '"])';
+    function x(T, E, y) {
       var c = new XMLHttpRequest();
-      c.open("GET", y, !0), c.onreadystatechange = function() {
-        c.readyState == 4 && (c.status < 400 && c.responseText ? E(c.responseText) : c.status >= 400 ? T(i(c.status, c.statusText)) : T(l));
+      c.open("GET", T, !0), c.onreadystatechange = function() {
+        c.readyState == 4 && (c.status < 400 && c.responseText ? E(c.responseText) : c.status >= 400 ? y(s(c.status, c.statusText)) : y(l));
       }, c.send(null);
     }
-    function w(y) {
-      var E = /^\s*(\d+)\s*(?:(,)\s*(?:(\d+)\s*)?)?$/.exec(y || "");
+    function C(T) {
+      var E = /^\s*(\d+)\s*(?:(,)\s*(?:(\d+)\s*)?)?$/.exec(T || "");
       if (E) {
-        var T = Number(E[1]), c = E[2], o = E[3];
-        return c ? o ? [T, Number(o)] : [T, void 0] : [T, T];
+        var y = Number(E[1]), c = E[2], o = E[3];
+        return c ? o ? [y, Number(o)] : [y, void 0] : [y, y];
       }
     }
-    t.hooks.add("before-highlightall", function(y) {
-      y.selector += ", " + C;
-    }), t.hooks.add("before-sanity-check", function(y) {
+    t.hooks.add("before-highlightall", function(T) {
+      T.selector += ", " + w;
+    }), t.hooks.add("before-sanity-check", function(T) {
       var E = (
         /** @type {HTMLPreElement} */
-        y.element
+        T.element
       );
-      if (E.matches(C)) {
-        y.code = "", E.setAttribute(a, f);
-        var T = E.appendChild(document.createElement("CODE"));
-        T.textContent = n;
-        var c = E.getAttribute("data-src"), o = y.language;
+      if (E.matches(w)) {
+        T.code = "", E.setAttribute(a, m);
+        var y = E.appendChild(document.createElement("CODE"));
+        y.textContent = r;
+        var c = E.getAttribute("data-src"), o = T.language;
         if (o === "none") {
           var u = (/\.(\w+)$/.exec(c) || [, "none"])[1];
-          o = s[u] || u;
+          o = i[u] || u;
         }
-        t.util.setLanguage(T, o), t.util.setLanguage(E, o);
+        t.util.setLanguage(y, o), t.util.setLanguage(E, o);
         var d = t.plugins.autoloader;
         d && d.loadLanguages(o), x(
           c,
           function(p) {
             E.setAttribute(a, g);
-            var m = w(E.getAttribute("data-range"));
-            if (m) {
-              var _ = p.split(/\r\n?|\n/g), b = m[0], F = m[1] == null ? _.length : m[1];
+            var f = C(E.getAttribute("data-range"));
+            if (f) {
+              var _ = p.split(/\r\n?|\n/g), b = f[0], F = f[1] == null ? _.length : f[1];
               b < 0 && (b += _.length), b = Math.max(0, Math.min(b - 1, _.length)), F < 0 && (F += _.length), F = Math.max(0, Math.min(F, _.length)), p = _.slice(b, F).join(`
 `), E.hasAttribute("data-start") || E.setAttribute("data-start", String(b + 1));
             }
-            T.textContent = p, t.highlightElement(T);
+            y.textContent = p, t.highlightElement(y);
           },
           function(p) {
-            E.setAttribute(a, v), T.textContent = p;
+            E.setAttribute(a, v), y.textContent = p;
           }
         );
       }
@@ -2704,7 +2702,7 @@ var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
        * @param {ParentNode} [container=document]
        */
       highlight: function(E) {
-        for (var T = (E || document).querySelectorAll(C), c = 0, o; o = T[c++]; )
+        for (var y = (E || document).querySelectorAll(w), c = 0, o; o = y[c++]; )
           t.highlightElement(o);
       }
     };
@@ -2714,7 +2712,7 @@ var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
     };
   }();
 })(ae);
-var Ie = ae.exports;
+var De = ae.exports;
 Prism.languages.c = Prism.languages.extend("clike", {
   comment: {
     pattern: /\/\/(?:[^\r\n\\]|\\(?:\r\n?|\n|(?![\r\n])))*|\/\*[\s\S]*?(?:\*\/|$)/,
@@ -2791,11 +2789,11 @@ Prism.languages.insertBefore("c", "function", {
   constant: /\b(?:EOF|NULL|SEEK_CUR|SEEK_END|SEEK_SET|__DATE__|__FILE__|__LINE__|__TIMESTAMP__|__TIME__|__func__|stderr|stdin|stdout)\b/
 });
 delete Prism.languages.c.boolean;
-(function(r) {
+(function(n) {
   var e = /\b(?:alignas|alignof|asm|auto|bool|break|case|catch|char|char16_t|char32_t|char8_t|class|co_await|co_return|co_yield|compl|concept|const|const_cast|consteval|constexpr|constinit|continue|decltype|default|delete|do|double|dynamic_cast|else|enum|explicit|export|extern|final|float|for|friend|goto|if|import|inline|int|int16_t|int32_t|int64_t|int8_t|long|module|mutable|namespace|new|noexcept|nullptr|operator|override|private|protected|public|register|reinterpret_cast|requires|return|short|signed|sizeof|static|static_assert|static_cast|struct|switch|template|this|thread_local|throw|try|typedef|typeid|typename|uint16_t|uint32_t|uint64_t|uint8_t|union|unsigned|using|virtual|void|volatile|wchar_t|while)\b/, t = /\b(?!<keyword>)\w+(?:\s*\.\s*\w+)*\b/.source.replace(/<keyword>/g, function() {
     return e.source;
   });
-  r.languages.cpp = r.languages.extend("c", {
+  n.languages.cpp = n.languages.extend("c", {
     "class-name": [
       {
         pattern: RegExp(/(\b(?:class|concept|enum|struct|typename)\s+)(?!<keyword>)\w+/.source.replace(/<keyword>/g, function() {
@@ -2822,7 +2820,7 @@ delete Prism.languages.c.boolean;
     },
     operator: />>=?|<<=?|->|--|\+\+|&&|\|\||[?:~]|<=>|[-+*/%&|^!=<>]=?|\b(?:and|and_eq|bitand|bitor|not|not_eq|or|or_eq|xor|xor_eq)\b/,
     boolean: /\b(?:false|true)\b/
-  }), r.languages.insertBefore("cpp", "string", {
+  }), n.languages.insertBefore("cpp", "string", {
     module: {
       // https://en.cppreference.com/w/cpp/language/modules
       pattern: RegExp(
@@ -2845,7 +2843,7 @@ delete Prism.languages.c.boolean;
       alias: "string",
       greedy: !0
     }
-  }), r.languages.insertBefore("cpp", "keyword", {
+  }), n.languages.insertBefore("cpp", "keyword", {
     "generic-function": {
       pattern: /\b(?!operator\b)[a-z_]\w*\s*<(?:[^<>]|<[^<>]*>)*>(?=\s*\()/i,
       inside: {
@@ -2853,170 +2851,98 @@ delete Prism.languages.c.boolean;
         generic: {
           pattern: /<[\s\S]+/,
           alias: "class-name",
-          inside: r.languages.cpp
+          inside: n.languages.cpp
         }
       }
     }
-  }), r.languages.insertBefore("cpp", "operator", {
+  }), n.languages.insertBefore("cpp", "operator", {
     "double-colon": {
       pattern: /::/,
       alias: "punctuation"
     }
-  }), r.languages.insertBefore("cpp", "class-name", {
+  }), n.languages.insertBefore("cpp", "class-name", {
     // the base clause is an optional list of parent classes
     // https://en.cppreference.com/w/cpp/language/class
     "base-clause": {
       pattern: /(\b(?:class|struct)\s+\w+\s*:\s*)[^;{}"'\s]+(?:\s+[^;{}"'\s]+)*(?=\s*[;{])/,
       lookbehind: !0,
       greedy: !0,
-      inside: r.languages.extend("cpp", {})
+      inside: n.languages.extend("cpp", {})
     }
-  }), r.languages.insertBefore("inside", "double-colon", {
+  }), n.languages.insertBefore("inside", "double-colon", {
     // All untokenized words that are not namespaces should be class names
     "class-name": /\b[a-z_]\w*\b(?!\s*::)/i
-  }, r.languages.cpp["base-clause"]);
+  }, n.languages.cpp["base-clause"]);
 })(Prism);
-function Ue(r, e, t) {
-  const n = document.createElement("div");
-  n.className = "prism-editor-wrapper";
-  const i = document.createElement("div");
-  i.className = "prism-editor-line-numbers";
+function Ie(n, e, t) {
+  const r = document.createElement("div");
+  r.className = "prism-editor-wrapper";
+  const s = document.createElement("div");
+  s.className = "prism-editor-line-numbers";
   const l = document.createElement("div");
   l.className = "prism-editor-area";
-  const s = document.createElement("textarea");
-  s.className = "prism-editor-textarea", s.value = e, s.spellcheck = !1, s.autocapitalize = "off", s.autocomplete = "off";
+  const i = document.createElement("textarea");
+  i.className = "prism-editor-textarea", i.value = e, i.spellcheck = !1, i.autocapitalize = "off", i.autocomplete = "off";
   const a = document.createElement("pre");
   a.className = "prism-editor-highlight";
-  const f = document.createElement("code");
-  f.className = "language-cpp", a.appendChild(f), l.appendChild(s), l.appendChild(a), n.appendChild(i), n.appendChild(l), r.appendChild(n);
+  const m = document.createElement("code");
+  m.className = "language-cpp", a.appendChild(m), l.appendChild(i), l.appendChild(a), r.appendChild(s), r.appendChild(l), n.appendChild(r);
   function g() {
-    const x = s.value;
-    f.textContent = x + `
-`, Ie.highlightElement(f);
-    const w = x.split(`
+    const x = i.value;
+    m.textContent = x + `
+`, De.highlightElement(m);
+    const C = x.split(`
 `);
-    i.innerHTML = w.map((A, y) => `<span>${y + 1}</span>`).join(""), t && t(x);
+    s.innerHTML = C.map((A, T) => `<span>${T + 1}</span>`).join(""), t && t(x);
   }
   function v() {
-    a.scrollTop = s.scrollTop, a.scrollLeft = s.scrollLeft, i.scrollTop = s.scrollTop;
+    a.scrollTop = i.scrollTop, a.scrollLeft = i.scrollLeft, s.scrollTop = i.scrollTop;
   }
-  function C(x) {
+  function w(x) {
     if (x.key === "Tab") {
       x.preventDefault();
-      const w = s.selectionStart, A = s.selectionEnd, y = s.value;
-      s.value = y.substring(0, w) + "  " + y.substring(A), s.selectionStart = s.selectionEnd = w + 2, g();
+      const C = i.selectionStart, A = i.selectionEnd, T = i.value;
+      i.value = T.substring(0, C) + "  " + T.substring(A), i.selectionStart = i.selectionEnd = C + 2, g();
     }
   }
-  return s.addEventListener("input", g), s.addEventListener("scroll", v), s.addEventListener("keydown", C), g(), {
-    getSource: () => s.value,
+  return i.addEventListener("input", g), i.addEventListener("scroll", v), i.addEventListener("keydown", w), g(), {
+    getSource: () => i.value,
     setSource: (x) => {
-      s.value = x, g();
+      i.value = x, g();
     },
     destroy: () => {
-      s.removeEventListener("input", g), s.removeEventListener("scroll", v), s.removeEventListener("keydown", C), r.removeChild(n);
+      i.removeEventListener("input", g), i.removeEventListener("scroll", v), i.removeEventListener("keydown", w), n.removeChild(r);
     }
   };
 }
-const ie = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const se = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  createEditor: Ue
-}, Symbol.toStringTag, { value: "Module" })), Ne = `void mainImage(out vec4 fragColor, in vec2 fragCoord)
+  createEditor: Ie
+}, Symbol.toStringTag, { value: "Module" })), Ue = `void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
-    if (iFrame == 0) {
-        fragColor = vec4(0.0);
-        return;
-    }
+    float d = length(fragCoord - iMouse.xy);
 
-    if (!inDomain(fragCoord, iResolution.xy)) {
-        fragColor = vec4(0.0);
-        return;
-    }
-
-    ivec2 p = ivec2(fragCoord);
-
-    float u = texelFetch(iChannel0, p, 0).r;
-    float v = texelFetch(iChannel0, p, 0).g;
-
-    float u_n = texelFetch(iChannel0, p + ivec2( 0,  1), 0).r;
-    float u_s = texelFetch(iChannel0, p + ivec2( 0, -1), 0).r;
-    float u_e = texelFetch(iChannel0, p + ivec2( 1,  0), 0).r;
-    float u_w = texelFetch(iChannel0, p + ivec2(-1,  0), 0).r;
-    float laplacian = u_n + u_s + u_e + u_w - 4.0 * u;
-
-    // Symplectic Euler
-    float dt = 0.3;
-    float c = 1.0;
-    float newV = v + dt * c * c * laplacian;
-
-    if (iMouse.z > 0.0) {
-        float d = length(fragCoord - iMouse.xy);
-        float sigma = 10.0;
-        newV += 0.01 * exp(-d * d / (2.0 * sigma * sigma));
-    }
-
-    float newU = u + dt * newV;
-
-    fragColor = vec4(newU, newV, 0.0, 1.0);
-}
-`, $e = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
-  __proto__: null,
-  default: Ne
-}, Symbol.toStringTag, { value: "Module" })), je = `bool inDomain(vec2 fragCoord, vec2 resolution) {
-    vec2 center = resolution * 0.5;
-    float scale = min(resolution.x, resolution.y) * 0.3;
-    vec2 c = (fragCoord - center) / scale;
-    c.x -= 0.5;
-
-    vec2 z = vec2(0.0);
-    for (int i = 0; i < 100; i++) {
-        z = vec2(z.x*z.x - z.y*z.y, 2.0*z.x*z.y) + c;
-        if (dot(z, z) > 4.0) return false;
-    }
-    return true;
-}
-`, Oe = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
-  __proto__: null,
-  default: je
-}, Symbol.toStringTag, { value: "Module" })), He = `void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    if (!inDomain(fragCoord, iResolution.xy)) {
-        fragColor = vec4(0.1, 0.1, 0.1, 1.0);
-        return;
-    }
-
-    float u = texelFetch(iChannel0, ivec2(fragCoord), 0).r;
-    u *= 3.0;
-
-    vec3 color;
-    if (u > 0.0) {
-        color = mix(vec3(0.0), vec3(1.0, 0.5, 0.0), u);
+    if (iMouse.z > 0.0 && d < 10.0) {
+        fragColor = vec4(1.0);  // White brush
     } else {
-        color = mix(vec3(0.0), vec3(0.0, 0.3, 1.0), -u);
+        fragColor = vec4(0.0, 0.0, 0.0, 1.0);  // Black background
     }
-
-    fragColor = vec4(color, 1.0);
 }
-`, ze = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+`, Ne = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  default: He
-}, Symbol.toStringTag, { value: "Module" })), se = "tabbed", oe = !0, ce = {
-  iChannel0: "BufferA"
-}, le = {
-  iChannel0: "BufferA"
-}, Xe = {
-  layout: se,
+  default: Ue
+}, Symbol.toStringTag, { value: "Module" })), ie = "tabbed", oe = !0, ce = {}, $e = {
+  layout: ie,
   controls: oe,
-  BufferA: ce,
-  Image: le
-}, Ge = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  Image: ce
+}, je = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  BufferA: ce,
-  Image: le,
+  Image: ce,
   controls: oe,
-  default: Xe,
-  layout: se
+  default: $e,
+  layout: ie
 }, Symbol.toStringTag, { value: "Module" }));
 export {
-  ke as DEMO_NAME,
-  Ke as embed
+  Le as DEMO_NAME,
+  He as embed
 };

@@ -1,30 +1,30 @@
-(function(){"use strict";try{if(typeof document<"u"){var e=document.createElement("style");e.appendChild(document.createTextNode('.shader-demo{position:relative;width:100%}.shader-demo canvas{display:block;width:100%;height:100%}.fps-counter{position:absolute;bottom:8px;left:8px;padding:6px 10px;background:#000000bf;color:#fff;font-family:Monaco,Menlo,Courier New,monospace;font-size:12px;font-weight:500;border-radius:4px;pointer-events:none;-webkit-user-select:none;user-select:none;z-index:1000;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);box-shadow:0 2px 8px #0000004d}.playback-controls{position:absolute;bottom:8px;right:8px;display:flex;gap:8px;z-index:1000}.control-button{padding:6px 8px;background:#000000bf;color:#fff;border:none;border-radius:4px;cursor:pointer;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);box-shadow:0 2px 8px #0000004d;transition:all .2s ease;display:flex;align-items:center;justify-content:center;width:32px;height:32px}.control-button:hover{background:#000000d9;transform:scale(1.05)}.control-button:active{transform:scale(.95)}.control-button svg{width:16px;height:16px;fill:currentColor}.shader-error-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:#000000f2;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:2000;padding:60px;overflow-y:auto}.error-overlay-content{background:#1a1a1a;border-radius:6px;max-width:900px;width:100%;display:flex;flex-direction:column;box-shadow:0 20px 60px #000c,0 0 1px #ffffff1a;border:1px solid #2a2a2a;max-height:calc(100vh - 120px)}.error-header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;background:linear-gradient(135deg,#c62828,#b71c1c);color:#fff;border-radius:6px 6px 0 0;border-bottom:1px solid rgba(0,0,0,.3);box-shadow:0 2px 8px #0003}.error-title{font-size:15px;font-weight:600;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;display:flex;align-items:center;gap:8px;letter-spacing:-.01em}.error-close{background:transparent;border:none;color:#ffffffe6;font-size:24px;line-height:1;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all .2s ease;opacity:.8}.error-close:hover{background:#ffffff26;opacity:1;transform:scale(1.05)}.error-body{padding:24px;overflow-y:auto;flex:1}.error-section{margin-bottom:24px}.error-section:last-child{margin-bottom:0}.error-pass-name{font-size:13px;font-weight:600;color:#ffa726;font-family:Monaco,Menlo,Courier New,monospace;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #2a2a2a;letter-spacing:.02em}.error-content{margin:0;padding:14px 16px;background:#0f0f0f;border-radius:4px;color:#ff6b6b;font-size:13px;font-family:Monaco,Menlo,Courier New,monospace;line-height:1.6;overflow-x:auto;border:1px solid #2a2a2a;white-space:pre-wrap;word-break:break-word}.error-code-context{margin:12px 0 0;padding:14px 16px;background:#0d0d0d;border-radius:4px;color:#b0b0b0;font-size:12px;font-family:Monaco,Menlo,Courier New,monospace;line-height:1.6;overflow-x:auto;border:1px solid #2a2a2a;white-space:pre}.error-code-context .context-line{color:#666;display:block}.error-code-context .error-line-highlight{color:#fff;background:#c6282840;display:block;font-weight:600;border-left:3px solid #c62828;margin-left:-16px;padding-left:13px}.layout-fullscreen{width:100%;height:100%}.layout-fullscreen .canvas-container{position:relative;width:100%;height:100%;background:#000}.layout-centered{width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:60px}.layout-centered .canvas-container{position:relative;width:800px;height:600px;background:#000;border-radius:8px;box-shadow:0 20px 60px #00000040,0 5px 15px #00000026;overflow:hidden}.layout-split{width:100%;height:100%;display:flex;gap:40px;padding:120px 140px}.layout-split .canvas-container{position:relative;flex:1;background:#000;border-radius:8px;box-shadow:0 10px 30px #0003,0 3px 8px #0000001f;overflow:hidden}.layout-split .code-panel{position:relative;flex:1;display:flex;flex-direction:column;background:#fff;border-radius:8px;box-shadow:0 10px 30px #0003,0 3px 8px #0000001f;overflow:hidden}.tab-bar{display:flex;background:#f8f8f8;border-bottom:1px solid #e0e0e0;padding:8px 8px 0;gap:4px}.tab-button{padding:8px 16px;background:transparent;border:none;border-radius:6px 6px 0 0;font-size:13px;font-family:Monaco,Menlo,Courier New,monospace;cursor:pointer;transition:background .2s;color:#666}.tab-button:hover{background:#e8e8e8}.tab-button.active{background:#fff;color:#000;font-weight:500}.copy-button{position:absolute;top:12px;right:12px;padding:6px;background:transparent;border:none;border-radius:4px;color:#666;cursor:pointer;transition:all .2s;z-index:10;display:flex;align-items:center;justify-content:center}.copy-button:hover{background:#0000000d;color:#333}.copy-button:active{transform:scale(.9)}.copy-button.copied{color:#4caf50}.code-viewer{flex:1;min-height:0;overflow:auto;position:relative;background:#fff}.code-viewer pre{margin:0;padding:16px;font-size:13px;line-height:1.5;font-family:Monaco,Menlo,Courier New,monospace;background:#fff}.code-viewer code{font-family:inherit;font-size:inherit}.token.comment{color:#6a9955}.token.keyword{color:#00f}.token.string{color:#a31515}.token.number{color:#098658}.token.operator{color:#000}.token.function{color:#795e26}.token.class-name{color:#267f99}.token.punctuation{color:#000}@media (max-width: 1800px){.layout-split{padding:100px 120px}}@media (max-width: 1600px){.layout-split{padding:80px 100px}}@media (max-width: 1400px){.layout-split{padding:60px 80px}}@media (max-width: 1200px){.layout-split{padding:50px 60px}}@media (max-width: 1000px){.layout-split{padding:40px 50px}}@media (max-width: 800px){.layout-split{flex-direction:column;padding:30px;gap:30px}}.layout-tabbed{--tab-bg: #f8f8f8;--tab-border: #e0e0e0;--tab-text: #666;--tab-text-hover: #333;--tab-hover-bg: #e8e8e8;--tab-active-bg: white;--tab-active-text: #000;--code-bg: white;--code-text: #000;--line-number-text: #999;--copy-btn-bg: rgba(0, 0, 0, .05);--copy-btn-hover-bg: rgba(0, 0, 0, .1)}[data-bs-theme=dark] .layout-tabbed,.dark .layout-tabbed,:root.dark .layout-tabbed{--tab-bg: #2d2d2d;--tab-border: #444;--tab-text: #999;--tab-text-hover: #ccc;--tab-hover-bg: #3d3d3d;--tab-active-bg: #1e1e1e;--tab-active-text: #fff;--code-bg: #1e1e1e;--code-text: #d4d4d4;--line-number-text: #666;--copy-btn-bg: rgba(255, 255, 255, .1);--copy-btn-hover-bg: rgba(255, 255, 255, .15)}.layout-tabbed{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px;box-sizing:border-box}.tabbed-wrapper{display:flex;flex-direction:column;width:800px;max-width:100%;height:650px;max-height:100%;border-radius:8px;box-shadow:0 20px 60px #00000040,0 5px 15px #00000026;overflow:hidden}.tabbed-tab-bar{display:flex;flex-shrink:0;background:var(--tab-bg);padding:8px 8px 0;gap:4px;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;position:relative}.tabbed-tab-bar:after{content:"";position:absolute;bottom:0;left:0;right:0;height:1px;background:var(--tab-border);z-index:0}.tabbed-tab-bar::-webkit-scrollbar{height:4px}.tabbed-tab-bar::-webkit-scrollbar-thumb{background:#ccc;border-radius:2px}.tabbed-tab-button{padding:10px 20px;background:transparent;border:none;border-radius:6px 6px 0 0;font-size:13px;font-family:Monaco,Menlo,Courier New,monospace;cursor:pointer;transition:background .2s,color .2s;color:var(--tab-text);white-space:nowrap;flex-shrink:0}.tabbed-tab-button:hover{background:var(--tab-hover-bg);color:var(--tab-text-hover)}.tabbed-tab-button.active{background:var(--tab-active-bg);color:var(--tab-active-text);font-weight:500;position:relative;z-index:1;padding-bottom:11px;margin-bottom:-1px}.tabbed-tab-button.shader-tab{font-family:system-ui,-apple-system,sans-serif}.tabbed-content{flex:1;min-height:0;position:relative;background:#000;overflow:hidden}.tabbed-canvas-container{position:absolute;top:0;left:0;width:100%;height:100%}.tabbed-code-viewer{position:absolute;top:0;left:0;width:100%;height:100%;overflow:auto;background:var(--code-bg)}.tabbed-code-viewer pre{margin:0;padding:16px 16px 16px 0;font-size:13px;line-height:1.6;font-family:Monaco,Menlo,Courier New,monospace;background:var(--code-bg);color:var(--code-text);display:flex}.tabbed-code-viewer code{font-family:inherit;font-size:inherit}.tabbed-line-numbers{text-align:right;padding-right:16px;margin-right:16px;border-right:1px solid var(--tab-border);color:var(--line-number-text);-webkit-user-select:none;user-select:none;flex-shrink:0;padding-left:16px}.tabbed-code-content{flex:1;overflow-x:auto}.tabbed-copy-button{position:absolute;top:12px;right:12px;padding:8px;background:var(--copy-btn-bg);border:none;border-radius:6px;color:var(--tab-text);cursor:pointer;transition:all .2s;z-index:10;display:flex;align-items:center;justify-content:center}.tabbed-copy-button:hover{background:var(--copy-btn-hover-bg);color:var(--tab-text-hover)}.tabbed-copy-button:active{transform:scale(.9)}.tabbed-copy-button.copied{color:#4caf50}.tabbed-code-viewer .token.comment{color:#6a9955}.tabbed-code-viewer .token.keyword{color:#00f}.tabbed-code-viewer .token.string{color:#a31515}.tabbed-code-viewer .token.number{color:#098658}.tabbed-code-viewer .token.operator{color:#000}.tabbed-code-viewer .token.function{color:#795e26}.tabbed-code-viewer .token.class-name{color:#267f99}.tabbed-code-viewer .token.punctuation{color:#000}[data-bs-theme=dark] .tabbed-code-viewer .token.comment,.dark .tabbed-code-viewer .token.comment{color:#6a9955}[data-bs-theme=dark] .tabbed-code-viewer .token.keyword,.dark .tabbed-code-viewer .token.keyword{color:#569cd6}[data-bs-theme=dark] .tabbed-code-viewer .token.string,.dark .tabbed-code-viewer .token.string{color:#ce9178}[data-bs-theme=dark] .tabbed-code-viewer .token.number,.dark .tabbed-code-viewer .token.number{color:#b5cea8}[data-bs-theme=dark] .tabbed-code-viewer .token.operator,.dark .tabbed-code-viewer .token.operator{color:#d4d4d4}[data-bs-theme=dark] .tabbed-code-viewer .token.function,.dark .tabbed-code-viewer .token.function{color:#dcdcaa}[data-bs-theme=dark] .tabbed-code-viewer .token.class-name,.dark .tabbed-code-viewer .token.class-name{color:#4ec9b0}[data-bs-theme=dark] .tabbed-code-viewer .token.punctuation,.dark .tabbed-code-viewer .token.punctuation{color:#d4d4d4}@media (max-width: 1200px){.layout-tabbed{padding:40px 60px}}@media (max-width: 900px){.layout-tabbed{padding:30px 40px}}@media (max-width: 600px){.layout-tabbed{padding:20px}.tabbed-tab-button{padding:8px 12px;font-size:12px}}')),document.head.appendChild(e)}}catch(o){console.error("vite-plugin-css-injected-by-js",o)}})();
-var ce = Object.defineProperty;
-var ue = (n, e, t) => e in n ? ce(n, e, { enumerable: !0, configurable: !0, writable: !0, value: t }) : n[e] = t;
-var g = (n, e, t) => ue(n, typeof e != "symbol" ? e + "" : e, t);
-function K(n, e, t) {
+(function(){"use strict";try{if(typeof document<"u"){var e=document.createElement("style");e.appendChild(document.createTextNode(".shader-demo{position:relative;width:100%}.shader-demo canvas{display:block;width:100%;height:100%}.fps-counter{position:absolute;bottom:8px;left:8px;padding:6px 10px;background:#000000bf;color:#fff;font-family:Monaco,Menlo,Courier New,monospace;font-size:12px;font-weight:500;border-radius:4px;pointer-events:none;-webkit-user-select:none;user-select:none;z-index:1000;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);box-shadow:0 2px 8px #0000004d}.playback-controls{position:absolute;bottom:8px;right:8px;display:flex;gap:8px;z-index:1000}.control-button{padding:6px 8px;background:#000000bf;color:#fff;border:none;border-radius:4px;cursor:pointer;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);box-shadow:0 2px 8px #0000004d;transition:all .2s ease;display:flex;align-items:center;justify-content:center;width:32px;height:32px}.control-button:hover{background:#000000d9;transform:scale(1.05)}.control-button:active{transform:scale(.95)}.control-button svg{width:16px;height:16px;fill:currentColor}.shader-error-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:#000000f2;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:2000;padding:60px;overflow-y:auto}.error-overlay-content{background:#1a1a1a;border-radius:6px;max-width:900px;width:100%;display:flex;flex-direction:column;box-shadow:0 20px 60px #000c,0 0 1px #ffffff1a;border:1px solid #2a2a2a;max-height:calc(100vh - 120px)}.error-header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;background:linear-gradient(135deg,#c62828,#b71c1c);color:#fff;border-radius:6px 6px 0 0;border-bottom:1px solid rgba(0,0,0,.3);box-shadow:0 2px 8px #0003}.error-title{font-size:15px;font-weight:600;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;display:flex;align-items:center;gap:8px;letter-spacing:-.01em}.error-close{background:transparent;border:none;color:#ffffffe6;font-size:24px;line-height:1;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all .2s ease;opacity:.8}.error-close:hover{background:#ffffff26;opacity:1;transform:scale(1.05)}.error-body{padding:24px;overflow-y:auto;flex:1}.error-section{margin-bottom:24px}.error-section:last-child{margin-bottom:0}.error-pass-name{font-size:13px;font-weight:600;color:#ffa726;font-family:Monaco,Menlo,Courier New,monospace;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #2a2a2a;letter-spacing:.02em}.error-content{margin:0;padding:14px 16px;background:#0f0f0f;border-radius:4px;color:#ff6b6b;font-size:13px;font-family:Monaco,Menlo,Courier New,monospace;line-height:1.6;overflow-x:auto;border:1px solid #2a2a2a;white-space:pre-wrap;word-break:break-word}.error-code-context{margin:12px 0 0;padding:14px 16px;background:#0d0d0d;border-radius:4px;color:#b0b0b0;font-size:12px;font-family:Monaco,Menlo,Courier New,monospace;line-height:1.6;overflow-x:auto;border:1px solid #2a2a2a;white-space:pre}.error-code-context .context-line{color:#666;display:block}.error-code-context .error-line-highlight{color:#fff;background:#c6282840;display:block;font-weight:600;border-left:3px solid #c62828;margin-left:-16px;padding-left:13px}.layout-fullscreen{width:100%;height:100%}.layout-fullscreen .canvas-container{position:relative;width:100%;height:100%;background:#000}.layout-centered{width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:60px}.layout-centered .canvas-container{position:relative;width:800px;height:600px;background:#000;border-radius:8px;box-shadow:0 20px 60px #00000040,0 5px 15px #00000026;overflow:hidden}.layout-split{width:100%;height:100%;display:flex;gap:40px;padding:120px 140px}.layout-split .canvas-container{position:relative;flex:1;background:#000;border-radius:8px;box-shadow:0 10px 30px #0003,0 3px 8px #0000001f;overflow:hidden}.layout-split .code-panel{position:relative;flex:1;display:flex;flex-direction:column;background:#fff;border-radius:8px;box-shadow:0 10px 30px #0003,0 3px 8px #0000001f;overflow:hidden}.tab-bar{display:flex;background:#f8f8f8;border-bottom:1px solid #e0e0e0;padding:8px 8px 0;gap:4px}.tab-button{padding:8px 16px;background:transparent;border:none;border-radius:6px 6px 0 0;font-size:13px;font-family:Monaco,Menlo,Courier New,monospace;cursor:pointer;transition:background .2s;color:#666}.tab-button:hover{background:#e8e8e8}.tab-button.active{background:#fff;color:#000;font-weight:500}.copy-button{position:absolute;top:12px;right:12px;padding:6px;background:transparent;border:none;border-radius:4px;color:#666;cursor:pointer;transition:all .2s;z-index:10;display:flex;align-items:center;justify-content:center}.copy-button:hover{background:#0000000d;color:#333}.copy-button:active{transform:scale(.9)}.copy-button.copied{color:#4caf50}.code-viewer{flex:1;min-height:0;overflow:auto;position:relative;background:#fff}.code-viewer pre{margin:0;padding:16px;font-size:13px;line-height:1.5;font-family:Monaco,Menlo,Courier New,monospace;background:#fff}.code-viewer code{font-family:inherit;font-size:inherit}.token.comment{color:#6a9955}.token.keyword{color:#00f}.token.string{color:#a31515}.token.number{color:#098658}.token.operator{color:#000}.token.function{color:#795e26}.token.class-name{color:#267f99}.token.punctuation{color:#000}.tab-button.image-tab,.tab-button.image-tab.active{color:#7c4dff}.image-viewer{display:flex;align-items:center;justify-content:center;height:100%;padding:16px;background:#f5f5f5}.image-viewer img{max-width:100%;max-height:100%;object-fit:contain;border-radius:4px;box-shadow:0 2px 8px #0000001a}@media (max-width: 1800px){.layout-split{padding:100px 120px}}@media (max-width: 1600px){.layout-split{padding:80px 100px}}@media (max-width: 1400px){.layout-split{padding:60px 80px}}@media (max-width: 1200px){.layout-split{padding:50px 60px}}@media (max-width: 1000px){.layout-split{padding:40px 50px}}@media (max-width: 800px){.layout-split{flex-direction:column;padding:30px;gap:30px}}.layout-tabbed{--tab-border: #e0e0e0;--code-bg: white;--code-text: #000;--line-number-text: #999}.layout-tabbed{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px;box-sizing:border-box}.tabbed-wrapper{display:flex;flex-direction:column;width:800px;max-width:100%;height:650px;max-height:100%;border-radius:8px;box-shadow:0 20px 60px #00000040,0 5px 15px #00000026;overflow:hidden}.tabbed-toolbar{display:flex;align-items:center;flex-shrink:0;background:#f8f8f8;border-bottom:1px solid #e0e0e0;padding-right:8px}.tabbed-tab-bar{display:flex;flex:1;gap:4px;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin}.tabbed-tab-bar::-webkit-scrollbar{height:4px}.tabbed-tab-bar::-webkit-scrollbar-thumb{background:#ccc;border-radius:2px}.tabbed-tab-button{padding:10px 16px;background:transparent;border:none;border-bottom:2px solid transparent;font-size:12px;font-family:Monaco,Menlo,Courier New,monospace;cursor:pointer;transition:color .15s,border-color .15s;color:#666;white-space:nowrap;flex-shrink:0}.tabbed-tab-button:hover{color:#333}.tabbed-tab-button.active{color:#000;border-bottom-color:#4a9eff}.tabbed-tab-button.shader-tab{font-family:system-ui,-apple-system,sans-serif}.tabbed-tab-button.image-tab{color:#7c4dff}.tabbed-tab-button.image-tab.active{color:#7c4dff;border-bottom-color:#7c4dff}.tabbed-content{flex:1;min-height:0;position:relative;background:#000;overflow:hidden}.tabbed-canvas-container{position:absolute;top:0;left:0;width:100%;height:100%}.tabbed-code-viewer{position:absolute;top:0;left:0;width:100%;height:100%;overflow:auto;background:var(--code-bg)}.tabbed-code-viewer pre{margin:0;padding:16px 16px 16px 0;font-size:13px;line-height:1.6;font-family:Monaco,Menlo,Courier New,monospace;background:var(--code-bg);color:var(--code-text);display:flex}.tabbed-code-viewer code{font-family:inherit;font-size:inherit}.tabbed-line-numbers{text-align:right;padding-right:16px;margin-right:16px;border-right:1px solid var(--tab-border);color:var(--line-number-text);-webkit-user-select:none;user-select:none;flex-shrink:0;padding-left:16px}.tabbed-code-content{flex:1;overflow-x:auto}.tabbed-image-viewer{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f5f5f5;padding:20px;box-sizing:border-box}.tabbed-image-viewer img{max-width:100%;max-height:100%;object-fit:contain;border-radius:4px;box-shadow:0 2px 8px #00000026}.tabbed-code-viewer .token.comment{color:#6a9955}.tabbed-code-viewer .token.keyword{color:#00f}.tabbed-code-viewer .token.string{color:#a31515}.tabbed-code-viewer .token.number{color:#098658}.tabbed-code-viewer .token.operator{color:#000}.tabbed-code-viewer .token.function{color:#795e26}.tabbed-code-viewer .token.class-name{color:#267f99}.tabbed-code-viewer .token.punctuation{color:#000}[data-bs-theme=dark] .tabbed-code-viewer .token.comment,.dark .tabbed-code-viewer .token.comment{color:#6a9955}[data-bs-theme=dark] .tabbed-code-viewer .token.keyword,.dark .tabbed-code-viewer .token.keyword{color:#569cd6}[data-bs-theme=dark] .tabbed-code-viewer .token.string,.dark .tabbed-code-viewer .token.string{color:#ce9178}[data-bs-theme=dark] .tabbed-code-viewer .token.number,.dark .tabbed-code-viewer .token.number{color:#b5cea8}[data-bs-theme=dark] .tabbed-code-viewer .token.operator,.dark .tabbed-code-viewer .token.operator{color:#d4d4d4}[data-bs-theme=dark] .tabbed-code-viewer .token.function,.dark .tabbed-code-viewer .token.function{color:#dcdcaa}[data-bs-theme=dark] .tabbed-code-viewer .token.class-name,.dark .tabbed-code-viewer .token.class-name{color:#4ec9b0}[data-bs-theme=dark] .tabbed-code-viewer .token.punctuation,.dark .tabbed-code-viewer .token.punctuation{color:#d4d4d4}@media (max-width: 1200px){.layout-tabbed{padding:40px 60px}}@media (max-width: 900px){.layout-tabbed{padding:30px 40px}}@media (max-width: 600px){.layout-tabbed{padding:20px}.tabbed-tab-button{padding:8px 12px;font-size:12px}}.tabbed-editor-container{position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden;background:#fff}.tabbed-button-container{display:flex;align-items:center;gap:6px;flex-shrink:0}.tabbed-copy-button{display:flex;align-items:center;justify-content:center;background:transparent;border:1px solid #ccc;color:#666;width:32px;height:32px;border-radius:4px;cursor:pointer;transition:background .15s,border-color .15s,color .15s}.tabbed-copy-button:hover{background:#f0f0f0;border-color:#999;color:#333}.tabbed-copy-button:active{background:#e0e0e0}.tabbed-copy-button.copied{background:#e8f5e9;border-color:#4caf50;color:#4caf50}.tabbed-recompile-button{display:flex;align-items:center;gap:6px;background:#4a9eff;border:none;color:#fff;padding:6px 12px;border-radius:4px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;transition:background .15s}.tabbed-recompile-button:hover{background:#3a8eef}.tabbed-recompile-button:active{background:#2a7edf}.tabbed-recompile-button svg{flex-shrink:0}.tabbed-error-display{position:absolute;bottom:0;left:0;right:0;background:#fff0f0;color:#c00;padding:10px 14px;font-family:Monaco,Menlo,Courier New,monospace;font-size:12px;white-space:pre-wrap;overflow:auto;max-height:120px;border-top:1px solid #fcc;z-index:10}.tabbed-fallback-textarea{width:100%;height:100%;background:#fff;color:#000;border:none;padding:12px;font-family:Monaco,Menlo,Courier New,monospace;font-size:13px;resize:none;outline:none}.editor-toolbar{display:flex;align-items:center;background:#f8f8f8;border-bottom:1px solid #e0e0e0;padding-right:8px}.editor-tab-bar{display:flex;flex:1;overflow-x:auto;scrollbar-width:thin}.editor-tab-button{background:transparent;border:none;color:#666;padding:10px 16px;cursor:pointer;font-family:Monaco,Menlo,Courier New,monospace;font-size:12px;white-space:nowrap;border-bottom:2px solid transparent;transition:color .15s,border-color .15s}.editor-tab-button:hover{color:#333}.editor-tab-button.active{color:#000;border-bottom-color:#4a9eff}.editor-tab-button.image-tab{color:#7c4dff}.editor-tab-button.image-tab.active{color:#7c4dff;border-bottom-color:#7c4dff}.editor-copy-button{display:flex;align-items:center;justify-content:center;background:transparent;border:1px solid #ccc;color:#666;width:32px;height:32px;border-radius:4px;cursor:pointer;transition:background .15s,border-color .15s,color .15s;flex-shrink:0;margin-right:6px}.editor-copy-button:hover{background:#f0f0f0;border-color:#999;color:#333}.editor-copy-button:active{background:#e0e0e0}.editor-copy-button.copied{background:#e8f5e9;border-color:#4caf50;color:#4caf50}.editor-copy-button svg{flex-shrink:0}.editor-recompile-button{display:flex;align-items:center;gap:6px;background:#4a9eff;border:none;color:#fff;padding:6px 12px;border-radius:4px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;transition:background .15s;flex-shrink:0}.editor-recompile-button:hover{background:#3a8eef}.editor-recompile-button:active{background:#2a7edf}.editor-recompile-button svg{flex-shrink:0}.editor-content-area{flex:1;overflow:hidden;position:relative;background:#fff}.editor-prism-container{height:100%;width:100%}.editor-fallback-textarea{width:100%;height:100%;background:#fff;color:#000;border:none;padding:12px;font-family:Monaco,Menlo,Courier New,monospace;font-size:13px;resize:none;outline:none}.editor-image-viewer{display:flex;align-items:center;justify-content:center;height:100%;background:#f5f5f5;padding:20px}.editor-image-viewer img{max-width:100%;max-height:100%;object-fit:contain;border-radius:4px;box-shadow:0 2px 8px #00000026}.editor-error-display{background:#fff0f0;color:#c00;padding:10px 14px;font-family:Monaco,Menlo,Courier New,monospace;font-size:12px;white-space:pre-wrap;overflow:auto;max-height:120px;border-top:1px solid #fcc}.prism-editor-wrapper{display:flex;height:100%;background:#fff;font-family:Monaco,Menlo,Courier New,monospace;font-size:13px;line-height:1.6}.prism-editor-line-numbers{flex-shrink:0;padding:16px 12px 16px 16px;text-align:right;color:#999;border-right:1px solid #e0e0e0;-webkit-user-select:none;user-select:none;overflow:hidden}.prism-editor-line-numbers span{display:block}.prism-editor-area{flex:1;position:relative;overflow:hidden}.prism-editor-textarea,.prism-editor-highlight{position:absolute;top:0;left:0;width:100%;height:100%;padding:16px;margin:0;border:none;outline:none;font-family:inherit;font-size:inherit;line-height:inherit;white-space:pre-wrap;word-wrap:break-word;overflow:auto;box-sizing:border-box}.prism-editor-textarea{background:transparent;color:transparent;caret-color:#000;resize:none;z-index:1;-webkit-text-fill-color:transparent}.prism-editor-textarea::selection{background:#add6ff66}.prism-editor-textarea::-moz-selection{background:#add6ff66}.prism-editor-highlight{background:#fff;color:#000;pointer-events:none;z-index:0}.prism-editor-highlight code{font-family:inherit;font-size:inherit;background:none;padding:0}.prism-editor-highlight .token.comment{color:#6a9955}.prism-editor-highlight .token.keyword{color:#00f}.prism-editor-highlight .token.string{color:#a31515}.prism-editor-highlight .token.number{color:#098658}.prism-editor-highlight .token.operator{color:#000}.prism-editor-highlight .token.function{color:#795e26}.prism-editor-highlight .token.class-name{color:#267f99}.prism-editor-highlight .token.punctuation{color:#000}")),document.head.appendChild(e)}}catch(o){console.error("vite-plugin-css-injected-by-js",o)}})();
+var fe = Object.defineProperty;
+var me = (n, e, t) => e in n ? fe(n, e, { enumerable: !0, configurable: !0, writable: !0, value: t }) : n[e] = t;
+var h = (n, e, t) => me(n, typeof e != "symbol" ? e + "" : e, t);
+function Y(n, e, t) {
   const r = n.createShader(e);
   if (!r)
     throw new Error("Failed to create shader object");
   if (n.shaderSource(r, t), n.compileShader(r), !n.getShaderParameter(r, n.COMPILE_STATUS)) {
-    const c = n.getShaderInfoLog(r);
+    const l = n.getShaderInfoLog(r);
     throw n.deleteShader(r), new Error(`Shader compilation failed:
-${c}`);
+${l}`);
   }
   return r;
 }
-function le(n, e, t) {
-  const r = K(n, n.VERTEX_SHADER, e), i = K(n, n.FRAGMENT_SHADER, t), c = n.createProgram();
-  if (!c)
+function Z(n, e, t) {
+  const r = Y(n, n.VERTEX_SHADER, e), i = Y(n, n.FRAGMENT_SHADER, t), l = n.createProgram();
+  if (!l)
     throw new Error("Failed to create program object");
-  if (n.attachShader(c, r), n.attachShader(c, i), n.linkProgram(c), !n.getProgramParameter(c, n.LINK_STATUS)) {
-    const o = n.getProgramInfoLog(c);
-    throw n.deleteProgram(c), n.deleteShader(r), n.deleteShader(i), new Error(`Program linking failed:
-${o}`);
+  if (n.attachShader(l, r), n.attachShader(l, i), n.linkProgram(l), !n.getProgramParameter(l, n.LINK_STATUS)) {
+    const a = n.getProgramInfoLog(l);
+    throw n.deleteProgram(l), n.deleteShader(r), n.deleteShader(i), new Error(`Program linking failed:
+${a}`);
   }
-  return n.detachShader(c, r), n.detachShader(c, i), n.deleteShader(r), n.deleteShader(i), c;
+  return n.detachShader(l, r), n.detachShader(l, i), n.deleteShader(r), n.deleteShader(i), l;
 }
-function he(n) {
+function ge(n) {
   const e = n.createVertexArray();
   if (!e)
     throw new Error("Failed to create VAO");
@@ -57,7 +57,7 @@ function he(n) {
     // offset
   ), n.bindVertexArray(null), n.bindBuffer(n.ARRAY_BUFFER, null), e;
 }
-function j(n, e, t) {
+function O(n, e, t) {
   const r = n.createTexture();
   if (!r)
     throw new Error("Failed to create texture");
@@ -79,7 +79,7 @@ function j(n, e, t) {
     // no data (allocate only)
   ), n.texParameteri(n.TEXTURE_2D, n.TEXTURE_MIN_FILTER, n.NEAREST), n.texParameteri(n.TEXTURE_2D, n.TEXTURE_MAG_FILTER, n.NEAREST), n.texParameteri(n.TEXTURE_2D, n.TEXTURE_WRAP_S, n.CLAMP_TO_EDGE), n.texParameteri(n.TEXTURE_2D, n.TEXTURE_WRAP_T, n.CLAMP_TO_EDGE), n.bindTexture(n.TEXTURE_2D, null), r;
 }
-function Y(n, e) {
+function J(n, e) {
   const t = n.createFramebuffer();
   if (!t)
     throw new Error("Failed to create framebuffer");
@@ -93,10 +93,10 @@ function Y(n, e) {
   );
   const r = n.checkFramebufferStatus(n.FRAMEBUFFER);
   if (r !== n.FRAMEBUFFER_COMPLETE)
-    throw n.deleteFramebuffer(t), new Error(`Framebuffer incomplete: ${me(n, r)}`);
+    throw n.deleteFramebuffer(t), new Error(`Framebuffer incomplete: ${ye(n, r)}`);
   return n.bindFramebuffer(n.FRAMEBUFFER, null), t;
 }
-function de(n) {
+function be(n) {
   const e = n.createTexture();
   if (!e)
     throw new Error("Failed to create black texture");
@@ -114,7 +114,7 @@ function de(n) {
     t
   ), n.texParameteri(n.TEXTURE_2D, n.TEXTURE_MIN_FILTER, n.NEAREST), n.texParameteri(n.TEXTURE_2D, n.TEXTURE_MAG_FILTER, n.NEAREST), n.texParameteri(n.TEXTURE_2D, n.TEXTURE_WRAP_S, n.CLAMP_TO_EDGE), n.texParameteri(n.TEXTURE_2D, n.TEXTURE_WRAP_T, n.CLAMP_TO_EDGE), n.bindTexture(n.TEXTURE_2D, null), e;
 }
-function pe(n) {
+function Ee(n) {
   const e = n.createTexture();
   if (!e)
     throw new Error("Failed to create keyboard texture");
@@ -132,13 +132,13 @@ function pe(n) {
     i
   ), n.texParameteri(n.TEXTURE_2D, n.TEXTURE_MIN_FILTER, n.NEAREST), n.texParameteri(n.TEXTURE_2D, n.TEXTURE_MAG_FILTER, n.NEAREST), n.texParameteri(n.TEXTURE_2D, n.TEXTURE_WRAP_S, n.CLAMP_TO_EDGE), n.texParameteri(n.TEXTURE_2D, n.TEXTURE_WRAP_T, n.CLAMP_TO_EDGE), n.bindTexture(n.TEXTURE_2D, null), e;
 }
-function fe(n, e, t, r) {
-  const p = new Float32Array(3072);
-  for (let o = 0; o < 256; o++) {
-    const m = t.get(o) || !1, b = r.get(o) || 0, T = (0 * 256 + o) * 4;
-    p[T + 0] = m ? 1 : 0, p[T + 1] = m ? 1 : 0, p[T + 2] = m ? 1 : 0, p[T + 3] = 1;
-    const E = (2 * 256 + o) * 4;
-    p[E + 0] = b, p[E + 1] = b, p[E + 2] = b, p[E + 3] = 1;
+function ve(n, e, t, r) {
+  const s = new Float32Array(3072);
+  for (let a = 0; a < 256; a++) {
+    const f = t.get(a) || !1, g = r.get(a) || 0, v = (0 * 256 + a) * 4;
+    s[v + 0] = f ? 1 : 0, s[v + 1] = f ? 1 : 0, s[v + 2] = f ? 1 : 0, s[v + 3] = 1;
+    const C = (2 * 256 + a) * 4;
+    s[C + 0] = g, s[C + 1] = g, s[C + 2] = g, s[C + 3] = 1;
   }
   n.bindTexture(n.TEXTURE_2D, e), n.texSubImage2D(
     n.TEXTURE_2D,
@@ -150,10 +150,10 @@ function fe(n, e, t, r) {
     3,
     n.RGBA,
     n.FLOAT,
-    p
+    s
   ), n.bindTexture(n.TEXTURE_2D, null);
 }
-function me(n, e) {
+function ye(n, e) {
   switch (e) {
     case n.FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
       return "FRAMEBUFFER_INCOMPLETE_ATTACHMENT";
@@ -169,7 +169,7 @@ function me(n, e) {
       return `Unknown status: ${e}`;
   }
 }
-const ge = `#version 300 es
+const Q = `#version 300 es
 precision highp float;
 
 layout(location = 0) in vec2 position;
@@ -177,7 +177,7 @@ layout(location = 0) in vec2 position;
 void main() {
   gl_Position = vec4(position, 0.0, 1.0);
 }
-`, J = `#version 300 es
+`, re = `#version 300 es
 precision highp float;
 
 // Shadertoy compatibility: equirectangular texture sampling
@@ -188,30 +188,30 @@ vec2 _st_dirToEquirect(vec3 dir) {
   float theta = asin(dir.y);
   return vec2(phi / ST_TWOPI + 0.5, theta / ST_PI + 0.5);
 }
-`, Ee = J.split(`
+`, Te = re.split(`
 `).length - 1;
-class be {
+class xe {
   constructor(e) {
-    g(this, "project");
-    g(this, "gl");
-    g(this, "_width");
-    g(this, "_height");
-    g(this, "_frame", 0);
-    g(this, "_time", 0);
-    g(this, "_lastStepTime", null);
-    g(this, "_passes", []);
-    g(this, "_textures", []);
-    g(this, "_keyboardTexture", null);
-    g(this, "_blackTexture", null);
+    h(this, "project");
+    h(this, "gl");
+    h(this, "_width");
+    h(this, "_height");
+    h(this, "_frame", 0);
+    h(this, "_time", 0);
+    h(this, "_lastStepTime", null);
+    h(this, "_passes", []);
+    h(this, "_textures", []);
+    h(this, "_keyboardTexture", null);
+    h(this, "_blackTexture", null);
     // Keyboard state tracking (Maps keycodes to state)
-    g(this, "_keyStates", /* @__PURE__ */ new Map());
+    h(this, "_keyStates", /* @__PURE__ */ new Map());
     // true = down, false = up
-    g(this, "_toggleStates", /* @__PURE__ */ new Map());
+    h(this, "_toggleStates", /* @__PURE__ */ new Map());
     // 0.0 or 1.0
     // Compilation errors (if any occurred during initialization)
-    g(this, "_compilationErrors", []);
-    this.gl = e.gl, this.project = e.project, this._width = this.gl.drawingBufferWidth, this._height = this.gl.drawingBufferHeight, this.initExtensions(), this._blackTexture = de(this.gl);
-    const t = pe(this.gl);
+    h(this, "_compilationErrors", []);
+    this.gl = e.gl, this.project = e.project, this._width = this.gl.drawingBufferWidth, this._height = this.gl.drawingBufferHeight, this.initExtensions(), this._blackTexture = be(this.gl);
+    const t = Ee(this.gl);
     this._keyboardTexture = {
       texture: t,
       width: 256,
@@ -266,17 +266,17 @@ class be {
   step(e, t) {
     const r = this.gl, i = this._lastStepTime === null ? 0 : e - this._lastStepTime;
     this._lastStepTime = e, this._time = e;
-    const c = [this._width, this._height, 1], p = this._time, o = i, m = this._frame, b = t;
+    const l = [this._width, this._height, 1], s = this._time, a = i, f = this._frame, g = t;
     r.viewport(0, 0, this._width, this._height);
-    const T = ["BufferA", "BufferB", "BufferC", "BufferD", "Image"];
-    for (const E of T) {
-      const x = this._passes.find((y) => y.name === E);
+    const v = ["BufferA", "BufferB", "BufferC", "BufferD", "Image"];
+    for (const C of v) {
+      const x = this._passes.find((w) => w.name === C);
       x && (this.executePass(x, {
-        iResolution: c,
-        iTime: p,
-        iTimeDelta: o,
-        iFrame: m,
-        iMouse: b
+        iResolution: l,
+        iTime: s,
+        iTimeDelta: a,
+        iFrame: f,
+        iMouse: g
       }), this.swapPassTextures(x));
     }
     this._frame += 1;
@@ -289,7 +289,7 @@ class be {
     this._width = e, this._height = t;
     const r = this.gl;
     for (const i of this._passes)
-      r.deleteTexture(i.currentTexture), r.deleteTexture(i.previousTexture), r.deleteFramebuffer(i.framebuffer), i.currentTexture = j(r, e, t), i.previousTexture = j(r, e, t), i.framebuffer = Y(r, i.currentTexture);
+      r.deleteTexture(i.currentTexture), r.deleteTexture(i.previousTexture), r.deleteFramebuffer(i.framebuffer), i.currentTexture = O(r, e, t), i.previousTexture = O(r, e, t), i.framebuffer = J(r, i.currentTexture);
   }
   /**
    * Reset frame counter and clear all render targets.
@@ -332,12 +332,77 @@ class be {
    * Should be called once per frame before rendering.
    */
   updateKeyboardTexture() {
-    this._keyboardTexture && fe(
+    this._keyboardTexture && ve(
       this.gl,
       this._keyboardTexture.texture,
       this._keyStates,
       this._toggleStates
     );
+  }
+  /**
+   * Recompile a single pass with new GLSL source code.
+   * Used for live editing - keeps the old shader running if compilation fails.
+   *
+   * @param passName - Name of the pass to recompile ('Image', 'BufferA', etc.)
+   * @param newSource - New GLSL source code for the pass
+   * @returns Object with success status and error message if failed
+   */
+  recompilePass(e, t) {
+    const r = this.gl, i = this._passes.find((a) => a.name === e);
+    if (!i)
+      return { success: !1, error: `Pass '${e}' not found` };
+    const l = this.project.passes[e];
+    if (!l)
+      return { success: !1, error: `Project pass '${e}' not found` };
+    const s = this.buildFragmentShader(t, l.channels);
+    try {
+      const a = Z(r, Q, s);
+      r.deleteProgram(i.uniforms.program);
+      const f = {
+        program: a,
+        iResolution: r.getUniformLocation(a, "iResolution"),
+        iTime: r.getUniformLocation(a, "iTime"),
+        iTimeDelta: r.getUniformLocation(a, "iTimeDelta"),
+        iFrame: r.getUniformLocation(a, "iFrame"),
+        iMouse: r.getUniformLocation(a, "iMouse"),
+        iChannel: [
+          r.getUniformLocation(a, "iChannel0"),
+          r.getUniformLocation(a, "iChannel1"),
+          r.getUniformLocation(a, "iChannel2"),
+          r.getUniformLocation(a, "iChannel3")
+        ]
+      };
+      return i.uniforms = f, l.glslSource = t, this._compilationErrors = this._compilationErrors.filter((g) => g.passName !== e), { success: !0 };
+    } catch (a) {
+      return { success: !1, error: a instanceof Error ? a.message : String(a) };
+    }
+  }
+  /**
+   * Recompile common.glsl and all passes that use it.
+   * Used for live editing of common code.
+   *
+   * @param newCommonSource - New GLSL source code for common.glsl
+   * @returns Object with success status and errors for each failed pass
+   */
+  recompileCommon(e) {
+    const t = this.project.commonSource;
+    this.project.commonSource = e;
+    const r = [], i = ["BufferA", "BufferB", "BufferC", "BufferD", "Image"];
+    for (const l of i) {
+      const s = this.project.passes[l];
+      if (!s) continue;
+      const a = this.recompilePass(l, s.glslSource);
+      a.success || r.push({ passName: l, error: a.error || "Unknown error" });
+    }
+    if (r.length > 0) {
+      this.project.commonSource = t;
+      for (const l of i) {
+        const s = this.project.passes[l];
+        s && (r.some((a) => a.passName === l) || this.recompilePass(l, s.glslSource));
+      }
+      return { success: !1, errors: r };
+    }
+    return { success: !0, errors: [] };
   }
   /**
    * Delete all GL resources.
@@ -383,65 +448,65 @@ class be {
         height: 1
       };
       this._textures.push(i);
-      const c = new Image();
-      c.crossOrigin = "anonymous", c.onload = () => {
-        e.bindTexture(e.TEXTURE_2D, r), e.texImage2D(e.TEXTURE_2D, 0, e.RGBA, e.RGBA, e.UNSIGNED_BYTE, c);
-        const p = t.filter === "nearest" ? e.NEAREST : e.LINEAR;
-        e.texParameteri(e.TEXTURE_2D, e.TEXTURE_MIN_FILTER, p), e.texParameteri(e.TEXTURE_2D, e.TEXTURE_MAG_FILTER, p);
-        const o = t.wrap === "clamp" ? e.CLAMP_TO_EDGE : e.REPEAT;
-        e.texParameteri(e.TEXTURE_2D, e.TEXTURE_WRAP_S, o), e.texParameteri(e.TEXTURE_2D, e.TEXTURE_WRAP_T, o), t.filter === "linear" && e.generateMipmap(e.TEXTURE_2D), i.width = c.width, i.height = c.height, console.log(`Loaded texture '${t.name}': ${c.width}x${c.height}`);
-      }, c.onerror = () => {
+      const l = new Image();
+      l.crossOrigin = "anonymous", l.onload = () => {
+        e.bindTexture(e.TEXTURE_2D, r), e.texImage2D(e.TEXTURE_2D, 0, e.RGBA, e.RGBA, e.UNSIGNED_BYTE, l);
+        const s = t.filter === "nearest" ? e.NEAREST : e.LINEAR;
+        e.texParameteri(e.TEXTURE_2D, e.TEXTURE_MIN_FILTER, s), e.texParameteri(e.TEXTURE_2D, e.TEXTURE_MAG_FILTER, s);
+        const a = t.wrap === "clamp" ? e.CLAMP_TO_EDGE : e.REPEAT;
+        e.texParameteri(e.TEXTURE_2D, e.TEXTURE_WRAP_S, a), e.texParameteri(e.TEXTURE_2D, e.TEXTURE_WRAP_T, a), t.filter === "linear" && e.generateMipmap(e.TEXTURE_2D), i.width = l.width, i.height = l.height, console.log(`Loaded texture '${t.name}': ${l.width}x${l.height}`);
+      }, l.onerror = () => {
         console.error(`Failed to load texture '${t.name}' from ${t.source}`);
-      }, c.src = t.source;
+      }, l.src = t.source;
     }
   }
   /**
    * Compile shaders, create VAOs/FBOs/textures, and build RuntimePass array.
    */
   initRuntimePasses() {
-    const e = this.gl, t = this.project, r = he(e), i = ["BufferA", "BufferB", "BufferC", "BufferD", "Image"];
-    for (const c of i) {
-      const p = t.passes[c];
-      if (!p) continue;
-      const o = this.buildFragmentShader(p.glslSource);
+    const e = this.gl, t = this.project, r = ge(e), i = ["BufferA", "BufferB", "BufferC", "BufferD", "Image"];
+    for (const l of i) {
+      const s = t.passes[l];
+      if (!s) continue;
+      const a = this.buildFragmentShader(s.glslSource, s.channels);
       try {
-        const m = le(e, ge, o), b = {
-          program: m,
-          iResolution: e.getUniformLocation(m, "iResolution"),
-          iTime: e.getUniformLocation(m, "iTime"),
-          iTimeDelta: e.getUniformLocation(m, "iTimeDelta"),
-          iFrame: e.getUniformLocation(m, "iFrame"),
-          iMouse: e.getUniformLocation(m, "iMouse"),
+        const f = Z(e, Q, a), g = {
+          program: f,
+          iResolution: e.getUniformLocation(f, "iResolution"),
+          iTime: e.getUniformLocation(f, "iTime"),
+          iTimeDelta: e.getUniformLocation(f, "iTimeDelta"),
+          iFrame: e.getUniformLocation(f, "iFrame"),
+          iMouse: e.getUniformLocation(f, "iMouse"),
           iChannel: [
-            e.getUniformLocation(m, "iChannel0"),
-            e.getUniformLocation(m, "iChannel1"),
-            e.getUniformLocation(m, "iChannel2"),
-            e.getUniformLocation(m, "iChannel3")
+            e.getUniformLocation(f, "iChannel0"),
+            e.getUniformLocation(f, "iChannel1"),
+            e.getUniformLocation(f, "iChannel2"),
+            e.getUniformLocation(f, "iChannel3")
           ]
-        }, T = j(e, this._width, this._height), E = j(e, this._width, this._height), x = Y(e, T), y = {
-          name: c,
-          projectChannels: p.channels,
+        }, v = O(e, this._width, this._height), C = O(e, this._width, this._height), x = J(e, v), w = {
+          name: l,
+          projectChannels: s.channels,
           vao: r,
-          uniforms: b,
+          uniforms: g,
           framebuffer: x,
-          currentTexture: T,
-          previousTexture: E
+          currentTexture: v,
+          previousTexture: C
         };
-        this._passes.push(y);
-      } catch (m) {
-        const b = m instanceof Error ? m.message : String(m), T = this.getLineMapping(), E = b.match(/ERROR:\s*\d+:(\d+):/);
-        let x = !1, y = null;
-        if (E && this.project.commonSource) {
-          const A = parseInt(E[1], 10), _ = T.boilerplateLinesBeforeCommon + 2, w = _ + T.commonLineCount - 1;
-          A >= _ && A <= w && (x = !0, y = A - _ + 1);
+        this._passes.push(w);
+      } catch (f) {
+        const g = f instanceof Error ? f.message : String(f), v = this.getLineMapping(), C = g.match(/ERROR:\s*\d+:(\d+):/);
+        let x = !1, w = null;
+        if (C && this.project.commonSource) {
+          const A = parseInt(C[1], 10), y = v.boilerplateLinesBeforeCommon + 2, E = y + v.commonLineCount - 1;
+          A >= y && A <= E && (x = !0, w = A - y + 1);
         }
         this._compilationErrors.push({
-          passName: c,
-          error: b,
-          source: o,
+          passName: l,
+          error: g,
+          source: a,
           isFromCommon: x,
-          originalLine: y
-        }), console.error(`Failed to compile ${c}:`, b);
+          originalLine: w
+        }), console.error(`Failed to compile ${l}:`, g);
       }
     }
   }
@@ -450,16 +515,19 @@ class be {
    * Returns info about where common.glsl code lives in the compiled shader.
    */
   getLineMapping() {
-    const e = Ee + 1, t = this.project.commonSource ? this.project.commonSource.split(`
+    const e = Te + 1, t = this.project.commonSource ? this.project.commonSource.split(`
 `).length : 0;
     return { boilerplateLinesBeforeCommon: e, commonLineCount: t };
   }
   /**
    * Build complete fragment shader source with Shadertoy boilerplate.
+   *
+   * @param userSource - The user's GLSL source code
+   * @param channels - Channel configuration for this pass (to detect cubemap textures)
    */
-  buildFragmentShader(e) {
-    const t = [J];
-    this.project.commonSource && (t.push("// Common code"), t.push(this.project.commonSource), t.push("")), t.push(`// Shadertoy built-in uniforms
+  buildFragmentShader(e, t) {
+    const r = [re];
+    this.project.commonSource && (r.push("// Common code"), r.push(this.project.commonSource), r.push("")), r.push(`// Shadertoy built-in uniforms
 uniform vec3  iResolution;
 uniform float iTime;
 uniform float iTimeDelta;
@@ -470,26 +538,33 @@ uniform sampler2D iChannel1;
 uniform sampler2D iChannel2;
 uniform sampler2D iChannel3;
 `);
-    const r = this.preprocessCubemapTextures(e);
-    return t.push("// User shader code"), t.push(r), t.push(""), t.push(`// Main wrapper
+    const i = this.preprocessCubemapTextures(e, t);
+    return r.push("// User shader code"), r.push(i), r.push(""), r.push(`// Main wrapper
 out vec4 fragColor;
 
 void main() {
   mainImage(fragColor, gl_FragCoord.xy);
-}`), t.join(`
+}`), r.join(`
 `);
   }
   /**
    * Preprocess shader to convert cubemap-style texture() calls to equirectangular.
-   * Detects: texture(iChannelN, vec3_expr) and converts to texture(iChannelN, _st_dirToEquirect(vec3_expr))
+   *
+   * Uses the channel configuration to determine which channels are cubemaps.
+   * Only channels explicitly marked as `type: 'cubemap'` in config.json will have
+   * their texture() calls wrapped with _st_dirToEquirect().
+   *
+   * @param source - User's GLSL source code
+   * @param channels - Channel configuration for this pass
    */
-  preprocessCubemapTextures(e) {
-    const t = /texture\s*\(\s*(iChannel[0-3])\s*,\s*([^)]+)\)/g;
-    return e.replace(t, (r, i, c) => c.includes("fragCoord") || // Using fragCoord directly
-    c.includes("/") || // Division (likely uv calculation)
-    /\.xy\s*$/.test(c.trim()) || // Ends with .xy swizzle
-    /\.st\s*$/.test(c.trim()) || // Ends with .st swizzle
-    /^vec2\s*\(/.test(c.trim()) ? r : `texture(${i}, _st_dirToEquirect(${c}))`);
+  preprocessCubemapTextures(e, t) {
+    const r = /* @__PURE__ */ new Set();
+    if (t.forEach((l, s) => {
+      l.kind === "texture" && l.cubemap && r.add(`iChannel${s}`);
+    }), r.size === 0)
+      return e;
+    const i = /texture\s*\(\s*(iChannel[0-3])\s*,\s*([^)]+)\)/g;
+    return e.replace(i, (l, s, a) => r.has(s) ? `texture(${s}, _st_dirToEquirect(${a}))` : l);
   }
   // ===========================================================================
   // Pass Execution
@@ -505,40 +580,40 @@ void main() {
   bindChannelTextures(e) {
     const t = this.gl;
     for (let r = 0; r < 4; r++) {
-      const i = e.projectChannels[r], c = this.resolveChannelTexture(i, e.name);
-      t.activeTexture(t.TEXTURE0 + r), t.bindTexture(t.TEXTURE_2D, c);
-      const p = e.uniforms.iChannel[r];
-      p && t.uniform1i(p, r);
+      const i = e.projectChannels[r], l = this.resolveChannelTexture(i);
+      t.activeTexture(t.TEXTURE0 + r), t.bindTexture(t.TEXTURE_2D, l);
+      const s = e.uniforms.iChannel[r];
+      s && t.uniform1i(s, r);
     }
   }
   /**
    * Resolve a ChannelSource to an actual WebGLTexture to bind.
    */
-  resolveChannelTexture(e, t) {
+  resolveChannelTexture(e) {
     switch (e.kind) {
       case "none":
         if (!this._blackTexture)
           throw new Error("Black texture not initialized");
         return this._blackTexture;
       case "buffer": {
-        const i = this._passes.find((p) => p.name === e.buffer);
-        if (!i)
+        const r = this._passes.find((i) => i.name === e.buffer);
+        if (!r)
           throw new Error(`Buffer '${e.buffer}' not found`);
-        return e.buffer === t ? i.previousTexture : i.currentTexture;
+        return e.current ? r.currentTexture : r.previousTexture;
       }
-      case "texture2D": {
-        const i = this._textures.find((c) => c.name === e.name);
-        if (!i)
+      case "texture": {
+        const r = this._textures.find((i) => i.name === e.name);
+        if (!r)
           throw new Error(`Texture '${e.name}' not found`);
-        return i.texture;
+        return r.texture;
       }
       case "keyboard":
         if (!this._keyboardTexture)
           throw new Error("Internal error: keyboard texture not initialized");
         return this._keyboardTexture.texture;
       default:
-        const r = e;
-        throw new Error(`Unknown channel source: ${JSON.stringify(r)}`);
+        const t = e;
+        throw new Error(`Unknown channel source: ${JSON.stringify(t)}`);
     }
   }
   /**
@@ -556,38 +631,38 @@ void main() {
     ), t.bindFramebuffer(t.FRAMEBUFFER, null);
   }
 }
-class ve {
+class _e {
   constructor(e) {
-    g(this, "container");
-    g(this, "canvas");
-    g(this, "gl");
-    g(this, "engine");
-    g(this, "project");
-    g(this, "pixelRatio");
-    g(this, "animationId", null);
-    g(this, "startTime", 0);
+    h(this, "container");
+    h(this, "canvas");
+    h(this, "gl");
+    h(this, "engine");
+    h(this, "project");
+    h(this, "pixelRatio");
+    h(this, "animationId", null);
+    h(this, "startTime", 0);
     // Mouse state for iMouse uniform
-    g(this, "mouse", [0, 0, -1, -1]);
+    h(this, "mouse", [0, 0, -1, -1]);
     // FPS tracking
-    g(this, "fpsDisplay");
-    g(this, "frameCount", 0);
-    g(this, "lastFpsUpdate", 0);
-    g(this, "currentFps", 0);
+    h(this, "fpsDisplay");
+    h(this, "frameCount", 0);
+    h(this, "lastFpsUpdate", 0);
+    h(this, "currentFps", 0);
     // Playback controls
-    g(this, "controlsContainer", null);
-    g(this, "playPauseButton", null);
-    g(this, "isPaused", !1);
+    h(this, "controlsContainer", null);
+    h(this, "playPauseButton", null);
+    h(this, "isPaused", !1);
     // Error overlay
-    g(this, "errorOverlay", null);
+    h(this, "errorOverlay", null);
     // Resize observer
-    g(this, "resizeObserver");
+    h(this, "resizeObserver");
     // Visibility observer (auto-pause when off-screen)
-    g(this, "intersectionObserver");
-    g(this, "isVisible", !0);
+    h(this, "intersectionObserver");
+    h(this, "isVisible", !0);
     // ===========================================================================
     // Animation Loop
     // ===========================================================================
-    g(this, "animate", (e) => {
+    h(this, "animate", (e) => {
       if (this.animationId = requestAnimationFrame(this.animate), this.isPaused || !this.isVisible)
         return;
       const t = e / 1e3, r = t - this.startTime;
@@ -605,7 +680,7 @@ class ve {
     });
     if (!t)
       throw new Error("WebGL2 not supported");
-    this.gl = t, this.updateCanvasSize(), this.engine = new be({
+    this.gl = t, this.updateCanvasSize(), this.engine = new xe({
       gl: this.gl,
       project: e.project
     }), this.engine.hasErrors() && this.showErrorOverlay(this.engine.getCompilationErrors()), this.resizeObserver = new ResizeObserver(() => {
@@ -628,6 +703,13 @@ class ve {
    */
   hasErrors() {
     return this.engine.hasErrors();
+  }
+  /**
+   * Get the underlying engine instance.
+   * Used for live recompilation in editor mode.
+   */
+  getEngine() {
+    return this.engine;
   }
   /**
    * Start the animation loop.
@@ -693,11 +775,11 @@ class ve {
   // ===========================================================================
   setupMouseTracking() {
     const e = (r) => {
-      const i = this.canvas.getBoundingClientRect(), c = (r.clientX - i.left) * this.pixelRatio, p = (i.height - (r.clientY - i.top)) * this.pixelRatio;
-      this.mouse[0] = c, this.mouse[1] = p;
+      const i = this.canvas.getBoundingClientRect(), l = (r.clientX - i.left) * this.pixelRatio, s = (i.height - (r.clientY - i.top)) * this.pixelRatio;
+      this.mouse[0] = l, this.mouse[1] = s;
     }, t = (r) => {
-      const i = this.canvas.getBoundingClientRect(), c = (r.clientX - i.left) * this.pixelRatio, p = (i.height - (r.clientY - i.top)) * this.pixelRatio;
-      this.mouse[2] = c, this.mouse[3] = p;
+      const i = this.canvas.getBoundingClientRect(), l = (r.clientX - i.left) * this.pixelRatio, s = (i.height - (r.clientY - i.top)) * this.pixelRatio;
+      this.mouse[2] = l, this.mouse[3] = s;
     };
     this.canvas.addEventListener("mousemove", e), this.canvas.addEventListener("click", t);
   }
@@ -775,13 +857,13 @@ class ve {
    */
   screenshot() {
     const e = this.project.root.split("/").pop() || "shader", t = /* @__PURE__ */ new Date(), r = t.getFullYear().toString() + (t.getMonth() + 1).toString().padStart(2, "0") + t.getDate().toString().padStart(2, "0") + "-" + t.getHours().toString().padStart(2, "0") + t.getMinutes().toString().padStart(2, "0") + t.getSeconds().toString().padStart(2, "0"), i = `shadertoy-${e}-${r}.png`;
-    this.canvas.toBlob((c) => {
-      if (!c) {
+    this.canvas.toBlob((l) => {
+      if (!l) {
         console.error("Failed to create screenshot blob");
         return;
       }
-      const p = URL.createObjectURL(c), o = document.createElement("a");
-      o.href = p, o.download = i, o.click(), URL.revokeObjectURL(p), console.log(`Screenshot saved: ${i}`);
+      const s = URL.createObjectURL(l), a = document.createElement("a");
+      a.href = s, a.download = i, a.click(), URL.revokeObjectURL(s), console.log(`Screenshot saved: ${i}`);
     }, "image/png");
   }
   /**
@@ -806,20 +888,20 @@ class ve {
    */
   showErrorOverlay(e) {
     this.errorOverlay || (this.errorOverlay = document.createElement("div"), this.errorOverlay.className = "shader-error-overlay", this.container.appendChild(this.errorOverlay));
-    const t = e.filter((b) => b.isFromCommon), r = e.filter((b) => !b.isFromCommon), o = [...t.length > 0 ? [t[0]] : [], ...r].map(({ passName: b, error: T, source: E, isFromCommon: x, originalLine: y }) => {
-      const A = T.replace(`Shader compilation failed:
+    const t = e.filter((g) => g.isFromCommon), r = e.filter((g) => !g.isFromCommon), a = [...t.length > 0 ? [t[0]] : [], ...r].map(({ passName: g, error: v, source: C, isFromCommon: x, originalLine: w }) => {
+      const A = v.replace(`Shader compilation failed:
 `, "");
-      let _ = A;
-      return x && y !== null && (_ = A.replace(/Line \d+:/, `Line ${y}:`), _ = _.replace(/ERROR:\s*\d+:(\d+):/, `ERROR: 0:${y}:`)), {
-        passName: x ? "common.glsl" : b,
-        error: this.parseShaderError(_),
-        codeContext: x ? this.extractCodeContextFromCommon(y) : this.extractCodeContext(_, E)
+      let y = A;
+      return x && w !== null && (y = A.replace(/Line \d+:/, `Line ${w}:`), y = y.replace(/ERROR:\s*\d+:(\d+):/, `ERROR: 0:${w}:`)), {
+        passName: x ? "common.glsl" : g,
+        error: this.parseShaderError(y),
+        codeContext: x ? this.extractCodeContextFromCommon(w) : this.extractCodeContext(y, C)
       };
-    }).map(({ passName: b, error: T, codeContext: E }) => `
+    }).map(({ passName: g, error: v, codeContext: C }) => `
       <div class="error-section">
-        <div class="error-pass-name">${b}</div>
-        <pre class="error-content">${this.escapeHTML(T)}</pre>
-        ${E ? `<pre class="error-code-context">${E}</pre>` : ""}
+        <div class="error-pass-name">${g}</div>
+        <pre class="error-content">${this.escapeHTML(v)}</pre>
+        ${C ? `<pre class="error-code-context">${C}</pre>` : ""}
       </div>
     `).join("");
     this.errorOverlay.innerHTML = `
@@ -834,12 +916,12 @@ class ve {
           <button class="error-close" title="Dismiss">×</button>
         </div>
         <div class="error-body">
-          ${o}
+          ${a}
         </div>
       </div>
     `;
-    const m = this.errorOverlay.querySelector(".error-close");
-    m && m.addEventListener("click", () => this.hideErrorOverlay());
+    const f = this.errorOverlay.querySelector(".error-close");
+    f && f.addEventListener("click", () => this.hideErrorOverlay());
   }
   /**
    * Parse and improve WebGL shader error messages.
@@ -849,8 +931,8 @@ class ve {
 `).map((t) => {
       const r = t.match(/^ERROR:\s*(\d+):(\d+):\s*(.+)$/);
       if (r) {
-        const [, , i, c] = r;
-        return `Line ${i}: ${c}`;
+        const [, , i, l] = r;
+        return `Line ${i}: ${l}`;
       }
       return t;
     }).join(`
@@ -863,11 +945,11 @@ class ve {
   extractCodeContext(e, t) {
     const r = e.match(/ERROR:\s*\d+:(\d+):/);
     if (!r) return null;
-    const i = parseInt(r[1], 10), c = t.split(`
-`), p = 3, o = Math.max(0, i - p - 1), m = Math.min(c.length, i + p);
-    return c.slice(o, m).map((E, x) => {
-      const y = o + x + 1, A = y === i, _ = String(y).padStart(4, " "), w = this.escapeHTML(E);
-      return A ? `<span class="error-line-highlight">${_} │ ${w}</span>` : `<span class="context-line">${_} │ ${w}</span>`;
+    const i = parseInt(r[1], 10), l = t.split(`
+`), s = 3, a = Math.max(0, i - s - 1), f = Math.min(l.length, i + s);
+    return l.slice(a, f).map((C, x) => {
+      const w = a + x + 1, A = w === i, y = String(w).padStart(4, " "), E = this.escapeHTML(C);
+      return A ? `<span class="error-line-highlight">${y} │ ${E}</span>` : `<span class="context-line">${y} │ ${E}</span>`;
     }).join("");
   }
   /**
@@ -878,10 +960,10 @@ class ve {
     const t = this.engine.project.commonSource;
     if (!t) return null;
     const r = t.split(`
-`), i = 3, c = Math.max(0, e - i - 1), p = Math.min(r.length, e + i);
-    return r.slice(c, p).map((b, T) => {
-      const E = c + T + 1, x = E === e, y = String(E).padStart(4, " "), A = this.escapeHTML(b);
-      return x ? `<span class="error-line-highlight">${y} │ ${A}</span>` : `<span class="context-line">${y} │ ${A}</span>`;
+`), i = 3, l = Math.max(0, e - i - 1), s = Math.min(r.length, e + i);
+    return r.slice(l, s).map((g, v) => {
+      const C = l + v + 1, x = C === e, w = String(C).padStart(4, " "), A = this.escapeHTML(g);
+      return x ? `<span class="error-line-highlight">${w} │ ${A}</span>` : `<span class="context-line">${w} │ ${A}</span>`;
     }).join("");
   }
   /**
@@ -898,11 +980,11 @@ class ve {
     this.errorOverlay && (this.errorOverlay.remove(), this.errorOverlay = null);
   }
 }
-class Te {
+class Ce {
   constructor(e) {
-    g(this, "container");
-    g(this, "root");
-    g(this, "canvasContainer");
+    h(this, "container");
+    h(this, "root");
+    h(this, "canvasContainer");
     this.container = e.container, this.root = document.createElement("div"), this.root.className = "layout-fullscreen", this.canvasContainer = document.createElement("div"), this.canvasContainer.className = "canvas-container", this.root.appendChild(this.canvasContainer), this.container.appendChild(this.root);
   }
   getCanvasContainer() {
@@ -912,11 +994,11 @@ class Te {
     this.container.innerHTML = "";
   }
 }
-class xe {
+class we {
   constructor(e) {
-    g(this, "container");
-    g(this, "root");
-    g(this, "canvasContainer");
+    h(this, "container");
+    h(this, "root");
+    h(this, "canvasContainer");
     this.container = e.container, this.root = document.createElement("div"), this.root.className = "layout-centered", this.canvasContainer = document.createElement("div"), this.canvasContainer.className = "canvas-container", this.root.appendChild(this.canvasContainer), this.container.appendChild(this.root);
   }
   getCanvasContainer() {
@@ -926,7 +1008,555 @@ class xe {
     this.container.innerHTML = "";
   }
 }
-var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : typeof global < "u" ? global : typeof self < "u" ? self : {}, ee = { exports: {} };
+class Fe {
+  constructor(e) {
+    h(this, "container");
+    h(this, "project");
+    h(this, "root");
+    h(this, "canvasContainer");
+    h(this, "codePanel");
+    h(this, "editorPanel", null);
+    h(this, "recompileHandler", null);
+    this.container = e.container, this.project = e.project, this.root = document.createElement("div"), this.root.className = "layout-split", this.canvasContainer = document.createElement("div"), this.canvasContainer.className = "canvas-container", this.codePanel = document.createElement("div"), this.codePanel.className = "code-panel", this.buildEditorPanel(), this.root.appendChild(this.canvasContainer), this.root.appendChild(this.codePanel), this.container.appendChild(this.root);
+  }
+  getCanvasContainer() {
+    return this.canvasContainer;
+  }
+  setRecompileHandler(e) {
+    this.recompileHandler = e, this.editorPanel && this.editorPanel.setRecompileHandler(e);
+  }
+  dispose() {
+    this.editorPanel && (this.editorPanel.dispose(), this.editorPanel = null), this.container.innerHTML = "";
+  }
+  /**
+   * Build editor panel (dynamically loaded).
+   */
+  async buildEditorPanel() {
+    try {
+      const { EditorPanel: e } = await Promise.resolve().then(() => De);
+      this.editorPanel = new e(this.codePanel, this.project), this.recompileHandler && this.editorPanel.setRecompileHandler(this.recompileHandler);
+    } catch (e) {
+      console.error("Failed to load editor panel:", e);
+    }
+  }
+}
+class Ae {
+  constructor(e) {
+    h(this, "container");
+    h(this, "project");
+    h(this, "root");
+    h(this, "canvasContainer");
+    h(this, "contentArea");
+    h(this, "imageViewer");
+    h(this, "editorContainer");
+    h(this, "editorInstance", null);
+    h(this, "buttonContainer");
+    h(this, "copyButton");
+    h(this, "recompileButton");
+    h(this, "errorDisplay");
+    h(this, "recompileHandler", null);
+    h(this, "modifiedSources", /* @__PURE__ */ new Map());
+    h(this, "tabs", []);
+    h(this, "activeTabIndex", 0);
+    this.container = e.container, this.project = e.project, this.root = document.createElement("div"), this.root.className = "layout-tabbed";
+    const t = document.createElement("div");
+    t.className = "tabbed-wrapper", this.contentArea = document.createElement("div"), this.contentArea.className = "tabbed-content", this.canvasContainer = document.createElement("div"), this.canvasContainer.className = "tabbed-canvas-container", this.imageViewer = document.createElement("div"), this.imageViewer.className = "tabbed-image-viewer", this.imageViewer.style.visibility = "hidden", this.contentArea.appendChild(this.canvasContainer), this.contentArea.appendChild(this.imageViewer), this.editorContainer = document.createElement("div"), this.editorContainer.className = "tabbed-editor-container", this.editorContainer.style.visibility = "hidden", this.contentArea.appendChild(this.editorContainer), this.buttonContainer = document.createElement("div"), this.buttonContainer.className = "tabbed-button-container", this.buttonContainer.style.display = "none", this.copyButton = document.createElement("button"), this.copyButton.className = "tabbed-copy-button", this.copyButton.innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V2z" opacity="0.4"/>
+        <path d="M2 5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H2zm0 1h7a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1z"/>
+      </svg>
+    `, this.copyButton.title = "Copy code to clipboard", this.copyButton.addEventListener("click", () => this.copyToClipboard()), this.buttonContainer.appendChild(this.copyButton), this.recompileButton = document.createElement("button"), this.recompileButton.className = "tabbed-recompile-button", this.recompileButton.innerHTML = `
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M4 3v10l8-5-8-5z"/>
+      </svg>
+      Recompile
+    `, this.recompileButton.title = "Recompile shader (Ctrl+Enter)", this.recompileButton.addEventListener("click", () => this.recompile()), this.buttonContainer.appendChild(this.recompileButton), this.errorDisplay = document.createElement("div"), this.errorDisplay.className = "tabbed-error-display", this.errorDisplay.style.display = "none", this.contentArea.appendChild(this.errorDisplay), this.setupKeyboardShortcut();
+    const r = this.buildTabBar();
+    t.appendChild(r), t.appendChild(this.contentArea), this.root.appendChild(t), this.container.appendChild(this.root);
+  }
+  getCanvasContainer() {
+    return this.canvasContainer;
+  }
+  setRecompileHandler(e) {
+    this.recompileHandler = e;
+  }
+  dispose() {
+    this.editorInstance && (this.editorInstance.destroy(), this.editorInstance = null), this.container.innerHTML = "";
+  }
+  setupKeyboardShortcut() {
+    document.addEventListener("keydown", (e) => {
+      (e.ctrlKey || e.metaKey) && e.key === "Enter" && this.tabs[this.activeTabIndex].kind === "code" && (e.preventDefault(), this.recompile());
+    });
+  }
+  saveCurrentEditorContent() {
+    if (this.editorInstance) {
+      const e = this.tabs[this.activeTabIndex];
+      if (e.kind === "code") {
+        const t = this.editorInstance.getSource();
+        this.modifiedSources.set(e.passName, t);
+      }
+    }
+  }
+  recompile() {
+    if (!this.recompileHandler) {
+      console.warn("No recompile handler set");
+      return;
+    }
+    this.saveCurrentEditorContent();
+    const e = this.tabs[this.activeTabIndex];
+    if (e.kind !== "code") return;
+    const t = this.modifiedSources.get(e.passName) ?? e.source, r = this.recompileHandler(e.passName, t);
+    r.success ? (this.hideError(), e.source = t) : this.showError(r.error || "Compilation failed");
+  }
+  showError(e) {
+    this.errorDisplay && (this.errorDisplay.textContent = e, this.errorDisplay.style.display = "block");
+  }
+  hideError() {
+    this.errorDisplay && (this.errorDisplay.style.display = "none");
+  }
+  async copyToClipboard() {
+    const e = this.tabs[this.activeTabIndex];
+    if (e.kind !== "code") return;
+    const t = this.editorInstance ? this.editorInstance.getSource() : this.modifiedSources.get(e.passName) ?? e.source;
+    try {
+      await navigator.clipboard.writeText(t);
+      const r = this.copyButton.innerHTML;
+      this.copyButton.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/>
+        </svg>
+      `, this.copyButton.classList.add("copied"), setTimeout(() => {
+        this.copyButton.innerHTML = r, this.copyButton.classList.remove("copied");
+      }, 1500);
+    } catch (r) {
+      console.error("Failed to copy:", r);
+    }
+  }
+  buildTabBar() {
+    const e = document.createElement("div");
+    e.className = "tabbed-toolbar";
+    const t = document.createElement("div");
+    t.className = "tabbed-tab-bar", this.tabs = [], this.tabs.push({ kind: "shader", name: "Shader" }), this.project.commonSource && this.tabs.push({
+      kind: "code",
+      name: "common.glsl",
+      passName: "common",
+      source: this.project.commonSource
+    });
+    const r = [
+      "BufferA",
+      "BufferB",
+      "BufferC",
+      "BufferD"
+    ];
+    for (const s of r) {
+      const a = this.project.passes[s];
+      a && this.tabs.push({
+        kind: "code",
+        name: `${s.toLowerCase()}.glsl`,
+        passName: s,
+        source: a.glslSource
+      });
+    }
+    const i = this.project.passes.Image;
+    this.tabs.push({
+      kind: "code",
+      name: "image.glsl",
+      passName: "Image",
+      source: i.glslSource
+    });
+    for (const s of this.project.textures) {
+      const a = s.source.split("/").pop() || s.source;
+      this.tabs.push({
+        kind: "image",
+        name: a,
+        url: s.source
+      });
+    }
+    const l = async (s) => {
+      this.saveCurrentEditorContent();
+      const a = this.tabs[s];
+      if (this.activeTabIndex = s, t.querySelectorAll(".tabbed-tab-button").forEach((f, g) => {
+        f.classList.toggle("active", g === s);
+      }), this.canvasContainer.style.visibility = "hidden", this.imageViewer.style.visibility = "hidden", this.editorContainer.style.visibility = "hidden", this.buttonContainer.style.display = "none", this.editorInstance && (this.editorInstance.destroy(), this.editorInstance = null), a.kind === "shader")
+        this.canvasContainer.style.visibility = "visible";
+      else if (a.kind === "code") {
+        this.editorContainer.style.visibility = "visible", this.buttonContainer.style.display = "flex";
+        const f = this.modifiedSources.get(a.passName) ?? a.source;
+        this.editorContainer.innerHTML = "";
+        try {
+          const { createEditor: g } = await Promise.resolve().then(() => ie);
+          this.editorInstance = g(this.editorContainer, f, (v) => {
+            this.modifiedSources.set(a.passName, v);
+          });
+        } catch (g) {
+          console.error("Failed to load editor:", g);
+          const v = document.createElement("textarea");
+          v.className = "tabbed-fallback-textarea", v.value = f, v.addEventListener("input", () => {
+            this.modifiedSources.set(a.passName, v.value);
+          }), this.editorContainer.appendChild(v);
+        }
+      } else {
+        this.imageViewer.style.visibility = "visible";
+        const f = document.createElement("img");
+        f.src = a.url, f.alt = a.name, this.imageViewer.innerHTML = "", this.imageViewer.appendChild(f);
+      }
+    };
+    return this.tabs.forEach((s, a) => {
+      const f = document.createElement("button");
+      f.className = "tabbed-tab-button", s.kind === "shader" ? f.classList.add("shader-tab") : s.kind === "image" && f.classList.add("image-tab"), f.textContent = s.name, a === 0 && f.classList.add("active"), f.addEventListener("click", () => l(a)), t.appendChild(f);
+    }), e.appendChild(t), e.appendChild(this.buttonContainer), e;
+  }
+}
+function Se(n, e) {
+  switch (n) {
+    case "fullscreen":
+      return new Ce(e);
+    case "centered":
+      return new we(e);
+    case "split":
+      return new Fe(e);
+    case "tabbed":
+      return new Ae(e);
+  }
+}
+function I(n, e) {
+  if (e in n) return e;
+  const t = e.toLowerCase();
+  for (const r of Object.keys(n))
+    if (r.toLowerCase() === t)
+      return r;
+  return null;
+}
+function Re(n) {
+  return n === "Image" || n === "BufferA" || n === "BufferB" || n === "BufferC" || n === "BufferD";
+}
+function ne(n) {
+  return typeof n == "string" ? Re(n) ? { buffer: n } : n === "keyboard" ? { keyboard: !0 } : { texture: n } : n;
+}
+async function Be(n, e, t, r) {
+  const i = `/demos/${n}/config.json`;
+  if (i in t) {
+    const s = await t[i]();
+    return s.Image || s.BufferA || s.BufferB || s.BufferC || s.BufferD ? Le(n, s, e, r) : ee(n, e, s);
+  } else
+    return ee(n, e);
+}
+async function ee(n, e, t) {
+  const r = `/demos/${n}/image.glsl`, i = I(e, r);
+  if (!i)
+    throw new Error(`Demo '${n}' not found. Expected ${r}`);
+  const l = await e[i](), s = (t == null ? void 0 : t.layout) || "tabbed", a = (t == null ? void 0 : t.controls) ?? !0, f = (t == null ? void 0 : t.title) || n.split("-").map((g) => g.charAt(0).toUpperCase() + g.slice(1)).join(" ");
+  return {
+    root: `/demos/${n}`,
+    meta: {
+      title: f,
+      author: (t == null ? void 0 : t.author) || null,
+      description: (t == null ? void 0 : t.description) || null
+    },
+    layout: s,
+    controls: a,
+    commonSource: null,
+    passes: {
+      Image: {
+        name: "Image",
+        glslSource: l,
+        channels: [
+          { kind: "none" },
+          { kind: "none" },
+          { kind: "none" },
+          { kind: "none" }
+        ]
+      }
+    },
+    textures: []
+  };
+}
+async function Le(n, e, t, r) {
+  const i = {
+    Image: e.Image,
+    BufferA: e.BufferA,
+    BufferB: e.BufferB,
+    BufferC: e.BufferC,
+    BufferD: e.BufferD
+  };
+  let l = null;
+  if (e.common) {
+    const E = `/demos/${n}/${e.common}`, T = I(t, E);
+    T && (l = await t[T]());
+  } else {
+    const E = `/demos/${n}/common.glsl`, T = I(t, E);
+    T && (l = await t[T]());
+  }
+  const s = /* @__PURE__ */ new Set(), a = ["Image", "BufferA", "BufferB", "BufferC", "BufferD"];
+  for (const E of a) {
+    const T = i[E];
+    if (T)
+      for (const c of ["iChannel0", "iChannel1", "iChannel2", "iChannel3"]) {
+        const o = T[c];
+        if (!o) continue;
+        const u = ne(o);
+        u && "texture" in u && s.add(u.texture);
+      }
+  }
+  const f = [], g = /* @__PURE__ */ new Map();
+  for (const E of s) {
+    const T = `/demos/${n}/${E.replace(/^\.\//, "")}`, c = I(r, T);
+    if (!c)
+      throw new Error(`Texture not found: ${E} (expected at ${T})`);
+    const o = await r[c](), u = E.split("/").pop().replace(/\.[^.]+$/, "");
+    f.push({
+      name: u,
+      source: o,
+      filter: "linear",
+      wrap: "repeat"
+    }), g.set(E, u);
+  }
+  const v = {};
+  for (const E of a) {
+    const T = i[E];
+    if (!T) continue;
+    const c = {
+      Image: "image.glsl",
+      BufferA: "bufferA.glsl",
+      BufferB: "bufferB.glsl",
+      BufferC: "bufferC.glsl",
+      BufferD: "bufferD.glsl"
+    }, o = T.source || c[E], u = `/demos/${n}/${o}`, d = I(t, u);
+    if (!d)
+      throw new Error(`Missing shader file: ${u}`);
+    const p = await t[d](), m = [
+      H(T.iChannel0, g),
+      H(T.iChannel1, g),
+      H(T.iChannel2, g),
+      H(T.iChannel3, g)
+    ];
+    v[E] = {
+      name: E,
+      glslSource: p,
+      channels: m
+    };
+  }
+  if (!v.Image)
+    throw new Error(`Demo '${n}' must have an Image pass`);
+  const C = e.title || n.split("-").map((E) => E.charAt(0).toUpperCase() + E.slice(1)).join(" "), x = e.author || null, w = e.description || null, A = e.layout || "tabbed", y = e.controls ?? !0;
+  return {
+    root: `/demos/${n}`,
+    meta: { title: C, author: x, description: w },
+    layout: A,
+    controls: y,
+    commonSource: l,
+    passes: v,
+    textures: f
+  };
+}
+function H(n, e) {
+  if (!n)
+    return { kind: "none" };
+  const t = ne(n);
+  return t ? "buffer" in t ? {
+    kind: "buffer",
+    buffer: t.buffer,
+    current: !!t.current
+  } : "texture" in t ? {
+    kind: "texture",
+    name: (e == null ? void 0 : e.get(t.texture)) || t.texture,
+    cubemap: t.type === "cubemap"
+  } : "keyboard" in t ? { kind: "keyboard" } : { kind: "none" } : { kind: "none" };
+}
+const ke = "course/day4/paint-basic";
+async function Me() {
+  return Be(ke, /* @__PURE__ */ Object.assign({
+    "/demos/course/day4/paint-basic/bufferA.glsl": () => Promise.resolve().then(() => $e).then((r) => r.default),
+    "/demos/course/day4/paint-basic/image.glsl": () => Promise.resolve().then(() => Oe).then((r) => r.default)
+  }), /* @__PURE__ */ Object.assign({
+    "/demos/course/day4/paint-basic/config.json": () => Promise.resolve().then(() => ze).then((r) => r.default)
+  }), /* @__PURE__ */ Object.assign({}));
+}
+async function Ge(n) {
+  const e = typeof n.container == "string" ? document.querySelector(n.container) : n.container;
+  if (!e || !(e instanceof HTMLElement))
+    throw new Error(`Container not found: ${n.container}`);
+  const t = await Me(), r = Se(t.layout, {
+    container: e,
+    project: t
+  }), i = new _e({
+    container: r.getCanvasContainer(),
+    project: t,
+    pixelRatio: n.pixelRatio ?? window.devicePixelRatio
+  });
+  return i.hasErrors() || i.start(), {
+    app: i,
+    destroy: () => {
+      var l;
+      (l = i.stop) == null || l.call(i);
+    }
+  };
+}
+class Pe {
+  constructor(e, t) {
+    h(this, "container");
+    h(this, "project");
+    h(this, "recompileHandler", null);
+    h(this, "tabBar");
+    h(this, "contentArea");
+    h(this, "copyButton");
+    h(this, "recompileButton");
+    h(this, "errorDisplay");
+    h(this, "tabs", []);
+    h(this, "activeTabIndex", 0);
+    // Editor instance (null if not in editor mode or viewing image)
+    h(this, "editorInstance", null);
+    // Track modified sources (passName -> modified source)
+    h(this, "modifiedSources", /* @__PURE__ */ new Map());
+    this.container = e, this.project = t, this.buildTabs(), this.tabBar = document.createElement("div"), this.tabBar.className = "editor-tab-bar", this.buildTabBar(), this.contentArea = document.createElement("div"), this.contentArea.className = "editor-content-area", this.copyButton = document.createElement("button"), this.copyButton.className = "editor-copy-button", this.copyButton.innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V2z" opacity="0.4"/>
+        <path d="M2 5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H2zm0 1h7a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1z"/>
+      </svg>
+    `, this.copyButton.title = "Copy code to clipboard", this.copyButton.addEventListener("click", () => this.copyToClipboard()), this.recompileButton = document.createElement("button"), this.recompileButton.className = "editor-recompile-button", this.recompileButton.innerHTML = `
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M4 3v10l8-5-8-5z"/>
+      </svg>
+      Recompile
+    `, this.recompileButton.title = "Recompile shader (Ctrl+Enter)", this.recompileButton.addEventListener("click", () => this.recompile()), this.errorDisplay = document.createElement("div"), this.errorDisplay.className = "editor-error-display", this.errorDisplay.style.display = "none";
+    const r = document.createElement("div");
+    r.className = "editor-toolbar", r.appendChild(this.tabBar), r.appendChild(this.copyButton), r.appendChild(this.recompileButton), this.container.appendChild(r), this.container.appendChild(this.contentArea), this.container.appendChild(this.errorDisplay), this.setupKeyboardShortcut(), this.showTab(0);
+  }
+  setRecompileHandler(e) {
+    this.recompileHandler = e;
+  }
+  dispose() {
+    this.editorInstance && (this.editorInstance.destroy(), this.editorInstance = null), this.container.innerHTML = "";
+  }
+  buildTabs() {
+    this.tabs = [], this.project.commonSource && this.tabs.push({
+      kind: "code",
+      name: "common.glsl",
+      passName: "common",
+      source: this.project.commonSource
+    });
+    const e = [
+      "BufferA",
+      "BufferB",
+      "BufferC",
+      "BufferD"
+    ];
+    for (const r of e) {
+      const i = this.project.passes[r];
+      i && this.tabs.push({
+        kind: "code",
+        name: `${r.toLowerCase()}.glsl`,
+        passName: r,
+        source: i.glslSource
+      });
+    }
+    const t = this.project.passes.Image;
+    this.tabs.push({
+      kind: "code",
+      name: "image.glsl",
+      passName: "Image",
+      source: t.glslSource
+    });
+    for (const r of this.project.textures) {
+      const i = r.source.split("/").pop() || r.source;
+      this.tabs.push({
+        kind: "image",
+        name: i,
+        url: r.source
+      });
+    }
+  }
+  buildTabBar() {
+    this.tabBar.innerHTML = "", this.tabs.forEach((e, t) => {
+      const r = document.createElement("button");
+      r.className = "editor-tab-button", e.kind === "image" && r.classList.add("image-tab"), r.textContent = e.name, t === this.activeTabIndex && r.classList.add("active"), r.addEventListener("click", () => this.showTab(t)), this.tabBar.appendChild(r);
+    });
+  }
+  async showTab(e) {
+    this.saveCurrentEditorContent(), this.activeTabIndex = e;
+    const t = this.tabs[e];
+    if (this.tabBar.querySelectorAll(".editor-tab-button").forEach((r, i) => {
+      r.classList.toggle("active", i === e);
+    }), this.contentArea.innerHTML = "", this.editorInstance && (this.editorInstance.destroy(), this.editorInstance = null), t.kind === "code") {
+      this.copyButton.style.display = "", this.recompileButton.style.display = "";
+      const r = this.modifiedSources.get(t.passName) ?? t.source, i = document.createElement("div");
+      i.className = "editor-prism-container", this.contentArea.appendChild(i);
+      try {
+        const { createEditor: l } = await Promise.resolve().then(() => ie);
+        this.editorInstance = l(i, r, (s) => {
+          this.modifiedSources.set(t.passName, s);
+        });
+      } catch (l) {
+        console.error("Failed to load editor:", l);
+        const s = document.createElement("textarea");
+        s.className = "editor-fallback-textarea", s.value = r, s.addEventListener("input", () => {
+          this.modifiedSources.set(t.passName, s.value);
+        }), i.appendChild(s);
+      }
+    } else {
+      this.copyButton.style.display = "none", this.recompileButton.style.display = "none";
+      const r = document.createElement("div");
+      r.className = "editor-image-viewer";
+      const i = document.createElement("img");
+      i.src = t.url, i.alt = t.name, r.appendChild(i), this.contentArea.appendChild(r);
+    }
+  }
+  saveCurrentEditorContent() {
+    if (this.editorInstance) {
+      const e = this.tabs[this.activeTabIndex];
+      if (e.kind === "code") {
+        const t = this.editorInstance.getSource();
+        this.modifiedSources.set(e.passName, t);
+      }
+    }
+  }
+  recompile() {
+    if (!this.recompileHandler) {
+      console.warn("No recompile handler set");
+      return;
+    }
+    this.saveCurrentEditorContent();
+    const e = this.tabs[this.activeTabIndex];
+    if (e.kind !== "code")
+      return;
+    const t = this.modifiedSources.get(e.passName) ?? e.source, r = this.recompileHandler(e.passName, t);
+    r.success ? (this.hideError(), e.source = t) : this.showError(r.error || "Compilation failed");
+  }
+  showError(e) {
+    this.errorDisplay.textContent = e, this.errorDisplay.style.display = "block";
+  }
+  hideError() {
+    this.errorDisplay.style.display = "none";
+  }
+  async copyToClipboard() {
+    const e = this.tabs[this.activeTabIndex];
+    if (e.kind !== "code") return;
+    const t = this.editorInstance ? this.editorInstance.getSource() : this.modifiedSources.get(e.passName) ?? e.source;
+    try {
+      await navigator.clipboard.writeText(t);
+      const r = this.copyButton.innerHTML;
+      this.copyButton.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/>
+        </svg>
+      `, this.copyButton.classList.add("copied"), setTimeout(() => {
+        this.copyButton.innerHTML = r, this.copyButton.classList.remove("copied");
+      }, 1500);
+    } catch (r) {
+      console.error("Failed to copy:", r);
+    }
+  }
+  setupKeyboardShortcut() {
+    this.container.addEventListener("keydown", (e) => {
+      (e.ctrlKey || e.metaKey) && e.key === "Enter" && (e.preventDefault(), this.recompile());
+    });
+  }
+}
+const De = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  EditorPanel: Pe
+}, Symbol.toStringTag, { value: "Module" }));
+var te = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : typeof global < "u" ? global : typeof self < "u" ? self : {}, ae = { exports: {} };
 (function(n) {
   var e = typeof window < "u" ? window : typeof WorkerGlobalScope < "u" && self instanceof WorkerGlobalScope ? self : {};
   /**
@@ -938,7 +1568,7 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
    * @public
    */
   var t = function(r) {
-    var i = /(?:^|\s)lang(?:uage)?-([\w-]+)(?=\s|$)/i, c = 0, p = {}, o = {
+    var i = /(?:^|\s)lang(?:uage)?-([\w-]+)(?=\s|$)/i, l = 0, s = {}, a = {
       /**
        * By default, Prism will attempt to highlight all code elements (by calling {@link Prism.highlightAll}) on the
        * current page after the page finished loading. This might be a problem if e.g. you wanted to asynchronously load
@@ -993,8 +1623,8 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
        * @memberof Prism
        */
       util: {
-        encode: function s(a) {
-          return a instanceof m ? new m(a.type, s(a.content), a.alias) : Array.isArray(a) ? a.map(s) : a.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/\u00a0/g, " ");
+        encode: function c(o) {
+          return o instanceof f ? new f(o.type, c(o.content), o.alias) : Array.isArray(o) ? o.map(c) : o.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/\u00a0/g, " ");
         },
         /**
          * Returns the name of the type of the given value.
@@ -1012,8 +1642,8 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
          * type(String)    === 'Function'
          * type(/abc+/)    === 'RegExp'
          */
-        type: function(s) {
-          return Object.prototype.toString.call(s).slice(8, -1);
+        type: function(c) {
+          return Object.prototype.toString.call(c).slice(8, -1);
         },
         /**
          * Returns a unique number for the given object. Later calls will still return the same number.
@@ -1021,8 +1651,8 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
          * @param {Object} obj
          * @returns {number}
          */
-        objId: function(s) {
-          return s.__id || Object.defineProperty(s, "__id", { value: ++c }), s.__id;
+        objId: function(c) {
+          return c.__id || Object.defineProperty(c, "__id", { value: ++l }), c.__id;
         },
         /**
          * Creates a deep clone of the given object.
@@ -1034,30 +1664,30 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
          * @returns {T}
          * @template T
          */
-        clone: function s(a, u) {
+        clone: function c(o, u) {
           u = u || {};
-          var l, h;
-          switch (o.util.type(a)) {
+          var d, p;
+          switch (a.util.type(o)) {
             case "Object":
-              if (h = o.util.objId(a), u[h])
-                return u[h];
-              l = /** @type {Record<string, any>} */
-              {}, u[h] = l;
-              for (var d in a)
-                a.hasOwnProperty(d) && (l[d] = s(a[d], u));
+              if (p = a.util.objId(o), u[p])
+                return u[p];
+              d = /** @type {Record<string, any>} */
+              {}, u[p] = d;
+              for (var m in o)
+                o.hasOwnProperty(m) && (d[m] = c(o[m], u));
               return (
                 /** @type {any} */
-                l
+                d
               );
             case "Array":
-              return h = o.util.objId(a), u[h] ? u[h] : (l = [], u[h] = l, /** @type {Array} */
+              return p = a.util.objId(o), u[p] ? u[p] : (d = [], u[p] = d, /** @type {Array} */
               /** @type {any} */
-              a.forEach(function(v, f) {
-                l[f] = s(v, u);
+              o.forEach(function(_, b) {
+                d[b] = c(_, u);
               }), /** @type {any} */
-              l);
+              d);
             default:
-              return a;
+              return o;
           }
         },
         /**
@@ -1068,12 +1698,12 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
          * @param {Element} element
          * @returns {string}
          */
-        getLanguage: function(s) {
-          for (; s; ) {
-            var a = i.exec(s.className);
-            if (a)
-              return a[1].toLowerCase();
-            s = s.parentElement;
+        getLanguage: function(c) {
+          for (; c; ) {
+            var o = i.exec(c.className);
+            if (o)
+              return o[1].toLowerCase();
+            c = c.parentElement;
           }
           return "none";
         },
@@ -1084,8 +1714,8 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
          * @param {string} language
          * @returns {void}
          */
-        setLanguage: function(s, a) {
-          s.className = s.className.replace(RegExp(i, "gi"), ""), s.classList.add("language-" + a);
+        setLanguage: function(c, o) {
+          c.className = c.className.replace(RegExp(i, "gi"), ""), c.classList.add("language-" + o);
         },
         /**
          * Returns the script element that is currently executing.
@@ -1104,13 +1734,13 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
             );
           try {
             throw new Error();
-          } catch (l) {
-            var s = (/at [^(\r\n]*\((.*):[^:]+:[^:]+\)$/i.exec(l.stack) || [])[1];
-            if (s) {
-              var a = document.getElementsByTagName("script");
-              for (var u in a)
-                if (a[u].src == s)
-                  return a[u];
+          } catch (d) {
+            var c = (/at [^(\r\n]*\((.*):[^:]+:[^:]+\)$/i.exec(d.stack) || [])[1];
+            if (c) {
+              var o = document.getElementsByTagName("script");
+              for (var u in o)
+                if (o[u].src == c)
+                  return o[u];
             }
             return null;
           }
@@ -1134,14 +1764,14 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
          * @param {boolean} [defaultActivation=false]
          * @returns {boolean}
          */
-        isActive: function(s, a, u) {
-          for (var l = "no-" + a; s; ) {
-            var h = s.classList;
-            if (h.contains(a))
+        isActive: function(c, o, u) {
+          for (var d = "no-" + o; c; ) {
+            var p = c.classList;
+            if (p.contains(o))
               return !0;
-            if (h.contains(l))
+            if (p.contains(d))
               return !1;
-            s = s.parentElement;
+            c = c.parentElement;
           }
           return !!u;
         }
@@ -1157,10 +1787,10 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
         /**
          * The grammar for plain, unformatted text.
          */
-        plain: p,
-        plaintext: p,
-        text: p,
-        txt: p,
+        plain: s,
+        plaintext: s,
+        text: s,
+        txt: s,
         /**
          * Creates a deep copy of the language with the given id and appends the given tokens.
          *
@@ -1189,10 +1819,10 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
          *     'color': /\b(?:red|green|blue)\b/
          * });
          */
-        extend: function(s, a) {
-          var u = o.util.clone(o.languages[s]);
-          for (var l in a)
-            u[l] = a[l];
+        extend: function(c, o) {
+          var u = a.util.clone(a.languages[c]);
+          for (var d in o)
+            u[d] = o[d];
           return u;
         },
         /**
@@ -1270,31 +1900,31 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
          * @returns {Grammar} The new grammar object.
          * @public
          */
-        insertBefore: function(s, a, u, l) {
-          l = l || /** @type {any} */
-          o.languages;
-          var h = l[s], d = {};
-          for (var v in h)
-            if (h.hasOwnProperty(v)) {
-              if (v == a)
-                for (var f in u)
-                  u.hasOwnProperty(f) && (d[f] = u[f]);
-              u.hasOwnProperty(v) || (d[v] = h[v]);
+        insertBefore: function(c, o, u, d) {
+          d = d || /** @type {any} */
+          a.languages;
+          var p = d[c], m = {};
+          for (var _ in p)
+            if (p.hasOwnProperty(_)) {
+              if (_ == o)
+                for (var b in u)
+                  u.hasOwnProperty(b) && (m[b] = u[b]);
+              u.hasOwnProperty(_) || (m[_] = p[_]);
             }
-          var F = l[s];
-          return l[s] = d, o.languages.DFS(o.languages, function(R, M) {
-            M === F && R != s && (this[R] = d);
-          }), d;
+          var F = d[c];
+          return d[c] = m, a.languages.DFS(a.languages, function(S, k) {
+            k === F && S != c && (this[S] = m);
+          }), m;
         },
         // Traverse a language definition with Depth First Search
-        DFS: function s(a, u, l, h) {
-          h = h || {};
-          var d = o.util.objId;
-          for (var v in a)
-            if (a.hasOwnProperty(v)) {
-              u.call(a, v, a[v], l || v);
-              var f = a[v], F = o.util.type(f);
-              F === "Object" && !h[d(f)] ? (h[d(f)] = !0, s(f, u, null, h)) : F === "Array" && !h[d(f)] && (h[d(f)] = !0, s(f, u, v, h));
+        DFS: function c(o, u, d, p) {
+          p = p || {};
+          var m = a.util.objId;
+          for (var _ in o)
+            if (o.hasOwnProperty(_)) {
+              u.call(o, _, o[_], d || _);
+              var b = o[_], F = a.util.type(b);
+              F === "Object" && !p[m(b)] ? (p[m(b)] = !0, c(b, u, null, p)) : F === "Array" && !p[m(b)] && (p[m(b)] = !0, c(b, u, _, p));
             }
         }
       },
@@ -1311,8 +1941,8 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
        * @memberof Prism
        * @public
        */
-      highlightAll: function(s, a) {
-        o.highlightAllUnder(document, s, a);
+      highlightAll: function(c, o) {
+        a.highlightAllUnder(document, c, o);
       },
       /**
        * Fetches all the descendants of `container` that have a `.language-xxxx` class and then calls
@@ -1329,15 +1959,15 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
        * @memberof Prism
        * @public
        */
-      highlightAllUnder: function(s, a, u) {
-        var l = {
+      highlightAllUnder: function(c, o, u) {
+        var d = {
           callback: u,
-          container: s,
+          container: c,
           selector: 'code[class*="language-"], [class*="language-"] code, code[class*="lang-"], [class*="lang-"] code'
         };
-        o.hooks.run("before-highlightall", l), l.elements = Array.prototype.slice.apply(l.container.querySelectorAll(l.selector)), o.hooks.run("before-all-elements-highlight", l);
-        for (var h = 0, d; d = l.elements[h++]; )
-          o.highlightElement(d, a === !0, l.callback);
+        a.hooks.run("before-highlightall", d), d.elements = Array.prototype.slice.apply(d.container.querySelectorAll(d.selector)), a.hooks.run("before-all-elements-highlight", d);
+        for (var p = 0, m; m = d.elements[p++]; )
+          a.highlightElement(m, o === !0, d.callback);
       },
       /**
        * Highlights the code inside a single element.
@@ -1367,39 +1997,39 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
        * @memberof Prism
        * @public
        */
-      highlightElement: function(s, a, u) {
-        var l = o.util.getLanguage(s), h = o.languages[l];
-        o.util.setLanguage(s, l);
-        var d = s.parentElement;
-        d && d.nodeName.toLowerCase() === "pre" && o.util.setLanguage(d, l);
-        var v = s.textContent, f = {
-          element: s,
-          language: l,
-          grammar: h,
-          code: v
+      highlightElement: function(c, o, u) {
+        var d = a.util.getLanguage(c), p = a.languages[d];
+        a.util.setLanguage(c, d);
+        var m = c.parentElement;
+        m && m.nodeName.toLowerCase() === "pre" && a.util.setLanguage(m, d);
+        var _ = c.textContent, b = {
+          element: c,
+          language: d,
+          grammar: p,
+          code: _
         };
-        function F(M) {
-          f.highlightedCode = M, o.hooks.run("before-insert", f), f.element.innerHTML = f.highlightedCode, o.hooks.run("after-highlight", f), o.hooks.run("complete", f), u && u.call(f.element);
+        function F(k) {
+          b.highlightedCode = k, a.hooks.run("before-insert", b), b.element.innerHTML = b.highlightedCode, a.hooks.run("after-highlight", b), a.hooks.run("complete", b), u && u.call(b.element);
         }
-        if (o.hooks.run("before-sanity-check", f), d = f.element.parentElement, d && d.nodeName.toLowerCase() === "pre" && !d.hasAttribute("tabindex") && d.setAttribute("tabindex", "0"), !f.code) {
-          o.hooks.run("complete", f), u && u.call(f.element);
+        if (a.hooks.run("before-sanity-check", b), m = b.element.parentElement, m && m.nodeName.toLowerCase() === "pre" && !m.hasAttribute("tabindex") && m.setAttribute("tabindex", "0"), !b.code) {
+          a.hooks.run("complete", b), u && u.call(b.element);
           return;
         }
-        if (o.hooks.run("before-highlight", f), !f.grammar) {
-          F(o.util.encode(f.code));
+        if (a.hooks.run("before-highlight", b), !b.grammar) {
+          F(a.util.encode(b.code));
           return;
         }
-        if (a && r.Worker) {
-          var R = new Worker(o.filename);
-          R.onmessage = function(M) {
-            F(M.data);
-          }, R.postMessage(JSON.stringify({
-            language: f.language,
-            code: f.code,
+        if (o && r.Worker) {
+          var S = new Worker(a.filename);
+          S.onmessage = function(k) {
+            F(k.data);
+          }, S.postMessage(JSON.stringify({
+            language: b.language,
+            code: b.code,
             immediateClose: !0
           }));
         } else
-          F(o.highlight(f.code, f.grammar, f.language));
+          F(a.highlight(b.code, b.grammar, b.language));
       },
       /**
        * Low-level function, only use if you know what you’re doing. It accepts a string of text as input
@@ -1421,15 +2051,15 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
        * @example
        * Prism.highlight('var foo = true;', Prism.languages.javascript, 'javascript');
        */
-      highlight: function(s, a, u) {
-        var l = {
-          code: s,
-          grammar: a,
+      highlight: function(c, o, u) {
+        var d = {
+          code: c,
+          grammar: o,
           language: u
         };
-        if (o.hooks.run("before-tokenize", l), !l.grammar)
-          throw new Error('The language "' + l.language + '" has no grammar.');
-        return l.tokens = o.tokenize(l.code, l.grammar), o.hooks.run("after-tokenize", l), m.stringify(o.util.encode(l.tokens), l.language);
+        if (a.hooks.run("before-tokenize", d), !d.grammar)
+          throw new Error('The language "' + d.language + '" has no grammar.');
+        return d.tokens = a.tokenize(d.code, d.grammar), a.hooks.run("after-tokenize", d), f.stringify(a.util.encode(d.tokens), d.language);
       },
       /**
        * This is the heart of Prism, and the most low-level function you can use. It accepts a string of text as input
@@ -1455,15 +2085,15 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
        *     }
        * });
        */
-      tokenize: function(s, a) {
-        var u = a.rest;
+      tokenize: function(c, o) {
+        var u = o.rest;
         if (u) {
-          for (var l in u)
-            a[l] = u[l];
-          delete a.rest;
+          for (var d in u)
+            o[d] = u[d];
+          delete o.rest;
         }
-        var h = new E();
-        return x(h, h.head, s), T(s, h, a, h.head, 0), A(h);
+        var p = new C();
+        return x(p, p.head, c), v(c, p, o, p.head, 0), A(p);
       },
       /**
        * @namespace
@@ -1484,9 +2114,9 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
          * @param {HookCallback} callback The callback function which is given environment variables.
          * @public
          */
-        add: function(s, a) {
-          var u = o.hooks.all;
-          u[s] = u[s] || [], u[s].push(a);
+        add: function(c, o) {
+          var u = a.hooks.all;
+          u[c] = u[c] || [], u[c].push(o);
         },
         /**
          * Runs a hook invoking all registered callbacks with the given environment variables.
@@ -1497,135 +2127,135 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
          * @param {Object<string, any>} env The environment variables of the hook passed to all callbacks registered.
          * @public
          */
-        run: function(s, a) {
-          var u = o.hooks.all[s];
+        run: function(c, o) {
+          var u = a.hooks.all[c];
           if (!(!u || !u.length))
-            for (var l = 0, h; h = u[l++]; )
-              h(a);
+            for (var d = 0, p; p = u[d++]; )
+              p(o);
         }
       },
-      Token: m
+      Token: f
     };
-    r.Prism = o;
-    function m(s, a, u, l) {
-      this.type = s, this.content = a, this.alias = u, this.length = (l || "").length | 0;
+    r.Prism = a;
+    function f(c, o, u, d) {
+      this.type = c, this.content = o, this.alias = u, this.length = (d || "").length | 0;
     }
-    m.stringify = function s(a, u) {
-      if (typeof a == "string")
-        return a;
-      if (Array.isArray(a)) {
-        var l = "";
-        return a.forEach(function(F) {
-          l += s(F, u);
-        }), l;
+    f.stringify = function c(o, u) {
+      if (typeof o == "string")
+        return o;
+      if (Array.isArray(o)) {
+        var d = "";
+        return o.forEach(function(F) {
+          d += c(F, u);
+        }), d;
       }
-      var h = {
-        type: a.type,
-        content: s(a.content, u),
+      var p = {
+        type: o.type,
+        content: c(o.content, u),
         tag: "span",
-        classes: ["token", a.type],
+        classes: ["token", o.type],
         attributes: {},
         language: u
-      }, d = a.alias;
-      d && (Array.isArray(d) ? Array.prototype.push.apply(h.classes, d) : h.classes.push(d)), o.hooks.run("wrap", h);
-      var v = "";
-      for (var f in h.attributes)
-        v += " " + f + '="' + (h.attributes[f] || "").replace(/"/g, "&quot;") + '"';
-      return "<" + h.tag + ' class="' + h.classes.join(" ") + '"' + v + ">" + h.content + "</" + h.tag + ">";
+      }, m = o.alias;
+      m && (Array.isArray(m) ? Array.prototype.push.apply(p.classes, m) : p.classes.push(m)), a.hooks.run("wrap", p);
+      var _ = "";
+      for (var b in p.attributes)
+        _ += " " + b + '="' + (p.attributes[b] || "").replace(/"/g, "&quot;") + '"';
+      return "<" + p.tag + ' class="' + p.classes.join(" ") + '"' + _ + ">" + p.content + "</" + p.tag + ">";
     };
-    function b(s, a, u, l) {
-      s.lastIndex = a;
-      var h = s.exec(u);
-      if (h && l && h[1]) {
-        var d = h[1].length;
-        h.index += d, h[0] = h[0].slice(d);
+    function g(c, o, u, d) {
+      c.lastIndex = o;
+      var p = c.exec(u);
+      if (p && d && p[1]) {
+        var m = p[1].length;
+        p.index += m, p[0] = p[0].slice(m);
       }
-      return h;
+      return p;
     }
-    function T(s, a, u, l, h, d) {
-      for (var v in u)
-        if (!(!u.hasOwnProperty(v) || !u[v])) {
-          var f = u[v];
-          f = Array.isArray(f) ? f : [f];
-          for (var F = 0; F < f.length; ++F) {
-            if (d && d.cause == v + "," + F)
+    function v(c, o, u, d, p, m) {
+      for (var _ in u)
+        if (!(!u.hasOwnProperty(_) || !u[_])) {
+          var b = u[_];
+          b = Array.isArray(b) ? b : [b];
+          for (var F = 0; F < b.length; ++F) {
+            if (m && m.cause == _ + "," + F)
               return;
-            var R = f[F], M = R.inside, D = !!R.lookbehind, V = !!R.greedy, ae = R.alias;
-            if (V && !R.pattern.global) {
-              var se = R.pattern.toString().match(/[imsuy]*$/)[0];
-              R.pattern = RegExp(R.pattern.source, se + "g");
+            var S = b[F], k = S.inside, V = !!S.lookbehind, K = !!S.greedy, ue = S.alias;
+            if (K && !S.pattern.global) {
+              var de = S.pattern.toString().match(/[imsuy]*$/)[0];
+              S.pattern = RegExp(S.pattern.source, de + "g");
             }
-            for (var q = R.pattern || R, S = l.next, B = h; S !== a.tail && !(d && B >= d.reach); B += S.value.length, S = S.next) {
-              var P = S.value;
-              if (a.length > s.length)
+            for (var q = S.pattern || S, R = d.next, L = p; R !== o.tail && !(m && L >= m.reach); L += R.value.length, R = R.next) {
+              var P = R.value;
+              if (o.length > c.length)
                 return;
-              if (!(P instanceof m)) {
-                var $ = 1, L;
-                if (V) {
-                  if (L = b(q, B, s, D), !L || L.index >= s.length)
+              if (!(P instanceof f)) {
+                var U = 1, B;
+                if (K) {
+                  if (B = g(q, L, c, V), !B || B.index >= c.length)
                     break;
-                  var I = L.index, ie = L.index + L[0].length, k = B;
-                  for (k += S.value.length; I >= k; )
-                    S = S.next, k += S.value.length;
-                  if (k -= S.value.length, B = k, S.value instanceof m)
+                  var N = B.index, he = B.index + B[0].length, M = L;
+                  for (M += R.value.length; N >= M; )
+                    R = R.next, M += R.value.length;
+                  if (M -= R.value.length, L = M, R.value instanceof f)
                     continue;
-                  for (var U = S; U !== a.tail && (k < ie || typeof U.value == "string"); U = U.next)
-                    $++, k += U.value.length;
-                  $--, P = s.slice(B, k), L.index -= B;
-                } else if (L = b(q, 0, P, D), !L)
+                  for (var D = R; D !== o.tail && (M < he || typeof D.value == "string"); D = D.next)
+                    U++, M += D.value.length;
+                  U--, P = c.slice(L, M), B.index -= L;
+                } else if (B = g(q, 0, P, V), !B)
                   continue;
-                var I = L.index, O = L[0], H = P.slice(0, I), W = P.slice(I + O.length), X = B + P.length;
-                d && X > d.reach && (d.reach = X);
-                var N = S.prev;
-                H && (N = x(a, N, H), B += H.length), y(a, N, $);
-                var oe = new m(v, M ? o.tokenize(O, M) : O, ae, O);
-                if (S = x(a, N, oe), W && x(a, S, W), $ > 1) {
+                var N = B.index, $ = B[0], z = P.slice(0, N), W = P.slice(N + $.length), X = L + P.length;
+                m && X > m.reach && (m.reach = X);
+                var j = R.prev;
+                z && (j = x(o, j, z), L += z.length), w(o, j, U);
+                var pe = new f(_, k ? a.tokenize($, k) : $, ue, $);
+                if (R = x(o, j, pe), W && x(o, R, W), U > 1) {
                   var G = {
-                    cause: v + "," + F,
+                    cause: _ + "," + F,
                     reach: X
                   };
-                  T(s, a, u, S.prev, B, G), d && G.reach > d.reach && (d.reach = G.reach);
+                  v(c, o, u, R.prev, L, G), m && G.reach > m.reach && (m.reach = G.reach);
                 }
               }
             }
           }
         }
     }
-    function E() {
-      var s = { value: null, prev: null, next: null }, a = { value: null, prev: s, next: null };
-      s.next = a, this.head = s, this.tail = a, this.length = 0;
+    function C() {
+      var c = { value: null, prev: null, next: null }, o = { value: null, prev: c, next: null };
+      c.next = o, this.head = c, this.tail = o, this.length = 0;
     }
-    function x(s, a, u) {
-      var l = a.next, h = { value: u, prev: a, next: l };
-      return a.next = h, l.prev = h, s.length++, h;
+    function x(c, o, u) {
+      var d = o.next, p = { value: u, prev: o, next: d };
+      return o.next = p, d.prev = p, c.length++, p;
     }
-    function y(s, a, u) {
-      for (var l = a.next, h = 0; h < u && l !== s.tail; h++)
-        l = l.next;
-      a.next = l, l.prev = a, s.length -= h;
+    function w(c, o, u) {
+      for (var d = o.next, p = 0; p < u && d !== c.tail; p++)
+        d = d.next;
+      o.next = d, d.prev = o, c.length -= p;
     }
-    function A(s) {
-      for (var a = [], u = s.head.next; u !== s.tail; )
-        a.push(u.value), u = u.next;
-      return a;
+    function A(c) {
+      for (var o = [], u = c.head.next; u !== c.tail; )
+        o.push(u.value), u = u.next;
+      return o;
     }
     if (!r.document)
-      return r.addEventListener && (o.disableWorkerMessageHandler || r.addEventListener("message", function(s) {
-        var a = JSON.parse(s.data), u = a.language, l = a.code, h = a.immediateClose;
-        r.postMessage(o.highlight(l, o.languages[u], u)), h && r.close();
-      }, !1)), o;
-    var _ = o.util.currentScript();
-    _ && (o.filename = _.src, _.hasAttribute("data-manual") && (o.manual = !0));
-    function w() {
-      o.manual || o.highlightAll();
+      return r.addEventListener && (a.disableWorkerMessageHandler || r.addEventListener("message", function(c) {
+        var o = JSON.parse(c.data), u = o.language, d = o.code, p = o.immediateClose;
+        r.postMessage(a.highlight(d, a.languages[u], u)), p && r.close();
+      }, !1)), a;
+    var y = a.util.currentScript();
+    y && (a.filename = y.src, y.hasAttribute("data-manual") && (a.manual = !0));
+    function E() {
+      a.manual || a.highlightAll();
     }
-    if (!o.manual) {
-      var C = document.readyState;
-      C === "loading" || C === "interactive" && _ && _.defer ? document.addEventListener("DOMContentLoaded", w) : window.requestAnimationFrame ? window.requestAnimationFrame(w) : window.setTimeout(w, 16);
+    if (!a.manual) {
+      var T = document.readyState;
+      T === "loading" || T === "interactive" && y && y.defer ? document.addEventListener("DOMContentLoaded", E) : window.requestAnimationFrame ? window.requestAnimationFrame(E) : window.setTimeout(E, 16);
     }
-    return o;
+    return a;
   }(e);
-  n.exports && (n.exports = t), typeof Z < "u" && (Z.Prism = t), t.languages.markup = {
+  n.exports && (n.exports = t), typeof te < "u" && (te.Prism = t), t.languages.markup = {
     comment: {
       pattern: /<!--(?:(?!<!--)[\s\S])*?-->/,
       greedy: !0
@@ -1716,32 +2346,32 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
      * @example
      * addInlined('style', 'css');
      */
-    value: function(i, c) {
-      var p = {};
-      p["language-" + c] = {
+    value: function(i, l) {
+      var s = {};
+      s["language-" + l] = {
         pattern: /(^<!\[CDATA\[)[\s\S]+?(?=\]\]>$)/i,
         lookbehind: !0,
-        inside: t.languages[c]
-      }, p.cdata = /^<!\[CDATA\[|\]\]>$/i;
-      var o = {
+        inside: t.languages[l]
+      }, s.cdata = /^<!\[CDATA\[|\]\]>$/i;
+      var a = {
         "included-cdata": {
           pattern: /<!\[CDATA\[[\s\S]*?\]\]>/i,
-          inside: p
+          inside: s
         }
       };
-      o["language-" + c] = {
+      a["language-" + l] = {
         pattern: /[\s\S]+/,
-        inside: t.languages[c]
+        inside: t.languages[l]
       };
-      var m = {};
-      m[i] = {
+      var f = {};
+      f[i] = {
         pattern: RegExp(/(<__[^>]*>)(?:<!\[CDATA\[(?:[^\]]|\](?!\]>))*\]\]>|(?!<!\[CDATA\[)[\s\S])*?(?=<\/__>)/.source.replace(/__/g, function() {
           return i;
         }), "i"),
         lookbehind: !0,
         greedy: !0,
-        inside: o
-      }, t.languages.insertBefore("markup", "cdata", m);
+        inside: a
+      }, t.languages.insertBefore("markup", "cdata", f);
     }
   }), Object.defineProperty(t.languages.markup.tag, "addAttribute", {
     /**
@@ -1837,8 +2467,8 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
       },
       punctuation: /[(){};:,]/
     }, r.languages.css.atrule.inside.rest = r.languages.css;
-    var c = r.languages.markup;
-    c && (c.tag.addInlined("style", "css"), c.tag.addAttribute("style", "css"));
+    var l = r.languages.markup;
+    l && (l.tag.addInlined("style", "css"), l.tag.addAttribute("style", "css"));
   }(t), t.languages.clike = {
     comment: [
       {
@@ -2003,9 +2633,9 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
     if (typeof t > "u" || typeof document > "u")
       return;
     Element.prototype.matches || (Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector);
-    var r = "Loading…", i = function(_, w) {
-      return "✖ Error " + _ + " while fetching file: " + w;
-    }, c = "✖ Error: File does not exist or is empty", p = {
+    var r = "Loading…", i = function(y, E) {
+      return "✖ Error " + y + " while fetching file: " + E;
+    }, l = "✖ Error: File does not exist or is empty", s = {
       js: "javascript",
       py: "python",
       rb: "ruby",
@@ -2015,52 +2645,52 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
       bat: "batch",
       h: "c",
       tex: "latex"
-    }, o = "data-src-status", m = "loading", b = "loaded", T = "failed", E = "pre[data-src]:not([" + o + '="' + b + '"]):not([' + o + '="' + m + '"])';
-    function x(_, w, C) {
-      var s = new XMLHttpRequest();
-      s.open("GET", _, !0), s.onreadystatechange = function() {
-        s.readyState == 4 && (s.status < 400 && s.responseText ? w(s.responseText) : s.status >= 400 ? C(i(s.status, s.statusText)) : C(c));
-      }, s.send(null);
+    }, a = "data-src-status", f = "loading", g = "loaded", v = "failed", C = "pre[data-src]:not([" + a + '="' + g + '"]):not([' + a + '="' + f + '"])';
+    function x(y, E, T) {
+      var c = new XMLHttpRequest();
+      c.open("GET", y, !0), c.onreadystatechange = function() {
+        c.readyState == 4 && (c.status < 400 && c.responseText ? E(c.responseText) : c.status >= 400 ? T(i(c.status, c.statusText)) : T(l));
+      }, c.send(null);
     }
-    function y(_) {
-      var w = /^\s*(\d+)\s*(?:(,)\s*(?:(\d+)\s*)?)?$/.exec(_ || "");
-      if (w) {
-        var C = Number(w[1]), s = w[2], a = w[3];
-        return s ? a ? [C, Number(a)] : [C, void 0] : [C, C];
+    function w(y) {
+      var E = /^\s*(\d+)\s*(?:(,)\s*(?:(\d+)\s*)?)?$/.exec(y || "");
+      if (E) {
+        var T = Number(E[1]), c = E[2], o = E[3];
+        return c ? o ? [T, Number(o)] : [T, void 0] : [T, T];
       }
     }
-    t.hooks.add("before-highlightall", function(_) {
-      _.selector += ", " + E;
-    }), t.hooks.add("before-sanity-check", function(_) {
-      var w = (
+    t.hooks.add("before-highlightall", function(y) {
+      y.selector += ", " + C;
+    }), t.hooks.add("before-sanity-check", function(y) {
+      var E = (
         /** @type {HTMLPreElement} */
-        _.element
+        y.element
       );
-      if (w.matches(E)) {
-        _.code = "", w.setAttribute(o, m);
-        var C = w.appendChild(document.createElement("CODE"));
-        C.textContent = r;
-        var s = w.getAttribute("data-src"), a = _.language;
-        if (a === "none") {
-          var u = (/\.(\w+)$/.exec(s) || [, "none"])[1];
-          a = p[u] || u;
+      if (E.matches(C)) {
+        y.code = "", E.setAttribute(a, f);
+        var T = E.appendChild(document.createElement("CODE"));
+        T.textContent = r;
+        var c = E.getAttribute("data-src"), o = y.language;
+        if (o === "none") {
+          var u = (/\.(\w+)$/.exec(c) || [, "none"])[1];
+          o = s[u] || u;
         }
-        t.util.setLanguage(C, a), t.util.setLanguage(w, a);
-        var l = t.plugins.autoloader;
-        l && l.loadLanguages(a), x(
-          s,
-          function(h) {
-            w.setAttribute(o, b);
-            var d = y(w.getAttribute("data-range"));
-            if (d) {
-              var v = h.split(/\r\n?|\n/g), f = d[0], F = d[1] == null ? v.length : d[1];
-              f < 0 && (f += v.length), f = Math.max(0, Math.min(f - 1, v.length)), F < 0 && (F += v.length), F = Math.max(0, Math.min(F, v.length)), h = v.slice(f, F).join(`
-`), w.hasAttribute("data-start") || w.setAttribute("data-start", String(f + 1));
+        t.util.setLanguage(T, o), t.util.setLanguage(E, o);
+        var d = t.plugins.autoloader;
+        d && d.loadLanguages(o), x(
+          c,
+          function(p) {
+            E.setAttribute(a, g);
+            var m = w(E.getAttribute("data-range"));
+            if (m) {
+              var _ = p.split(/\r\n?|\n/g), b = m[0], F = m[1] == null ? _.length : m[1];
+              b < 0 && (b += _.length), b = Math.max(0, Math.min(b - 1, _.length)), F < 0 && (F += _.length), F = Math.max(0, Math.min(F, _.length)), p = _.slice(b, F).join(`
+`), E.hasAttribute("data-start") || E.setAttribute("data-start", String(b + 1));
             }
-            C.textContent = h, t.highlightElement(C);
+            T.textContent = p, t.highlightElement(T);
           },
-          function(h) {
-            w.setAttribute(o, T), C.textContent = h;
+          function(p) {
+            E.setAttribute(a, v), T.textContent = p;
           }
         );
       }
@@ -2072,9 +2702,9 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
        *
        * @param {ParentNode} [container=document]
        */
-      highlight: function(w) {
-        for (var C = (w || document).querySelectorAll(E), s = 0, a; a = C[s++]; )
-          t.highlightElement(a);
+      highlight: function(E) {
+        for (var T = (E || document).querySelectorAll(C), c = 0, o; o = T[c++]; )
+          t.highlightElement(o);
       }
     };
     var A = !1;
@@ -2082,8 +2712,8 @@ var Z = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : ty
       A || (console.warn("Prism.fileHighlight is deprecated. Use `Prism.plugins.fileHighlight.highlight` instead."), A = !0), t.plugins.fileHighlight.highlight.apply(this, arguments);
     };
   }();
-})(ee);
-var te = ee.exports;
+})(ae);
+var Ie = ae.exports;
 Prism.languages.c = Prism.languages.extend("clike", {
   comment: {
     pattern: /\/\/(?:[^\r\n\\]|\\(?:\r\n?|\n|(?![\r\n])))*|\/\*[\s\S]*?(?:\*\/|$)/,
@@ -2245,373 +2875,90 @@ delete Prism.languages.c.boolean;
     "class-name": /\b[a-z_]\w*\b(?!\s*::)/i
   }, n.languages.cpp["base-clause"]);
 })(Prism);
-class _e {
-  constructor(e) {
-    g(this, "container");
-    g(this, "project");
-    g(this, "root");
-    g(this, "canvasContainer");
-    g(this, "codePanel");
-    this.container = e.container, this.project = e.project, this.root = document.createElement("div"), this.root.className = "layout-split", this.canvasContainer = document.createElement("div"), this.canvasContainer.className = "canvas-container", this.codePanel = document.createElement("div"), this.codePanel.className = "code-panel", this.buildCodePanel(), this.root.appendChild(this.canvasContainer), this.root.appendChild(this.codePanel), this.container.appendChild(this.root);
-  }
-  getCanvasContainer() {
-    return this.canvasContainer;
-  }
-  dispose() {
-    this.container.innerHTML = "";
-  }
-  /**
-   * Build the code panel with tabs for each shader pass.
-   * Uses Prism.js with C++ syntax highlighting (lightweight, works well for GLSL).
-   */
-  buildCodePanel() {
-    const e = [];
-    this.project.commonSource && e.push({ name: "common.glsl", source: this.project.commonSource });
-    const t = [
-      "BufferA",
-      "BufferB",
-      "BufferC",
-      "BufferD"
-    ];
-    for (const E of t) {
-      const x = this.project.passes[E];
-      x && e.push({
-        name: `${E.toLowerCase()}.glsl`,
-        source: x.glslSource
-      });
-    }
-    const r = this.project.passes.Image;
-    e.push({ name: "image.glsl", source: r.glslSource });
-    const i = document.createElement("div");
-    i.className = "tab-bar";
-    const c = document.createElement("div");
-    c.className = "code-viewer";
-    const p = document.createElement("button");
-    p.className = "copy-button", p.innerHTML = `
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-        <path d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V2z" opacity="0.4"/>
-        <path d="M2 5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H2zm0 1h7a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1z"/>
-      </svg>
-    `, p.title = "Copy code to clipboard";
-    let o = "";
-    const m = p.innerHTML, b = `
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-        <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/>
-      </svg>
-    `, T = (E) => {
-      const x = e[E];
-      o = x.source;
-      const y = document.createElement("pre"), A = document.createElement("code");
-      A.className = "language-cpp", A.textContent = x.source, y.appendChild(A), c.innerHTML = "", c.appendChild(y), te.highlightElement(A);
-    };
-    p.addEventListener("click", async () => {
-      try {
-        await navigator.clipboard.writeText(o), p.innerHTML = b, p.classList.add("copied"), setTimeout(() => {
-          p.innerHTML = m, p.classList.remove("copied");
-        }, 1500);
-      } catch (E) {
-        console.error("Failed to copy:", E);
-      }
-    }), e.forEach((E, x) => {
-      const y = document.createElement("button");
-      y.className = "tab-button", y.textContent = E.name, x === 0 && y.classList.add("active"), y.addEventListener("click", () => {
-        i.querySelectorAll(".tab-button").forEach((A) => A.classList.remove("active")), y.classList.add("active"), T(x);
-      }), i.appendChild(y);
-    }), this.codePanel.appendChild(i), this.codePanel.appendChild(p), this.codePanel.appendChild(c), e.length > 0 && T(0);
-  }
-}
-class ye {
-  constructor(e) {
-    g(this, "container");
-    g(this, "project");
-    g(this, "root");
-    g(this, "canvasContainer");
-    g(this, "contentArea");
-    g(this, "codeViewer");
-    g(this, "copyButton");
-    this.container = e.container, this.project = e.project, this.root = document.createElement("div"), this.root.className = "layout-tabbed";
-    const t = document.createElement("div");
-    t.className = "tabbed-wrapper", this.contentArea = document.createElement("div"), this.contentArea.className = "tabbed-content", this.canvasContainer = document.createElement("div"), this.canvasContainer.className = "tabbed-canvas-container", this.codeViewer = document.createElement("div"), this.codeViewer.className = "tabbed-code-viewer", this.codeViewer.style.visibility = "hidden", this.copyButton = document.createElement("button"), this.copyButton.className = "tabbed-copy-button", this.copyButton.innerHTML = `
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-        <path d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V2z" opacity="0.4"/>
-        <path d="M2 5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H2zm0 1h7a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1z"/>
-      </svg>
-    `, this.copyButton.title = "Copy code to clipboard", this.copyButton.style.visibility = "hidden", this.contentArea.appendChild(this.canvasContainer), this.contentArea.appendChild(this.codeViewer), this.contentArea.appendChild(this.copyButton);
-    const r = this.buildTabBar();
-    t.appendChild(r), t.appendChild(this.contentArea), this.root.appendChild(t), this.container.appendChild(this.root);
-  }
-  getCanvasContainer() {
-    return this.canvasContainer;
-  }
-  dispose() {
-    this.container.innerHTML = "";
-  }
-  buildTabBar() {
-    const e = document.createElement("div");
-    e.className = "tabbed-tab-bar";
-    const t = [];
-    t.push({ name: "Shader", isShader: !0 }), this.project.commonSource && t.push({ name: "common.glsl", isShader: !1, source: this.project.commonSource });
-    const r = [
-      "BufferA",
-      "BufferB",
-      "BufferC",
-      "BufferD"
-    ];
-    for (const b of r) {
-      const T = this.project.passes[b];
-      T && t.push({
-        name: `${b.toLowerCase()}.glsl`,
-        isShader: !1,
-        source: T.glslSource
-      });
-    }
-    const i = this.project.passes.Image;
-    t.push({ name: "image.glsl", isShader: !1, source: i.glslSource });
-    let c = "";
-    const p = this.copyButton.innerHTML, o = `
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-        <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/>
-      </svg>
-    `;
-    this.copyButton.addEventListener("click", async () => {
-      try {
-        await navigator.clipboard.writeText(c), this.copyButton.innerHTML = o, this.copyButton.classList.add("copied"), setTimeout(() => {
-          this.copyButton.innerHTML = p, this.copyButton.classList.remove("copied");
-        }, 1500);
-      } catch (b) {
-        console.error("Failed to copy:", b);
-      }
-    });
-    const m = (b) => {
-      const T = t[b];
-      if (e.querySelectorAll(".tabbed-tab-button").forEach((E, x) => {
-        E.classList.toggle("active", x === b);
-      }), T.isShader)
-        this.canvasContainer.style.visibility = "visible", this.codeViewer.style.visibility = "hidden", this.copyButton.style.visibility = "hidden";
-      else {
-        this.canvasContainer.style.visibility = "hidden", this.codeViewer.style.visibility = "visible", this.copyButton.style.visibility = "visible", c = T.source || "";
-        const E = c.split(`
-`), x = document.createElement("pre"), y = document.createElement("div");
-        y.className = "tabbed-line-numbers", y.innerHTML = E.map((w, C) => C + 1).join(`
+function Ue(n, e, t) {
+  const r = document.createElement("div");
+  r.className = "prism-editor-wrapper";
+  const i = document.createElement("div");
+  i.className = "prism-editor-line-numbers";
+  const l = document.createElement("div");
+  l.className = "prism-editor-area";
+  const s = document.createElement("textarea");
+  s.className = "prism-editor-textarea", s.value = e, s.spellcheck = !1, s.autocapitalize = "off", s.autocomplete = "off";
+  const a = document.createElement("pre");
+  a.className = "prism-editor-highlight";
+  const f = document.createElement("code");
+  f.className = "language-cpp", a.appendChild(f), l.appendChild(s), l.appendChild(a), r.appendChild(i), r.appendChild(l), n.appendChild(r);
+  function g() {
+    const x = s.value;
+    f.textContent = x + `
+`, Ie.highlightElement(f);
+    const w = x.split(`
 `);
-        const A = document.createElement("div");
-        A.className = "tabbed-code-content";
-        const _ = document.createElement("code");
-        _.className = "language-cpp", _.textContent = c, A.appendChild(_), x.appendChild(y), x.appendChild(A), this.codeViewer.innerHTML = "", this.codeViewer.appendChild(x), te.highlightElement(_);
-      }
-    };
-    return t.forEach((b, T) => {
-      const E = document.createElement("button");
-      E.className = "tabbed-tab-button", b.isShader && E.classList.add("shader-tab"), E.textContent = b.name, T === 0 && E.classList.add("active"), E.addEventListener("click", () => m(T)), e.appendChild(E);
-    }), e;
+    i.innerHTML = w.map((A, y) => `<span>${y + 1}</span>`).join(""), t && t(x);
   }
-}
-function we(n, e) {
-  switch (n) {
-    case "fullscreen":
-      return new Te(e);
-    case "centered":
-      return new xe(e);
-    case "split":
-      return new _e(e);
-    case "tabbed":
-      return new ye(e);
+  function v() {
+    a.scrollTop = s.scrollTop, a.scrollLeft = s.scrollLeft, i.scrollTop = s.scrollTop;
   }
-}
-async function Fe(n, e, t, r) {
-  const i = `/demos/${n}/shadertoy.config.json`, c = `/demos/${n}/config.json`, p = i in t ? i : c in t ? c : null;
-  if (p) {
-    const o = await t[p]();
-    return o.passes ? Ae(n, o, e, r) : Q(n, e, o);
-  } else
-    return Q(n, e);
-}
-async function Q(n, e, t) {
-  var m, b, T;
-  const r = `/demos/${n}/image.glsl`;
-  if (!(r in e))
-    throw new Error(`Demo '${n}' not found. Expected ${r}`);
-  const i = await e[r](), c = (t == null ? void 0 : t.layout) || "tabbed", p = (t == null ? void 0 : t.controls) ?? !0, o = ((m = t == null ? void 0 : t.meta) == null ? void 0 : m.title) || n.split("-").map((E) => E.charAt(0).toUpperCase() + E.slice(1)).join(" ");
-  return {
-    root: `/demos/${n}`,
-    meta: {
-      title: o,
-      author: ((b = t == null ? void 0 : t.meta) == null ? void 0 : b.author) || null,
-      description: ((T = t == null ? void 0 : t.meta) == null ? void 0 : T.description) || null
+  function C(x) {
+    if (x.key === "Tab") {
+      x.preventDefault();
+      const w = s.selectionStart, A = s.selectionEnd, y = s.value;
+      s.value = y.substring(0, w) + "  " + y.substring(A), s.selectionStart = s.selectionEnd = w + 2, g();
+    }
+  }
+  return s.addEventListener("input", g), s.addEventListener("scroll", v), s.addEventListener("keydown", C), g(), {
+    getSource: () => s.value,
+    setSource: (x) => {
+      s.value = x, g();
     },
-    layout: c,
-    controls: p,
-    commonSource: null,
-    passes: {
-      Image: {
-        name: "Image",
-        glslSource: i,
-        channels: [
-          { kind: "none" },
-          { kind: "none" },
-          { kind: "none" },
-          { kind: "none" }
-        ]
-      }
-    },
-    textures: []
-  };
-}
-async function Ae(n, e, t, r) {
-  var _, w, C, s, a, u, l, h;
-  let i = null;
-  if (e.common) {
-    const d = `/demos/${n}/${e.common}`;
-    d in t && (i = await t[d]());
-  } else {
-    const d = `/demos/${n}/common.glsl`;
-    d in t && (i = await t[d]());
-  }
-  const c = /* @__PURE__ */ new Set(), p = ["Image", "BufferA", "BufferB", "BufferC", "BufferD"];
-  for (const d of p) {
-    const v = e.passes[d];
-    if (v)
-      for (const f of ["iChannel0", "iChannel1", "iChannel2", "iChannel3"]) {
-        const F = (_ = v.channels) == null ? void 0 : _[f];
-        F && "texture" in F && c.add(F.texture);
-      }
-  }
-  const o = [], m = /* @__PURE__ */ new Map();
-  for (const d of c) {
-    const v = `/demos/${n}/${d.replace(/^\.\//, "")}`;
-    if (!(v in r))
-      throw new Error(`Texture not found: ${d} (expected at ${v})`);
-    const f = await r[v](), F = d.split("/").pop().replace(/\.[^.]+$/, "");
-    o.push({
-      name: F,
-      source: f,
-      filter: "linear",
-      wrap: "repeat"
-    }), m.set(d, F);
-  }
-  const b = {};
-  for (const d of p) {
-    const v = e.passes[d];
-    if (!v) continue;
-    const f = {
-      Image: "image.glsl",
-      BufferA: "bufferA.glsl",
-      BufferB: "bufferB.glsl",
-      BufferC: "bufferC.glsl",
-      BufferD: "bufferD.glsl"
-    }, F = v.source || f[d], R = `/demos/${n}/${F}`;
-    if (!(R in t))
-      throw new Error(`Missing shader file: ${R}`);
-    const M = await t[R](), D = [
-      z((w = v.channels) == null ? void 0 : w.iChannel0, m),
-      z((C = v.channels) == null ? void 0 : C.iChannel1, m),
-      z((s = v.channels) == null ? void 0 : s.iChannel2, m),
-      z((a = v.channels) == null ? void 0 : a.iChannel3, m)
-    ];
-    b[d] = {
-      name: d,
-      glslSource: M,
-      channels: D
-    };
-  }
-  if (!b.Image)
-    throw new Error(`Demo '${n}' must have an Image pass`);
-  const T = ((u = e.meta) == null ? void 0 : u.title) || n.split("-").map((d) => d.charAt(0).toUpperCase() + d.slice(1)).join(" "), E = ((l = e.meta) == null ? void 0 : l.author) || null, x = ((h = e.meta) == null ? void 0 : h.description) || null, y = e.layout || "tabbed", A = e.controls ?? !0;
-  return {
-    root: `/demos/${n}`,
-    meta: { title: T, author: E, description: x },
-    layout: y,
-    controls: A,
-    commonSource: i,
-    passes: b,
-    textures: o
-  };
-}
-function z(n, e) {
-  return n ? "buffer" in n ? {
-    kind: "buffer",
-    buffer: n.buffer,
-    previous: !!n.previous
-  } : "texture" in n ? {
-    kind: "texture2D",
-    name: (e == null ? void 0 : e.get(n.texture)) || n.texture
-  } : "keyboard" in n ? { kind: "keyboard" } : { kind: "none" } : { kind: "none" };
-}
-const Ce = "course/day4/paint-basic";
-async function Re() {
-  return Fe(Ce, /* @__PURE__ */ Object.assign({
-    "/demos/course/day4/paint-basic/bufferA.glsl": () => Promise.resolve().then(() => Le).then((r) => r.default),
-    "/demos/course/day4/paint-basic/image.glsl": () => Promise.resolve().then(() => Be).then((r) => r.default)
-  }), /* @__PURE__ */ Object.assign({
-    "/demos/course/day4/paint-basic/config.json": () => Promise.resolve().then(() => Pe).then((r) => r.default)
-  }), /* @__PURE__ */ Object.assign({}));
-}
-async function De(n) {
-  const e = typeof n.container == "string" ? document.querySelector(n.container) : n.container;
-  if (!e || !(e instanceof HTMLElement))
-    throw new Error(`Container not found: ${n.container}`);
-  const t = await Re(), r = we(t.layout, {
-    container: e,
-    project: t
-  }), i = new ve({
-    container: r.getCanvasContainer(),
-    project: t,
-    pixelRatio: n.pixelRatio ?? window.devicePixelRatio
-  });
-  return i.hasErrors() || i.start(), {
-    app: i,
     destroy: () => {
-      var c;
-      (c = i.stop) == null || c.call(i);
+      s.removeEventListener("input", g), s.removeEventListener("scroll", v), s.removeEventListener("keydown", C), n.removeChild(r);
     }
   };
 }
-const Se = `void mainImage(out vec4 fragColor, in vec2 fragCoord)
+const ie = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  createEditor: Ue
+}, Symbol.toStringTag, { value: "Module" })), Ne = `void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
     vec4 prev = texelFetch(iChannel0, ivec2(fragCoord), 0);
-    
+
     float d = length(fragCoord - iMouse.xy);
-    
+
     if (iMouse.z > 0.0 && d < 10.0) {
         fragColor = vec4(1.0);
     } else {
         fragColor = prev;
     }
-}`, Le = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+}
+`, $e = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  default: Se
-}, Symbol.toStringTag, { value: "Module" })), Me = `void mainImage(out vec4 fragColor, in vec2 fragCoord)
+  default: Ne
+}, Symbol.toStringTag, { value: "Module" })), je = `void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
     fragColor = texelFetch(iChannel0, ivec2(fragCoord), 0);
-}`, Be = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+}
+`, Oe = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  default: Me
-}, Symbol.toStringTag, { value: "Module" })), ne = !0, re = {
-  BufferA: {
-    channels: {
-      iChannel0: {
-        buffer: "BufferA",
-        previous: !0
-      }
-    }
-  },
-  Image: {
-    channels: {
-      iChannel0: {
-        buffer: "BufferA"
-      }
-    }
-  }
-}, ke = {
-  controls: ne,
-  passes: re
-}, Pe = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  default: je
+}, Symbol.toStringTag, { value: "Module" })), se = "tabbed", oe = !0, ce = {
+  iChannel0: "BufferA"
+}, le = {
+  iChannel0: "BufferA"
+}, He = {
+  layout: se,
+  controls: oe,
+  BufferA: ce,
+  Image: le
+}, ze = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  controls: ne,
-  default: ke,
-  passes: re
+  BufferA: ce,
+  Image: le,
+  controls: oe,
+  default: He,
+  layout: se
 }, Symbol.toStringTag, { value: "Module" }));
 export {
-  Ce as DEMO_NAME,
-  De as embed
+  ke as DEMO_NAME,
+  Ge as embed
 };

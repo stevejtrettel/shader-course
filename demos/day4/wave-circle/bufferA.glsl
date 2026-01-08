@@ -1,6 +1,6 @@
-bool inDomain(vec2 fragCoord) {
-    vec2 center = iResolution.xy * 0.5;
-    float radius = min(iResolution.x, iResolution.y) * 0.4;
+bool inDomain(vec2 fragCoord, vec2 resolution) {
+    vec2 center = resolution * 0.5;
+    float radius = min(resolution.x, resolution.y) * 0.4;
     return length(fragCoord - center) < radius;
 }
 
@@ -10,36 +10,35 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
         fragColor = vec4(0.0);
         return;
     }
-    
-    if (!inDomain(fragCoord)) {
+
+    if (!inDomain(fragCoord, iResolution.xy)) {
         fragColor = vec4(0.0);
         return;
     }
-    
+
     ivec2 p = ivec2(fragCoord);
-    
+
     float u = texelFetch(iChannel0, p, 0).r;
     float v = texelFetch(iChannel0, p, 0).g;
-    
+
     float u_n = texelFetch(iChannel0, p + ivec2( 0,  1), 0).r;
     float u_s = texelFetch(iChannel0, p + ivec2( 0, -1), 0).r;
     float u_e = texelFetch(iChannel0, p + ivec2( 1,  0), 0).r;
     float u_w = texelFetch(iChannel0, p + ivec2(-1,  0), 0).r;
     float laplacian = u_n + u_s + u_e + u_w - 4.0 * u;
-    
+
     // Symplectic Euler
     float dt = 0.3;
     float c = 1.0;
     float newV = v + dt * c * c * laplacian;
-    
+
     if (iMouse.z > 0.0) {
         float d = length(fragCoord - iMouse.xy);
-        if (d < 20.0) {
-            newV += 0.5;
-        }
+        float sigma = 10.0;
+        newV += 0.01 * exp(-d * d / (2.0 * sigma * sigma));
     }
-    
+
     float newU = u + dt * newV;
-    
+
     fragColor = vec4(newU, newV, 0.0, 1.0);
 }
