@@ -355,13 +355,15 @@ bool inGlass(vec2 p) {
 
 Send in plane waves. A convex region of slow material acts as a converging lens — waves focus on the far side!
 
-**Part D: GRIN Lens.** A gradient-index lens has smoothly varying speed:
+**Part D: Varyind Index of Refraction.** Simulating a material with spatially varying index of refraction is simple in shadertoy - as everythign is already done per-pixel!  Here we build a lens out of a varyinhg index of refraction medium, where the index varies between 1 and 1.5, exponentially decreasing away from the center.
+
+
 ```glsl
 float n = 1.0 + 0.5 * exp(-d * d / 5000.0);  // higher index at center
 float c = 1.0 / n;
 ```
 
-This creates focusing without any sharp boundary. Real GRIN lenses are used in fiber optics and compact cameras.
+This creates focusing without any sharp boundary.
 
 **Extensions:**
 - Add absorption (multiply $u$ by a decay factor in the glass region)
