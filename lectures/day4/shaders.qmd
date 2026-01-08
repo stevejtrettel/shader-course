@@ -142,7 +142,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     if (iFrame == 0) {
         vec2 center = iResolution.xy * 0.5;
         float d = length(fragCoord - center);
-        float u = exp(-d * d / 1800.0);
+        float u = 3.0 * exp(-d * d / 100.0);
         fragColor = vec4(u, 0.0, 0.0, 1.0);
         return;
     }
@@ -219,9 +219,8 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     
     if (iMouse.z > 0.0) {
         float d = length(fragCoord - iMouse.xy);
-        if (d < 20.0) {
-            newV += 0.5;
-        }
+        float sigma = 10.0;
+        newV += 0.01 * exp(-d * d / (2.0 * sigma * sigma));
     }
     
     float newU = u + dt * newV;
@@ -292,9 +291,8 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     
     if (iMouse.z > 0.0) {
         float d = length(fragCoord - iMouse.xy);
-        if (d < 20.0) {
-            newV += 0.5;
-        }
+        float sigma = 10.0;
+        newV += 0.01 * exp(-d * d / (2.0 * sigma * sigma));
     }
     
     float newU = u + dt * newV;
@@ -387,9 +385,8 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     
     if (iMouse.z > 0.0) {
         float d = length(fragCoord - iMouse.xy);
-        if (d < 20.0) {
-            newV += 0.5;
-        }
+        float sigma = 10.0;
+        newV += 0.01 * exp(-d * d / (2.0 * sigma * sigma));
     }
     
     float newU = u + dt * newV;
@@ -456,7 +453,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
         // Off-center Gaussian bump
         vec2 center = iResolution.xy * 0.5 + vec2(50.0, 30.0);
         float d = length(fragCoord - center);
-        float u = 0.5 * exp(-d * d / 800.0);
+        float u = 3.0 * exp(-d * d / 100.0);
         fragColor = vec4(u, 0.0, 0.0, 1.0);
         return;
     }
@@ -484,9 +481,8 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     
     if (iMouse.z > 0.0) {
         float d = length(fragCoord - iMouse.xy);
-        if (d < 20.0) {
-            newV += 0.5;
-        }
+        float sigma = 10.0;
+        newV += 0.01 * exp(-d * d / (2.0 * sigma * sigma));
     }
     
     float newU = u + dt * newV;
