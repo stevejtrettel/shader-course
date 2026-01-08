@@ -41,6 +41,8 @@ website:
             href: lectures/day4/notes.qmd
           - text: "Code"
             href: lectures/day4/shaders.qmd
+          - text: "Homework"
+            href: lectures/day4/homework.qmd
       - section: "Day 5: Rendering"
         contents:
           - text: "Notes"
