@@ -1,0 +1,330 @@
+# Day 5: Exercises
+
+## Checkpoints
+
+Quick exercises to verify understanding. A few minutes each.
+
+**Checkpoint 1: Move the Sphere**
+
+In `raymarch-sphere`, the sphere is at the origin. Move it to `vec3(1.0, 0.5, 0.0)`. What changes in the code? (Just one number in `sceneSDF`.)
+
+**Checkpoint 2: Torus Proportions**
+
+In `raymarch-torus`, the torus has major radius 1.0 and minor radius 0.4. Try:
+- A thin ring: `vec2(1.0, 0.1)`
+- A fat donut: `vec2(1.0, 0.8)`
+- What happens when minor radius exceeds major radius?
+
+**Checkpoint 3: Add a Sphere to the Scene**
+
+In `scene-multi`, add a third sphere floating above the others. You'll need one more `min()` in the chain.
+
+**Checkpoint 4: Change the Light**
+
+The light direction is `normalize(vec3(1.0, 1.0, 1.0))`—from the upper-right-front. Try:
+- Light from above: `vec3(0.0, 1.0, 0.0)`
+- Light from the left: `vec3(-1.0, 0.5, 0.5)`
+
+Where do the specular highlights move?
+
+Now try animating the light:
+- Rotate the light direction with `iTime`: use `vec3(cos(iTime), 1.0, sin(iTime))`
+- Pulse the light brightness: multiply `light.color` by `0.5 + 0.5 * sin(iTime)`
+
+**Checkpoint 5: Field of View**
+
+In `generateRay`, the FOV is 90°. Try 60° (telephoto) and 120° (wide angle). How does the scene change?
+
+---
+
+## Explorations
+
+Deeper exercises that build on the core concepts.
+
+**Exploration 1: Per-Object Colors**
+
+In `scene-multi`, everything is orange. Give each object its own color.
+
+One approach: write a `sceneColor(vec3 p)` function that checks which object is closest and returns the appropriate color:
+
+```glsl
+vec3 sceneColor(vec3 p) {
+    float sphere = length(p - vec3(-1.5, 0.0, 0.0)) - 1.0;
+    float torus = sdTorus(p - vec3(1.5, 0.0, 0.0), vec2(0.8, 0.3));
+    float ground = p.y + 1.0;
+    
+    float d = sceneSDF(p);
+    if (d == sphere) return vec3(1.0, 0.0, 0.0);  // red
+    if (d == torus) return vec3(0.0, 0.7, 1.0);   // cyan
+    return vec3(0.5, 0.5, 0.5);                    // gray
+}
+```
+
+Then use `hit.color = sceneColor(p)` after raymarching.
+
+**Exploration 2: Two Lights**
+
+Add a second light source. Compute shading for both and sum the results:
+
+```glsl
+Light light1 = Light(normalize(vec3(1.0, 1.0, 1.0)), vec3(1.0, 0.9, 0.8));
+Light light2 = Light(normalize(vec3(-1.0, 0.5, 0.0)), vec3(0.2, 0.3, 0.5));
+
+vec3 ambient = hit.color * 0.1;
+vec3 color = ambient + shade(hit, light1, viewDir) + shade(hit, light2, viewDir);
+```
+
+A warm key light with a cool fill is a classic look.
+
+**Exploration 3: Fog**
+
+Add distance-based fog to create depth. After shading, blend toward a fog color based on distance traveled:
+
+```glsl
+vec3 fogColor = vec3(0.5, 0.6, 0.7);
+float fogAmount = 1.0 - exp(-t * 0.1);
+color = mix(color, fogColor, fogAmount);
+```
+
+Adjust the `0.1` to control fog density.
+
+**Exploration 4: Materials**
+
+Our `shade` function hardcodes shininess at 32. Make it a parameter by extending Hit or creating a Material struct:
+
+```glsl
+struct Material {
+    vec3 color;
+    float shininess;
+};
+```
+
+Give the sphere a tight metallic highlight (shininess = 128) and the ground a soft plastic sheen (shininess = 8).
+
+**Exploration 5: Normal Coloring**
+
+Replace shading with normal visualization: `color = normal * 0.5 + 0.5`. This maps the normal components to RGB—a useful debugging tool that also looks striking.
+
+Try variations:
+- `abs(normal)` — what changes?
+- `vec3(normal.y * 0.5 + 0.5)` — height-based coloring
+
+---
+
+## Challenges
+
+Substantial projects requiring creative problem-solving.
+
+**Challenge 1: CSG Operations**
+
+We used `min` for union. Implement intersection and subtraction:
+
+- **Intersection**: `max(a, b)` — points inside *both* shapes
+- **Subtraction**: `max(a, -b)` — points inside A but outside B
+
+Build these shapes:
+- A cube with a spherical cavity carved out
+- A sphere with a cylindrical hole through it
+- The intersection of two overlapping spheres (a lens shape)
+- A cube with cylindrical holes drilled through all three axes (a dice-like frame)
+- A torus with a wedge cut out (like Pac-Man in 3D)
+- The intersection of a cube and a sphere (a rounded cube)
+- A hollow sphere (subtract a smaller sphere from a larger one)
+
+**Challenge 2: Infinite Repetition**
+
+The `mod` function can repeat space infinitely:
+
+```glsl
+float sceneSDF(vec3 p) {
+    vec3 spacing = vec3(4.0);
+    vec3 q = mod(p + spacing * 0.5, spacing) - spacing * 0.5;
+    return length(q) - 1.0;  // Infinite grid of spheres
+}
+```
+
+Experiment with:
+- Different spacing in different directions
+- Repeating only in 2D (an infinite floor of objects)
+- Mixing repeated and non-repeated objects
+
+**Challenge 3: Smooth Blending**
+
+Sharp `min` creates hard edges where objects meet. For organic shapes, use smooth minimum:
+
+```glsl
+float smin(float a, float b, float k) {
+    float h = max(k - abs(a - b), 0.0) / k;
+    return min(a, b) - h * h * k * 0.25;
+}
+```
+
+The parameter `k` controls blend radius. Create a "metaball" effect with two spheres that merge smoothly as they approach each other.
+
+**Challenge 4: Hard Shadows**
+
+To check if a point is in shadow, raymarch from the hit point toward the light. If you hit something before reaching the light, you're in shadow:
+
+```glsl
+float shadow(vec3 origin, vec3 lightDir, float maxDist) {
+    float t = 0.02;  // Start slightly off surface
+    for (int i = 0; i < 50; i++) {
+        float d = sceneSDF(origin + lightDir * t);
+        if (d < 0.001) return 0.0;  // In shadow
+        t += d;
+        if (t > maxDist) break;
+    }
+    return 1.0;  // Lit
+}
+```
+
+Multiply your diffuse term by the shadow result.
+
+**Challenge 5: Soft Shadows**
+
+Hard shadows have sharp edges. For soft shadows, track how close the shadow ray came to occluders:
+
+```glsl
+float softShadow(vec3 origin, vec3 lightDir, float maxDist, float k) {
+    float result = 1.0;
+    float t = 0.02;
+    for (int i = 0; i < 50; i++) {
+        float d = sceneSDF(origin + lightDir * t);
+        if (d < 0.001) return 0.0;
+        result = min(result, k * d / t);
+        t += d;
+        if (t > maxDist) break;
+    }
+    return result;
+}
+```
+
+The parameter `k` controls shadow softness—smaller `k` gives softer shadows.
+
+---
+
+## Project: Algebraic Varieties
+
+An **algebraic variety** is the zero set of a polynomial—a surface defined by $f(x, y, z) = 0$. These surfaces have been studied for centuries, and some are strikingly beautiful.
+
+### Distance Estimation
+
+We can't compute an exact SDF for a general polynomial, but we can estimate the distance. Near the surface, the function value $f(\mathbf{p})$ is approximately proportional to distance, with the gradient telling us the rate of change:
+
+$$d \approx \frac{|f(\mathbf{p})|}{|\nabla f(\mathbf{p})|}$$
+
+This isn't exact, but it's good enough for raymarching:
+
+```glsl
+vec3 gradient(vec3 p) {
+    float eps = 0.001;
+    return vec3(
+        polynomial(p + vec3(eps, 0, 0)) - polynomial(p - vec3(eps, 0, 0)),
+        polynomial(p + vec3(0, eps, 0)) - polynomial(p - vec3(0, eps, 0)),
+        polynomial(p + vec3(0, 0, eps)) - polynomial(p - vec3(0, 0, eps))
+    ) / (2.0 * eps);
+}
+
+float sceneSDF(vec3 p) {
+    float f = polynomial(p);
+    vec3 g = gradient(p);
+    return 0.5 * abs(f) / length(g);  // Factor of 0.5 for safety
+}
+```
+
+The normal is just the normalized gradient: `normalize(gradient(p))`.
+
+::: {.callout-warning}
+## Singularities
+
+Near singular points where $\nabla f = 0$, the distance estimate becomes unreliable. You may see artifacts at these locations—this is expected.
+:::
+
+### Bounding Volume
+
+Algebraic varieties can extend to infinity. For efficient raymarching, first check a bounding sphere:
+
+```glsl
+float sceneSDF(vec3 p) {
+    float bounds = length(p) - 2.0;
+    if (bounds > 0.01) return bounds;
+    
+    // Inside bounds: use distance estimate
+    float f = polynomial(p);
+    vec3 g = gradient(p);
+    return 0.5 * abs(f) / length(g);
+}
+```
+
+### A Gallery of Varieties
+
+**Barth Sextic** (degree 6)—the surface from the opening demo:
+
+```glsl
+float polynomial(vec3 p) {
+    float phi = (1.0 + sqrt(5.0)) / 2.0;
+    float phi2 = phi * phi;
+    
+    float x2 = p.x * p.x, y2 = p.y * p.y, z2 = p.z * p.z;
+    
+    float a = (phi2 * x2 - y2) * (phi2 * y2 - z2) * (phi2 * z2 - x2);
+    float b = (x2 + y2 + z2 - 1.0);
+    
+    return 4.0 * a - (1.0 + 2.0 * phi) * b * b;
+}
+```
+
+The golden ratio $\phi$ gives it icosahedral symmetry.
+
+**Clebsch Diagonal Cubic** (degree 3)—contains exactly 27 lines:
+
+```glsl
+float polynomial(vec3 p) {
+    float x = p.x, y = p.y, z = p.z;
+    float x2 = x*x, y2 = y*y, z2 = z*z;
+    float x3 = x2*x, y3 = y2*y, z3 = z2*z;
+    
+    return 81.0*(x3 + y3 + z3)
+         - 189.0*(x2*y + x2*z + y2*x + y2*z + z2*x + z2*y)
+         + 54.0*x*y*z + 126.0*(x*y + x*z + y*z)
+         - 9.0*(x2 + y2 + z2) - 9.0*(x + y + z) + 1.0;
+}
+```
+
+**Cayley Cubic** (degree 3)—4 nodes:
+
+```glsl
+float polynomial(vec3 p) {
+    float x2 = p.x * p.x, y2 = p.y * p.y, z2 = p.z * p.z;
+    return x2 + y2 - x2 * p.z + y2 * p.z + z2 - 1.0;
+}
+```
+
+**Heart Surface** (degree 6)—for fun:
+
+```glsl
+float polynomial(vec3 p) {
+    float x2 = p.x * p.x, y2 = p.y * p.y, z2 = p.z * p.z;
+    float z3 = z2 * p.z;
+    
+    float a = x2 + 2.25 * y2 + z2 - 1.0;
+    return a * a * a - x2 * z3 - 0.1125 * y2 * z3;
+}
+```
+
+(Rotate 90° around X to see it upright.)
+
+### Your Task
+
+Build a shader that renders an algebraic variety. Your shader should:
+
+1. Implement distance estimation for at least one variety
+2. Use a bounding volume for efficiency
+3. Include proper lighting with surface normals
+4. Allow rotation via mouse (use `orbitCamera`)
+
+Extensions:
+- Add a second colored light
+- Implement soft shadows
+- Try multiple varieties and find your favorite
+- Animate the rotation automatically with `iTime`

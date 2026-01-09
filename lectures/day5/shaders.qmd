@@ -1,36 +1,10 @@
-# Day 5 Code
+# Day 5 Shaders
 
-Complete, standalone code for each shader referenced in Day 4. Each listing can be copied directly into [Shadertoy](https://www.shadertoy.com/new) and run immediately.
+Complete, runnable shaders for each demo in the notes.
 
+---
 
-## Common Functions
-
-These helper functions are used throughout Day 4:
-
-```glsl
-struct Ray {
-    vec3 origin;
-    vec3 dir;
-};
-
-Ray generateRay(vec2 fragCoord) {
-    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
-    uv.x *= iResolution.x / iResolution.y;
-    
-    float fov = 90.0;
-    float f = 1.0 / tan(radians(fov) / 2.0);
-    
-    Ray ray;
-    ray.origin = vec3(0.0);
-    ray.dir = normalize(vec3(uv, -f));
-    return ray;
-}
-```
-
-
-## A1. ray-visualization
-
-Visualize ray directions as colors to verify camera setup.
+## ray-visualization
 
 ```glsl
 struct Ray {
@@ -53,18 +27,14 @@ Ray generateRay(vec2 fragCoord) {
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     Ray ray = generateRay(fragCoord);
-    
-    // Map direction components from [-1,1] to [0,1] for display
     vec3 color = ray.dir * 0.5 + 0.5;
-    
     fragColor = vec4(color, 1.0);
 }
 ```
 
+---
 
-## A2. sphere-flat
-
-Sphere intersection test with flat color (no lighting).
+## sphere-flat
 
 ```glsl
 struct Ray {
@@ -92,44 +62,32 @@ float intersectSphere(Ray ray, vec3 center, float radius) {
     float c = dot(delta, delta) - radius * radius;
     float discriminant = b * b - c;
     
-    if (discriminant < 0.0) {
-        return -1.0;  // No intersection
-    }
+    if (discriminant < 0.0) return -1.0;
     
     float sqrtDisc = sqrt(discriminant);
     float t1 = -b - sqrtDisc;
     float t2 = -b + sqrtDisc;
     
-    if (t1 > 0.0) return t1;  // First intersection in front
-    if (t2 > 0.0) return t2;  // We're inside the sphere
-    return -1.0;              // Sphere is behind us
+    if (t1 > 0.0) return t1;
+    if (t2 > 0.0) return t2;
+    return -1.0;
 }
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     Ray ray = generateRay(fragCoord);
     
-    vec3 sphereCenter = vec3(0.0, 0.0, -3.0);
-    float sphereRadius = 1.0;
+    float t = intersectSphere(ray, vec3(0.0, 0.0, -3.0), 1.0);
     
-    float t = intersectSphere(ray, sphereCenter, sphereRadius);
-    
-    vec3 color;
-    if (t > 0.0) {
-        color = vec3(1.0, 0.0, 0.0);  // Red
-    }
-    else {
-        // Ray missed - background color
-        color = vec3(0.1, 0.1, 0.2);
-    }
+    vec3 color = vec3(0.1, 0.1, 0.2);
+    if (t > 0.0) color = vec3(1.0, 0.0, 0.0);
     
     fragColor = vec4(color, 1.0);
 }
 ```
 
+---
 
-## A3. sphere-normals
-
-Sphere with normals visualized as colors.
+## sphere-normals
 
 ```glsl
 struct Ray {
@@ -157,9 +115,7 @@ float intersectSphere(Ray ray, vec3 center, float radius) {
     float c = dot(delta, delta) - radius * radius;
     float discriminant = b * b - c;
     
-    if (discriminant < 0.0) {
-        return -1.0;
-    }
+    if (discriminant < 0.0) return -1.0;
     
     float sqrtDisc = sqrt(discriminant);
     float t1 = -b - sqrtDisc;
@@ -178,30 +134,37 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     
     float t = intersectSphere(ray, sphereCenter, sphereRadius);
     
-    vec3 color;
+    vec3 color = vec3(0.1, 0.1, 0.2);
     if (t > 0.0) {
         vec3 hitPoint = ray.origin + t * ray.dir;
         vec3 normal = (hitPoint - sphereCenter) / sphereRadius;
-        color = normal * 0.5 + 0.5;  // Map [-1,1] to [0,1]
-    }
-    else {
-        // Ray missed - background color
-        color = vec3(0.1, 0.1, 0.2);
+        color = normal * 0.5 + 0.5;
     }
     
     fragColor = vec4(color, 1.0);
 }
 ```
 
+---
 
-## A4. sphere-diffuse
-
-Sphere with Lambertian diffuse lighting.
+## sphere-lit
 
 ```glsl
 struct Ray {
     vec3 origin;
     vec3 dir;
+};
+
+struct Hit {
+    float t;
+    vec3 point;
+    vec3 normal;
+    vec3 color;
+};
+
+struct Light {
+    vec3 dir;
+    vec3 color;
 };
 
 Ray generateRay(vec2 fragCoord) {
@@ -217,68 +180,77 @@ Ray generateRay(vec2 fragCoord) {
     return ray;
 }
 
-float intersectSphere(Ray ray, vec3 center, float radius) {
-    vec3 delta = ray.origin - center;
+Hit intersectSphere(Ray ray, vec3 center, float radius, vec3 color) {
+    Hit hit;
+    hit.t = -1.0;
     
+    vec3 delta = ray.origin - center;
     float b = dot(delta, ray.dir);
     float c = dot(delta, delta) - radius * radius;
     float discriminant = b * b - c;
     
-    if (discriminant < 0.0) {
-        return -1.0;
-    }
+    if (discriminant < 0.0) return hit;
     
     float sqrtDisc = sqrt(discriminant);
     float t1 = -b - sqrtDisc;
     float t2 = -b + sqrtDisc;
     
-    if (t1 > 0.0) return t1;
-    if (t2 > 0.0) return t2;
-    return -1.0;
+    if (t1 > 0.0) hit.t = t1;
+    else if (t2 > 0.0) hit.t = t2;
+    else return hit;
+    
+    hit.point = ray.origin + hit.t * ray.dir;
+    hit.normal = (hit.point - center) / radius;
+    hit.color = color;
+    return hit;
+}
+
+vec3 shade(Hit hit, Light light, vec3 viewDir) {
+    float diffuse = max(0.0, dot(hit.normal, light.dir));
+    vec3 reflected = reflect(-light.dir, hit.normal);
+    float specular = pow(max(0.0, dot(reflected, viewDir)), 32.0);
+    
+    vec3 diff = hit.color * light.color * diffuse;
+    vec3 spec = light.color * specular * 0.5;
+    return diff + spec;
 }
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     Ray ray = generateRay(fragCoord);
+    Light light = Light(normalize(vec3(1.0, 1.0, 1.0)), vec3(1.0));
     
-    // Scene
-    vec3 sphereCenter = vec3(0.0, 0.0, -3.0);
-    float sphereRadius = 1.0;
+    Hit hit = intersectSphere(ray, vec3(0.0, 0.0, -3.0), 1.0, vec3(1.0, 0.0, 0.0));
     
-    float t = intersectSphere(ray, sphereCenter, sphereRadius);
-    
-    vec3 color;
-    if (t > 0.0) {
-        // Compute hit point and normal
-        vec3 hitPoint = ray.origin + t * ray.dir;
-        vec3 normal = (hitPoint - sphereCenter) / sphereRadius;
-        
-        // Lighting
-        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));  // Direction toward light
-        float diffuse = max(0.0, dot(normal, lightDir));
-        
-        // Shading
-        vec3 sphereColor = vec3(1.0, 0.0, 0.0);
-        float ambient = 0.1;
-        color = sphereColor * (ambient + diffuse);
-    }
-    else {
-        // Ray missed - background color
-        color = vec3(0.1, 0.1, 0.2);
+    vec3 color = vec3(0.1, 0.1, 0.2);
+    if (hit.t > 0.0) {
+        vec3 ambient = hit.color * 0.1;
+        color = ambient + shade(hit, light, -ray.dir);
     }
     
     fragColor = vec4(color, 1.0);
 }
 ```
 
+---
 
-## A5. sphere-lit
-
-Sphere with diffuse and specular lighting.
+## sphere-orbit
 
 ```glsl
 struct Ray {
     vec3 origin;
     vec3 dir;
+};
+
+struct Hit {
+    float t;
+    vec3 point;
+    vec3 normal;
+    vec3 color;
+};
+
+struct Light {
+    vec3 dir;
+    vec3 color;
 };
 
 Ray generateRay(vec2 fragCoord) {
@@ -294,76 +266,100 @@ Ray generateRay(vec2 fragCoord) {
     return ray;
 }
 
-float intersectSphere(Ray ray, vec3 center, float radius) {
-    vec3 delta = ray.origin - center;
+mat3 rotateX(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(1, 0, 0, 0, c, -s, 0, s, c);
+}
+
+mat3 rotateY(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
+}
+
+Ray orbitCamera(Ray ray, float distance) {
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
     
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+Hit intersectSphere(Ray ray, vec3 center, float radius, vec3 color) {
+    Hit hit;
+    hit.t = -1.0;
+    
+    vec3 delta = ray.origin - center;
     float b = dot(delta, ray.dir);
     float c = dot(delta, delta) - radius * radius;
     float discriminant = b * b - c;
     
-    if (discriminant < 0.0) {
-        return -1.0;
-    }
+    if (discriminant < 0.0) return hit;
     
     float sqrtDisc = sqrt(discriminant);
     float t1 = -b - sqrtDisc;
     float t2 = -b + sqrtDisc;
     
-    if (t1 > 0.0) return t1;
-    if (t2 > 0.0) return t2;
-    return -1.0;
+    if (t1 > 0.0) hit.t = t1;
+    else if (t2 > 0.0) hit.t = t2;
+    else return hit;
+    
+    hit.point = ray.origin + hit.t * ray.dir;
+    hit.normal = (hit.point - center) / radius;
+    hit.color = color;
+    return hit;
+}
+
+vec3 shade(Hit hit, Light light, vec3 viewDir) {
+    float diffuse = max(0.0, dot(hit.normal, light.dir));
+    vec3 reflected = reflect(-light.dir, hit.normal);
+    float specular = pow(max(0.0, dot(reflected, viewDir)), 32.0);
+    
+    vec3 diff = hit.color * light.color * diffuse;
+    vec3 spec = light.color * specular * 0.5;
+    return diff + spec;
 }
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 5.0);
     
-    // Scene
-    vec3 sphereCenter = vec3(0.0, 0.0, -3.0);
-    float sphereRadius = 1.0;
+    Light light = Light(normalize(vec3(1.0, 1.0, 1.0)), vec3(1.0));
     
-    float t = intersectSphere(ray, sphereCenter, sphereRadius);
+    Hit hit = intersectSphere(ray, vec3(0.0), 1.0, vec3(1.0, 0.0, 0.0));
     
-    vec3 color;
-    if (t > 0.0) {
-        // Compute hit point and normal
-        vec3 hitPoint = ray.origin + t * ray.dir;
-        vec3 normal = (hitPoint - sphereCenter) / sphereRadius;
-        
-        // Directions
-        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));  // Toward light
-        vec3 viewDir = -ray.dir;                         // Toward camera
-        vec3 reflectDir = reflect(-lightDir, normal);    // Light reflected about normal
-        
-        // Diffuse: brightness based on angle to light
-        float diffuse = max(0.0, dot(normal, lightDir));
-        
-        // Specular: bright spot where reflection aligns with view
-        float shininess = 32.0;
-        float specular = pow(max(0.0, dot(reflectDir, viewDir)), shininess);
-        
-        // Combine lighting
-        vec3 sphereColor = vec3(1.0, 0.0, 0.0);
-        float ambient = 0.1;
-        color = sphereColor * (ambient + diffuse) + vec3(1.0) * specular * 0.5;
-    }
-    else {
-        // Ray missed - background color
-        color = vec3(0.1, 0.1, 0.2);
+    vec3 color = vec3(0.1, 0.1, 0.2);
+    if (hit.t > 0.0) {
+        vec3 ambient = hit.color * 0.1;
+        color = ambient + shade(hit, light, -ray.dir);
     }
     
     fragColor = vec4(color, 1.0);
 }
 ```
 
+---
 
-## A6. torus-analytical
-
-Analytical ray-torus intersection using quartic solver.
+## torus-analytical
 
 ```glsl
 struct Ray {
     vec3 origin;
     vec3 dir;
+};
+
+struct Hit {
+    float t;
+    vec3 point;
+    vec3 normal;
+    vec3 color;
+};
+
+struct Light {
+    vec3 dir;
+    vec3 color;
 };
 
 Ray generateRay(vec2 fragCoord) {
@@ -376,12 +372,33 @@ Ray generateRay(vec2 fragCoord) {
     Ray ray;
     ray.origin = vec3(0.0);
     ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+mat3 rotateX(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(1, 0, 0, 0, c, -s, 0, s, c);
+}
+
+mat3 rotateY(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
+}
+
+Ray orbitCamera(Ray ray, float distance) {
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
+    
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
+    ray.dir = rot * ray.dir;
     return ray;
 }
 
 // Torus intersection by Inigo Quilez
 // https://iquilezles.org/articles/intersectors/
-float intersectTorus(Ray ray, vec2 tor) {
+float intersectTorusRaw(Ray ray, vec2 tor) {
     float po = 1.0;
     float Ra2 = tor.x * tor.x;
     float ra2 = tor.y * tor.y;
@@ -389,19 +406,16 @@ float intersectTorus(Ray ray, vec2 tor) {
     float m = dot(ray.origin, ray.origin);
     float n = dot(ray.origin, ray.dir);
     
-    // Bounding sphere check
     float h = n*n - m + (tor.x + tor.y) * (tor.x + tor.y);
-    if(h < 0.0) return -1.0;
+    if (h < 0.0) return -1.0;
     
-    // Find quartic coefficients
     float k = (m - ra2 - Ra2) / 2.0;
     float k3 = n;
-    float k2 = n*n + Ra2*ray.dir.z*ray.dir.z + k;
-    float k1 = k*n + Ra2*ray.origin.z*ray.dir.z;
-    float k0 = k*k + Ra2*ray.origin.z*ray.origin.z - Ra2*ra2;
+    float k2 = n*n + Ra2*ray.dir.y*ray.dir.y + k;
+    float k1 = k*n + Ra2*ray.origin.y*ray.dir.y;
+    float k0 = k*k + Ra2*ray.origin.y*ray.origin.y - Ra2*ra2;
     
-    // Prevent numerical issues
-    if(abs(k3*(k3*k3 - k2) + k1) < 0.01) {
+    if (abs(k3*(k3*k3 - k2) + k1) < 0.01) {
         po = -1.0;
         float tmp = k1; k1 = k3; k3 = tmp;
         k0 = 1.0/k0;
@@ -424,13 +438,10 @@ float intersectTorus(Ray ray, vec2 tor) {
     float h2 = R*R - Q*Q*Q;
     float z = 0.0;
     
-    if(h2 < 0.0) {
-        // 4 intersections
+    if (h2 < 0.0) {
         float sQ = sqrt(Q);
         z = 2.0*sQ*cos(acos(R/(sQ*Q)) / 3.0);
-    }
-    else {
-        // 2 intersections
+    } else {
         float sQ = pow(sqrt(h2) + abs(R), 1.0/3.0);
         z = sign(R)*abs(sQ + Q/sQ);
     }
@@ -440,12 +451,11 @@ float intersectTorus(Ray ray, vec2 tor) {
     float d1 = z - 3.0*c2;
     float d2 = z*z - 3.0*c0;
     
-    if(abs(d1) < 1.0e-4) {
-        if(d2 < 0.0) return -1.0;
+    if (abs(d1) < 1.0e-4) {
+        if (d2 < 0.0) return -1.0;
         d2 = sqrt(d2);
-    }
-    else {
-        if(d1 < 0.0) return -1.0;
+    } else {
+        if (d1 < 0.0) return -1.0;
         d1 = sqrt(d1/2.0);
         d2 = c1/d1;
     }
@@ -453,265 +463,80 @@ float intersectTorus(Ray ray, vec2 tor) {
     float result = 1e20;
     
     h2 = d1*d1 - z + d2;
-    if(h2 > 0.0) {
+    if (h2 > 0.0) {
         h2 = sqrt(h2);
         float t1 = -d1 - h2 - k3;
         float t2 = -d1 + h2 - k3;
         t1 = (po < 0.0) ? 2.0/t1 : t1;
         t2 = (po < 0.0) ? 2.0/t2 : t2;
-        if(t1 > 0.0) result = t1;
-        if(t2 > 0.0) result = min(result, t2);
+        if (t1 > 0.0) result = t1;
+        if (t2 > 0.0) result = min(result, t2);
     }
     
     h2 = d1*d1 - z - d2;
-    if(h2 > 0.0) {
+    if (h2 > 0.0) {
         h2 = sqrt(h2);
         float t1 = d1 - h2 - k3;
         float t2 = d1 + h2 - k3;
         t1 = (po < 0.0) ? 2.0/t1 : t1;
         t2 = (po < 0.0) ? 2.0/t2 : t2;
-        if(t1 > 0.0) result = min(result, t1);
-        if(t2 > 0.0) result = min(result, t2);
+        if (t1 > 0.0) result = min(result, t1);
+        if (t2 > 0.0) result = min(result, t2);
     }
     
-    if(result > 1e10) return -1.0;
+    if (result > 1e10) return -1.0;
     return result;
 }
 
 vec3 torusNormal(vec3 p, vec2 tor) {
     float R = tor.x;
-    float denom = sqrt(p.x*p.x + p.y*p.y);
-    return normalize(vec3(
-        p.x * (1.0 - R/denom),
-        p.y * (1.0 - R/denom),
-        p.z
-    ));
+    float k = sqrt(p.x*p.x + p.z*p.z);
+    return normalize(vec3(p.x * (1.0 - R/k), p.y, p.z * (1.0 - R/k)));
+}
+
+Hit intersectTorus(Ray ray, vec2 tor, vec3 color) {
+    Hit hit;
+    hit.t = intersectTorusRaw(ray, tor);
+    if (hit.t > 0.0) {
+        hit.point = ray.origin + hit.t * ray.dir;
+        hit.normal = torusNormal(hit.point, tor);
+        hit.color = color;
+    }
+    return hit;
+}
+
+vec3 shade(Hit hit, Light light, vec3 viewDir) {
+    float diffuse = max(0.0, dot(hit.normal, light.dir));
+    vec3 reflected = reflect(-light.dir, hit.normal);
+    float specular = pow(max(0.0, dot(reflected, viewDir)), 32.0);
+    
+    vec3 diff = hit.color * light.color * diffuse;
+    vec3 spec = light.color * specular * 0.5;
+    return diff + spec;
 }
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 4.0);
     
-    // Torus parameters: (major radius, minor radius)
-    vec2 torus = vec2(1.0, 0.4);
+    Light light = Light(normalize(vec3(1.0, 1.0, 1.0)), vec3(1.0));
     
-    // Move torus in front of camera
-    ray.origin.z += 3.0;
+    // Torus with major radius 1.0, minor radius 0.4
+    Hit hit = intersectTorus(ray, vec2(1.0, 0.4), vec3(0.0, 0.7, 1.0));
     
-    float t = intersectTorus(ray, torus);
-    
-    vec3 color;
-    if (t > 0.0) {
-        vec3 hitPoint = ray.origin + t * ray.dir;
-        vec3 normal = torusNormal(hitPoint, torus);
-        
-        // Lighting (same as sphere)
-        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
-        vec3 viewDir = -ray.dir;
-        vec3 reflectDir = reflect(-lightDir, normal);
-        
-        float diffuse = max(0.0, dot(normal, lightDir));
-        float specular = pow(max(0.0, dot(reflectDir, viewDir)), 32.0);
-        
-        vec3 torusColor = vec3(0.0, 0.7, 1.0);
-        float ambient = 0.1;
-        color = torusColor * (ambient + diffuse) + vec3(1.0) * specular * 0.5;
-    }
-    else {
-        // Ray missed - background color
-        color = vec3(0.1, 0.1, 0.2);
+    vec3 color = vec3(0.1, 0.1, 0.2);
+    if (hit.t > 0.0) {
+        vec3 ambient = hit.color * 0.1;
+        color = ambient + shade(hit, light, -ray.dir);
     }
     
     fragColor = vec4(color, 1.0);
 }
 ```
 
+---
 
-## A7. torus-rotating
-
-Analytical torus rotating around the X axis.
-
-```glsl
-struct Ray {
-    vec3 origin;
-    vec3 dir;
-};
-
-Ray generateRay(vec2 fragCoord) {
-    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
-    uv.x *= iResolution.x / iResolution.y;
-    
-    float fov = 90.0;
-    float f = 1.0 / tan(radians(fov) / 2.0);
-    
-    Ray ray;
-    ray.origin = vec3(0.0);
-    ray.dir = normalize(vec3(uv, -f));
-    return ray;
-}
-
-// Rotation matrix around X axis
-mat3 rotateX(float angle) {
-    float c = cos(angle);
-    float s = sin(angle);
-    return mat3(
-        1.0, 0.0, 0.0,
-        0.0, c, -s,
-        0.0, s, c
-    );
-}
-
-// Torus intersection by Inigo Quilez
-// https://iquilezles.org/articles/intersectors/
-float intersectTorus(Ray ray, vec2 tor) {
-    float po = 1.0;
-    float Ra2 = tor.x * tor.x;
-    float ra2 = tor.y * tor.y;
-    
-    float m = dot(ray.origin, ray.origin);
-    float n = dot(ray.origin, ray.dir);
-    
-    float h = n*n - m + (tor.x + tor.y) * (tor.x + tor.y);
-    if(h < 0.0) return -1.0;
-    
-    float k = (m - ra2 - Ra2) / 2.0;
-    float k3 = n;
-    float k2 = n*n + Ra2*ray.dir.z*ray.dir.z + k;
-    float k1 = k*n + Ra2*ray.origin.z*ray.dir.z;
-    float k0 = k*k + Ra2*ray.origin.z*ray.origin.z - Ra2*ra2;
-    
-    if(abs(k3*(k3*k3 - k2) + k1) < 0.01) {
-        po = -1.0;
-        float tmp = k1; k1 = k3; k3 = tmp;
-        k0 = 1.0/k0;
-        k1 = k1*k0;
-        k2 = k2*k0;
-        k3 = k3*k0;
-    }
-    
-    float c2 = 2.0*k2 - 3.0*k3*k3;
-    float c1 = k3*(k3*k3 - k2) + k1;
-    float c0 = k3*(k3*(-3.0*k3*k3 + 4.0*k2) - 8.0*k1) + 4.0*k0;
-    
-    c2 /= 3.0;
-    c1 *= 2.0;
-    c0 /= 3.0;
-    
-    float Q = c2*c2 + c0;
-    float R = 3.0*c0*c2 - c2*c2*c2 - c1*c1;
-    
-    float h2 = R*R - Q*Q*Q;
-    float z = 0.0;
-    
-    if(h2 < 0.0) {
-        float sQ = sqrt(Q);
-        z = 2.0*sQ*cos(acos(R/(sQ*Q)) / 3.0);
-    }
-    else {
-        float sQ = pow(sqrt(h2) + abs(R), 1.0/3.0);
-        z = sign(R)*abs(sQ + Q/sQ);
-    }
-    
-    z = c2 - z;
-    
-    float d1 = z - 3.0*c2;
-    float d2 = z*z - 3.0*c0;
-    
-    if(abs(d1) < 1.0e-4) {
-        if(d2 < 0.0) return -1.0;
-        d2 = sqrt(d2);
-    }
-    else {
-        if(d1 < 0.0) return -1.0;
-        d1 = sqrt(d1/2.0);
-        d2 = c1/d1;
-    }
-    
-    float result = 1e20;
-    
-    h2 = d1*d1 - z + d2;
-    if(h2 > 0.0) {
-        h2 = sqrt(h2);
-        float t1 = -d1 - h2 - k3;
-        float t2 = -d1 + h2 - k3;
-        t1 = (po < 0.0) ? 2.0/t1 : t1;
-        t2 = (po < 0.0) ? 2.0/t2 : t2;
-        if(t1 > 0.0) result = t1;
-        if(t2 > 0.0) result = min(result, t2);
-    }
-    
-    h2 = d1*d1 - z - d2;
-    if(h2 > 0.0) {
-        h2 = sqrt(h2);
-        float t1 = d1 - h2 - k3;
-        float t2 = d1 + h2 - k3;
-        t1 = (po < 0.0) ? 2.0/t1 : t1;
-        t2 = (po < 0.0) ? 2.0/t2 : t2;
-        if(t1 > 0.0) result = min(result, t1);
-        if(t2 > 0.0) result = min(result, t2);
-    }
-    
-    if(result > 1e10) return -1.0;
-    return result;
-}
-
-vec3 torusNormal(vec3 p, vec2 tor) {
-    float R = tor.x;
-    float denom = sqrt(p.x*p.x + p.y*p.y);
-    return normalize(vec3(
-        p.x * (1.0 - R/denom),
-        p.y * (1.0 - R/denom),
-        p.z
-    ));
-}
-
-void mainImage(out vec4 fragColor, in vec2 fragCoord) {
-    Ray ray = generateRay(fragCoord);
-    
-    // Torus parameters: (major radius, minor radius)
-    vec2 torus = vec2(1.0, 0.4);
-    
-    // Rotate ray into torus local space
-    mat3 rot = rotateX(iTime);
-    Ray localRay;
-    localRay.origin = rot * (ray.origin + vec3(0.0, 0.0, 3.0));
-    localRay.dir = rot * ray.dir;
-    
-    float t = intersectTorus(localRay, torus);
-    
-    vec3 color;
-    if (t > 0.0) {
-        vec3 localHit = localRay.origin + t * localRay.dir;
-        vec3 localNormal = torusNormal(localHit, torus);
-        
-        // Rotate normal back to world space
-        vec3 normal = transpose(rot) * localNormal;
-        
-        // Lighting in world space
-        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
-        vec3 viewDir = -ray.dir;
-        vec3 reflectDir = reflect(-lightDir, normal);
-        
-        float diffuse = max(0.0, dot(normal, lightDir));
-        float specular = pow(max(0.0, dot(reflectDir, viewDir)), 32.0);
-        
-        vec3 torusColor = vec3(0.0, 0.7, 1.0);
-        float ambient = 0.1;
-        color = torusColor * (ambient + diffuse) + vec3(1.0) * specular * 0.5;
-    }
-    else {
-        // Ray missed - background color
-        color = vec3(0.1, 0.1, 0.2);
-    }
-    
-    fragColor = vec4(color, 1.0);
-}
-```
-
-
-
-## A8. sdf-circle-2d
-
-2D circle SDF visualization with contour lines.
+## sdf-circle-2d
 
 ```glsl
 float sdCircle(vec2 p, float r) {
@@ -719,35 +544,37 @@ float sdCircle(vec2 p, float r) {
 }
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
-    // Normalized coordinates centered at origin
     vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
     uv.x *= iResolution.x / iResolution.y;
-    uv *= 2.0;  // Scale to [-2, 2]
+    vec2 p = uv * 2.0;
     
-    // Evaluate SDF
-    float d = sdCircle(uv, 1.0);
+    float d = sdCircle(p, 1.0);
     
-    // Color by sign: orange outside, blue inside
-    vec3 color = (d > 0.0) ? vec3(1.0, 0.6, 0.2) : vec3(0.2, 0.4, 0.8);
+    // Color by sign: blue inside, orange outside
+    vec3 color;
+    if (d < 0.0) {
+        color = vec3(0.2, 0.4, 0.8);  // inside: blue
+    } else {
+        color = vec3(0.9, 0.6, 0.2);  // outside: orange
+    }
     
-    // Darken based on distance (further = darker)
-    color *= 1.0 - 0.3 * abs(d);
+    // Darken near the boundary
+    color *= 1.0 - exp(-6.0 * abs(d));
     
     // Contour lines
-    float contour = abs(fract(d * 4.0 + 0.5) - 0.5) * 2.0;
-    color *= 0.5 + 0.5 * smoothstep(0.0, 0.05, contour);
+    float contour = abs(fract(d * 4.0 + 0.5) - 0.5);
+    color = mix(vec3(1.0), color, smoothstep(0.0, 0.05, contour));
     
-    // Highlight the zero contour (the actual circle)
+    // Highlight the zero level set
     color = mix(vec3(1.0), color, smoothstep(0.0, 0.02, abs(d)));
     
     fragColor = vec4(color, 1.0);
 }
 ```
 
+---
 
-## A9. sdf-box-2d
-
-2D box SDF visualization with contour lines.
+## sdf-box-2d
 
 ```glsl
 float sdBox(vec2 p, vec2 halfSize) {
@@ -756,40 +583,54 @@ float sdBox(vec2 p, vec2 halfSize) {
 }
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
-    // Normalized coordinates centered at origin
     vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
     uv.x *= iResolution.x / iResolution.y;
-    uv *= 2.0;  // Scale to [-2, 2]
+    vec2 p = uv * 2.0;
     
-    // Evaluate SDF
-    float d = sdBox(uv, vec2(1.0, 0.6));
+    float d = sdBox(p, vec2(0.8, 0.5));
     
-    // Color by sign: orange outside, blue inside
-    vec3 color = (d > 0.0) ? vec3(1.0, 0.6, 0.2) : vec3(0.2, 0.4, 0.8);
+    // Color by sign: blue inside, orange outside
+    vec3 color;
+    if (d < 0.0) {
+        color = vec3(0.2, 0.4, 0.8);  // inside: blue
+    } else {
+        color = vec3(0.9, 0.6, 0.2);  // outside: orange
+    }
     
-    // Darken based on distance (further = darker)
-    color *= 1.0 - 0.3 * abs(d);
+    // Darken near the boundary
+    color *= 1.0 - exp(-6.0 * abs(d));
     
     // Contour lines
-    float contour = abs(fract(d * 4.0 + 0.5) - 0.5) * 2.0;
-    color *= 0.5 + 0.5 * smoothstep(0.0, 0.05, contour);
+    float contour = abs(fract(d * 4.0 + 0.5) - 0.5);
+    color = mix(vec3(1.0), color, smoothstep(0.0, 0.05, contour));
     
-    // Highlight the zero contour (the actual box boundary)
+    // Highlight the zero level set
     color = mix(vec3(1.0), color, smoothstep(0.0, 0.02, abs(d)));
     
     fragColor = vec4(color, 1.0);
 }
 ```
 
+---
 
-## A10. raymarch-sphere
-
-Raymarched sphere with lighting.
+## raymarch-sphere
 
 ```glsl
 struct Ray {
     vec3 origin;
     vec3 dir;
+};
+
+struct Hit {
+    float t;
+    vec3 point;
+    vec3 normal;
+    vec3 color;
+};
+
+struct Light {
+    vec3 dir;
+    vec3 color;
 };
 
 Ray generateRay(vec2 fragCoord) {
@@ -805,15 +646,32 @@ Ray generateRay(vec2 fragCoord) {
     return ray;
 }
 
-float sdSphere(vec3 p, vec3 center, float radius) {
-    return length(p - center) - radius;
+mat3 rotateX(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(1, 0, 0, 0, c, -s, 0, s, c);
+}
+
+mat3 rotateY(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
+}
+
+Ray orbitCamera(Ray ray, float distance) {
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
+    
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
+    ray.dir = rot * ray.dir;
+    return ray;
 }
 
 float sceneSDF(vec3 p) {
-    return sdSphere(p, vec3(0.0, 0.0, -3.0), 1.0);
+    return length(p) - 1.0;  // Unit sphere at origin
 }
 
-vec3 estimateNormal(vec3 p) {
+vec3 calcNormal(vec3 p) {
     float eps = 0.001;
     return normalize(vec3(
         sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
@@ -829,59 +687,73 @@ float raymarch(Ray ray) {
         vec3 p = ray.origin + t * ray.dir;
         float d = sceneSDF(p);
         
-        if (d < 0.001) {
-            return t;
-        }
+        if (d < 0.001) return t;
         
         t += d;
         
-        if (t > 100.0) {
-            return -1.0;
-        }
+        if (t > 100.0) return -1.0;
     }
     
     return -1.0;
 }
 
+vec3 shade(Hit hit, Light light, vec3 viewDir) {
+    float diffuse = max(0.0, dot(hit.normal, light.dir));
+    vec3 reflected = reflect(-light.dir, hit.normal);
+    float specular = pow(max(0.0, dot(reflected, viewDir)), 32.0);
+    
+    vec3 diff = hit.color * light.color * diffuse;
+    vec3 spec = light.color * specular * 0.5;
+    return diff + spec;
+}
+
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 5.0);
+    
+    Light light = Light(normalize(vec3(1.0, 1.0, 1.0)), vec3(1.0));
     
     float t = raymarch(ray);
     
-    vec3 color;
+    vec3 color = vec3(0.1, 0.1, 0.2);
     if (t > 0.0) {
-        vec3 hitPoint = ray.origin + t * ray.dir;
-        vec3 normal = estimateNormal(hitPoint);
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 normal = calcNormal(p);
         
-        // Lighting
-        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
-        vec3 viewDir = -ray.dir;
-        vec3 reflectDir = reflect(-lightDir, normal);
+        Hit hit;
+        hit.t = t;
+        hit.point = p;
+        hit.normal = normal;
+        hit.color = vec3(1.0, 0.0, 0.0);
         
-        float diffuse = max(0.0, dot(normal, lightDir));
-        float specular = pow(max(0.0, dot(reflectDir, viewDir)), 32.0);
-        
-        vec3 sphereColor = vec3(1.0, 0.0, 0.0);
-        float ambient = 0.1;
-        color = sphereColor * (ambient + diffuse) + vec3(1.0) * specular * 0.5;
-    }
-    else {
-        color = vec3(0.1, 0.1, 0.2);
+        vec3 ambient = hit.color * 0.1;
+        color = ambient + shade(hit, light, -ray.dir);
     }
     
     fragColor = vec4(color, 1.0);
 }
 ```
 
+---
 
-## A11. raymarch-torus
-
-Raymarched torus - same code, different SDF.
+## raymarch-torus
 
 ```glsl
 struct Ray {
     vec3 origin;
     vec3 dir;
+};
+
+struct Hit {
+    float t;
+    vec3 point;
+    vec3 normal;
+    vec3 color;
+};
+
+struct Light {
+    vec3 dir;
+    vec3 color;
 };
 
 Ray generateRay(vec2 fragCoord) {
@@ -894,19 +766,168 @@ Ray generateRay(vec2 fragCoord) {
     Ray ray;
     ray.origin = vec3(0.0);
     ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+mat3 rotateX(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(1, 0, 0, 0, c, -s, 0, s, c);
+}
+
+mat3 rotateY(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
+}
+
+Ray orbitCamera(Ray ray, float distance) {
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
+    
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+float sceneSDF(vec3 p) {
+    vec2 tor = vec2(1.0, 0.4);  // major radius, minor radius
+    vec2 q = vec2(length(p.xz) - tor.x, p.y);
+    return length(q) - tor.y;
+}
+
+vec3 calcNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
+        sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0)),
+        sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    
+    for (int i = 0; i < 100; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
+        
+        if (d < 0.001) return t;
+        
+        t += d;
+        
+        if (t > 100.0) return -1.0;
+    }
+    
+    return -1.0;
+}
+
+vec3 shade(Hit hit, Light light, vec3 viewDir) {
+    float diffuse = max(0.0, dot(hit.normal, light.dir));
+    vec3 reflected = reflect(-light.dir, hit.normal);
+    float specular = pow(max(0.0, dot(reflected, viewDir)), 32.0);
+    
+    vec3 diff = hit.color * light.color * diffuse;
+    vec3 spec = light.color * specular * 0.5;
+    return diff + spec;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 4.0);
+    
+    Light light = Light(normalize(vec3(1.0, 1.0, 1.0)), vec3(1.0));
+    
+    float t = raymarch(ray);
+    
+    vec3 color = vec3(0.1, 0.1, 0.2);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 normal = calcNormal(p);
+        
+        Hit hit;
+        hit.t = t;
+        hit.point = p;
+        hit.normal = normal;
+        hit.color = vec3(0.0, 0.7, 1.0);
+        
+        vec3 ambient = hit.color * 0.1;
+        color = ambient + shade(hit, light, -ray.dir);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## scene-multi
+
+```glsl
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+struct Hit {
+    float t;
+    vec3 point;
+    vec3 normal;
+    vec3 color;
+};
+
+struct Light {
+    vec3 dir;
+    vec3 color;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+    
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+mat3 rotateX(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(1, 0, 0, 0, c, -s, 0, s, c);
+}
+
+mat3 rotateY(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
+}
+
+Ray orbitCamera(Ray ray, float distance) {
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
+    
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
+    ray.dir = rot * ray.dir;
     return ray;
 }
 
 float sdTorus(vec3 p, vec2 tor) {
-    vec2 q = vec2(length(p.xy) - tor.x, p.z);
+    vec2 q = vec2(length(p.xz) - tor.x, p.y);
     return length(q) - tor.y;
 }
 
 float sceneSDF(vec3 p) {
-    return sdTorus(p, vec2(1.0, 0.4));
+    float sphere = length(p - vec3(-1.5, 0.0, 0.0)) - 1.0;
+    float torus = sdTorus(p - vec3(1.5, 0.0, 0.0), vec2(0.8, 0.3));
+    float ground = p.y + 1.0;
+    return min(sphere, min(torus, ground));
 }
 
-vec3 estimateNormal(vec3 p) {
+vec3 calcNormal(vec3 p) {
     float eps = 0.001;
     return normalize(vec3(
         sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
@@ -922,197 +943,73 @@ float raymarch(Ray ray) {
         vec3 p = ray.origin + t * ray.dir;
         float d = sceneSDF(p);
         
-        if (d < 0.001) {
-            return t;
-        }
+        if (d < 0.001) return t;
         
         t += d;
         
-        if (t > 100.0) {
-            return -1.0;
-        }
+        if (t > 100.0) return -1.0;
     }
     
     return -1.0;
 }
 
+vec3 shade(Hit hit, Light light, vec3 viewDir) {
+    float diffuse = max(0.0, dot(hit.normal, light.dir));
+    vec3 reflected = reflect(-light.dir, hit.normal);
+    float specular = pow(max(0.0, dot(reflected, viewDir)), 32.0);
+    
+    vec3 diff = hit.color * light.color * diffuse;
+    vec3 spec = light.color * specular * 0.5;
+    return diff + spec;
+}
+
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 6.0);
     
-    // Move camera back to see the torus
-    ray.origin.z += 3.0;
+    Light light = Light(normalize(vec3(1.0, 1.0, 1.0)), vec3(1.0));
     
     float t = raymarch(ray);
     
-    vec3 color;
+    vec3 color = vec3(0.1, 0.1, 0.2);
     if (t > 0.0) {
-        vec3 hitPoint = ray.origin + t * ray.dir;
-        vec3 normal = estimateNormal(hitPoint);
-        
-        // Lighting
-        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
-        vec3 viewDir = -ray.dir;
-        vec3 reflectDir = reflect(-lightDir, normal);
-        
-        float diffuse = max(0.0, dot(normal, lightDir));
-        float specular = pow(max(0.0, dot(reflectDir, viewDir)), 32.0);
-        
-        vec3 torusColor = vec3(0.0, 0.7, 1.0);
-        float ambient = 0.1;
-        color = torusColor * (ambient + diffuse) + vec3(1.0) * specular * 0.5;
-    }
-    else {
-        color = vec3(0.1, 0.1, 0.2);
-    }
-    
-    fragColor = vec4(color, 1.0);
-}
-```
-
-
-## A12. scene-multi
-
-Multi-object scene with materials.
-
-```glsl
-struct Ray {
-    vec3 origin;
-    vec3 dir;
-};
-
-Ray generateRay(vec2 fragCoord) {
-    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
-    uv.x *= iResolution.x / iResolution.y;
-    
-    float fov = 90.0;
-    float f = 1.0 / tan(radians(fov) / 2.0);
-    
-    Ray ray;
-    ray.origin = vec3(0.0);
-    ray.dir = normalize(vec3(uv, -f));
-    return ray;
-}
-
-float sdSphere(vec3 p, vec3 center, float radius) {
-    return length(p - center) - radius;
-}
-
-float sdTorus(vec3 p, vec2 tor) {
-    vec2 q = vec2(length(p.xy) - tor.x, p.z);
-    return length(q) - tor.y;
-}
-
-float sdPlane(vec3 p, float height) {
-    return p.y - height;
-}
-
-// Which object is closest: 1 = sphere, 2 = torus, 3 = ground
-float materialID;
-
-float sceneSDF(vec3 p) {
-    float d = 1e10;
-    
-    // Sphere
-    float sphere = sdSphere(p, vec3(-1.5, 0.0, 0.0), 1.0);
-    if (sphere < d) {
-        d = sphere;
-        materialID = 1.0;
-    }
-    
-    // Torus
-    float torus = sdTorus(p - vec3(1.5, 0.0, 0.0), vec2(1.0, 0.4));
-    if (torus < d) {
-        d = torus;
-        materialID = 2.0;
-    }
-    
-    // Ground plane
-    float ground = sdPlane(p, -1.0);
-    if (ground < d) {
-        d = ground;
-        materialID = 3.0;
-    }
-    
-    return d;
-}
-
-vec3 getMaterialColor(float id) {
-    if (id < 1.5) return vec3(1.0, 0.0, 0.0);  // Sphere: red
-    if (id < 2.5) return vec3(0.0, 0.7, 1.0);  // Torus: cyan
-    return vec3(0.5, 0.5, 0.5);                 // Ground: gray
-}
-
-vec3 estimateNormal(vec3 p) {
-    float eps = 0.001;
-    return normalize(vec3(
-        sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
-        sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0)),
-        sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps))
-    ));
-}
-
-float raymarch(Ray ray) {
-    float t = 0.0;
-    
-    for (int i = 0; i < 100; i++) {
         vec3 p = ray.origin + t * ray.dir;
-        float d = sceneSDF(p);
+        vec3 normal = calcNormal(p);
         
-        if (d < 0.001) {
-            return t;
-        }
+        Hit hit;
+        hit.t = t;
+        hit.point = p;
+        hit.normal = normal;
+        hit.color = vec3(0.9, 0.5, 0.2);
         
-        t += d;
-        
-        if (t > 100.0) {
-            return -1.0;
-        }
-    }
-    
-    return -1.0;
-}
-
-void mainImage(out vec4 fragColor, in vec2 fragCoord) {
-    Ray ray = generateRay(fragCoord);
-    ray.origin.z += 5.0;  // Move camera back
-    ray.origin.y += 1.0;  // Move camera up
-    
-    float t = raymarch(ray);
-    
-    vec3 color;
-    if (t > 0.0) {
-        vec3 hitPoint = ray.origin + t * ray.dir;
-        vec3 normal = estimateNormal(hitPoint);
-        
-        // Lighting
-        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
-        vec3 viewDir = -ray.dir;
-        vec3 reflectDir = reflect(-lightDir, normal);
-        
-        float diffuse = max(0.0, dot(normal, lightDir));
-        float specular = pow(max(0.0, dot(reflectDir, viewDir)), 32.0);
-        
-        vec3 matColor = getMaterialColor(materialID);
-        float ambient = 0.1;
-        color = matColor * (ambient + diffuse) + vec3(1.0) * specular * 0.3;
-    }
-    else {
-        color = vec3(0.1, 0.1, 0.2);
+        vec3 ambient = hit.color * 0.1;
+        color = ambient + shade(hit, light, -ray.dir);
     }
     
     fragColor = vec4(color, 1.0);
 }
 ```
 
+---
 
-## A13. barth-sextic-final
-
-The hero shader for the overview - Barth sextic with full scene.
+## barth-sextic-final
 
 ```glsl
 struct Ray {
     vec3 origin;
     vec3 dir;
+};
+
+struct Hit {
+    float t;
+    vec3 point;
+    vec3 normal;
+    vec3 color;
+};
+
+struct Light {
+    vec3 dir;
+    vec3 color;
 };
 
 Ray generateRay(vec2 fragCoord) {
@@ -1128,26 +1025,32 @@ Ray generateRay(vec2 fragCoord) {
     return ray;
 }
 
-mat3 rotateY(float angle) {
-    float c = cos(angle);
-    float s = sin(angle);
-    return mat3(
-        c, 0.0, s,
-        0.0, 1.0, 0.0,
-        -s, 0.0, c
-    );
+mat3 rotateX(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(1, 0, 0, 0, c, -s, 0, s, c);
 }
 
-float barthSextic(vec3 p) {
-    // Apply rotation
-    p = rotateY(iTime * 0.3) * p;
+mat3 rotateY(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
+}
+
+Ray orbitCamera(Ray ray, float distance) {
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
     
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+float polynomial(vec3 p) {
     float phi = (1.0 + sqrt(5.0)) / 2.0;
     float phi2 = phi * phi;
     
-    float x2 = p.x * p.x;
-    float y2 = p.y * p.y;
-    float z2 = p.z * p.z;
+    float x2 = p.x * p.x, y2 = p.y * p.y, z2 = p.z * p.z;
     
     float a = (phi2 * x2 - y2) * (phi2 * y2 - z2) * (phi2 * z2 - x2);
     float b = (x2 + y2 + z2 - 1.0);
@@ -1158,54 +1061,52 @@ float barthSextic(vec3 p) {
 vec3 gradient(vec3 p) {
     float eps = 0.001;
     return vec3(
-        barthSextic(p + vec3(eps, 0, 0)) - barthSextic(p - vec3(eps, 0, 0)),
-        barthSextic(p + vec3(0, eps, 0)) - barthSextic(p - vec3(0, eps, 0)),
-        barthSextic(p + vec3(0, 0, eps)) - barthSextic(p - vec3(0, 0, eps))
+        polynomial(p + vec3(eps, 0, 0)) - polynomial(p - vec3(eps, 0, 0)),
+        polynomial(p + vec3(0, eps, 0)) - polynomial(p - vec3(0, eps, 0)),
+        polynomial(p + vec3(0, 0, eps)) - polynomial(p - vec3(0, 0, eps))
     ) / (2.0 * eps);
 }
 
-float varietyDistance(vec3 p) {
-    float f = barthSextic(p);
-    vec3 grad = gradient(p);
-    float gradLen = length(grad);
-    return 0.3 * abs(f) / max(gradLen, 0.1);
+float sdBarth(vec3 p) {
+    // Rotate the Barth surface
+    mat3 spin = rotateY(iTime * 0.3);
+    p = spin * p;
+    
+    // Bounding sphere
+    float bounds = length(p) - 2.5;
+    if (bounds > 0.01) return bounds;
+    
+    // Distance estimate for algebraic variety
+    float f = polynomial(p);
+    vec3 g = gradient(p);
+    float glen = length(g);
+    if (glen < 0.001) return 0.1;
+    return 0.5 * abs(f) / glen;
 }
 
-// 1 = variety, 2 = floor, 3 = wall
-float materialID;
-
 float sceneSDF(vec3 p) {
-    float d = 1e10;
+    float barth = sdBarth(p);
+    float floor = p.y + 1.8;
+    return min(barth, floor);
+}
+
+vec3 sceneColor(vec3 p) {
+    float barth = sdBarth(p);
+    float floor = p.y + 1.8;
     
-    // Variety (raised up)
-    vec3 varietyPos = p - vec3(0.0, 0.3, 0.0);
-    float bounds = length(varietyPos) - 2.0;
-    float variety;
-    if (bounds > 0.01) {
-        variety = bounds;
-    } else {
-        variety = varietyDistance(varietyPos);
+    if (barth < floor) {
+        return vec3(0.9, 0.7, 0.5);  // Barth: gold
     }
-    if (variety < d) {
-        d = variety;
-        materialID = 1.0;
-    }
-    
-    // Floor
-    float floor = p.y + 2.0;
-    if (floor < d) {
-        d = floor;
-        materialID = 2.0;
-    }
-    
-    // Back wall
-    float wall = p.z + 4.0;
-    if (wall < d) {
-        d = wall;
-        materialID = 3.0;
-    }
-    
-    return d;
+    return vec3(0.3, 0.3, 0.35);     // Floor: gray
+}
+
+vec3 calcNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
+        sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0)),
+        sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps))
+    ));
 }
 
 float raymarch(Ray ray) {
@@ -1216,92 +1117,65 @@ float raymarch(Ray ray) {
         float d = sceneSDF(p);
         
         if (d < 0.0005) return t;
+        
         t += d;
-        if (t > 50.0) return -1.0;
+        
+        if (t > 100.0) return -1.0;
     }
     
     return -1.0;
 }
 
-// Hard shadow - returns 0 if in shadow, 1 if lit
-float hardShadow(vec3 origin, vec3 dir, float maxt) {
+float shadow(vec3 origin, vec3 lightDir, float maxDist) {
     float t = 0.02;
-    
-    for (int i = 0; i < 64; i++) {
-        float d = sceneSDF(origin + dir * t);
+    for (int i = 0; i < 50; i++) {
+        float d = sceneSDF(origin + lightDir * t);
         if (d < 0.001) return 0.0;
         t += d;
-        if (t > maxt) break;
+        if (t > maxDist) break;
     }
-    
     return 1.0;
 }
 
-vec3 getMaterialColor(float id) {
-    if (id < 1.5) return vec3(0.9, 0.4, 0.3);   // Variety: coral
-    if (id < 2.5) return vec3(0.2, 0.2, 0.22);  // Floor: dark gray
-    return vec3(0.25, 0.25, 0.28);               // Wall: slightly lighter
+vec3 shade(Hit hit, Light light, vec3 viewDir, float shadowFactor) {
+    float diffuse = max(0.0, dot(hit.normal, light.dir));
+    vec3 reflected = reflect(-light.dir, hit.normal);
+    float specular = pow(max(0.0, dot(reflected, viewDir)), 64.0);
+    
+    vec3 diff = hit.color * light.color * diffuse * shadowFactor;
+    vec3 spec = light.color * specular * 0.5 * shadowFactor;
+    return diff + spec;
 }
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     Ray ray = generateRay(fragCoord);
-    ray.origin.z += 4.0;
-    ray.origin.y += 0.3;
+    ray = orbitCamera(ray, 5.0);
+    
+    // Two colored lights
+    Light light1 = Light(normalize(vec3(1.0, 2.0, 1.0)), vec3(1.0, 0.8, 0.6));
+    Light light2 = Light(normalize(vec3(-1.0, 1.0, -0.5)), vec3(0.3, 0.4, 0.8));
     
     float t = raymarch(ray);
     
-    vec3 color;
+    vec3 color = vec3(0.05, 0.05, 0.1);
     if (t > 0.0) {
-        vec3 hitPoint = ray.origin + t * ray.dir;
-        float hitMat = materialID;
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 normal = calcNormal(p);
         
-        // Get normal
-        vec3 normal;
-        if (hitMat < 1.5) {
-            // Variety: use gradient
-            vec3 varietyPos = hitPoint - vec3(0.0, 0.3, 0.0);
-            normal = normalize(gradient(varietyPos));
-            if (dot(normal, ray.dir) > 0.0) normal = -normal;
-        } else if (hitMat < 2.5) {
-            // Floor
-            normal = vec3(0.0, 1.0, 0.0);
-        } else {
-            // Wall
-            normal = vec3(0.0, 0.0, 1.0);
-        }
+        // Flip normal if facing away from camera (for Barth surface)
+        if (dot(normal, ray.dir) > 0.0) normal = -normal;
         
-        vec3 matColor = getMaterialColor(hitMat);
-        vec3 viewDir = -ray.dir;
+        Hit hit;
+        hit.t = t;
+        hit.point = p;
+        hit.normal = normal;
+        hit.color = sceneColor(p);
         
-        // Key light (warm, from upper right)
-        vec3 lightDir1 = normalize(vec3(2.0, 2.0, 1.0));
-        vec3 lightColor1 = vec3(1.0, 0.9, 0.8);
-        float diff1 = max(0.0, dot(normal, lightDir1));
-        float spec1 = pow(max(0.0, dot(reflect(-lightDir1, normal), viewDir)), 32.0);
-        float shadow1 = hardShadow(hitPoint + normal * 0.02, lightDir1, 10.0);
+        float shadow1 = shadow(p, light1.dir, 20.0);
+        float shadow2 = shadow(p, light2.dir, 20.0);
         
-        // Fill light (cool blue, from left)
-        vec3 lightDir2 = normalize(vec3(-2.0, 1.0, 0.5));
-        vec3 lightColor2 = vec3(0.4, 0.5, 0.8);
-        float diff2 = max(0.0, dot(normal, lightDir2));
-        float spec2 = pow(max(0.0, dot(reflect(-lightDir2, normal), viewDir)), 32.0);
-        
-        // Rim light (purple, from behind)
-        vec3 lightDir3 = normalize(vec3(0.0, 0.5, -1.0));
-        vec3 lightColor3 = vec3(0.5, 0.3, 0.6);
-        float diff3 = max(0.0, dot(normal, lightDir3));
-        
-        float ambient = 0.08;
-        color = matColor * ambient;
-        color += (matColor * diff1 * lightColor1 + spec1 * lightColor1 * 0.3) * shadow1;
-        color += matColor * diff2 * lightColor2 + spec2 * lightColor2 * 0.2;
-        color += matColor * diff3 * lightColor3;
-        
-        // Gamma correction
-        color = pow(color, vec3(0.4545));
-    }
-    else {
-        color = vec3(0.08, 0.08, 0.1);
+        vec3 ambient = hit.color * 0.1;
+        color = ambient + shade(hit, light1, -ray.dir, shadow1) + shade(hit, light2, -ray.dir, shadow2);
     }
     
     fragColor = vec4(color, 1.0);
