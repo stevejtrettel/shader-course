@@ -49,6 +49,8 @@ website:
             href: lectures/day5/notes.qmd
           - text: "Code"
             href: lectures/day5/shaders.qmd
+          - text: "Homework"
+            href: lectures/day5/homework.qmd
       # - text: "Download PDF"
       #   href: GPU-Accelerated-Mathematical-Illustration.pdf
       - section: "Appendices"
