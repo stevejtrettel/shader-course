@@ -9,7 +9,7 @@ shader-course/
 ├── main/                    # Main landing page + future living notes
 │   ├── _quarto.yml          # Quarto config for main site
 │   ├── index.qmd            # Landing page with links to courses
-│   └── styles/              # (populated by build.sh from _shared)
+│   └── styles/              # Site styles
 │
 ├── cirm/                    # CIRM 2025 course (self-contained)
 │   ├── _quarto.yml          # Quarto config for this course
@@ -19,11 +19,7 @@ shader-course/
 │   ├── demos/               # Interactive shader demos
 │   ├── images/              # Course images
 │   ├── _extensions/         # Quarto extensions (shader-demo, etc.)
-│   └── styles/              # (populated by build.sh from _shared)
-│
-├── _shared/
-│   └── styles/
-│       └── website.scss     # Shared styles copied to each project
+│   └── styles/              # Site styles
 │
 ├── build.sh                 # Build script (see below)
 ├── netlify.toml             # Netlify deployment config
@@ -51,10 +47,9 @@ cd main && quarto preview
 
 The `build.sh` script:
 
-1. Copies shared styles from `_shared/styles/` into each project
-2. Builds `main/` with `quarto render`
-3. Builds `cirm/` with `quarto render`
-4. Combines outputs into root `_site/`:
+1. Builds `main/` with `quarto render`
+2. Builds `cirm/` with `quarto render`
+3. Combines outputs into root `_site/`:
    - `main/_site/*` → `_site/`
    - `cirm/_site/` → `_site/cirm/`
 
@@ -81,9 +76,6 @@ The `@quarto/netlify-plugin-quarto` plugin installs Quarto on the build server.
 
 3. Add to `build.sh`:
    ```bash
-   # In the "Copying shared styles" section:
-   cp _shared/styles/* mit-2026/styles/
-
    # Add a build step:
    echo "=== Building MIT 2026 course ==="
    cd mit-2026 && quarto render && cd ..
@@ -98,5 +90,5 @@ The `@quarto/netlify-plugin-quarto` plugin installs Quarto on the build server.
 
 - Each course has its own `_extensions/` — they may diverge over time
 - Each course has its own `appendices/` — content may be customized per course
-- Styles are shared via `_shared/` to keep consistent theming
+- Each course has its own `styles/` — can customize per course if needed
 - The root `README.md` is not rendered (only files in `main/` and `cirm/` are)
