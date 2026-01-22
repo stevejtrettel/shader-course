@@ -5,6 +5,15 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR"
 
+# Install Quarto if not available (for Netlify)
+if ! command -v quarto &> /dev/null; then
+    echo "=== Installing Quarto ==="
+    curl -LO https://quarto.org/download/latest/quarto-linux-amd64.deb
+    dpkg -x quarto-linux-amd64.deb .
+    export PATH="$PWD/opt/quarto/bin:$PATH"
+    rm quarto-linux-amd64.deb
+fi
+
 echo "=== Building main site ==="
 cd main && quarto render && cd ..
 
