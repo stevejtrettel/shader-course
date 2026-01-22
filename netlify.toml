@@ -1,9 +1,10 @@
-# Netlify configuration for Quarto site
-
 [build]
+  command = "bash build.sh"
   publish = "_site"
 
+[build.environment]
+  QUARTO_PRINT_STACK = "true"
+
+# Plugin installs Quarto; our build.sh handles rendering
 [[plugins]]
   package = "@quarto/netlify-plugin-quarto"
-  [plugins.inputs]
-    cmd = "render"

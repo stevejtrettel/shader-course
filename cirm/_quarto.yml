@@ -1,10 +1,15 @@
 project:
   type: website
   output-dir: _site
+  resources:
+    - demos/**
 
 website:
-  title: "GPU-Accelerated Mathematical Illustration"
-  repo-url: https://github.com/stevejtrettel/shader-course
+  title: "GPU-Accelerated Mathematical Illustration: CIRM 2025"
+  navbar:
+    left:
+      - text: "← Back to Main Site"
+        href: https://shaders.stevejtrettel.site
 
   sidebar:
     style: docked
@@ -51,8 +56,6 @@ website:
             href: lectures/day5/shaders.qmd
           - text: "Homework"
             href: lectures/day5/homework.qmd
-      # - text: "Download PDF"
-      #   href: GPU-Accelerated-Mathematical-Illustration.pdf
       - section: "Appendices"
         contents:
           - text: "GLSL Reference"
@@ -65,6 +68,18 @@ website:
             href: appendices/sdfs.qmd
           - text: "Debugging"
             href: appendices/debug.qmd
+
+# Shared metadata
+author: "Steve Trettel"
+date: "January 2025"
+
+bibliography: references.bib
+highlight-style: arrow
+
+execute:
+  freeze: auto
+  echo: true
+  warning: false
 
 format:
   html:

@@ -1,0 +1,11 @@
+# Shader Programming {.unnumbered}
+
+Notes and courses on GPU shader programming for mathematical illustration.
+
+## Courses
+
+- [**CIRM 2025**](/cirm/) — GPU-Accelerated Mathematical Illustration, taught at CIRM Marseille in January 2025
+
+## Notes
+
+*Coming soon* — general notes on shader programming will appear here over time.
