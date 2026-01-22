@@ -17,6 +17,9 @@ cirm/styles/website.scss
 # OS files
 .DS_Store
 
+# IDE
+.idea/
+
 # LaTeX auxiliary files
 *.aux
 *.log
