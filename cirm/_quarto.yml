@@ -5,8 +5,9 @@ project:
     - demos/**
 
 website:
-  title: "GPU-Accelerated Mathematical Illustration: CIRM 2025"
+  title: "CIRM 2025: GPU-Accelerated Mathematical Illustration"
   navbar:
+    title: false
     left:
       - text: "← Back to Main Site"
         href: https://shaders.stevejtrettel.site
