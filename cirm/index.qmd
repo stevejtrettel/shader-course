@@ -1,6 +1,6 @@
-# CIRM 2025: GPU-Accelerated Mathematical Illustration {.unnumbered}
+# CIRM 2026: GPU-Accelerated Mathematical Illustration {.unnumbered}
 
-This mini-course was taught at [CIRM](https://www.cirm-math.fr/) in Marseille, January 2025. It introduces shader programming as a tool for mathematical illustration and exploration.
+This mini-course was taught at [CIRM](https://www.cirm-math.fr/) in Marseille, January 2026. It introduces shader programming as a tool for mathematical illustration and exploration.
 
 Shaders are programs that run in parallel on the GPU, making them exceptionally fast for visualization tasks. We learn to write code that "reads like mathematics" using Shadertoy, a beginner-friendly web-based platform that handles all the low-level programming complexities.
 
