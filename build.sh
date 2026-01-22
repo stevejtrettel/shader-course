@@ -6,6 +6,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR"
 
 echo "=== Copying shared styles ==="
+mkdir -p main/styles cirm/styles
 cp _shared/styles/* main/styles/
 cp _shared/styles/* cirm/styles/
 
