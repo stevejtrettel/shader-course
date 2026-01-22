@@ -1,4 +1,4 @@
-# CIRM 2026: GPU-Accelerated Mathematical Illustration {.unnumbered}
+# GPU-Accelerated Mathematical Illustration {.unnumbered}
 
 This mini-course was taught at [CIRM](https://www.cirm-math.fr/) in Marseille, January 2026. It introduces shader programming as a tool for mathematical illustration and exploration.
 
