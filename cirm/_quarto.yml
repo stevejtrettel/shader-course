@@ -5,9 +5,8 @@ project:
     - demos/**
 
 website:
-  title: "CIRM 2025: GPU-Accelerated Mathematical Illustration"
+  title: "GPU-Accelerated Mathematical Illustration"
   navbar:
-    title: false
     left:
       - text: "← Back to Main Site"
         href: https://shaders.stevejtrettel.site
@@ -72,7 +71,7 @@ website:
 
 # Shared metadata
 author: "Steve Trettel"
-date: "January 2025"
+date: "January 2026"
 
 bibliography: references.bib
 highlight-style: arrow

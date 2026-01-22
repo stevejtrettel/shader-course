@@ -20,7 +20,7 @@ website:
       #     - fundamentals/coordinates.qmd
       #     - fundamentals/colors.qmd
       - text: "---"
-      - text: "CIRM 2025"
+      - text: "CIRM 2026"
         href: /cirm/
 
 # Shared metadata
