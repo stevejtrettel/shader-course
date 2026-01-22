@@ -18,6 +18,8 @@ echo "=== Building main site ==="
 cd main && quarto render && cd ..
 
 echo "=== Building CIRM course ==="
+echo "Contents of cirm/:"
+ls -la cirm/
 cd cirm && quarto render && cd ..
 
 echo "=== Combining outputs ==="
@@ -32,3 +34,5 @@ cp -r cirm/_site _site/cirm
 
 echo "=== Build complete ==="
 echo "Output in _site/"
+echo "Contents of _site/cirm/:"
+ls -la _site/cirm/ | head -20
