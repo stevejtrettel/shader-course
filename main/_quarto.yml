@@ -20,10 +20,8 @@ website:
       #     - fundamentals/coordinates.qmd
       #     - fundamentals/colors.qmd
       - text: "---"
-      - section: "Courses"
-        contents:
-          - text: "CIRM 2025"
-            href: /cirm/
+      - text: "CIRM 2025"
+        href: /cirm/
 
 # Shared metadata
 author: "Steve Trettel"
