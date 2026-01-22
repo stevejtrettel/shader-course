@@ -21,7 +21,7 @@ website:
       #     - fundamentals/colors.qmd
       - text: "---"
       - text: "CIRM 2026"
-        href: /cirm/
+        href: /cirm-2026/
 
 # Shared metadata
 author: "Steve Trettel"
