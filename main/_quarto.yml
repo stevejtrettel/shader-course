@@ -1,0 +1,43 @@
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "Shader Programming"
+
+  sidebar:
+    style: docked
+    collapse-level: 1
+    contents:
+      - index.qmd
+      # Add notes sections here as they grow:
+      # - section: "Introduction"
+      #   contents:
+      #     - intro/what-is-a-shader.qmd
+      #     - intro/setup.qmd
+      # - section: "Fundamentals"
+      #   contents:
+      #     - fundamentals/coordinates.qmd
+      #     - fundamentals/colors.qmd
+      - text: "---"
+      - text: "CIRM 2025"
+        href: /cirm/
+
+# Shared metadata
+author: "Steve Trettel"
+
+highlight-style: arrow
+
+format:
+  html:
+    theme:
+      light: [cosmo, styles/website.scss]
+      dark: [darkly, styles/website.scss]
+    code-copy: true
+    code-overflow: wrap
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    number-depth: 2
+    link-external-newwindow: true
+    smooth-scroll: true
