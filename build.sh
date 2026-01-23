@@ -27,8 +27,8 @@ mkdir _site
 # Copy main site to root
 cp -r main/_site/* _site/
 
-# Copy CIRM course to /cirm/
-cp -r cirm/_site _site/cirm
+# Copy CIRM course to /cirm-2026/
+cp -r cirm/_site _site/cirm-2026
 
 echo "=== Build complete ==="
 echo "Output in _site/"
