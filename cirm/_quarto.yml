@@ -64,10 +64,6 @@ website:
             href: appendices/coordinates.qmd
           - text: "Color"
             href: appendices/color.qmd
-          - text: "SDFs"
-            href: appendices/sdfs.qmd
-          - text: "Debugging"
-            href: appendices/debug.qmd
 
 # Shared metadata
 author: "Steve Trettel"
