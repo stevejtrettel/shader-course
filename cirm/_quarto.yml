@@ -4,7 +4,7 @@ project:
   resources:
     - demos/**
 
-  site-url: /cirm-2026
+base-path: /cirm-2026
 
 website:
   title: "GPU-Accelerated Mathematical Illustration"

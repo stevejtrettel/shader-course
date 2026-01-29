@@ -4,8 +4,8 @@ return {
     local height = pandoc.utils.stringify(kwargs["height"] or "500px")
     local caption = pandoc.utils.stringify(kwargs["caption"] or "")
     
-    local site_url = pandoc.utils.stringify(meta["site-url"] or "")
-    local base_path = site_url .. "/demos/" .. name
+    local prefix = pandoc.utils.stringify(meta["base-path"] or "")
+    local base_path = prefix .. "/demos/" .. name
     
     if quarto.doc.is_format("html") then
       local id = "demo-" .. name:gsub("[^%w]", "-")
