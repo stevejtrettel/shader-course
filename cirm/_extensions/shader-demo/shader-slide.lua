@@ -1,7 +1,8 @@
 return {
   ['shader-slide'] = function(args, kwargs, meta)
     local name = pandoc.utils.stringify(args[1])
-    local base_path = "/demos/" .. name
+    local site_url = pandoc.utils.stringify(meta["site-url"] or "")
+    local base_path = site_url .. "/demos/" .. name
     local id = "slide-" .. name:gsub("[^%w]", "-")
 
     -- Fullscreen shader for reveal.js slides
