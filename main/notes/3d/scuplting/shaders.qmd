@@ -1,0 +1,2225 @@
+# Sculpting with Math — Shaders
+
+Complete, runnable shaders for each demo in the notes.
+
+---
+
+## Common Infrastructure
+
+All shaders in this chapter use the same boilerplate: ray generation, orbit camera, gradient-based normals, raymarching, and Phong shading with shadows. Each shader below is self-contained — paste it into Shadertoy and it runs.
+
+The primitive SDFs appear as bare helper functions (`sdSphere`, `sdBox`, etc.) rather than structs, to keep the demos compact. The notes explain the struct convention; the shaders use the shorthand.
+
+---
+
+## punched-sphere
+
+A sphere with three cylindrical holes along the coordinate axes.
+
+```glsl
+struct Ray { vec3 origin; vec3 dir; };
+struct Light { vec3 dir; vec3 color; };
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    float f = 1.0 / tan(radians(90.0) / 2.0);
+    return Ray(vec3(0.0), normalize(vec3(uv, -f)));
+}
+
+mat3 rotateX(float a) { float c = cos(a), s = sin(a); return mat3(1,0,0, 0,c,-s, 0,s,c); }
+mat3 rotateY(float a) { float c = cos(a), s = sin(a); return mat3(c,0,s, 0,1,0, -s,0,c); }
+
+Ray orbitCamera(Ray ray, float dist) {
+    vec2 m = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) m = vec2(0.6, 0.55);
+    mat3 rot = rotateX((0.5 - m.y) * 3.14) * rotateY((m.x - 0.5) * 6.28);
+    ray.origin = rot * vec3(0, 0, dist);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+float sdSphere(vec3 p, float r) { return length(p) - r; }
+
+float sdCylinder(vec3 p, float r, float h) {
+    vec2 d = vec2(length(p.xz) - r, abs(p.y) - h);
+    return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
+}
+
+float sceneSDF(vec3 p) {
+    float d = sdSphere(p, 1.0);
+    d = max(d, -sdCylinder(p,     0.4, 1.2));
+    d = max(d, -sdCylinder(p.yzx, 0.4, 1.2));
+    d = max(d, -sdCylinder(p.zxy, 0.4, 1.2));
+    float ground = p.y + 1.5;
+    return min(d, ground);
+}
+
+vec3 sceneColor(vec3 p) {
+    float d = sdSphere(p, 1.0);
+    d = max(d, -sdCylinder(p,     0.4, 1.2));
+    d = max(d, -sdCylinder(p.yzx, 0.4, 1.2));
+    d = max(d, -sdCylinder(p.zxy, 0.4, 1.2));
+    float ground = p.y + 1.5;
+    if (d < ground) return vec3(0.9, 0.3, 0.2);
+    return vec3(0.35, 0.3, 0.3);
+}
+
+vec3 calcNormal(vec3 p) {
+    float e = 0.001;
+    return normalize(vec3(
+        sceneSDF(p+vec3(e,0,0)) - sceneSDF(p-vec3(e,0,0)),
+        sceneSDF(p+vec3(0,e,0)) - sceneSDF(p-vec3(0,e,0)),
+        sceneSDF(p+vec3(0,0,e)) - sceneSDF(p-vec3(0,0,e))));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < 150; i++) {
+        float d = sceneSDF(ray.origin + t * ray.dir);
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    return -1.0;
+}
+
+float shadow(vec3 p, vec3 ld) {
+    float t = 0.05;
+    for (int i = 0; i < 50; i++) {
+        float d = sceneSDF(p + ld * t);
+        if (d < 0.001) return 0.0;
+        t += d;
+        if (t > 20.0) break;
+    }
+    return 1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 5.0);
+    Light light = Light(normalize(vec3(1, 2, 1.5)), vec3(1, 0.97, 0.95));
+    float t = raymarch(ray);
+    vec3 color = vec3(0.4, 0.6, 0.9);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 n = calcNormal(p);
+        vec3 mat = sceneColor(p);
+        float sh = shadow(p + n * 0.01, light.dir);
+        float diff = max(0.0, dot(n, light.dir));
+        vec3 refl = reflect(-light.dir, n);
+        float spec = pow(max(0.0, dot(refl, -ray.dir)), 32.0);
+        color = mat * vec3(0.25, 0.3, 0.4) + mat * light.color * diff * sh + light.color * spec * 0.3 * sh;
+    }
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## steinmetz
+
+Intersection of three orthogonal cylinders.
+
+```glsl
+struct Ray { vec3 origin; vec3 dir; };
+struct Light { vec3 dir; vec3 color; };
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    float f = 1.0 / tan(radians(90.0) / 2.0);
+    return Ray(vec3(0.0), normalize(vec3(uv, -f)));
+}
+
+mat3 rotateX(float a) { float c = cos(a), s = sin(a); return mat3(1,0,0, 0,c,-s, 0,s,c); }
+mat3 rotateY(float a) { float c = cos(a), s = sin(a); return mat3(c,0,s, 0,1,0, -s,0,c); }
+
+Ray orbitCamera(Ray ray, float dist) {
+    vec2 m = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) m = vec2(0.6, 0.55);
+    mat3 rot = rotateX((0.5 - m.y) * 3.14) * rotateY((m.x - 0.5) * 6.28);
+    ray.origin = rot * vec3(0, 0, dist);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+float sdCylinder(vec3 p, float r, float h) {
+    vec2 d = vec2(length(p.xz) - r, abs(p.y) - h);
+    return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
+}
+
+float sceneSDF(vec3 p) {
+    float d = sdCylinder(p,     1.0, 2.0);
+    d = max(d, sdCylinder(p.yzx, 1.0, 2.0));
+    d = max(d, sdCylinder(p.zxy, 1.0, 2.0));
+    float ground = p.y + 1.5;
+    return min(d, ground);
+}
+
+vec3 sceneColor(vec3 p) {
+    float d = sdCylinder(p,     1.0, 2.0);
+    d = max(d, sdCylinder(p.yzx, 1.0, 2.0));
+    d = max(d, sdCylinder(p.zxy, 1.0, 2.0));
+    float ground = p.y + 1.5;
+    if (d < ground) return vec3(0.2, 0.6, 0.9);
+    return vec3(0.35, 0.3, 0.3);
+}
+
+vec3 calcNormal(vec3 p) {
+    float e = 0.001;
+    return normalize(vec3(
+        sceneSDF(p+vec3(e,0,0)) - sceneSDF(p-vec3(e,0,0)),
+        sceneSDF(p+vec3(0,e,0)) - sceneSDF(p-vec3(0,e,0)),
+        sceneSDF(p+vec3(0,0,e)) - sceneSDF(p-vec3(0,0,e))));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < 150; i++) {
+        float d = sceneSDF(ray.origin + t * ray.dir);
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    return -1.0;
+}
+
+float shadow(vec3 p, vec3 ld) {
+    float t = 0.05;
+    for (int i = 0; i < 50; i++) {
+        float d = sceneSDF(p + ld * t);
+        if (d < 0.001) return 0.0;
+        t += d;
+        if (t > 20.0) break;
+    }
+    return 1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 5.0);
+    Light light = Light(normalize(vec3(1, 2, 1.5)), vec3(1, 0.97, 0.95));
+    float t = raymarch(ray);
+    vec3 color = vec3(0.4, 0.6, 0.9);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 n = calcNormal(p);
+        vec3 mat = sceneColor(p);
+        float sh = shadow(p + n * 0.01, light.dir);
+        float diff = max(0.0, dot(n, light.dir));
+        vec3 refl = reflect(-light.dir, n);
+        float spec = pow(max(0.0, dot(refl, -ray.dir)), 32.0);
+        color = mat * vec3(0.25, 0.3, 0.4) + mat * light.color * diff * sh + light.color * spec * 0.3 * sh;
+    }
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## scooped-cube
+
+A cube with a sphere subtracted from one corner.
+
+```glsl
+struct Ray { vec3 origin; vec3 dir; };
+struct Light { vec3 dir; vec3 color; };
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    float f = 1.0 / tan(radians(90.0) / 2.0);
+    return Ray(vec3(0.0), normalize(vec3(uv, -f)));
+}
+
+mat3 rotateX(float a) { float c = cos(a), s = sin(a); return mat3(1,0,0, 0,c,-s, 0,s,c); }
+mat3 rotateY(float a) { float c = cos(a), s = sin(a); return mat3(c,0,s, 0,1,0, -s,0,c); }
+
+Ray orbitCamera(Ray ray, float dist) {
+    vec2 m = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) m = vec2(0.62, 0.55);
+    mat3 rot = rotateX((0.5 - m.y) * 3.14) * rotateY((m.x - 0.5) * 6.28);
+    ray.origin = rot * vec3(0, 0, dist);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+float sdSphere(vec3 p, float r) { return length(p) - r; }
+float sdBox(vec3 p, vec3 b) {
+    vec3 d = abs(p) - b;
+    return length(max(d, 0.0)) + min(max(d.x, max(d.y, d.z)), 0.0);
+}
+
+float sceneSDF(vec3 p) {
+    float cube = sdBox(p, vec3(1.0));
+    float scoop = sdSphere(p - vec3(1.0), 1.2);
+    float d = max(cube, -scoop);
+    float ground = p.y + 1.5;
+    return min(d, ground);
+}
+
+vec3 sceneColor(vec3 p) {
+    float cube = sdBox(p, vec3(1.0));
+    float scoop = sdSphere(p - vec3(1.0), 1.2);
+    float d = max(cube, -scoop);
+    float ground = p.y + 1.5;
+    if (d < ground) return vec3(0.85, 0.75, 0.5);
+    return vec3(0.35, 0.3, 0.3);
+}
+
+vec3 calcNormal(vec3 p) {
+    float e = 0.001;
+    return normalize(vec3(
+        sceneSDF(p+vec3(e,0,0)) - sceneSDF(p-vec3(e,0,0)),
+        sceneSDF(p+vec3(0,e,0)) - sceneSDF(p-vec3(0,e,0)),
+        sceneSDF(p+vec3(0,0,e)) - sceneSDF(p-vec3(0,0,e))));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < 150; i++) {
+        float d = sceneSDF(ray.origin + t * ray.dir);
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    return -1.0;
+}
+
+float shadow(vec3 p, vec3 ld) {
+    float t = 0.05;
+    for (int i = 0; i < 50; i++) {
+        float d = sceneSDF(p + ld * t);
+        if (d < 0.001) return 0.0;
+        t += d;
+        if (t > 20.0) break;
+    }
+    return 1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 5.0);
+    Light light = Light(normalize(vec3(1, 2, 1.5)), vec3(1, 0.97, 0.95));
+    float t = raymarch(ray);
+    vec3 color = vec3(0.4, 0.6, 0.9);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 n = calcNormal(p);
+        vec3 mat = sceneColor(p);
+        float sh = shadow(p + n * 0.01, light.dir);
+        float diff = max(0.0, dot(n, light.dir));
+        vec3 refl = reflect(-light.dir, n);
+        float spec = pow(max(0.0, dot(refl, -ray.dir)), 32.0);
+        color = mat * vec3(0.25, 0.3, 0.4) + mat * light.color * diff * sh + light.color * spec * 0.3 * sh;
+    }
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## crease-problem-2d
+
+Two circles: hard union on the left, smooth union on the right. Shows the crease vs. the fillet.
+
+```glsl
+float sdCircle(vec2 p, vec2 c, float r) {
+    return length(p - c) - r;
+}
+
+float smin(float a, float b, float k) {
+    float h = max(k - abs(a - b), 0.0) / k;
+    return min(a, b) - h * h * k * 0.25;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 2.5;
+
+    // Left side: hard union (min)
+    float d1L = sdCircle(p, vec2(-1.8, 0.3), 0.8);
+    float d2L = sdCircle(p, vec2(-1.2, -0.3), 0.8);
+    float dLeft = min(d1L, d2L);
+
+    // Right side: smooth union (smin)
+    float d1R = sdCircle(p, vec2(1.2, 0.3), 0.8);
+    float d2R = sdCircle(p, vec2(1.8, -0.3), 0.8);
+    float dRight = smin(d1R, d2R, 0.5);
+
+    // Pick side
+    float d = (p.x < 0.0) ? dLeft : dRight;
+
+    // Color by sign
+    vec3 color;
+    if (d < 0.0) {
+        color = vec3(0.2, 0.4, 0.8);
+    } else {
+        color = vec3(0.9, 0.6, 0.2);
+    }
+
+    color *= 1.0 - exp(-6.0 * abs(d));
+
+    // Contour lines
+    float contour = abs(fract(d * 4.0 + 0.5) - 0.5);
+    color = mix(vec3(1.0), color, smoothstep(0.0, 0.05, contour));
+
+    // Zero set
+    color = mix(vec3(1.0), color, smoothstep(0.0, 0.02, abs(d)));
+
+    // Divider
+    color = mix(vec3(0.5), color, smoothstep(0.0, 0.01, abs(p.x)));
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## smin-1d
+
+1D graph showing min(a,b) vs smin(a,b,k) for several k values.
+
+```glsl
+float smin(float a, float b, float k) {
+    float h = max(k - abs(a - b), 0.0) / k;
+    return min(a, b) - h * h * k * 0.25;
+}
+
+float line(vec2 p, float y, float thickness) {
+    return smoothstep(thickness, 0.0, abs(p.y - y));
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 3.0;
+
+    // Two linear functions
+    float a = 0.7 * p.x + 0.5;
+    float b = -0.7 * p.x + 0.5;
+
+    vec3 color = vec3(0.95);
+
+    // Grid
+    float grid = smoothstep(0.02, 0.0, abs(fract(p.x) - 0.5)) +
+                 smoothstep(0.02, 0.0, abs(fract(p.y) - 0.5));
+    color -= vec3(0.08) * grid;
+
+    // Axes
+    color -= vec3(0.3) * smoothstep(0.02, 0.0, abs(p.x));
+    color -= vec3(0.3) * smoothstep(0.02, 0.0, abs(p.y));
+
+    float px = 3.0 / iResolution.y;
+
+    // Draw a and b as thin gray lines
+    color = mix(color, vec3(0.7), line(p, a, 2.0 * px));
+    color = mix(color, vec3(0.7), line(p, b, 2.0 * px));
+
+    // Hard min: red
+    float hardMin = min(a, b);
+    color = mix(color, vec3(0.9, 0.2, 0.2), line(p, hardMin, 3.0 * px));
+
+    // smin with k = 0.5: blue
+    float sm1 = smin(a, b, 0.5);
+    color = mix(color, vec3(0.2, 0.4, 0.9), line(p, sm1, 3.0 * px));
+
+    // smin with k = 1.0: green
+    float sm2 = smin(a, b, 1.0);
+    color = mix(color, vec3(0.2, 0.8, 0.4), line(p, sm2, 3.0 * px));
+
+    // smin with k = 2.0: orange
+    float sm3 = smin(a, b, 2.0);
+    color = mix(color, vec3(0.9, 0.6, 0.1), line(p, sm3, 3.0 * px));
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## smooth-union-spheres
+
+Two spheres joined with smooth union, on a ground plane.
+
+```glsl
+struct Ray { vec3 origin; vec3 dir; };
+struct Light { vec3 dir; vec3 color; };
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    float f = 1.0 / tan(radians(90.0) / 2.0);
+    return Ray(vec3(0.0), normalize(vec3(uv, -f)));
+}
+
+mat3 rotateX(float a) { float c = cos(a), s = sin(a); return mat3(1,0,0, 0,c,-s, 0,s,c); }
+mat3 rotateY(float a) { float c = cos(a), s = sin(a); return mat3(c,0,s, 0,1,0, -s,0,c); }
+
+Ray orbitCamera(Ray ray, float dist) {
+    vec2 m = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) m = vec2(0.6, 0.55);
+    mat3 rot = rotateX((0.5 - m.y) * 3.14) * rotateY((m.x - 0.5) * 6.28);
+    ray.origin = rot * vec3(0, 0, dist);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+float sdSphere(vec3 p, float r) { return length(p) - r; }
+
+float smin(float a, float b, float k) {
+    float h = max(k - abs(a - b), 0.0) / k;
+    return min(a, b) - h * h * k * 0.25;
+}
+
+float sceneSDF(vec3 p) {
+    float s1 = sdSphere(p - vec3(-0.6, 0, 0), 0.8);
+    float s2 = sdSphere(p - vec3( 0.6, 0, 0), 0.8);
+    float d = smin(s1, s2, 0.4);
+    float ground = p.y + 1.2;
+    return min(d, ground);
+}
+
+vec3 sceneColor(vec3 p) {
+    float s1 = sdSphere(p - vec3(-0.6, 0, 0), 0.8);
+    float s2 = sdSphere(p - vec3( 0.6, 0, 0), 0.8);
+    float d = smin(s1, s2, 0.4);
+    float ground = p.y + 1.2;
+    if (d < ground) return vec3(0.9, 0.4, 0.3);
+    return vec3(0.35, 0.3, 0.3);
+}
+
+vec3 calcNormal(vec3 p) {
+    float e = 0.001;
+    return normalize(vec3(
+        sceneSDF(p+vec3(e,0,0)) - sceneSDF(p-vec3(e,0,0)),
+        sceneSDF(p+vec3(0,e,0)) - sceneSDF(p-vec3(0,e,0)),
+        sceneSDF(p+vec3(0,0,e)) - sceneSDF(p-vec3(0,0,e))));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < 150; i++) {
+        float d = sceneSDF(ray.origin + t * ray.dir);
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    return -1.0;
+}
+
+float shadow(vec3 p, vec3 ld) {
+    float t = 0.05;
+    for (int i = 0; i < 50; i++) {
+        float d = sceneSDF(p + ld * t);
+        if (d < 0.001) return 0.0;
+        t += d;
+        if (t > 20.0) break;
+    }
+    return 1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 5.0);
+    Light light = Light(normalize(vec3(1, 2, 1.5)), vec3(1, 0.97, 0.95));
+    float t = raymarch(ray);
+    vec3 color = vec3(0.4, 0.6, 0.9);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 n = calcNormal(p);
+        vec3 mat = sceneColor(p);
+        float sh = shadow(p + n * 0.01, light.dir);
+        float diff = max(0.0, dot(n, light.dir));
+        vec3 refl = reflect(-light.dir, n);
+        float spec = pow(max(0.0, dot(refl, -ray.dir)), 32.0);
+        color = mat * vec3(0.25, 0.3, 0.4) + mat * light.color * diff * sh + light.color * spec * 0.3 * sh;
+    }
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## smooth-subtraction
+
+A sphere with a smooth bite taken out.
+
+```glsl
+struct Ray { vec3 origin; vec3 dir; };
+struct Light { vec3 dir; vec3 color; };
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    float f = 1.0 / tan(radians(90.0) / 2.0);
+    return Ray(vec3(0.0), normalize(vec3(uv, -f)));
+}
+
+mat3 rotateX(float a) { float c = cos(a), s = sin(a); return mat3(1,0,0, 0,c,-s, 0,s,c); }
+mat3 rotateY(float a) { float c = cos(a), s = sin(a); return mat3(c,0,s, 0,1,0, -s,0,c); }
+
+Ray orbitCamera(Ray ray, float dist) {
+    vec2 m = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) m = vec2(0.65, 0.55);
+    mat3 rot = rotateX((0.5 - m.y) * 3.14) * rotateY((m.x - 0.5) * 6.28);
+    ray.origin = rot * vec3(0, 0, dist);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+float sdSphere(vec3 p, float r) { return length(p) - r; }
+
+float smin(float a, float b, float k) {
+    float h = max(k - abs(a - b), 0.0) / k;
+    return min(a, b) - h * h * k * 0.25;
+}
+
+float ssubtract(float a, float b, float k) {
+    return -smin(-a, b, k);
+}
+
+float sceneSDF(vec3 p) {
+    float sphere = sdSphere(p, 1.0);
+    float bite = sdSphere(p - vec3(0.7, 0.0, 0.0), 0.9);
+    float d = ssubtract(sphere, bite, 0.15);
+    float ground = p.y + 1.5;
+    return min(d, ground);
+}
+
+vec3 sceneColor(vec3 p) {
+    float sphere = sdSphere(p, 1.0);
+    float bite = sdSphere(p - vec3(0.7, 0.0, 0.0), 0.9);
+    float d = ssubtract(sphere, bite, 0.15);
+    float ground = p.y + 1.5;
+    if (d < ground) return vec3(0.3, 0.7, 0.5);
+    return vec3(0.35, 0.3, 0.3);
+}
+
+vec3 calcNormal(vec3 p) {
+    float e = 0.001;
+    return normalize(vec3(
+        sceneSDF(p+vec3(e,0,0)) - sceneSDF(p-vec3(e,0,0)),
+        sceneSDF(p+vec3(0,e,0)) - sceneSDF(p-vec3(0,e,0)),
+        sceneSDF(p+vec3(0,0,e)) - sceneSDF(p-vec3(0,0,e))));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < 150; i++) {
+        float d = sceneSDF(ray.origin + t * ray.dir);
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    return -1.0;
+}
+
+float shadow(vec3 p, vec3 ld) {
+    float t = 0.05;
+    for (int i = 0; i < 50; i++) {
+        float d = sceneSDF(p + ld * t);
+        if (d < 0.001) return 0.0;
+        t += d;
+        if (t > 20.0) break;
+    }
+    return 1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 5.0);
+    Light light = Light(normalize(vec3(1, 2, 1.5)), vec3(1, 0.97, 0.95));
+    float t = raymarch(ray);
+    vec3 color = vec3(0.4, 0.6, 0.9);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 n = calcNormal(p);
+        vec3 mat = sceneColor(p);
+        float sh = shadow(p + n * 0.01, light.dir);
+        float diff = max(0.0, dot(n, light.dir));
+        vec3 refl = reflect(-light.dir, n);
+        float spec = pow(max(0.0, dot(refl, -ray.dir)), 32.0);
+        color = mat * vec3(0.25, 0.3, 0.4) + mat * light.color * diff * sh + light.color * spec * 0.3 * sh;
+    }
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## displacement-sphere
+
+A sphere with sinusoidal displacement creating a bumpy surface.
+
+```glsl
+struct Ray { vec3 origin; vec3 dir; };
+struct Light { vec3 dir; vec3 color; };
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    float f = 1.0 / tan(radians(90.0) / 2.0);
+    return Ray(vec3(0.0), normalize(vec3(uv, -f)));
+}
+
+mat3 rotateX(float a) { float c = cos(a), s = sin(a); return mat3(1,0,0, 0,c,-s, 0,s,c); }
+mat3 rotateY(float a) { float c = cos(a), s = sin(a); return mat3(c,0,s, 0,1,0, -s,0,c); }
+
+Ray orbitCamera(Ray ray, float dist) {
+    vec2 m = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) m = vec2(0.6, 0.55);
+    mat3 rot = rotateX((0.5 - m.y) * 3.14) * rotateY((m.x - 0.5) * 6.28);
+    ray.origin = rot * vec3(0, 0, dist);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+float sceneSDF(vec3 p) {
+    float sphere = length(p) - 1.0;
+    sphere += 0.05 * sin(12.0 * p.x) * sin(12.0 * p.y) * sin(12.0 * p.z);
+    float ground = p.y + 1.5;
+    return min(sphere, ground);
+}
+
+vec3 sceneColor(vec3 p) {
+    float sphere = length(p) - 1.0;
+    sphere += 0.05 * sin(12.0 * p.x) * sin(12.0 * p.y) * sin(12.0 * p.z);
+    float ground = p.y + 1.5;
+    if (sphere < ground) return vec3(0.7, 0.5, 0.3);
+    return vec3(0.35, 0.3, 0.3);
+}
+
+vec3 calcNormal(vec3 p) {
+    float e = 0.001;
+    return normalize(vec3(
+        sceneSDF(p+vec3(e,0,0)) - sceneSDF(p-vec3(e,0,0)),
+        sceneSDF(p+vec3(0,e,0)) - sceneSDF(p-vec3(0,e,0)),
+        sceneSDF(p+vec3(0,0,e)) - sceneSDF(p-vec3(0,0,e))));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < 200; i++) {
+        float d = sceneSDF(ray.origin + t * ray.dir);
+        if (d < 0.0005) return t;
+        t += d * 0.7;  // conservative step for displacement
+        if (t > 100.0) return -1.0;
+    }
+    return -1.0;
+}
+
+float shadow(vec3 p, vec3 ld) {
+    float t = 0.05;
+    for (int i = 0; i < 50; i++) {
+        float d = sceneSDF(p + ld * t);
+        if (d < 0.001) return 0.0;
+        t += d * 0.7;
+        if (t > 20.0) break;
+    }
+    return 1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 4.5);
+    Light light = Light(normalize(vec3(1, 2, 1.5)), vec3(1, 0.97, 0.95));
+    float t = raymarch(ray);
+    vec3 color = vec3(0.4, 0.6, 0.9);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 n = calcNormal(p);
+        vec3 mat = sceneColor(p);
+        float sh = shadow(p + n * 0.01, light.dir);
+        float diff = max(0.0, dot(n, light.dir));
+        vec3 refl = reflect(-light.dir, n);
+        float spec = pow(max(0.0, dot(refl, -ray.dir)), 32.0);
+        color = mat * vec3(0.25, 0.3, 0.4) + mat * light.color * diff * sh + light.color * spec * 0.3 * sh;
+    }
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## symmetry-abs
+
+A few primitives in the positive octant, mirrored with abs(p) to get 8-fold symmetry.
+
+```glsl
+struct Ray { vec3 origin; vec3 dir; };
+struct Light { vec3 dir; vec3 color; };
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    float f = 1.0 / tan(radians(90.0) / 2.0);
+    return Ray(vec3(0.0), normalize(vec3(uv, -f)));
+}
+
+mat3 rotateX(float a) { float c = cos(a), s = sin(a); return mat3(1,0,0, 0,c,-s, 0,s,c); }
+mat3 rotateY(float a) { float c = cos(a), s = sin(a); return mat3(c,0,s, 0,1,0, -s,0,c); }
+
+Ray orbitCamera(Ray ray, float dist) {
+    vec2 m = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) m = vec2(0.58, 0.52);
+    mat3 rot = rotateX((0.5 - m.y) * 3.14) * rotateY((m.x - 0.5) * 6.28);
+    ray.origin = rot * vec3(0, 0, dist);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+float sdSphere(vec3 p, float r) { return length(p) - r; }
+float sdBox(vec3 p, vec3 b) {
+    vec3 d = abs(p) - b;
+    return length(max(d, 0.0)) + min(max(d.x, max(d.y, d.z)), 0.0);
+}
+
+float smin(float a, float b, float k) {
+    float h = max(k - abs(a - b), 0.0) / k;
+    return min(a, b) - h * h * k * 0.25;
+}
+
+float sceneSDF(vec3 p) {
+    // Fold into positive octant
+    vec3 q = abs(p);
+    // A sphere near the corner
+    float s = sdSphere(q - vec3(1.2, 0.4, 0.2), 0.35);
+    // A box along an edge
+    float b = sdBox(q - vec3(0.0, 0.9, 0.9), vec3(0.6, 0.15, 0.15));
+    float d = smin(s, b, 0.15);
+    float ground = p.y + 1.8;
+    return min(d, ground);
+}
+
+vec3 sceneColor(vec3 p) {
+    vec3 q = abs(p);
+    float s = sdSphere(q - vec3(1.2, 0.4, 0.2), 0.35);
+    float b = sdBox(q - vec3(0.0, 0.9, 0.9), vec3(0.6, 0.15, 0.15));
+    float d = smin(s, b, 0.15);
+    float ground = p.y + 1.8;
+    if (d < ground) return vec3(0.85, 0.5, 0.2);
+    return vec3(0.35, 0.3, 0.3);
+}
+
+vec3 calcNormal(vec3 p) {
+    float e = 0.001;
+    return normalize(vec3(
+        sceneSDF(p+vec3(e,0,0)) - sceneSDF(p-vec3(e,0,0)),
+        sceneSDF(p+vec3(0,e,0)) - sceneSDF(p-vec3(0,e,0)),
+        sceneSDF(p+vec3(0,0,e)) - sceneSDF(p-vec3(0,0,e))));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < 150; i++) {
+        float d = sceneSDF(ray.origin + t * ray.dir);
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    return -1.0;
+}
+
+float shadow(vec3 p, vec3 ld) {
+    float t = 0.05;
+    for (int i = 0; i < 50; i++) {
+        float d = sceneSDF(p + ld * t);
+        if (d < 0.001) return 0.0;
+        t += d;
+        if (t > 20.0) break;
+    }
+    return 1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 6.0);
+    Light light = Light(normalize(vec3(1, 2, 1.5)), vec3(1, 0.97, 0.95));
+    float t = raymarch(ray);
+    vec3 color = vec3(0.4, 0.6, 0.9);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 n = calcNormal(p);
+        vec3 mat = sceneColor(p);
+        float sh = shadow(p + n * 0.01, light.dir);
+        float diff = max(0.0, dot(n, light.dir));
+        vec3 refl = reflect(-light.dir, n);
+        float spec = pow(max(0.0, dot(refl, -ray.dir)), 32.0);
+        color = mat * vec3(0.25, 0.3, 0.4) + mat * light.color * diff * sh + light.color * spec * 0.3 * sh;
+    }
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## infinite-repetition
+
+A sphere tiled infinitely in xz with mod, on a ground plane.
+
+```glsl
+struct Ray { vec3 origin; vec3 dir; };
+struct Light { vec3 dir; vec3 color; };
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    float f = 1.0 / tan(radians(90.0) / 2.0);
+    return Ray(vec3(0.0), normalize(vec3(uv, -f)));
+}
+
+mat3 rotateX(float a) { float c = cos(a), s = sin(a); return mat3(1,0,0, 0,c,-s, 0,s,c); }
+mat3 rotateY(float a) { float c = cos(a), s = sin(a); return mat3(c,0,s, 0,1,0, -s,0,c); }
+
+Ray orbitCamera(Ray ray, float dist) {
+    vec2 m = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) m = vec2(0.58, 0.58);
+    mat3 rot = rotateX((0.5 - m.y) * 3.14) * rotateY((m.x - 0.5) * 6.28);
+    ray.origin = rot * vec3(0, 0, dist);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+float sdSphere(vec3 p, float r) { return length(p) - r; }
+
+float sceneSDF(vec3 p) {
+    float s = 3.0;
+    vec3 q = p;
+    q.xz = mod(p.xz + s * 0.5, s) - s * 0.5;
+    float sphere = sdSphere(q, 0.6);
+    float ground = p.y + 1.0;
+    return min(sphere, ground);
+}
+
+vec3 sceneColor(vec3 p) {
+    float s = 3.0;
+    vec3 q = p;
+    q.xz = mod(p.xz + s * 0.5, s) - s * 0.5;
+    float sphere = sdSphere(q, 0.6);
+    float ground = p.y + 1.0;
+    if (sphere < ground) return vec3(0.9, 0.4, 0.3);
+    return vec3(0.35, 0.3, 0.3);
+}
+
+vec3 calcNormal(vec3 p) {
+    float e = 0.001;
+    return normalize(vec3(
+        sceneSDF(p+vec3(e,0,0)) - sceneSDF(p-vec3(e,0,0)),
+        sceneSDF(p+vec3(0,e,0)) - sceneSDF(p-vec3(0,e,0)),
+        sceneSDF(p+vec3(0,0,e)) - sceneSDF(p-vec3(0,0,e))));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < 150; i++) {
+        float d = sceneSDF(ray.origin + t * ray.dir);
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 80.0) return -1.0;
+    }
+    return -1.0;
+}
+
+float shadow(vec3 p, vec3 ld) {
+    float t = 0.05;
+    for (int i = 0; i < 50; i++) {
+        float d = sceneSDF(p + ld * t);
+        if (d < 0.001) return 0.0;
+        t += d;
+        if (t > 20.0) break;
+    }
+    return 1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 8.0);
+    Light light = Light(normalize(vec3(1, 2, 1.5)), vec3(1, 0.97, 0.95));
+    float t = raymarch(ray);
+    vec3 color = vec3(0.4, 0.6, 0.9);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 n = calcNormal(p);
+        vec3 mat = sceneColor(p);
+        float sh = shadow(p + n * 0.01, light.dir);
+        float diff = max(0.0, dot(n, light.dir));
+        vec3 refl = reflect(-light.dir, n);
+        float spec = pow(max(0.0, dot(refl, -ray.dir)), 32.0);
+        color = mat * vec3(0.25, 0.3, 0.4) + mat * light.color * diff * sh + light.color * spec * 0.3 * sh;
+    }
+    // Distance fog
+    float fog = 1.0 - exp(-0.015 * t * t);
+    color = mix(color, vec3(0.4, 0.6, 0.9), fog);
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## finite-repetition
+
+A finite row of spheres along x using clamp.
+
+```glsl
+struct Ray { vec3 origin; vec3 dir; };
+struct Light { vec3 dir; vec3 color; };
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    float f = 1.0 / tan(radians(90.0) / 2.0);
+    return Ray(vec3(0.0), normalize(vec3(uv, -f)));
+}
+
+mat3 rotateX(float a) { float c = cos(a), s = sin(a); return mat3(1,0,0, 0,c,-s, 0,s,c); }
+mat3 rotateY(float a) { float c = cos(a), s = sin(a); return mat3(c,0,s, 0,1,0, -s,0,c); }
+
+Ray orbitCamera(Ray ray, float dist) {
+    vec2 m = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) m = vec2(0.55, 0.55);
+    mat3 rot = rotateX((0.5 - m.y) * 3.14) * rotateY((m.x - 0.5) * 6.28);
+    ray.origin = rot * vec3(0, 0, dist);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+float sdSphere(vec3 p, float r) { return length(p) - r; }
+
+float sceneSDF(vec3 p) {
+    float spacing = 2.0;
+    float count = 3.0;
+    vec3 q = p;
+    q.x = p.x - spacing * clamp(round(p.x / spacing), -count, count);
+    float sphere = sdSphere(q, 0.6);
+    float ground = p.y + 1.0;
+    return min(sphere, ground);
+}
+
+vec3 sceneColor(vec3 p) {
+    float spacing = 2.0;
+    float count = 3.0;
+    vec3 q = p;
+    q.x = p.x - spacing * clamp(round(p.x / spacing), -count, count);
+    float sphere = sdSphere(q, 0.6);
+    float ground = p.y + 1.0;
+    if (sphere < ground) return vec3(0.3, 0.6, 0.85);
+    return vec3(0.35, 0.3, 0.3);
+}
+
+vec3 calcNormal(vec3 p) {
+    float e = 0.001;
+    return normalize(vec3(
+        sceneSDF(p+vec3(e,0,0)) - sceneSDF(p-vec3(e,0,0)),
+        sceneSDF(p+vec3(0,e,0)) - sceneSDF(p-vec3(0,e,0)),
+        sceneSDF(p+vec3(0,0,e)) - sceneSDF(p-vec3(0,0,e))));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < 150; i++) {
+        float d = sceneSDF(ray.origin + t * ray.dir);
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    return -1.0;
+}
+
+float shadow(vec3 p, vec3 ld) {
+    float t = 0.05;
+    for (int i = 0; i < 50; i++) {
+        float d = sceneSDF(p + ld * t);
+        if (d < 0.001) return 0.0;
+        t += d;
+        if (t > 20.0) break;
+    }
+    return 1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 12.0);
+    Light light = Light(normalize(vec3(1, 2, 1.5)), vec3(1, 0.97, 0.95));
+    float t = raymarch(ray);
+    vec3 color = vec3(0.4, 0.6, 0.9);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 n = calcNormal(p);
+        vec3 mat = sceneColor(p);
+        float sh = shadow(p + n * 0.01, light.dir);
+        float diff = max(0.0, dot(n, light.dir));
+        vec3 refl = reflect(-light.dir, n);
+        float spec = pow(max(0.0, dot(refl, -ray.dir)), 32.0);
+        color = mat * vec3(0.25, 0.3, 0.4) + mat * light.color * diff * sh + light.color * spec * 0.3 * sh;
+    }
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## twist
+
+A box twisted along the y-axis. Demonstrates the domain warp.
+
+```glsl
+struct Ray { vec3 origin; vec3 dir; };
+struct Light { vec3 dir; vec3 color; };
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    float f = 1.0 / tan(radians(90.0) / 2.0);
+    return Ray(vec3(0.0), normalize(vec3(uv, -f)));
+}
+
+mat3 rotateX(float a) { float c = cos(a), s = sin(a); return mat3(1,0,0, 0,c,-s, 0,s,c); }
+mat3 rotateY(float a) { float c = cos(a), s = sin(a); return mat3(c,0,s, 0,1,0, -s,0,c); }
+
+Ray orbitCamera(Ray ray, float dist) {
+    vec2 m = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) m = vec2(0.6, 0.5);
+    mat3 rot = rotateX((0.5 - m.y) * 3.14) * rotateY((m.x - 0.5) * 6.28);
+    ray.origin = rot * vec3(0, 0, dist);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+float sdBox(vec3 p, vec3 b) {
+    vec3 d = abs(p) - b;
+    return length(max(d, 0.0)) + min(max(d.x, max(d.y, d.z)), 0.0);
+}
+
+float sceneSDF(vec3 p) {
+    // Twist the query point
+    float twistRate = 1.5;
+    float angle = twistRate * p.y;
+    float c = cos(angle), s = sin(angle);
+    vec3 q = vec3(c * p.x - s * p.z, p.y, s * p.x + c * p.z);
+    float box = sdBox(q, vec3(0.6, 1.5, 0.6));
+    float ground = p.y + 2.0;
+    return min(box, ground);
+}
+
+vec3 sceneColor(vec3 p) {
+    float twistRate = 1.5;
+    float angle = twistRate * p.y;
+    float c = cos(angle), s = sin(angle);
+    vec3 q = vec3(c * p.x - s * p.z, p.y, s * p.x + c * p.z);
+    float box = sdBox(q, vec3(0.6, 1.5, 0.6));
+    float ground = p.y + 2.0;
+    if (box < ground) return vec3(0.85, 0.6, 0.3);
+    return vec3(0.35, 0.3, 0.3);
+}
+
+vec3 calcNormal(vec3 p) {
+    float e = 0.001;
+    return normalize(vec3(
+        sceneSDF(p+vec3(e,0,0)) - sceneSDF(p-vec3(e,0,0)),
+        sceneSDF(p+vec3(0,e,0)) - sceneSDF(p-vec3(0,e,0)),
+        sceneSDF(p+vec3(0,0,e)) - sceneSDF(p-vec3(0,0,e))));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < 200; i++) {
+        float d = sceneSDF(ray.origin + t * ray.dir);
+        if (d < 0.001) return t;
+        t += d * 0.6;  // conservative for twist
+        if (t > 100.0) return -1.0;
+    }
+    return -1.0;
+}
+
+float shadow(vec3 p, vec3 ld) {
+    float t = 0.05;
+    for (int i = 0; i < 50; i++) {
+        float d = sceneSDF(p + ld * t);
+        if (d < 0.001) return 0.0;
+        t += d * 0.6;
+        if (t > 20.0) break;
+    }
+    return 1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 6.0);
+    Light light = Light(normalize(vec3(1, 2, 1.5)), vec3(1, 0.97, 0.95));
+    float t = raymarch(ray);
+    vec3 color = vec3(0.4, 0.6, 0.9);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 n = calcNormal(p);
+        vec3 mat = sceneColor(p);
+        float sh = shadow(p + n * 0.01, light.dir);
+        float diff = max(0.0, dot(n, light.dir));
+        vec3 refl = reflect(-light.dir, n);
+        float spec = pow(max(0.0, dot(refl, -ray.dir)), 32.0);
+        color = mat * vec3(0.25, 0.3, 0.4) + mat * light.color * diff * sh + light.color * spec * 0.3 * sh;
+    }
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## twisted-column
+
+A twisted capped cylinder on a ground plane — the barley-sugar column.
+
+```glsl
+struct Ray { vec3 origin; vec3 dir; };
+struct Light { vec3 dir; vec3 color; };
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    float f = 1.0 / tan(radians(90.0) / 2.0);
+    return Ray(vec3(0.0), normalize(vec3(uv, -f)));
+}
+
+mat3 rotateX(float a) { float c = cos(a), s = sin(a); return mat3(1,0,0, 0,c,-s, 0,s,c); }
+mat3 rotateY(float a) { float c = cos(a), s = sin(a); return mat3(c,0,s, 0,1,0, -s,0,c); }
+
+Ray orbitCamera(Ray ray, float dist) {
+    vec2 m = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) m = vec2(0.6, 0.48);
+    mat3 rot = rotateX((0.5 - m.y) * 3.14) * rotateY((m.x - 0.5) * 6.28);
+    ray.origin = rot * vec3(0, 0, dist);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+float sdBox(vec3 p, vec3 b) {
+    vec3 d = abs(p) - b;
+    return length(max(d, 0.0)) + min(max(d.x, max(d.y, d.z)), 0.0);
+}
+
+float sceneSDF(vec3 p) {
+    // Twist
+    float angle = 2.0 * p.y;
+    float c = cos(angle), s = sin(angle);
+    vec3 q = vec3(c * p.x - s * p.z, p.y, s * p.x + c * p.z);
+    // Square cross-section column
+    float col = sdBox(q, vec3(0.4, 2.0, 0.4));
+    float ground = p.y + 2.0;
+    // Pedestal
+    float base = sdBox(p - vec3(0, -2.15, 0), vec3(0.7, 0.15, 0.7));
+    return min(min(col, base), ground);
+}
+
+vec3 sceneColor(vec3 p) {
+    float angle = 2.0 * p.y;
+    float c = cos(angle), s = sin(angle);
+    vec3 q = vec3(c * p.x - s * p.z, p.y, s * p.x + c * p.z);
+    float col = sdBox(q, vec3(0.4, 2.0, 0.4));
+    float base = sdBox(p - vec3(0, -2.15, 0), vec3(0.7, 0.15, 0.7));
+    float ground = p.y + 2.0;
+    float shape = min(col, base);
+    if (shape < ground) return vec3(0.9, 0.85, 0.75);
+    return vec3(0.3, 0.28, 0.28);
+}
+
+vec3 calcNormal(vec3 p) {
+    float e = 0.001;
+    return normalize(vec3(
+        sceneSDF(p+vec3(e,0,0)) - sceneSDF(p-vec3(e,0,0)),
+        sceneSDF(p+vec3(0,e,0)) - sceneSDF(p-vec3(0,e,0)),
+        sceneSDF(p+vec3(0,0,e)) - sceneSDF(p-vec3(0,0,e))));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < 200; i++) {
+        float d = sceneSDF(ray.origin + t * ray.dir);
+        if (d < 0.001) return t;
+        t += d * 0.5;
+        if (t > 100.0) return -1.0;
+    }
+    return -1.0;
+}
+
+float shadow(vec3 p, vec3 ld) {
+    float t = 0.05;
+    for (int i = 0; i < 50; i++) {
+        float d = sceneSDF(p + ld * t);
+        if (d < 0.001) return 0.0;
+        t += d * 0.5;
+        if (t > 20.0) break;
+    }
+    return 1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 7.0);
+    Light light = Light(normalize(vec3(1, 2, 1.5)), vec3(1, 0.97, 0.95));
+    float t = raymarch(ray);
+    vec3 color = vec3(0.4, 0.6, 0.9);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 n = calcNormal(p);
+        vec3 mat = sceneColor(p);
+        float sh = shadow(p + n * 0.01, light.dir);
+        float diff = max(0.0, dot(n, light.dir));
+        vec3 refl = reflect(-light.dir, n);
+        float spec = pow(max(0.0, dot(refl, -ray.dir)), 32.0);
+        color = mat * vec3(0.25, 0.3, 0.4) + mat * light.color * diff * sh + light.color * spec * 0.3 * sh;
+    }
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## infinite-corridor
+
+Repeated columns in xz forming an infinite colonnade with floor and ceiling.
+
+```glsl
+struct Ray { vec3 origin; vec3 dir; };
+struct Light { vec3 dir; vec3 color; };
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    float f = 1.0 / tan(radians(90.0) / 2.0);
+    return Ray(vec3(0.0), normalize(vec3(uv, -f)));
+}
+
+mat3 rotateX(float a) { float c = cos(a), s = sin(a); return mat3(1,0,0, 0,c,-s, 0,s,c); }
+mat3 rotateY(float a) { float c = cos(a), s = sin(a); return mat3(c,0,s, 0,1,0, -s,0,c); }
+
+Ray orbitCamera(Ray ray, float dist) {
+    vec2 m = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) m = vec2(0.52, 0.52);
+    mat3 rot = rotateX((0.5 - m.y) * 3.14) * rotateY((m.x - 0.5) * 6.28);
+    ray.origin = rot * vec3(0, 1.0, dist);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+float sdCylinder(vec3 p, float r, float h) {
+    vec2 d = vec2(length(p.xz) - r, abs(p.y) - h);
+    return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
+}
+
+float sceneSDF(vec3 p) {
+    // Floor and ceiling
+    float floor = p.y + 2.0;
+    float ceiling = -(p.y - 4.0);
+
+    // Repeated columns
+    float s = 5.0;
+    vec3 q = p;
+    q.xz = mod(p.xz + s * 0.5, s) - s * 0.5;
+    float column = sdCylinder(q, 0.35, 2.0);
+
+    // Carve the central hallway: remove columns in a band
+    float hallway = abs(p.z) - 2.0;
+
+    float d = min(floor, ceiling);
+    // Only place columns outside the hallway
+    if (hallway > 0.0) d = min(d, column);
+    else d = min(d, min(column, -hallway));  // keep columns, subtract hallway space
+
+    return min(d, min(floor, ceiling));
+}
+
+vec3 sceneColor(vec3 p) {
+    float floor = p.y + 2.0;
+    float ceiling = -(p.y - 4.0);
+    float s = 5.0;
+    vec3 q = p;
+    q.xz = mod(p.xz + s * 0.5, s) - s * 0.5;
+    float column = sdCylinder(q, 0.35, 2.0);
+    float d = min(min(floor, ceiling), column);
+    if (d == column) return vec3(0.9, 0.85, 0.75);
+    if (d == floor) return vec3(0.4, 0.35, 0.32);
+    return vec3(0.5, 0.48, 0.45);
+}
+
+vec3 calcNormal(vec3 p) {
+    float e = 0.001;
+    return normalize(vec3(
+        sceneSDF(p+vec3(e,0,0)) - sceneSDF(p-vec3(e,0,0)),
+        sceneSDF(p+vec3(0,e,0)) - sceneSDF(p-vec3(0,e,0)),
+        sceneSDF(p+vec3(0,0,e)) - sceneSDF(p-vec3(0,0,e))));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < 200; i++) {
+        float d = sceneSDF(ray.origin + t * ray.dir);
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 60.0) return -1.0;
+    }
+    return -1.0;
+}
+
+float shadow(vec3 p, vec3 ld) {
+    float t = 0.05;
+    for (int i = 0; i < 50; i++) {
+        float d = sceneSDF(p + ld * t);
+        if (d < 0.001) return 0.0;
+        t += d;
+        if (t > 20.0) break;
+    }
+    return 1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 8.0);
+    Light light = Light(normalize(vec3(0.5, 1, 0.3)), vec3(1, 0.95, 0.85));
+    float t = raymarch(ray);
+    vec3 color = vec3(0.3, 0.4, 0.6);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 n = calcNormal(p);
+        vec3 mat = sceneColor(p);
+        float sh = shadow(p + n * 0.01, light.dir);
+        float diff = max(0.0, dot(n, light.dir));
+        vec3 refl = reflect(-light.dir, n);
+        float spec = pow(max(0.0, dot(refl, -ray.dir)), 32.0);
+        color = mat * vec3(0.2, 0.22, 0.3) + mat * light.color * diff * sh + light.color * spec * 0.2 * sh;
+    }
+    float fog = 1.0 - exp(-0.008 * t * t);
+    color = mix(color, vec3(0.3, 0.4, 0.6), fog);
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## symmetric-sculpture
+
+Primitives in the positive octant, smooth-unioned, then abs(q) for octant symmetry.
+
+```glsl
+struct Ray { vec3 origin; vec3 dir; };
+struct Light { vec3 dir; vec3 color; };
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    float f = 1.0 / tan(radians(90.0) / 2.0);
+    return Ray(vec3(0.0), normalize(vec3(uv, -f)));
+}
+
+mat3 rotateX(float a) { float c = cos(a), s = sin(a); return mat3(1,0,0, 0,c,-s, 0,s,c); }
+mat3 rotateY(float a) { float c = cos(a), s = sin(a); return mat3(c,0,s, 0,1,0, -s,0,c); }
+
+Ray orbitCamera(Ray ray, float dist) {
+    vec2 m = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) m = vec2(0.58, 0.48);
+    mat3 rot = rotateX((0.5 - m.y) * 3.14) * rotateY((m.x - 0.5) * 6.28);
+    ray.origin = rot * vec3(0, 0, dist);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+float sdSphere(vec3 p, float r) { return length(p) - r; }
+float sdBox(vec3 p, vec3 b) {
+    vec3 d = abs(p) - b;
+    return length(max(d, 0.0)) + min(max(d.x, max(d.y, d.z)), 0.0);
+}
+float sdTorus(vec3 p, float R, float r) {
+    vec2 q = vec2(length(p.xz) - R, p.y);
+    return length(q) - r;
+}
+float smin(float a, float b, float k) {
+    float h = max(k - abs(a - b), 0.0) / k;
+    return min(a, b) - h * h * k * 0.25;
+}
+
+float sceneSDF(vec3 p) {
+    vec3 q = abs(p);
+    // A sphere at the corner
+    float s1 = sdSphere(q - vec3(1.0, 0.6, 0.3), 0.3);
+    // A torus arm
+    float t1 = sdTorus(q - vec3(0, 0, 0), 1.2, 0.12);
+    // A connecting box
+    float b1 = sdBox(q - vec3(0.5, 0.0, 0.5), vec3(0.12, 0.8, 0.12));
+
+    float d = smin(s1, t1, 0.2);
+    d = smin(d, b1, 0.15);
+    float ground = p.y + 1.8;
+    return min(d, ground);
+}
+
+vec3 sceneColor(vec3 p) {
+    vec3 q = abs(p);
+    float s1 = sdSphere(q - vec3(1.0, 0.6, 0.3), 0.3);
+    float t1 = sdTorus(q - vec3(0, 0, 0), 1.2, 0.12);
+    float b1 = sdBox(q - vec3(0.5, 0.0, 0.5), vec3(0.12, 0.8, 0.12));
+    float d = smin(s1, t1, 0.2);
+    d = smin(d, b1, 0.15);
+    float ground = p.y + 1.8;
+    if (d < ground) return vec3(0.75, 0.55, 0.85);
+    return vec3(0.35, 0.3, 0.3);
+}
+
+vec3 calcNormal(vec3 p) {
+    float e = 0.001;
+    return normalize(vec3(
+        sceneSDF(p+vec3(e,0,0)) - sceneSDF(p-vec3(e,0,0)),
+        sceneSDF(p+vec3(0,e,0)) - sceneSDF(p-vec3(0,e,0)),
+        sceneSDF(p+vec3(0,0,e)) - sceneSDF(p-vec3(0,0,e))));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < 150; i++) {
+        float d = sceneSDF(ray.origin + t * ray.dir);
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    return -1.0;
+}
+
+float shadow(vec3 p, vec3 ld) {
+    float t = 0.05;
+    for (int i = 0; i < 50; i++) {
+        float d = sceneSDF(p + ld * t);
+        if (d < 0.001) return 0.0;
+        t += d;
+        if (t > 20.0) break;
+    }
+    return 1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 6.0);
+    Light light = Light(normalize(vec3(1, 2, 1.5)), vec3(1, 0.97, 0.95));
+    float t = raymarch(ray);
+    vec3 color = vec3(0.4, 0.6, 0.9);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 n = calcNormal(p);
+        vec3 mat = sceneColor(p);
+        float sh = shadow(p + n * 0.01, light.dir);
+        float diff = max(0.0, dot(n, light.dir));
+        vec3 refl = reflect(-light.dir, n);
+        float spec = pow(max(0.0, dot(refl, -ray.dir)), 32.0);
+        color = mat * vec3(0.25, 0.3, 0.4) + mat * light.color * diff * sh + light.color * spec * 0.3 * sh;
+    }
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## mug
+
+Coffee mug: hollow cylinder + torus handle with smooth union.
+
+```glsl
+struct Ray { vec3 origin; vec3 dir; };
+struct Light { vec3 dir; vec3 color; };
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    float f = 1.0 / tan(radians(90.0) / 2.0);
+    return Ray(vec3(0.0), normalize(vec3(uv, -f)));
+}
+
+mat3 rotateX(float a) { float c = cos(a), s = sin(a); return mat3(1,0,0, 0,c,-s, 0,s,c); }
+mat3 rotateY(float a) { float c = cos(a), s = sin(a); return mat3(c,0,s, 0,1,0, -s,0,c); }
+
+Ray orbitCamera(Ray ray, float dist) {
+    vec2 m = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) m = vec2(0.62, 0.52);
+    mat3 rot = rotateX((0.5 - m.y) * 3.14) * rotateY((m.x - 0.5) * 6.28);
+    ray.origin = rot * vec3(0, 0, dist);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+float sdCylinder(vec3 p, float r, float h) {
+    vec2 d = vec2(length(p.xz) - r, abs(p.y) - h);
+    return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
+}
+
+float sdTorus(vec3 p, float R, float r) {
+    vec2 q = vec2(length(p.xz) - R, p.y);
+    return length(q) - r;
+}
+
+float smin(float a, float b, float k) {
+    float h = max(k - abs(a - b), 0.0) / k;
+    return min(a, b) - h * h * k * 0.25;
+}
+
+float mugSDF(vec3 p) {
+    // Outer body
+    float outer = sdCylinder(p, 0.5, 0.5);
+    // Inner cavity (shifted up to preserve bottom)
+    float inner = sdCylinder(p - vec3(0, 0.05, 0), 0.45, 0.5);
+    float body = max(outer, -inner);
+    // Handle: torus at the side, intersected with half-space for arc
+    vec3 hp = p - vec3(0.5, 0.0, 0.0);
+    hp = hp.xzy;  // stand torus upright
+    float torus = sdTorus(hp, 0.3, 0.07);
+    float handle = max(torus, hp.y - 0.2);
+    return smin(body, handle, 0.08);
+}
+
+float sceneSDF(vec3 p) {
+    float mug = mugSDF(p);
+    float ground = p.y + 0.55;
+    return min(mug, ground);
+}
+
+vec3 sceneColor(vec3 p) {
+    float mug = mugSDF(p);
+    float ground = p.y + 0.55;
+    if (mug < ground) return vec3(0.85, 0.82, 0.78);
+    return vec3(0.35, 0.3, 0.3);
+}
+
+vec3 calcNormal(vec3 p) {
+    float e = 0.001;
+    return normalize(vec3(
+        sceneSDF(p+vec3(e,0,0)) - sceneSDF(p-vec3(e,0,0)),
+        sceneSDF(p+vec3(0,e,0)) - sceneSDF(p-vec3(0,e,0)),
+        sceneSDF(p+vec3(0,0,e)) - sceneSDF(p-vec3(0,0,e))));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < 150; i++) {
+        float d = sceneSDF(ray.origin + t * ray.dir);
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    return -1.0;
+}
+
+float shadow(vec3 p, vec3 ld) {
+    float t = 0.05;
+    for (int i = 0; i < 50; i++) {
+        float d = sceneSDF(p + ld * t);
+        if (d < 0.001) return 0.0;
+        t += d;
+        if (t > 20.0) break;
+    }
+    return 1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 3.5);
+    Light light = Light(normalize(vec3(1, 2, 1.5)), vec3(1, 0.97, 0.95));
+    float t = raymarch(ray);
+    vec3 color = vec3(0.4, 0.6, 0.9);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 n = calcNormal(p);
+        vec3 mat = sceneColor(p);
+        float sh = shadow(p + n * 0.01, light.dir);
+        float diff = max(0.0, dot(n, light.dir));
+        vec3 refl = reflect(-light.dir, n);
+        float spec = pow(max(0.0, dot(refl, -ray.dir)), 32.0);
+        color = mat * vec3(0.25, 0.3, 0.4) + mat * light.color * diff * sh + light.color * spec * 0.3 * sh;
+    }
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## saucer
+
+A thin disk with a smooth-unioned raised rim.
+
+```glsl
+struct Ray { vec3 origin; vec3 dir; };
+struct Light { vec3 dir; vec3 color; };
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    float f = 1.0 / tan(radians(90.0) / 2.0);
+    return Ray(vec3(0.0), normalize(vec3(uv, -f)));
+}
+
+mat3 rotateX(float a) { float c = cos(a), s = sin(a); return mat3(1,0,0, 0,c,-s, 0,s,c); }
+mat3 rotateY(float a) { float c = cos(a), s = sin(a); return mat3(c,0,s, 0,1,0, -s,0,c); }
+
+Ray orbitCamera(Ray ray, float dist) {
+    vec2 m = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) m = vec2(0.6, 0.58);
+    mat3 rot = rotateX((0.5 - m.y) * 3.14) * rotateY((m.x - 0.5) * 6.28);
+    ray.origin = rot * vec3(0, 0, dist);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+float sdCylinder(vec3 p, float r, float h) {
+    vec2 d = vec2(length(p.xz) - r, abs(p.y) - h);
+    return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
+}
+
+float smin(float a, float b, float k) {
+    float h = max(k - abs(a - b), 0.0) / k;
+    return min(a, b) - h * h * k * 0.25;
+}
+
+float saucerSDF(vec3 p) {
+    float base = sdCylinder(p, 0.7, 0.04);
+    vec3 rp = p - vec3(0, 0.03, 0);
+    float ring = sdCylinder(rp, 0.7, 0.03);
+    float hole = sdCylinder(rp, 0.55, 0.1);
+    float rim = max(ring, -hole);
+    return smin(base, rim, 0.06);
+}
+
+float sceneSDF(vec3 p) {
+    float s = saucerSDF(p);
+    float ground = p.y + 0.1;
+    return min(s, ground);
+}
+
+vec3 sceneColor(vec3 p) {
+    float s = saucerSDF(p);
+    float ground = p.y + 0.1;
+    if (s < ground) return vec3(0.85, 0.82, 0.78);
+    return vec3(0.35, 0.3, 0.3);
+}
+
+vec3 calcNormal(vec3 p) {
+    float e = 0.001;
+    return normalize(vec3(
+        sceneSDF(p+vec3(e,0,0)) - sceneSDF(p-vec3(e,0,0)),
+        sceneSDF(p+vec3(0,e,0)) - sceneSDF(p-vec3(0,e,0)),
+        sceneSDF(p+vec3(0,0,e)) - sceneSDF(p-vec3(0,0,e))));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < 150; i++) {
+        float d = sceneSDF(ray.origin + t * ray.dir);
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    return -1.0;
+}
+
+float shadow(vec3 p, vec3 ld) {
+    float t = 0.05;
+    for (int i = 0; i < 50; i++) {
+        float d = sceneSDF(p + ld * t);
+        if (d < 0.001) return 0.0;
+        t += d;
+        if (t > 20.0) break;
+    }
+    return 1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 3.0);
+    Light light = Light(normalize(vec3(1, 2, 1.5)), vec3(1, 0.97, 0.95));
+    float t = raymarch(ray);
+    vec3 color = vec3(0.4, 0.6, 0.9);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 n = calcNormal(p);
+        vec3 mat = sceneColor(p);
+        float sh = shadow(p + n * 0.01, light.dir);
+        float diff = max(0.0, dot(n, light.dir));
+        vec3 refl = reflect(-light.dir, n);
+        float spec = pow(max(0.0, dot(refl, -ray.dir)), 32.0);
+        color = mat * vec3(0.25, 0.3, 0.4) + mat * light.color * diff * sh + light.color * spec * 0.3 * sh;
+    }
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## plate-and-donut
+
+Plate with donut and icing (with noise displacement).
+
+```glsl
+struct Ray { vec3 origin; vec3 dir; };
+struct Light { vec3 dir; vec3 color; };
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    float f = 1.0 / tan(radians(90.0) / 2.0);
+    return Ray(vec3(0.0), normalize(vec3(uv, -f)));
+}
+
+mat3 rotateX(float a) { float c = cos(a), s = sin(a); return mat3(1,0,0, 0,c,-s, 0,s,c); }
+mat3 rotateY(float a) { float c = cos(a), s = sin(a); return mat3(c,0,s, 0,1,0, -s,0,c); }
+
+Ray orbitCamera(Ray ray, float dist) {
+    vec2 m = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) m = vec2(0.6, 0.55);
+    mat3 rot = rotateX((0.5 - m.y) * 3.14) * rotateY((m.x - 0.5) * 6.28);
+    ray.origin = rot * vec3(0, 0, dist);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+float sdCylinder(vec3 p, float r, float h) {
+    vec2 d = vec2(length(p.xz) - r, abs(p.y) - h);
+    return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
+}
+
+float sdTorus(vec3 p, float R, float r) {
+    vec2 q = vec2(length(p.xz) - R, p.y);
+    return length(q) - r;
+}
+
+float smin(float a, float b, float k) {
+    float h = max(k - abs(a - b), 0.0) / k;
+    return min(a, b) - h * h * k * 0.25;
+}
+
+#define MAT_PLATE  0.0
+#define MAT_DONUT  1.0
+#define MAT_ICING  2.0
+#define MAT_GROUND 3.0
+float objID;
+
+float plateSDF(vec3 p) {
+    float base = sdCylinder(p, 1.0, 0.04);
+    float ring = sdCylinder(p - vec3(0, 0.03, 0), 1.0, 0.03);
+    float hole = sdCylinder(p - vec3(0, 0.03, 0), 0.8, 0.1);
+    float rim = max(ring, -hole);
+    return smin(base, rim, 0.06);
+}
+
+float donutSDF(vec3 p) {
+    vec3 q = p - vec3(0, 0.23, 0);
+    return sdTorus(q, 0.35, 0.15);
+}
+
+float icingSDF(vec3 p) {
+    vec3 q = p - vec3(0, 0.23, 0);
+    float icing = sdTorus(q, 0.35, 0.17);
+    icing = max(icing, q.y + 0.02);
+    icing += 0.008 * sin(40.0 * q.x) * sin(40.0 * q.y) * sin(40.0 * q.z);
+    return icing;
+}
+
+float sceneSDF(vec3 p) {
+    float pl = plateSDF(p);
+    objID = MAT_PLATE;
+
+    float dn = donutSDF(p);
+    if (dn < pl) { pl = dn; objID = MAT_DONUT; }
+
+    float ic = icingSDF(p);
+    float donutWithIcing = smin(dn, ic, 0.03);
+    if (donutWithIcing < pl) {
+        pl = donutWithIcing;
+        objID = (ic < dn) ? MAT_ICING : MAT_DONUT;
+    }
+
+    float ground = p.y + 0.1;
+    if (ground < pl) { pl = ground; objID = MAT_GROUND; }
+
+    return min(min(plateSDF(p), min(donutSDF(p), icingSDF(p))), ground);
+}
+
+vec3 materialColor(float id) {
+    if (id == MAT_PLATE)  return vec3(0.85, 0.82, 0.78);
+    if (id == MAT_DONUT)  return vec3(0.8, 0.6, 0.35);
+    if (id == MAT_ICING)  return vec3(0.9, 0.45, 0.55);
+    return vec3(0.35, 0.3, 0.3);
+}
+
+// Simplified sceneSDF for raymarching (no material tracking)
+float sceneD(vec3 p) {
+    float pl = plateSDF(p);
+    float dn = donutSDF(p);
+    float ic = icingSDF(p);
+    float donutAll = smin(dn, ic, 0.03);
+    float ground = p.y + 0.1;
+    return min(min(pl, donutAll), ground);
+}
+
+vec3 calcNormal(vec3 p) {
+    float e = 0.001;
+    return normalize(vec3(
+        sceneD(p+vec3(e,0,0)) - sceneD(p-vec3(e,0,0)),
+        sceneD(p+vec3(0,e,0)) - sceneD(p-vec3(0,e,0)),
+        sceneD(p+vec3(0,0,e)) - sceneD(p-vec3(0,0,e))));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < 200; i++) {
+        float d = sceneD(ray.origin + t * ray.dir);
+        if (d < 0.0005) return t;
+        t += d * 0.8;
+        if (t > 100.0) return -1.0;
+    }
+    return -1.0;
+}
+
+float shadow(vec3 p, vec3 ld) {
+    float t = 0.05;
+    for (int i = 0; i < 50; i++) {
+        float d = sceneD(p + ld * t);
+        if (d < 0.001) return 0.0;
+        t += d;
+        if (t > 20.0) break;
+    }
+    return 1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 4.0);
+    Light light = Light(normalize(vec3(1, 2, 1.5)), vec3(1, 0.97, 0.95));
+    float t = raymarch(ray);
+    vec3 color = vec3(0.4, 0.6, 0.9);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        // Get material ID
+        sceneSDF(p);
+        float id = objID;
+        vec3 n = calcNormal(p);
+        vec3 mat = materialColor(id);
+        float sh = shadow(p + n * 0.01, light.dir);
+        float diff = max(0.0, dot(n, light.dir));
+        vec3 refl = reflect(-light.dir, n);
+        float spec = pow(max(0.0, dot(refl, -ray.dir)), 32.0);
+        color = mat * vec3(0.25, 0.3, 0.4) + mat * light.color * diff * sh + light.color * spec * 0.3 * sh;
+    }
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## table
+
+Table with box tabletop and four box legs, smooth-unioned.
+
+```glsl
+struct Ray { vec3 origin; vec3 dir; };
+struct Light { vec3 dir; vec3 color; };
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    float f = 1.0 / tan(radians(90.0) / 2.0);
+    return Ray(vec3(0.0), normalize(vec3(uv, -f)));
+}
+
+mat3 rotateX(float a) { float c = cos(a), s = sin(a); return mat3(1,0,0, 0,c,-s, 0,s,c); }
+mat3 rotateY(float a) { float c = cos(a), s = sin(a); return mat3(c,0,s, 0,1,0, -s,0,c); }
+
+Ray orbitCamera(Ray ray, float dist) {
+    vec2 m = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) m = vec2(0.58, 0.55);
+    mat3 rot = rotateX((0.5 - m.y) * 3.14) * rotateY((m.x - 0.5) * 6.28);
+    ray.origin = rot * vec3(0, 0, dist);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+float sdBox(vec3 p, vec3 b) {
+    vec3 d = abs(p) - b;
+    return length(max(d, 0.0)) + min(max(d.x, max(d.y, d.z)), 0.0);
+}
+
+float smin(float a, float b, float k) {
+    float h = max(k - abs(a - b), 0.0) / k;
+    return min(a, b) - h * h * k * 0.25;
+}
+
+float tableSDF(vec3 p) {
+    float top = sdBox(p, vec3(2.0, 0.06, 1.2));
+    float l1 = sdBox(p - vec3(-1.8, -0.56, -1.0), vec3(0.08, 0.5, 0.08));
+    float l2 = sdBox(p - vec3(-1.8, -0.56,  1.0), vec3(0.08, 0.5, 0.08));
+    float l3 = sdBox(p - vec3( 1.8, -0.56, -1.0), vec3(0.08, 0.5, 0.08));
+    float l4 = sdBox(p - vec3( 1.8, -0.56,  1.0), vec3(0.08, 0.5, 0.08));
+    float legs = min(min(l1, l2), min(l3, l4));
+    return smin(top, legs, 0.04);
+}
+
+float sceneSDF(vec3 p) {
+    float table = tableSDF(p);
+    float ground = p.y + 1.1;
+    return min(table, ground);
+}
+
+vec3 sceneColor(vec3 p) {
+    float table = tableSDF(p);
+    float ground = p.y + 1.1;
+    if (table < ground) return vec3(0.55, 0.35, 0.2);
+    return vec3(0.35, 0.3, 0.3);
+}
+
+vec3 calcNormal(vec3 p) {
+    float e = 0.001;
+    return normalize(vec3(
+        sceneSDF(p+vec3(e,0,0)) - sceneSDF(p-vec3(e,0,0)),
+        sceneSDF(p+vec3(0,e,0)) - sceneSDF(p-vec3(0,e,0)),
+        sceneSDF(p+vec3(0,0,e)) - sceneSDF(p-vec3(0,0,e))));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < 150; i++) {
+        float d = sceneSDF(ray.origin + t * ray.dir);
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    return -1.0;
+}
+
+float shadow(vec3 p, vec3 ld) {
+    float t = 0.05;
+    for (int i = 0; i < 50; i++) {
+        float d = sceneSDF(p + ld * t);
+        if (d < 0.001) return 0.0;
+        t += d;
+        if (t > 20.0) break;
+    }
+    return 1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 7.0);
+    Light light = Light(normalize(vec3(1, 2, 1.5)), vec3(1, 0.97, 0.95));
+    float t = raymarch(ray);
+    vec3 color = vec3(0.4, 0.6, 0.9);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 n = calcNormal(p);
+        vec3 mat = sceneColor(p);
+        float sh = shadow(p + n * 0.01, light.dir);
+        float diff = max(0.0, dot(n, light.dir));
+        vec3 refl = reflect(-light.dir, n);
+        float spec = pow(max(0.0, dot(refl, -ray.dir)), 32.0);
+        color = mat * vec3(0.25, 0.3, 0.4) + mat * light.color * diff * sh + light.color * spec * 0.3 * sh;
+    }
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## breakfast-scene
+
+The full scene: mug on saucer, plate with iced donut, all on a table.
+
+```glsl
+struct Ray { vec3 origin; vec3 dir; };
+struct Light { vec3 dir; vec3 color; };
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    float f = 1.0 / tan(radians(90.0) / 2.0);
+    return Ray(vec3(0.0), normalize(vec3(uv, -f)));
+}
+
+mat3 rotateX(float a) { float c = cos(a), s = sin(a); return mat3(1,0,0, 0,c,-s, 0,s,c); }
+mat3 rotateY(float a) { float c = cos(a), s = sin(a); return mat3(c,0,s, 0,1,0, -s,0,c); }
+
+Ray orbitCamera(Ray ray, float dist) {
+    vec2 m = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) m = vec2(0.58, 0.52);
+    mat3 rot = rotateX((0.5 - m.y) * 3.14) * rotateY((m.x - 0.5) * 6.28);
+    ray.origin = rot * vec3(0, 0.5, dist);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+float sdSphere(vec3 p, float r) { return length(p) - r; }
+float sdBox(vec3 p, vec3 b) {
+    vec3 d = abs(p) - b;
+    return length(max(d, 0.0)) + min(max(d.x, max(d.y, d.z)), 0.0);
+}
+float sdCylinder(vec3 p, float r, float h) {
+    vec2 d = vec2(length(p.xz) - r, abs(p.y) - h);
+    return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
+}
+float sdTorus(vec3 p, float R, float r) {
+    vec2 q = vec2(length(p.xz) - R, p.y);
+    return length(q) - r;
+}
+float smin(float a, float b, float k) {
+    float h = max(k - abs(a - b), 0.0) / k;
+    return min(a, b) - h * h * k * 0.25;
+}
+
+// --- Mug ---
+float mugSDF(vec3 p) {
+    vec3 mp = p - vec3(-1.0, 0.62, 0.0);
+    float outer = sdCylinder(mp, 0.5, 0.5);
+    float inner = sdCylinder(mp - vec3(0, 0.05, 0), 0.45, 0.5);
+    float body = max(outer, -inner);
+    vec3 hp = mp - vec3(0.5, 0.0, 0.0);
+    hp = hp.xzy;
+    float torus = sdTorus(hp, 0.3, 0.07);
+    float handle = max(torus, hp.y - 0.2);
+    return smin(body, handle, 0.08);
+}
+
+// --- Saucer ---
+float saucerSDF(vec3 p) {
+    vec3 sp = p - vec3(-1.0, 0.07, 0.0);
+    float base = sdCylinder(sp, 0.7, 0.04);
+    vec3 rp = sp - vec3(0, 0.03, 0);
+    float ring = sdCylinder(rp, 0.7, 0.03);
+    float hole = sdCylinder(rp, 0.55, 0.1);
+    float rim = max(ring, -hole);
+    return smin(base, rim, 0.06);
+}
+
+// --- Plate ---
+float plateSDF(vec3 p) {
+    vec3 pp = p - vec3(1.2, 0.07, 0.0);
+    float base = sdCylinder(pp, 1.0, 0.04);
+    float ring = sdCylinder(pp - vec3(0, 0.03, 0), 1.0, 0.03);
+    float hole = sdCylinder(pp - vec3(0, 0.03, 0), 0.8, 0.1);
+    float rim = max(ring, -hole);
+    return smin(base, rim, 0.06);
+}
+
+// --- Donut with icing ---
+float donutSDF(vec3 p) {
+    vec3 dp = p - vec3(1.2, 0.3, 0.0);
+    return sdTorus(dp, 0.35, 0.15);
+}
+
+float icingSDF(vec3 p) {
+    vec3 dp = p - vec3(1.2, 0.3, 0.0);
+    float icing = sdTorus(dp, 0.35, 0.17);
+    icing = max(icing, dp.y + 0.02);
+    icing += 0.008 * sin(40.0 * dp.x) * sin(40.0 * dp.y) * sin(40.0 * dp.z);
+    return icing;
+}
+
+// --- Table ---
+float tableSDF(vec3 p) {
+    float top = sdBox(p, vec3(2.5, 0.06, 1.5));
+    float l1 = sdBox(p - vec3(-2.3, -0.56, -1.3), vec3(0.08, 0.5, 0.08));
+    float l2 = sdBox(p - vec3(-2.3, -0.56,  1.3), vec3(0.08, 0.5, 0.08));
+    float l3 = sdBox(p - vec3( 2.3, -0.56, -1.3), vec3(0.08, 0.5, 0.08));
+    float l4 = sdBox(p - vec3( 2.3, -0.56,  1.3), vec3(0.08, 0.5, 0.08));
+    float legs = min(min(l1, l2), min(l3, l4));
+    return smin(top, legs, 0.04);
+}
+
+// --- Material tracking ---
+#define MAT_MUG    0.0
+#define MAT_SAUCER 1.0
+#define MAT_PLATE  2.0
+#define MAT_DONUT  3.0
+#define MAT_ICING  4.0
+#define MAT_TABLE  5.0
+#define MAT_GROUND 6.0
+float objID;
+
+float sceneSDF(vec3 p) {
+    float d = mugSDF(p);
+    objID = MAT_MUG;
+
+    float sc = saucerSDF(p);
+    if (sc < d) { d = sc; objID = MAT_SAUCER; }
+
+    float pl = plateSDF(p);
+    if (pl < d) { d = pl; objID = MAT_PLATE; }
+
+    float dn = donutSDF(p);
+    float ic = icingSDF(p);
+    float donutAll = smin(dn, ic, 0.03);
+    if (donutAll < d) {
+        d = donutAll;
+        objID = (ic < dn) ? MAT_ICING : MAT_DONUT;
+    }
+
+    float tb = tableSDF(p);
+    if (tb < d) { d = tb; objID = MAT_TABLE; }
+
+    float ground = p.y + 1.1;
+    if (ground < d) { d = ground; objID = MAT_GROUND; }
+
+    return d;
+}
+
+vec3 materialColor(float id) {
+    if (id == MAT_MUG)    return vec3(0.85, 0.82, 0.78);
+    if (id == MAT_SAUCER) return vec3(0.85, 0.82, 0.78);
+    if (id == MAT_PLATE)  return vec3(0.85, 0.82, 0.78);
+    if (id == MAT_DONUT)  return vec3(0.8, 0.6, 0.35);
+    if (id == MAT_ICING)  return vec3(0.9, 0.45, 0.55);
+    if (id == MAT_TABLE)  return vec3(0.55, 0.35, 0.2);
+    return vec3(0.35, 0.32, 0.3);
+}
+
+vec3 calcNormal(vec3 p) {
+    float e = 0.001;
+    return normalize(vec3(
+        sceneSDF(p+vec3(e,0,0)) - sceneSDF(p-vec3(e,0,0)),
+        sceneSDF(p+vec3(0,e,0)) - sceneSDF(p-vec3(0,e,0)),
+        sceneSDF(p+vec3(0,0,e)) - sceneSDF(p-vec3(0,0,e))));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < 200; i++) {
+        float d = sceneSDF(ray.origin + t * ray.dir);
+        if (d < 0.0005) return t;
+        t += d * 0.8;
+        if (t > 100.0) return -1.0;
+    }
+    return -1.0;
+}
+
+float shadow(vec3 p, vec3 ld) {
+    float t = 0.05;
+    for (int i = 0; i < 60; i++) {
+        float d = sceneSDF(p + ld * t);
+        if (d < 0.001) return 0.0;
+        t += d;
+        if (t > 20.0) break;
+    }
+    return 1.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 7.0);
+    Light light = Light(normalize(vec3(1, 2, 1.5)), vec3(1, 0.97, 0.95));
+    float t = raymarch(ray);
+    vec3 color = vec3(0.4, 0.6, 0.9);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        float id = objID;       // save before calcNormal clobbers it
+        vec3 n = calcNormal(p);
+        vec3 mat = materialColor(id);
+        float sh = shadow(p + n * 0.01, light.dir);
+        float diff = max(0.0, dot(n, light.dir));
+        vec3 refl = reflect(-light.dir, n);
+        float spec = pow(max(0.0, dot(refl, -ray.dir)), 32.0);
+        color = mat * vec3(0.25, 0.3, 0.4) + mat * light.color * diff * sh + light.color * spec * 0.3 * sh;
+    }
+    fragColor = vec4(color, 1.0);
+}
+```

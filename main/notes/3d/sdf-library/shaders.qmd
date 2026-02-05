@@ -1,0 +1,1475 @@
+# SDF Library Shaders
+
+Complete, runnable shaders for each demo in the SDF Library notes.
+
+---
+
+## circle-2d
+
+```glsl
+float sdCircle(vec2 p, float r) {
+    return length(p) - r;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 2.0;
+
+    float d = sdCircle(p, 1.0);
+
+    // Color by sign: blue inside, orange outside
+    vec3 color;
+    if (d < 0.0) {
+        color = vec3(0.2, 0.4, 0.8);
+    } else {
+        color = vec3(0.9, 0.6, 0.2);
+    }
+
+    // Darken near the boundary
+    color *= 1.0 - exp(-6.0 * abs(d));
+
+    // Contour lines
+    float contour = abs(fract(d * 4.0 + 0.5) - 0.5);
+    color = mix(vec3(1.0), color, smoothstep(0.0, 0.05, contour));
+
+    // Highlight the zero level set
+    color = mix(vec3(1.0), color, smoothstep(0.0, 0.02, abs(d)));
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## box-2d
+
+```glsl
+float sdBox(vec2 p, vec2 halfSize) {
+    vec2 d = abs(p) - halfSize;
+    return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 2.0;
+
+    float d = sdBox(p, vec2(0.8, 0.5));
+
+    vec3 color;
+    if (d < 0.0) {
+        color = vec3(0.2, 0.4, 0.8);
+    } else {
+        color = vec3(0.9, 0.6, 0.2);
+    }
+
+    color *= 1.0 - exp(-6.0 * abs(d));
+
+    float contour = abs(fract(d * 4.0 + 0.5) - 0.5);
+    color = mix(vec3(1.0), color, smoothstep(0.0, 0.05, contour));
+
+    color = mix(vec3(1.0), color, smoothstep(0.0, 0.02, abs(d)));
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## box-3d
+
+```glsl
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+struct Hit {
+    float t;
+    vec3 point;
+    vec3 normal;
+    vec3 color;
+};
+
+struct Light {
+    vec3 dir;
+    vec3 color;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+mat3 rotateX(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(1, 0, 0, 0, c, -s, 0, s, c);
+}
+
+mat3 rotateY(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
+}
+
+Ray orbitCamera(Ray ray, float distance) {
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
+
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+float sdBox(vec3 p, vec3 halfSize) {
+    vec3 d = abs(p) - halfSize;
+    return length(max(d, 0.0)) + min(max(d.x, max(d.y, d.z)), 0.0);
+}
+
+float sceneSDF(vec3 p) {
+    return sdBox(p, vec3(0.8, 0.5, 0.6));
+}
+
+vec3 calcNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
+        sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0)),
+        sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < 100; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    return -1.0;
+}
+
+vec3 shade(Hit hit, Light light, vec3 viewDir) {
+    float diffuse = max(0.0, dot(hit.normal, light.dir));
+    vec3 reflected = reflect(-light.dir, hit.normal);
+    float specular = pow(max(0.0, dot(reflected, viewDir)), 32.0);
+
+    vec3 diff = hit.color * light.color * diffuse;
+    vec3 spec = light.color * specular * 0.5;
+    return diff + spec;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 4.0);
+
+    Light light = Light(normalize(vec3(1.0, 1.0, 1.0)), vec3(1.0));
+
+    float t = raymarch(ray);
+
+    vec3 color = vec3(0.1, 0.1, 0.2);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 normal = calcNormal(p);
+
+        Hit hit;
+        hit.t = t;
+        hit.point = p;
+        hit.normal = normal;
+        hit.color = vec3(0.9, 0.5, 0.2);
+
+        vec3 ambient = hit.color * 0.1;
+        color = ambient + shade(hit, light, -ray.dir);
+    }
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## capped-cylinder
+
+```glsl
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+struct Hit {
+    float t;
+    vec3 point;
+    vec3 normal;
+    vec3 color;
+};
+
+struct Light {
+    vec3 dir;
+    vec3 color;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+mat3 rotateX(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(1, 0, 0, 0, c, -s, 0, s, c);
+}
+
+mat3 rotateY(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
+}
+
+Ray orbitCamera(Ray ray, float distance) {
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
+
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+float sdCylinder(vec3 p, float radius, float halfHeight) {
+    vec2 d = vec2(length(p.xz) - radius, abs(p.y) - halfHeight);
+    return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
+}
+
+float sceneSDF(vec3 p) {
+    return sdCylinder(p, 0.7, 0.9);
+}
+
+vec3 calcNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
+        sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0)),
+        sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < 100; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    return -1.0;
+}
+
+vec3 shade(Hit hit, Light light, vec3 viewDir) {
+    float diffuse = max(0.0, dot(hit.normal, light.dir));
+    vec3 reflected = reflect(-light.dir, hit.normal);
+    float specular = pow(max(0.0, dot(reflected, viewDir)), 32.0);
+
+    vec3 diff = hit.color * light.color * diffuse;
+    vec3 spec = light.color * specular * 0.5;
+    return diff + spec;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 4.0);
+
+    Light light = Light(normalize(vec3(1.0, 1.0, 1.0)), vec3(1.0));
+
+    float t = raymarch(ray);
+
+    vec3 color = vec3(0.1, 0.1, 0.2);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 normal = calcNormal(p);
+
+        Hit hit;
+        hit.t = t;
+        hit.point = p;
+        hit.normal = normal;
+        hit.color = vec3(0.2, 0.7, 0.4);
+
+        vec3 ambient = hit.color * 0.1;
+        color = ambient + shade(hit, light, -ray.dir);
+    }
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## torus
+
+```glsl
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+struct Hit {
+    float t;
+    vec3 point;
+    vec3 normal;
+    vec3 color;
+};
+
+struct Light {
+    vec3 dir;
+    vec3 color;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+mat3 rotateX(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(1, 0, 0, 0, c, -s, 0, s, c);
+}
+
+mat3 rotateY(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
+}
+
+Ray orbitCamera(Ray ray, float distance) {
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
+
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+float sdTorus(vec3 p, float majorRadius, float minorRadius) {
+    vec2 q = vec2(length(p.xz) - majorRadius, p.y);
+    return length(q) - minorRadius;
+}
+
+float sceneSDF(vec3 p) {
+    return sdTorus(p, 1.0, 0.4);
+}
+
+vec3 calcNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
+        sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0)),
+        sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < 100; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    return -1.0;
+}
+
+vec3 shade(Hit hit, Light light, vec3 viewDir) {
+    float diffuse = max(0.0, dot(hit.normal, light.dir));
+    vec3 reflected = reflect(-light.dir, hit.normal);
+    float specular = pow(max(0.0, dot(reflected, viewDir)), 32.0);
+
+    vec3 diff = hit.color * light.color * diffuse;
+    vec3 spec = light.color * specular * 0.5;
+    return diff + spec;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 4.0);
+
+    Light light = Light(normalize(vec3(1.0, 1.0, 1.0)), vec3(1.0));
+
+    float t = raymarch(ray);
+
+    vec3 color = vec3(0.1, 0.1, 0.2);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 normal = calcNormal(p);
+
+        Hit hit;
+        hit.t = t;
+        hit.point = p;
+        hit.normal = normal;
+        hit.color = vec3(0.0, 0.7, 1.0);
+
+        vec3 ambient = hit.color * 0.1;
+        color = ambient + shade(hit, light, -ray.dir);
+    }
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## capped-cone
+
+```glsl
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+struct Hit {
+    float t;
+    vec3 point;
+    vec3 normal;
+    vec3 color;
+};
+
+struct Light {
+    vec3 dir;
+    vec3 color;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+mat3 rotateX(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(1, 0, 0, 0, c, -s, 0, s, c);
+}
+
+mat3 rotateY(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
+}
+
+Ray orbitCamera(Ray ray, float distance) {
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
+
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+float sdCappedCone(vec3 p, float h, float r1, float r2) {
+    vec2 q = vec2(length(p.xz), p.y);
+    vec2 k1 = vec2(r2, h);
+    vec2 k2 = vec2(r2 - r1, 2.0 * h);
+    vec2 ca = vec2(q.x - min(q.x, (q.y < 0.0) ? r1 : r2),
+                   abs(q.y) - h);
+    vec2 cb = q - k1 + k2 * clamp(dot(k1 - q, k2) / dot(k2, k2), 0.0, 1.0);
+    float s = (cb.x < 0.0 && ca.y < 0.0) ? -1.0 : 1.0;
+    return s * sqrt(min(dot(ca, ca), dot(cb, cb)));
+}
+
+float sceneSDF(vec3 p) {
+    return sdCappedCone(p, 1.0, 0.8, 0.3);
+}
+
+vec3 calcNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
+        sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0)),
+        sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < 100; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    return -1.0;
+}
+
+vec3 shade(Hit hit, Light light, vec3 viewDir) {
+    float diffuse = max(0.0, dot(hit.normal, light.dir));
+    vec3 reflected = reflect(-light.dir, hit.normal);
+    float specular = pow(max(0.0, dot(reflected, viewDir)), 32.0);
+
+    vec3 diff = hit.color * light.color * diffuse;
+    vec3 spec = light.color * specular * 0.5;
+    return diff + spec;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 4.0);
+
+    Light light = Light(normalize(vec3(1.0, 1.0, 1.0)), vec3(1.0));
+
+    float t = raymarch(ray);
+
+    vec3 color = vec3(0.1, 0.1, 0.2);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 normal = calcNormal(p);
+
+        Hit hit;
+        hit.t = t;
+        hit.point = p;
+        hit.normal = normal;
+        hit.color = vec3(0.8, 0.4, 0.2);
+
+        vec3 ambient = hit.color * 0.1;
+        color = ambient + shade(hit, light, -ray.dir);
+    }
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## capsule
+
+```glsl
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+struct Hit {
+    float t;
+    vec3 point;
+    vec3 normal;
+    vec3 color;
+};
+
+struct Light {
+    vec3 dir;
+    vec3 color;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+mat3 rotateX(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(1, 0, 0, 0, c, -s, 0, s, c);
+}
+
+mat3 rotateY(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
+}
+
+Ray orbitCamera(Ray ray, float distance) {
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
+
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+float sdCapsule(vec3 p, vec3 a, vec3 b, float r) {
+    vec3 pa = p - a;
+    vec3 ba = b - a;
+    float t = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
+    return length(pa - ba * t) - r;
+}
+
+float sceneSDF(vec3 p) {
+    return sdCapsule(p, vec3(0.0, -0.8, 0.0), vec3(0.0, 0.8, 0.0), 0.4);
+}
+
+vec3 calcNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
+        sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0)),
+        sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < 100; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    return -1.0;
+}
+
+vec3 shade(Hit hit, Light light, vec3 viewDir) {
+    float diffuse = max(0.0, dot(hit.normal, light.dir));
+    vec3 reflected = reflect(-light.dir, hit.normal);
+    float specular = pow(max(0.0, dot(reflected, viewDir)), 32.0);
+
+    vec3 diff = hit.color * light.color * diffuse;
+    vec3 spec = light.color * specular * 0.5;
+    return diff + spec;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 4.0);
+
+    Light light = Light(normalize(vec3(1.0, 1.0, 1.0)), vec3(1.0));
+
+    float t = raymarch(ray);
+
+    vec3 color = vec3(0.1, 0.1, 0.2);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 normal = calcNormal(p);
+
+        Hit hit;
+        hit.t = t;
+        hit.point = p;
+        hit.normal = normal;
+        hit.color = vec3(0.8, 0.2, 0.4);
+
+        vec3 ambient = hit.color * 0.1;
+        color = ambient + shade(hit, light, -ray.dir);
+    }
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## rounded-box
+
+```glsl
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+struct Hit {
+    float t;
+    vec3 point;
+    vec3 normal;
+    vec3 color;
+};
+
+struct Light {
+    vec3 dir;
+    vec3 color;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+mat3 rotateX(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(1, 0, 0, 0, c, -s, 0, s, c);
+}
+
+mat3 rotateY(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
+}
+
+Ray orbitCamera(Ray ray, float distance) {
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
+
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+float sdRoundBox(vec3 p, vec3 halfSize, float rounding) {
+    vec3 d = abs(p) - (halfSize - rounding);
+    return length(max(d, 0.0)) + min(max(d.x, max(d.y, d.z)), 0.0) - rounding;
+}
+
+float sceneSDF(vec3 p) {
+    return sdRoundBox(p, vec3(0.8, 0.5, 0.6), 0.15);
+}
+
+vec3 calcNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
+        sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0)),
+        sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < 100; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    return -1.0;
+}
+
+vec3 shade(Hit hit, Light light, vec3 viewDir) {
+    float diffuse = max(0.0, dot(hit.normal, light.dir));
+    vec3 reflected = reflect(-light.dir, hit.normal);
+    float specular = pow(max(0.0, dot(reflected, viewDir)), 32.0);
+
+    vec3 diff = hit.color * light.color * diffuse;
+    vec3 spec = light.color * specular * 0.5;
+    return diff + spec;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 4.0);
+
+    Light light = Light(normalize(vec3(1.0, 1.0, 1.0)), vec3(1.0));
+
+    float t = raymarch(ray);
+
+    vec3 color = vec3(0.1, 0.1, 0.2);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 normal = calcNormal(p);
+
+        Hit hit;
+        hit.t = t;
+        hit.point = p;
+        hit.normal = normal;
+        hit.color = vec3(0.9, 0.5, 0.2);
+
+        vec3 ambient = hit.color * 0.1;
+        color = ambient + shade(hit, light, -ray.dir);
+    }
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## ring-2d
+
+```glsl
+float sdRing(vec2 p, float R, float t) {
+    return abs(length(p) - R) - t;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 2.0;
+
+    float d = sdRing(p, 0.8, 0.2);
+
+    vec3 color;
+    if (d < 0.0) {
+        color = vec3(0.2, 0.4, 0.8);
+    } else {
+        color = vec3(0.9, 0.6, 0.2);
+    }
+
+    color *= 1.0 - exp(-6.0 * abs(d));
+
+    float contour = abs(fract(d * 4.0 + 0.5) - 0.5);
+    color = mix(vec3(1.0), color, smoothstep(0.0, 0.05, contour));
+
+    color = mix(vec3(1.0), color, smoothstep(0.0, 0.02, abs(d)));
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## triangle-chambers
+
+Visualizes the six chambers of the dihedral group $I_2(3)$ for the equilateral triangle.
+
+```glsl
+#define PI 3.14159265
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 2.0;
+
+    float r = 1.0;
+
+    // Color chambers: use angle to assign colors
+    float angle = atan(p.y, p.x);
+    float sector = mod(angle + PI, PI / 3.0);
+    float chamber = floor((angle + PI) / (PI / 3.0));
+
+    // Six distinct pastel colors for the six chambers
+    vec3 colors[6];
+    colors[0] = vec3(0.9, 0.5, 0.5);
+    colors[1] = vec3(0.5, 0.9, 0.5);
+    colors[2] = vec3(0.5, 0.5, 0.9);
+    colors[3] = vec3(0.9, 0.9, 0.5);
+    colors[4] = vec3(0.9, 0.5, 0.9);
+    colors[5] = vec3(0.5, 0.9, 0.9);
+
+    int idx = int(mod(chamber, 6.0));
+    vec3 color = colors[idx];
+
+    // Draw mirror lines
+    float lineWidth = 0.02;
+
+    // y-axis mirror
+    float mirrorY = abs(p.x);
+    color = mix(vec3(0.0), color, smoothstep(0.0, lineWidth, mirrorY));
+
+    // +30 degree mirror: y = x * tan(30) = x / sqrt(3)
+    vec2 n1 = vec2(-sin(PI / 6.0), cos(PI / 6.0));
+    float mirror1 = abs(dot(p, n1));
+    color = mix(vec3(0.0), color, smoothstep(0.0, lineWidth, mirror1));
+
+    // -30 degree mirror: y = -x / sqrt(3)
+    vec2 n2 = vec2(sin(PI / 6.0), cos(PI / 6.0));
+    float mirror2 = abs(dot(p, n2));
+    color = mix(vec3(0.0), color, smoothstep(0.0, lineWidth, mirror2));
+
+    // Draw the triangle outline
+    vec2 tp = p;
+    tp.x = abs(tp.x);
+    tp -= 2.0 * min(dot(tp, vec2(-0.5, -sqrt(3.0) / 2.0)), 0.0)
+             * vec2(-0.5, -sqrt(3.0) / 2.0);
+    tp.x = abs(tp.x);
+    float triDist = -(tp.y + r * 0.5);
+    color = mix(vec3(1.0), color, smoothstep(0.0, 0.025, abs(triDist)));
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## triangle-2d
+
+```glsl
+#define PI 3.14159265
+
+float sdTriangle(vec2 p, float r) {
+    // Fold into fundamental domain (3 folds for I_2(3))
+    p.x = abs(p.x);
+    p -= 2.0 * min(dot(p, vec2(-0.5, -sqrt(3.0) / 2.0)), 0.0)
+           * vec2(-0.5, -sqrt(3.0) / 2.0);
+    p.x = abs(p.x);
+
+    // Distance to bottom edge
+    return -(p.y + r * 0.5);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 2.0;
+
+    float d = sdTriangle(p, 1.2);
+
+    vec3 color;
+    if (d < 0.0) {
+        color = vec3(0.2, 0.4, 0.8);
+    } else {
+        color = vec3(0.9, 0.6, 0.2);
+    }
+
+    color *= 1.0 - exp(-6.0 * abs(d));
+
+    float contour = abs(fract(d * 4.0 + 0.5) - 0.5);
+    color = mix(vec3(1.0), color, smoothstep(0.0, 0.05, contour));
+
+    color = mix(vec3(1.0), color, smoothstep(0.0, 0.02, abs(d)));
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## octahedron
+
+```glsl
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+struct Hit {
+    float t;
+    vec3 point;
+    vec3 normal;
+    vec3 color;
+};
+
+struct Light {
+    vec3 dir;
+    vec3 color;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+mat3 rotateX(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(1, 0, 0, 0, c, -s, 0, s, c);
+}
+
+mat3 rotateY(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
+}
+
+Ray orbitCamera(Ray ray, float distance) {
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
+
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+float sdOctahedron(vec3 p, float s) {
+    p = abs(p);
+    return (p.x + p.y + p.z - s) * 0.57735027;
+}
+
+float sceneSDF(vec3 p) {
+    return sdOctahedron(p, 1.2);
+}
+
+vec3 calcNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
+        sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0)),
+        sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < 100; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    return -1.0;
+}
+
+vec3 shade(Hit hit, Light light, vec3 viewDir) {
+    float diffuse = max(0.0, dot(hit.normal, light.dir));
+    vec3 reflected = reflect(-light.dir, hit.normal);
+    float specular = pow(max(0.0, dot(reflected, viewDir)), 32.0);
+
+    vec3 diff = hit.color * light.color * diffuse;
+    vec3 spec = light.color * specular * 0.5;
+    return diff + spec;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 4.0);
+
+    Light light = Light(normalize(vec3(1.0, 1.0, 1.0)), vec3(1.0));
+
+    float t = raymarch(ray);
+
+    vec3 color = vec3(0.1, 0.1, 0.2);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 normal = calcNormal(p);
+
+        Hit hit;
+        hit.t = t;
+        hit.point = p;
+        hit.normal = normal;
+        hit.color = vec3(0.7, 0.3, 0.8);
+
+        vec3 ambient = hit.color * 0.1;
+        color = ambient + shade(hit, light, -ray.dir);
+    }
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## tetrahedron
+
+```glsl
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+struct Hit {
+    float t;
+    vec3 point;
+    vec3 normal;
+    vec3 color;
+};
+
+struct Light {
+    vec3 dir;
+    vec3 color;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+mat3 rotateX(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(1, 0, 0, 0, c, -s, 0, s, c);
+}
+
+mat3 rotateY(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
+}
+
+Ray orbitCamera(Ray ray, float distance) {
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
+
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+float sdTetrahedron(vec3 p, float s) {
+    p /= s;
+    float m;
+    m = min(p.x + p.y, 0.0); p.x -= m; p.y -= m;
+    m = min(p.y + p.z, 0.0); p.y -= m; p.z -= m;
+    m = min(p.x + p.y, 0.0); p.x -= m; p.y -= m;
+    return (p.x + p.y + p.z - 1.0) * s * 0.57735027;
+}
+
+float sceneSDF(vec3 p) {
+    return sdTetrahedron(p, 1.2);
+}
+
+vec3 calcNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
+        sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0)),
+        sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < 100; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    return -1.0;
+}
+
+vec3 shade(Hit hit, Light light, vec3 viewDir) {
+    float diffuse = max(0.0, dot(hit.normal, light.dir));
+    vec3 reflected = reflect(-light.dir, hit.normal);
+    float specular = pow(max(0.0, dot(reflected, viewDir)), 32.0);
+
+    vec3 diff = hit.color * light.color * diffuse;
+    vec3 spec = light.color * specular * 0.5;
+    return diff + spec;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 4.0);
+
+    Light light = Light(normalize(vec3(1.0, 1.0, 1.0)), vec3(1.0));
+
+    float t = raymarch(ray);
+
+    vec3 color = vec3(0.1, 0.1, 0.2);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 normal = calcNormal(p);
+
+        Hit hit;
+        hit.t = t;
+        hit.point = p;
+        hit.normal = normal;
+        hit.color = vec3(0.3, 0.8, 0.5);
+
+        vec3 ambient = hit.color * 0.1;
+        color = ambient + shade(hit, light, -ray.dir);
+    }
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## icosahedron
+
+```glsl
+#define PHI (0.5 + 0.5 * sqrt(5.0))
+
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+struct Hit {
+    float t;
+    vec3 point;
+    vec3 normal;
+    vec3 color;
+};
+
+struct Light {
+    vec3 dir;
+    vec3 color;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+mat3 rotateX(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(1, 0, 0, 0, c, -s, 0, s, c);
+}
+
+mat3 rotateY(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
+}
+
+Ray orbitCamera(Ray ray, float distance) {
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
+
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+float sdIcosahedron(vec3 p, float r) {
+    p = abs(p);
+    vec3 n1 = normalize(vec3(0, 1, PHI));
+    vec3 n2 = normalize(vec3(1, PHI, 0));
+    vec3 n3 = normalize(vec3(PHI, 0, 1));
+    p -= 2.0 * min(dot(p, n1), 0.0) * n1;
+    p -= 2.0 * min(dot(p, n2), 0.0) * n2;
+    p -= 2.0 * min(dot(p, n3), 0.0) * n3;
+    return (p.x + p.y + p.z - r * sqrt(3.0)) * 0.57735027;
+}
+
+float sceneSDF(vec3 p) {
+    return sdIcosahedron(p, 0.9);
+}
+
+vec3 calcNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
+        sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0)),
+        sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < 100; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    return -1.0;
+}
+
+vec3 shade(Hit hit, Light light, vec3 viewDir) {
+    float diffuse = max(0.0, dot(hit.normal, light.dir));
+    vec3 reflected = reflect(-light.dir, hit.normal);
+    float specular = pow(max(0.0, dot(reflected, viewDir)), 32.0);
+
+    vec3 diff = hit.color * light.color * diffuse;
+    vec3 spec = light.color * specular * 0.5;
+    return diff + spec;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 4.0);
+
+    Light light = Light(normalize(vec3(1.0, 1.0, 1.0)), vec3(1.0));
+
+    float t = raymarch(ray);
+
+    vec3 color = vec3(0.1, 0.1, 0.2);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 normal = calcNormal(p);
+
+        Hit hit;
+        hit.t = t;
+        hit.point = p;
+        hit.normal = normal;
+        hit.color = vec3(0.9, 0.7, 0.2);
+
+        vec3 ambient = hit.color * 0.1;
+        color = ambient + shade(hit, light, -ray.dir);
+    }
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## dodecahedron
+
+```glsl
+#define PHI (0.5 + 0.5 * sqrt(5.0))
+
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+struct Hit {
+    float t;
+    vec3 point;
+    vec3 normal;
+    vec3 color;
+};
+
+struct Light {
+    vec3 dir;
+    vec3 color;
+};
+
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+mat3 rotateX(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(1, 0, 0, 0, c, -s, 0, s, c);
+}
+
+mat3 rotateY(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
+}
+
+Ray orbitCamera(Ray ray, float distance) {
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
+
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+float sdDodecahedron(vec3 p, float r) {
+    p = abs(p);
+    vec3 n1 = normalize(vec3(0, 1, PHI));
+    vec3 n2 = normalize(vec3(1, PHI, 0));
+    vec3 n3 = normalize(vec3(PHI, 0, 1));
+    p -= 2.0 * min(dot(p, n1), 0.0) * n1;
+    p -= 2.0 * min(dot(p, n2), 0.0) * n2;
+    p -= 2.0 * min(dot(p, n3), 0.0) * n3;
+    vec3 fn = normalize(vec3(0, 1.0 / PHI, PHI));
+    return dot(p, fn) - r;
+}
+
+float sceneSDF(vec3 p) {
+    return sdDodecahedron(p, 1.0);
+}
+
+vec3 calcNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
+        sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0)),
+        sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < 100; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
+        if (d < 0.001) return t;
+        t += d;
+        if (t > 100.0) return -1.0;
+    }
+    return -1.0;
+}
+
+vec3 shade(Hit hit, Light light, vec3 viewDir) {
+    float diffuse = max(0.0, dot(hit.normal, light.dir));
+    vec3 reflected = reflect(-light.dir, hit.normal);
+    float specular = pow(max(0.0, dot(reflected, viewDir)), 32.0);
+
+    vec3 diff = hit.color * light.color * diffuse;
+    vec3 spec = light.color * specular * 0.5;
+    return diff + spec;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 4.0);
+
+    Light light = Light(normalize(vec3(1.0, 1.0, 1.0)), vec3(1.0));
+
+    float t = raymarch(ray);
+
+    vec3 color = vec3(0.1, 0.1, 0.2);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 normal = calcNormal(p);
+
+        Hit hit;
+        hit.t = t;
+        hit.point = p;
+        hit.normal = normal;
+        hit.color = vec3(0.2, 0.6, 0.9);
+
+        vec3 ambient = hit.color * 0.1;
+        color = ambient + shade(hit, light, -ray.dir);
+    }
+
+    fragColor = vec4(color, 1.0);
+}
+```

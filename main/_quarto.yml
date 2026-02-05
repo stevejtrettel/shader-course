@@ -10,11 +10,17 @@ website:
     collapse-level: 1
     contents:
       - index.qmd
-      # Add notes sections here as they grow:
-      # - section: "Introduction"
-      #   contents:
-      #     - intro/what-is-a-shader.qmd
-      #     - intro/setup.qmd
+     # Add notes sections here as they grow:
+      - section: "3D Rendering"
+        contents:
+          - section: "SDF Library"
+            contents:
+              - notes/3d/sdf-library/notes.qmd
+              - notes/3d/sdf-library/shaders.qmd
+          - section: "Sculpting"
+            contents:
+              - notes/3d/scuplting/notes.qmd
+              - notes/3d/scuplting/shaders.qmd
       # - section: "Fundamentals"
       #   contents:
       #     - fundamentals/coordinates.qmd
