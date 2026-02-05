@@ -1,4 +1,4 @@
-# Sculpting with Math — Shaders
+#  Shaders
 
 Complete, runnable shaders for each demo in the notes.
 
