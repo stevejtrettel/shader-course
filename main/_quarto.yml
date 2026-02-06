@@ -10,17 +10,26 @@ website:
     collapse-level: 1
     contents:
       - index.qmd
-     # Add notes sections here as they grow:
       - section: "3D Rendering"
         contents:
-          - section: "SDF Library"
-            contents:
-              - notes/3d/sdf-library/notes.qmd
-              - notes/3d/sdf-library/shaders.qmd
-          - section: "Sculpting"
-            contents:
-              - notes/3d/scuplting/notes.qmd
-              - notes/3d/scuplting/shaders.qmd
+          - text: "First Rays"
+            href: notes/3d/first-rays/notes.qmd
+          - text: "Raymarching"
+            href: notes/3d/raymarching/notes.qmd
+          - text: "Deriving SDFs"
+            href: notes/3d/deriving-sdfs/notes.qmd
+          - text: "SDF Library"
+            href: notes/3d/sdf-library/notes.qmd
+          - text: "Sculpting"
+            href: notes/3d/sculpting/notes.qmd
+          - text: "Lighting & Shadows"
+            href: notes/3d/lighting-shadows/notes.qmd
+          - text: "Materials"
+            href: notes/3d/materials/notes.qmd
+          - text: "Procedural Patterns"
+            href: notes/3d/procedural/notes.qmd
+          - text: "Refraction"
+            href: notes/3d/refraction/notes.qmd
       # - section: "Fundamentals"
       #   contents:
       #     - fundamentals/coordinates.qmd
@@ -43,7 +52,6 @@ format:
     code-overflow: wrap
     toc: true
     toc-depth: 3
-    number-sections: true
-    number-depth: 2
+    number-sections: false
     link-external-newwindow: true
     smooth-scroll: true

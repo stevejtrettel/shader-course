@@ -685,6 +685,12 @@ We have the tools: CSG for combining shapes, smooth operations for blending them
 
 The goal isn't just the scene. It's fluency with the workflow: pick a real object, decompose it into primitives and operations, and write the SDF.
 
+::: {.callout-note}
+## Code Style
+
+We use structs for scene objects — geometry and color bundled together, defined once, referenced by name. This keeps complex scenes organized. In Shadertoy and demo code, you'll often see the terser inline style: magic numbers scattered through `sceneSDF` and `getMaterial`, no structs at all. Both work. Ours is more readable; theirs is more compact. When you read SDF code in the wild, expect the inline style.
+:::
+
 
 ### Coffee Mug
 

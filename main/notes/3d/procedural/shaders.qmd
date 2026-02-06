@@ -1,0 +1,71 @@
+---
+title: "Procedural Shaders"
+format:
+  html:
+    code-fold: true
+---
+
+```{ojs}
+//| echo: false
+import { createShaderCanvas } from "/lib/shader-utils.js"
+```
+
+
+## perlin
+
+Basic Perlin noise visualization.
+
+```{ojs}
+//| label: perlin
+// TODO: implement Perlin noise shader
+```
+
+
+## fbm
+
+Fractal Brownian motion layering multiple octaves.
+
+```{ojs}
+//| label: fbm
+// TODO: implement FBM shader
+```
+
+
+## warp
+
+Domain warping for organic patterns.
+
+```{ojs}
+//| label: warp
+// TODO: implement domain warping shader
+```
+
+
+## displaced
+
+Noise-displaced sphere.
+
+```{ojs}
+//| label: displaced
+// TODO: implement displaced surface shader
+```
+
+
+## voronoi
+
+Voronoi / cellular noise pattern.
+
+```{ojs}
+//| label: voronoi
+// TODO: implement Voronoi shader
+```
+
+
+## materials
+
+Combined procedural materials (wood, marble, rust).
+
+```{ojs}
+//| label: materials
+// TODO: implement procedural materials shader
+```

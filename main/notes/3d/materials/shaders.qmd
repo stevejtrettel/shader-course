@@ -1,0 +1,71 @@
+---
+title: "Materials Shaders"
+format:
+  html:
+    code-fold: true
+---
+
+```{ojs}
+//| echo: false
+import { createShaderCanvas } from "/lib/shader-utils.js"
+```
+
+
+## fresnel
+
+Fresnel effect demonstration on a sphere.
+
+```{ojs}
+//| label: fresnel
+// TODO: implement fresnel shader
+```
+
+
+## reflections
+
+Scene with reflective surfaces.
+
+```{ojs}
+//| label: reflections
+// TODO: implement reflections shader
+```
+
+
+## roughness
+
+Varying roughness across surfaces.
+
+```{ojs}
+//| label: roughness
+// TODO: implement roughness shader
+```
+
+
+## metallic
+
+Metallic vs dielectric material comparison.
+
+```{ojs}
+//| label: metallic
+// TODO: implement metallic shader
+```
+
+
+## rim
+
+Rim lighting effect.
+
+```{ojs}
+//| label: rim
+// TODO: implement rim lighting shader
+```
+
+
+## complete
+
+Complete material system demonstration.
+
+```{ojs}
+//| label: complete
+// TODO: implement complete materials shader
+```

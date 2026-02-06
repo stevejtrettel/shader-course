@@ -1,0 +1,330 @@
+# GPU-Accelerated Mathematical Illustration
+
+## A Guide to Shader Programming for Mathematicians
+
+Based on and expanding the five-day mini-course taught in Marseille, January 2025.
+This guide is organized by topic rather than by day, with each part building on the tools and ideas developed in previous parts.
+
+---
+
+## Part 0: Foundations
+
+Everything you need before you can draw anything. By the end of this part you can write a fragment shader from scratch, place mathematical objects on the screen, and color them meaningfully.
+
+### 0.1 What Is a Fragment Shader?
+
+The pixel-by-pixel paradigm. How the GPU executes your function millions of times in parallel. The fragment shader contract: you receive a pixel coordinate, you return a color. How this differs from CPU thinking — no loops over pixels, no shared state, no drawing commands. A brief tour of the WebGL/GLSL pipeline (just enough to understand what we're doing).
+
+### 0.2 Coordinates and the Canvas
+
+UV coordinates and `gl_FragCoord`. Mapping pixel coordinates to mathematical coordinates: aspect ratio correction, centering, scaling. Setting up a coordinate system where (0,0) is the center and the axes have the range you want. The idea that every shader is really "for each point in the plane, evaluate a function."
+
+### 0.3 Color as Output
+
+RGB color as a vec3. Mapping real numbers to colors: gradients, ramps, cyclic palettes. HSL and the hue wheel. Cosine palettes (Inigo Quilez's technique). Building colormaps that are mathematically meaningful and perceptually honest.
+
+### 0.4 Drawing Shapes with Math
+
+Signed distance functions for basic shapes: circles, rectangles, half-planes, annuli. Using `smoothstep` to draw crisp boundaries with antialiasing. Combining shapes: union, intersection, subtraction. Building up a mathematical diagram piece by piece.
+
+### 0.5 Curves and Implicit Surfaces
+
+Drawing curves as thickened level sets of functions: $f(x,y) = 0$ becomes `smoothstep(thickness, 0.0, abs(f(p)))`. Parametric curves by closest-point distance. Plotting graphs of functions. Implicit vs. parametric representations and when each is natural in a shader.
+
+### 0.6 Interaction and Uniforms
+
+Mouse input, uniform variables, and building parameter-space explorers. Making your shaders interactive: click to set a point, drag to transform. Time as a uniform — simple animation. This is the basic toolkit for exploration that we'll use throughout the course.
+
+---
+
+## Part 1: The Complex Plane
+
+Mathematicians love $\mathbb{C}$, and it's a perfect playground for shaders. The complex plane is naturally a 2D domain, and fragment shaders are naturally functions on 2D domains. Everything here is single-pass: one function evaluation per pixel.
+
+### 1.1 Domain Coloring
+
+Phase portraits of complex functions. The HSL color wheel as a natural map from argument to hue. Visualizing modulus through brightness or contour lines. Choosing colormaps that reveal structure: phase alone, modulus alone, combined. Building a reusable `domainColor` function.
+
+### 1.2 Analytic Functions and Conformal Maps
+
+Möbius transformations as the first interesting example. Visualizing conformality: how circles and angles are preserved. Comparing maps side-by-side or animating between them. Exponential, logarithm, power maps. Joukowski transform and other classics from complex analysis.
+
+### 1.3 Zeros, Poles, and Singularities
+
+Reading a phase portrait: how zeros and poles appear as sources/sinks of color. Winding number as a visual quantity — count the color cycles. Essential singularities and their wild behavior. The argument principle, made visible.
+
+### 1.4 Taylor and Laurent Series
+
+Partial sums of power series, animated. Watching convergence happen (or fail) — the radius of convergence as a visible boundary. Laurent series near poles. Approximation quality visualized as the difference between the function and its truncation. Runge's theorem illustrated.
+
+### 1.5 Newton's Method and Root Finding
+
+Newton fractals as the first "iterate and color" example. Basins of attraction — which root does each starting point converge to? Coloring by basin (which root) and by speed (how many iterations). Relaxed Newton's method and other variants. This introduces the core technique we'll generalize in Part 2.
+
+### 1.6 Julia Sets and the Mandelbrot Set
+
+Iteration of $z \mapsto z^2 + c$. Julia sets: the boundary between escape and captivity. The Mandelbrot set as the parameter space. Smooth coloring via the escape-time algorithm with renormalization. Orbit traps and other artistic coloring methods. Higher-degree polynomials and rational maps. Burning Ship, Tricorn, and other variations.
+
+### 1.7 Number Theory Visualizations
+
+The complex plane as a home for number-theoretic pictures. Gaussian integers and their primes. Modular arithmetic patterns on lattices. Prime spirals (Ulam, Sacks). Dirichlet characters and $L$-functions via domain coloring. These serve as examples of the techniques from earlier chapters applied to number-theoretic objects.
+
+---
+
+## Part 2: Dynamical Systems
+
+Part 1 taught you to iterate on $\mathbb{C}$. This part says: that idea works for any dynamical system. The paradigm is always the same — each pixel is an initial condition (or a parameter), you iterate a map or integrate a flow, and you color by some orbit statistic. Everything here is single-pass, no buffers needed.
+
+### 2.1 Orbit Statistics and Coloring Strategies
+
+A conceptual chapter. What can you extract from an orbit to map to color? Escape time, Lyapunov exponent, rotation number, period detection, basin of attraction, residence time, return time. These are the building blocks for all the visualizations that follow.
+
+### 2.2 Discrete Maps: The Standard Map
+
+The Chirikov standard map as the canonical example of Hamiltonian chaos. Phase space on the torus, color by Lyapunov exponent. Watching KAM tori break up as the kick parameter increases. Island chains, the chaotic sea, accelerator modes. This is the single best "see KAM theory" shader.
+
+### 2.3 More Discrete Maps
+
+The Hénon map: strange attractors and their basins. Arnold cat map and finite-time Lyapunov exponents. The Ikeda map (laser cavity dynamics). Each of these is a few lines of iteration code plus the Lyapunov exponent computation from 2.2.
+
+### 2.4 Parameter Spaces
+
+One pixel = one dynamical system. Arnold tongues: the circle map's parameter space colored by rotation number, revealing the devil's staircase. Lyapunov fractals (Markus-Lyapunov): alternating logistic map parameters colored by Lyapunov exponent. The logistic map's $(r, x_0)$ plane colored by period or Lyapunov exponent (not the bifurcation diagram — that needs accumulation — but the per-pixel version).
+
+### 2.5 Billiards
+
+Billiard dynamics as a discrete map on phase space (boundary position, angle). The ellipse: integrable, with invariant curves corresponding to confocal caustics — a beautiful phase portrait. The Bunimovich stadium: chaotic sea with embedded islands. The mushroom billiard: a sharp boundary between integrable and chaotic regions. Sinai billiard. Each pixel is an initial condition in Birkhoff coordinates; iterate the reflection map; color by rotation number or Lyapunov exponent.
+
+### 2.6 Phase Portraits of ODEs
+
+Continuous flows visualized per-pixel via numerical integration (RK4). The magnetic pendulum: three magnets, fractal basins of attraction. Duffing oscillator: multiple wells, fractal basin boundaries. Hamiltonian systems colored by energy level (simple pendulum, double well). Lotka-Volterra colored by conserved quantity. Finite-time Lyapunov exponent (FTLE) fields for any 2D flow — Lagrangian coherent structures.
+
+---
+
+## Part 3: Symmetry and Tilings
+
+Where group theory meets pretty pictures. The fundamental technique — the reflection algorithm — reduces any symmetric image to "evaluate your function on the fundamental domain, then fold."
+
+### 3.1 Symmetry Groups in the Plane
+
+Wallpaper groups and their fundamental domains. The idea of coloring a quotient: given a point in the plane, find which copy of the fundamental domain it lies in, map it back, and evaluate your pattern. Lattices, rotations, reflections, glide reflections — the 17 wallpaper groups.
+
+### 3.2 The Reflection Algorithm
+
+Iterative reflection as a general-purpose symmetry engine. Given a triangular (or other) fundamental domain bounded by mirror lines, repeatedly reflect the point until it lands inside the domain. Counting reflections for coloring: parity, total count, which walls were hit. This is the key algorithmic idea for all tiling visualizations.
+
+### 3.3 Euclidean Tilings
+
+Triangle groups in $\mathbb{E}^2$. Regular and semi-regular tilings constructed via the reflection algorithm. Drawing clean edges, vertices, and decorations within the fundamental domain. Coloring strategies: distance-based, parity-based, artistic. Escher-style deformations.
+
+### 3.4 Hyperbolic Geometry and the Poincaré Disk
+
+The hyperbolic metric and the Poincaré disk model. Geodesics as circular arcs. Isometries as Möbius transformations preserving the unit disk. Distance, circles, and area in the hyperbolic plane. This is the geometric background needed for hyperbolic tilings.
+
+### 3.5 Hyperbolic Tilings
+
+Triangle groups in $\mathbb{H}^2$. The $\{p,q\}$ tilings — regular tilings that don't exist in Euclidean geometry. The reflection algorithm in the Poincaré disk: reflecting across geodesics (circle inversions). The universal cover perspective: the hyperbolic plane as the universal cover of a surface. Connections to Fuchsian groups and modular forms.
+
+### 3.6 Spherical Tilings
+
+Stereographic projection. Spherical triangle groups and the platonic solids as tilings of $S^2$. The reflection algorithm on the sphere. The finite list of spherical triangle groups versus the infinite families in $\mathbb{E}^2$ and $\mathbb{H}^2$.
+
+### 3.7 Orbifold Notation and the Three Geometries
+
+Conway's orbifold notation as a unifying language. Comparing Euclidean, hyperbolic, and spherical tilings through the lens of the Gauss-Bonnet theorem. Euler characteristic as the organizing principle. A conceptual capstone connecting the three previous chapters.
+
+---
+
+## Part 4: Textures, Data, and Procedural Techniques
+
+Up to now, every shader has been purely computational — no external data. This part introduces textures (loading images), framebuffers (reading your own previous output), and procedural noise (generating complex patterns from simple rules). These tools are prerequisites for simulation and 3D rendering.
+
+### 4.1 Textures and Sampling
+
+Loading an image as a `sampler2D`. Texture coordinates and filtering (nearest vs. linear). Using textures as lookup tables for data: earth maps for spherical geometry, photographs as input to distortion effects, function tables for efficient evaluation. Texture wrapping and tiling.
+
+### 4.2 Framebuffers and Multipass Rendering
+
+The ping-pong technique: render to a texture, then read that texture in the next frame. This is the fundamental mechanism for state — shaders are stateless by default, but framebuffers let you accumulate information over time. Setting up multipass rendering in WebGL. Reading from a buffer you wrote last frame.
+
+### 4.3 Pseudorandom Numbers on the GPU
+
+Why there's no `rand()` in GLSL. Hash functions as deterministic pseudorandom generators. Common hash functions and their quality tradeoffs. Reproducibility and its importance for debugging. White noise, blue noise, stratified sampling.
+
+### 4.4 Value Noise and Perlin Noise
+
+Interpolating random values on a grid: value noise. Gradient noise (Perlin): assigning random gradients at grid points and interpolating. Frequency, amplitude, and how they control the character of the noise. The mathematical structure: Perlin noise as a random field with controlled spectral properties.
+
+### 4.5 Fractal Noise (fBm)
+
+Layering octaves of noise: fractional Brownian motion. Lacunarity, gain, and the number of octaves. Connections to Hölder continuity and self-similarity — the mathematical content is richer than it looks. Ridged noise, turbulence, and other variants.
+
+### 4.6 Worley Noise and Voronoi Diagrams
+
+Distance to the nearest random point. Voronoi cells, their edges, and the F1/F2 distance trick. Connections to Voronoi diagrams and Delaunay triangulations. Crystal, cell, and organic patterns.
+
+### 4.7 Domain Warping
+
+Composing noise with itself: $f(p + g(p))$. Feedback loops of noise produce organic, flowing shapes. Warped Voronoi, warped fBm. The mathematics of iterated function composition.
+
+---
+
+## Part 5: Simulation
+
+Using framebuffers from Part 4, we can now simulate PDEs and other systems that evolve over time. The GPU becomes a massively parallel computer, updating millions of grid cells simultaneously.
+
+### 5.1 The Heat Equation
+
+The discrete Laplacian on a grid. Explicit Euler time-stepping for diffusion. Boundary conditions: Dirichlet, Neumann, periodic. Stability constraints (CFL condition). This is the simplest PDE simulation and establishes the pattern for everything that follows.
+
+### 5.2 Reaction-Diffusion
+
+The Gray-Scott model: two coupled diffusing species with nonlinear reaction terms. Turing patterns — spots, stripes, spirals, mazes — all from a two-line update rule. Parameter exploration: the rich taxonomy of patterns in $(F, k)$ space. Connections to Turing's morphogenesis paper.
+
+### 5.3 The Wave Equation
+
+Vibrating membranes in real time. The second-order wave equation requires storing two previous frames (position and velocity, or position at two times). Boundary conditions and reflection. Interference, standing waves, diffraction.
+
+### 5.4 Fluid Simulation
+
+Navier-Stokes on the GPU. The Stam stable-fluids approach: advection, diffusion, projection. Vorticity confinement for visual sharpness. Mouse interaction to inject velocity. The Helmholtz-Hodge decomposition and pressure projection via Jacobi iteration.
+
+### 5.5 Cellular Automata
+
+Conway's Game of Life as the simplest stateful shader. Extensions: larger neighborhoods, continuous states, multiple species. Lenia: continuous cellular automata with smooth kernels — a bridge between discrete automata and PDEs. Multiple Neighborhoods Cellular Automata (MNCA).
+
+### 5.6 Particle Systems via Texture State
+
+Encoding particle positions and velocities in texture pixels. Physarum (slime mold): agents that deposit and follow pheromone trails. Flocking (Boids). Diffusion-limited aggregation. The challenge of particle-based simulation on a fragment shader: no scatter writes, only gather reads.
+
+---
+
+## Part 6: 3D Rendering
+
+Raymarching with signed distance functions — the dominant technique for mathematical visualization in fragment shaders. This part covers Euclidean 3D rendering from basics through advanced geometry.
+
+### 6.1 Raymarching and Sphere Tracing
+
+The sphere-tracing algorithm: march a ray forward by the distance to the nearest surface, repeat until you hit something. SDFs for basic shapes: sphere, box, torus, cylinder, plane. The ray setup: camera position, look-at direction, screen-space ray construction.
+
+### 6.2 Lighting and Shading
+
+Estimating surface normals via the gradient of the SDF (central differences). Diffuse (Lambertian) lighting, specular highlights (Blinn-Phong). Ambient occlusion estimated from the SDF. Shadows via secondary ray marching. Fog and distance-based effects.
+
+### 6.3 Operations on SDFs
+
+Union, intersection, smooth blending (`smin`). Repetition: `mod` for infinite grids. Twist, bend, and other domain deformations. Building complex scenes from simple primitives. Instancing and symmetry operations on SDFs.
+
+### 6.4 Advanced SDFs
+
+SDFs for mathematically interesting objects: knots, minimal surfaces approximations, surfaces of revolution, tube neighborhoods of space curves. Techniques for objects defined by equations that don't have simple SDF formulas: overstepping and bisection refinement.
+
+### 6.5 Algebraic Surfaces and Implicit Varieties
+
+Ray-surface intersection for implicit surfaces $f(x,y,z) = 0$ via interval methods or Newton iteration. Visualizing algebraic varieties: cubics, quartics, Steiner surfaces, Kummer surfaces. The challenge of finding the first intersection along a ray. Combining raymarching with analytic intersection tests.
+
+### 6.6 Differential Geometry on Screen
+
+Gaussian and mean curvature estimated numerically from the SDF and rendered as color. Geodesics on surfaces. Principal curvature directions. Normal mapping and displacement for mathematical surfaces. Visualizing the shape operator.
+
+### 6.7 3D Fractals
+
+Mandelbulb: the power-N generalization of the Mandelbrot set to $\mathbb{R}^3$. Distance estimation for the Mandelbulb and Mandelbox. Quaternion Julia sets. Iterated function systems in 3D. These combine the iteration techniques of Part 1 with the raymarching of this part — a spectacular synthesis.
+
+---
+
+## Part 7: Beyond Euclidean
+
+Rendering in curved spaces. This is where shaders can show you things that are genuinely impossible to see any other way.
+
+### 7.1 Raymarching in Hyperbolic Space
+
+Adapting the sphere-tracing algorithm to $\mathbb{H}^3$. Geodesics in the upper half-space and ball models. Distance functions in hyperbolic space. Rendering hyperbolic polyhedra and tilings in 3D. Connections to the 2D hyperbolic tilings from Part 3, now seen from "inside" the geometry.
+
+### 7.2 Spherical Rendering
+
+Ray tracing on $S^3$ and $S^2$. Stereographic projection as a rendering tool. The view from inside a spherical tiling. Spherical lensing effects and Möbius transformations of the visual sphere.
+
+### 7.3 Black Holes and Curved Spacetime
+
+Geodesics in Schwarzschild spacetime: light bending around a black hole. Numerical integration of the geodesic equation. The photon sphere, Einstein ring, and accretion disk as visual features. Kerr black holes (rotating) if you're ambitious. This connects general relativity to ray tracing in a very concrete way.
+
+### 7.4 Four-Dimensional Visualization
+
+Raymarching SDFs in $\mathbb{R}^4$, projected to the screen. Tesseracts, 24-cells, 120-cells, and other regular polytopes. Animating rotations in the extra plane. Cross-sections of 4D objects: slicing with a hyperplane and rendering the 3D result, animated as the slice moves — connections to Morse theory (topology changes at critical points). Stereographic projection from $S^3$: the Hopf fibration visualized as nested tori and linked circles.
+
+---
+
+## Part 8: Path Tracing
+
+A capstone that synthesizes raymarching, framebuffers, and Monte Carlo integration into physically-based rendering.
+
+### 8.1 The Rendering Equation
+
+The mathematical statement: a Fredholm integral equation of the second kind. What it means physically: light arriving at a point is the integral of light arriving from all directions, weighted by the BRDF. Why this equation is hard (infinite-dimensional, recursive) and how we'll approximate it.
+
+### 8.2 Monte Carlo Integration
+
+Estimating integrals by random sampling. The law of large numbers as our convergence guarantee. Importance sampling: biasing samples toward directions that contribute more, correcting with the PDF. Cosine-weighted hemisphere sampling for diffuse surfaces. Variance and convergence rate.
+
+### 8.3 Building a Path Tracer
+
+The algorithm: shoot a ray, hit a surface, sample a random bounce direction, accumulate the color contribution, repeat. Progressive rendering: average many frames in a framebuffer, each with different random samples. The ping-pong accumulation pattern from Part 4, now used for convergence.
+
+### 8.4 Materials
+
+Diffuse (Lambertian): cosine-weighted random bounce. Mirror: perfect reflection. Glass: Snell's law plus Fresnel equations for reflection/transmission probability. Emissive surfaces as light sources. Combining materials: rough metals, glossy surfaces.
+
+### 8.5 Putting It Together
+
+Rendering a complete scene with global illumination: color bleeding, soft shadows, caustics (with enough patience). SDF scenes from Part 6 rendered with physical lighting. The tradeoff between noise and render time. Denoising strategies.
+
+---
+
+## Part 9: Technique and Craft
+
+Cross-cutting topics that make everything better. These can be read at any point in the course — they're reference material as much as sequential chapters.
+
+### 9.1 Antialiasing
+
+Why jagged edges appear and how to fix them. Supersampling (render at higher resolution and average). Analytical antialiasing via `smoothstep` and `fwidth`. When each approach is appropriate. The cost of aliasing in mathematical illustrations where precision matters.
+
+### 9.2 Color Science for Mathematicians
+
+Why RGB is a bad space for interpolation. Perceptually uniform color spaces: CIELAB, OKLAB, OKLCH. Choosing colormaps that don't lie — avoiding the rainbow colormap's perceptual non-uniformity. Diverging, sequential, and cyclic colormaps. The mathematics of color perception. Designing palettes for mathematical content.
+
+### 9.3 Animation and Time
+
+Using `iTime` effectively. Seamless loops: parameterize by $t \bmod T$. Easing functions and their mathematical descriptions. Animating parameters smoothly. Ping-pong animation. Encoding time in the colormap vs. in the geometry.
+
+### 9.4 Performance and Debugging
+
+Why your shader is slow: branching, precision issues, loop counts. `mediump` vs. `highp` and when it matters. Debugging strategies when you can't use `print`: color-coding intermediate values, isolating components, building diagnostic views. Common pitfalls: division by zero, `mod` of negative numbers, precision near boundaries.
+
+### 9.5 Post-Processing
+
+Bloom, tone mapping, and gamma correction. Vignette, film grain, and chromatic aberration for artistic effect. Depth of field as a post-process. These are especially important for path-traced images where raw output needs processing to look good.
+
+### 9.6 Putting It Online
+
+WebGL boilerplate: the minimal HTML/JS to run a fragment shader in a browser. Shadertoy vs. custom setups: tradeoffs and portability. Embedding interactive shaders in web pages, lecture notes, and publications. Quarto integration for this course's own infrastructure. Recording and exporting high-resolution images and video from shaders.
+
+---
+
+## Appendices
+
+### A. GLSL Quick Reference
+
+Types, built-in functions, swizzling, operator overloading. A cheat sheet for the language features used throughout the course.
+
+### B. WebGL Boilerplate
+
+A minimal, copy-pasteable template for running a fragment shader in the browser with mouse interaction, time uniform, and texture loading.
+
+### C. Mathematical Notation and Conventions
+
+How mathematical symbols used in the text correspond to GLSL code. Coordinate conventions, angle conventions, sign conventions for normals.
+
+### D. Further Reading and Resources
+
+Recommended books, papers, and online resources for each part. Shadertoy shaders worth studying. The Book of Shaders, Inigo Quilez's articles, etc.

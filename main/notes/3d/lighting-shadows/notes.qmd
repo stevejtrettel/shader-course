@@ -1,0 +1,283 @@
+---
+title: "Lighting & Shadows"
+---
+
+We've been using a simple `shade` function with the light direction baked in. Let's open it up, understand what it's doing, and make it more powerful.
+
+
+## What We Have
+
+Here's the `shade` function we've been using:
+
+```glsl
+vec3 shade(vec3 normal, vec3 surfaceColor) {
+    vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+    float diffuse = max(0.0, dot(normal, lightDir));
+    return surfaceColor * diffuse;
+}
+```
+
+And our `shadow` function:
+
+```glsl
+float shadow(vec3 p) {
+    vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+    // ... march toward light
+}
+```
+
+Both have the same light direction hardcoded. Let's extract it:
+
+```glsl
+vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+
+vec3 shade(vec3 normal, vec3 surfaceColor, vec3 lightDir) {
+    float diffuse = max(0.0, dot(normal, lightDir));
+    return surfaceColor * diffuse;
+}
+
+float shadow(vec3 p, vec3 lightDir) {
+    // ... march toward light
+}
+```
+
+Now we can change the light direction in one place.
+
+
+## Understanding Diffuse Lighting
+
+The `dot(normal, lightDir)` isn't arbitrary — it's the **Lambertian** model of diffuse reflection. A matte surface scatters incoming light equally in all directions. The brightness depends on how much light hits the surface, which is proportional to the cosine of the angle between the normal and light direction.
+
+$$I_{\text{diffuse}} = \max(0, \mathbf{n} \cdot \mathbf{l})$$
+
+Head-on light ($\mathbf{n} \parallel \mathbf{l}$) gives maximum brightness. Glancing light gives less. Light from behind (negative dot product) gives zero — that's what the `max` handles.
+
+
+## Adding Specular Highlights
+
+Diffuse-only surfaces look matte, like chalk. Real surfaces often have **specular highlights** — bright spots where light reflects toward the viewer.
+
+The Blinn-Phong model computes a "halfway vector" between the light and view directions, then checks how closely the normal aligns with it:
+
+```glsl
+vec3 shade(vec3 normal, vec3 surfaceColor, vec3 lightDir, vec3 viewDir) {
+    // Diffuse
+    float diff = max(0.0, dot(normal, lightDir));
+
+    // Specular
+    vec3 h = normalize(lightDir + viewDir);
+    float spec = pow(max(0.0, dot(normal, h)), 32.0);
+
+    return surfaceColor * diff + vec3(0.3) * spec;
+}
+```
+
+The exponent (32.0) controls highlight sharpness — higher values give tighter, glossier highlights. The specular color (here `vec3(0.3)`) is typically white or near-white for non-metallic surfaces.
+
+{{< shader-demo lighting-shadows/specular >}}
+
+
+## The Light Struct
+
+For scenes with multiple lights or colored lights, we bundle light properties:
+
+```glsl
+struct Light {
+    vec3 dir;
+    vec3 color;
+};
+
+vec3 shade(vec3 normal, vec3 surfaceColor, Light light, vec3 viewDir) {
+    float diff = max(0.0, dot(normal, light.dir));
+    vec3 h = normalize(light.dir + viewDir);
+    float spec = pow(max(0.0, dot(normal, h)), 32.0);
+
+    return surfaceColor * light.color * diff + light.color * spec * 0.3;
+}
+```
+
+Now we can have warm lights, cool lights, bright lights, dim lights.
+
+
+## Soft Shadows
+
+Our `shadow` function returns 0 or 1 — fully shadowed or fully lit. Real shadows have soft edges (penumbra) where light is partially blocked.
+
+**The idea:** During the shadow march, track not just *whether* we hit something, but *how close* we came. Near-misses mean partial occlusion.
+
+```glsl
+float softShadow(vec3 p, vec3 lightDir, float k) {
+    float res = 1.0;
+    float t = 0.02;
+
+    for (int i = 0; i < 50; i++) {
+        float d = sdScene(p + lightDir * t);
+        if (d < 0.001) return 0.0;
+
+        res = min(res, k * d / t);
+        t += d;
+
+        if (t > 20.0) break;
+    }
+
+    return res;
+}
+```
+
+The parameter `k` controls shadow sharpness — higher values give harder shadows. The ratio `d / t` captures how close the ray passed to geometry relative to how far it has traveled.
+
+{{< shader-demo lighting-shadows/soft-shadows >}}
+
+### Improved Soft Shadows
+
+The basic formula can produce banding artifacts. A smoother version uses:
+
+```glsl
+res = min(res, smoothstep(0.0, 1.0, k * d / t));
+```
+
+Or the "improved" formulation that tracks the previous distance:
+
+```glsl
+// TODO: Show the ph formulation from iq
+```
+
+
+## Ambient Occlusion
+
+Ambient occlusion (AO) approximates how much ambient light reaches a point. Corners and crevices are darker; exposed surfaces are brighter.
+
+**The idea:** March a short distance along the normal. If we're still inside geometry (or close to it), the point is occluded.
+
+```glsl
+float ambientOcclusion(vec3 p, vec3 n) {
+    float ao = 0.0;
+    float scale = 1.0;
+
+    for (int i = 1; i <= 5; i++) {
+        float dist = 0.02 * float(i);
+        float d = sdScene(p + n * dist);
+        ao += (dist - d) * scale;
+        scale *= 0.5;
+    }
+
+    return 1.0 - clamp(ao, 0.0, 1.0);
+}
+```
+
+We sample at increasing distances along the normal. If the SDF value `d` is less than the expected distance `dist`, we're inside geometry — that's occlusion. Closer samples are weighted more heavily.
+
+{{< shader-demo lighting-shadows/ambient-occlusion >}}
+
+
+## Fog and Atmosphere
+
+Distance-based fog adds depth cues and atmosphere. The further away an object, the more it fades toward the fog color.
+
+```glsl
+vec3 applyFog(vec3 color, float distance, vec3 fogColor) {
+    float fog = 1.0 - exp(-distance * 0.05);
+    return mix(color, fogColor, fog);
+}
+```
+
+Exponential falloff looks more natural than linear. The coefficient controls fog density.
+
+### Height Fog
+
+Fog that varies with height:
+
+```glsl
+// TODO: height-based fog formula
+```
+
+{{< shader-demo lighting-shadows/fog >}}
+
+
+## Multiple Lights
+
+So far we've used a single directional light. Adding more lights is straightforward — sum their contributions:
+
+```glsl
+vec3 totalLight = ambient;
+for each light {
+    float shadow = softShadow(p, light.dir, 16.0);
+    totalLight += shade(normal, material, light) * shadow;
+}
+```
+
+### Point Lights
+
+Point lights have position, not just direction. The light direction varies per surface point:
+
+```glsl
+vec3 lightDir = normalize(lightPos - p);
+float attenuation = 1.0 / (1.0 + 0.1 * length(lightPos - p));
+```
+
+{{< shader-demo lighting-shadows/point-lights >}}
+
+
+## Putting It Together
+
+A complete lighting pass with soft shadows, AO, and fog:
+
+```glsl
+// TODO: full example combining all techniques
+```
+
+{{< shader-demo lighting-shadows/complete >}}
+
+
+## Gamma Correction
+
+There's a problem we've been ignoring: monitors don't display light linearly. A pixel value of 0.5 doesn't emit half the light of 1.0 — it's closer to a quarter.
+
+This nonlinearity is called **gamma**. Historically, CRT monitors had a power-law response around $\gamma \approx 2.2$. Modern displays maintain this for compatibility. The result: linear values look too dark, and our carefully computed lighting looks wrong.
+
+### The Fix
+
+All our lighting math should happen in **linear space** — that's correct. But before displaying, we need to apply the inverse gamma:
+
+```glsl
+// At the very end, before output
+color = pow(color, vec3(1.0 / 2.2));
+```
+
+This "gamma correction" compensates for the display's nonlinearity. Linear 0.5 becomes ~0.73 in the output, which the monitor then displays as half brightness.
+
+### sRGB
+
+The sRGB standard (used by most monitors and image formats) is slightly more complex than pure gamma 2.2 — it has a linear segment near black. For most purposes, the simple `pow` is close enough.
+
+```glsl
+// More accurate sRGB conversion
+vec3 toSRGB(vec3 linear) {
+    return mix(
+        linear * 12.92,
+        1.055 * pow(linear, vec3(1.0/2.4)) - 0.055,
+        step(0.0031308, linear)
+    );
+}
+```
+
+### When to Apply
+
+Gamma correction is the **last** step before output. All lighting, blending, and color operations should happen in linear space. Apply gamma once at the end:
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    // ... all rendering in linear space ...
+
+    // Final gamma correction
+    color = pow(color, vec3(1.0 / 2.2));
+    fragColor = vec4(color, 1.0);
+}
+```
+
+{{< shader-demo lighting-shadows/gamma >}}
+
+
+## What's Next
+
+We've improved *how* light interacts with surfaces, but surfaces still have only a single color. The **Materials** chapter introduces richer surface properties: specular highlights, Fresnel effects, and reflections.

@@ -1,0 +1,81 @@
+---
+title: "Lighting & Shadows Shaders"
+format:
+  html:
+    code-fold: true
+---
+
+```{ojs}
+//| echo: false
+import { createShaderCanvas } from "/lib/shader-utils.js"
+```
+
+
+## specular
+
+Blinn-Phong specular highlights.
+
+```{ojs}
+//| label: specular
+// TODO: implement specular shader
+```
+
+
+## soft-shadows
+
+Scene with soft shadows using the penumbra technique.
+
+```{ojs}
+//| label: soft-shadows
+// TODO: implement soft shadow shader
+```
+
+
+## ambient-occlusion
+
+Ambient occlusion visualization.
+
+```{ojs}
+//| label: ambient-occlusion
+// TODO: implement AO shader
+```
+
+
+## fog
+
+Distance-based fog demonstration.
+
+```{ojs}
+//| label: fog
+// TODO: implement fog shader
+```
+
+
+## point-lights
+
+Scene with multiple point lights.
+
+```{ojs}
+//| label: point-lights
+// TODO: implement point lights shader
+```
+
+
+## complete
+
+Full lighting setup with soft shadows, AO, and fog.
+
+```{ojs}
+//| label: complete
+// TODO: implement complete lighting shader
+```
+
+
+## gamma
+
+Gamma correction comparison (linear vs corrected).
+
+```{ojs}
+//| label: gamma
+// TODO: implement gamma comparison shader
+```

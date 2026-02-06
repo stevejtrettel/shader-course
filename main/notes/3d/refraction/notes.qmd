@@ -1,0 +1,204 @@
+---
+title: "Refraction"
+---
+
+Light bends when passing between materials of different optical densities. This bending — refraction — gives glass its sparkle, water its shimmer, and diamonds their fire. Implementing refraction in a raymarcher requires tracking rays through transparent objects.
+
+
+## Snell's Law
+
+When light crosses a boundary between materials, it bends according to Snell's law:
+
+$$n_1 \sin\theta_1 = n_2 \sin\theta_2$$
+
+where $n_1$ and $n_2$ are the **indices of refraction** (IOR) of each material, and $\theta$ are the angles from the surface normal.
+
+Common IOR values:
+- Air: 1.0
+- Water: 1.33
+- Glass: 1.5
+- Diamond: 2.4
+
+GLSL provides `refract()`:
+
+```glsl
+vec3 refractedDir = refract(rayDir, normal, n1 / n2);
+```
+
+The ratio `n1 / n2` is called $\eta$ (eta). When entering glass from air, $\eta = 1.0 / 1.5 \approx 0.67$.
+
+{{< shader-demo refraction/snell >}}
+
+
+## Total Internal Reflection
+
+When light travels from a denser medium to a less dense one (glass to air), beyond a critical angle it reflects entirely — no refraction occurs.
+
+`refract()` returns a zero vector when total internal reflection occurs:
+
+```glsl
+vec3 refractedDir = refract(rayDir, normal, eta);
+if (length(refractedDir) < 0.001) {
+    // Total internal reflection — reflect instead
+    refractedDir = reflect(rayDir, normal);
+}
+```
+
+This is why diamonds sparkle — light bounces around inside before escaping, and why underwater surfaces look like mirrors from below.
+
+{{< shader-demo refraction/total-internal-reflection >}}
+
+
+## Entering and Exiting
+
+A ray passes through a transparent object twice: once entering (air → glass), once exiting (glass → air). We need to:
+
+1. Detect whether we're entering or exiting
+2. Use the correct IOR ratio
+3. Flip the normal when exiting
+
+**Detecting entry vs exit:** If the ray direction and normal point the same way (positive dot product), we're inside looking out.
+
+```glsl
+bool entering = dot(rayDir, normal) < 0.0;
+vec3 n = entering ? normal : -normal;
+float eta = entering ? (1.0 / ior) : ior;
+```
+
+{{< shader-demo refraction/entry-exit >}}
+
+
+## The Refraction Loop
+
+A full refraction trace:
+
+```glsl
+vec3 traceRefraction(Ray ray, float ior, int maxBounces) {
+    vec3 color = vec3(0.0);
+    vec3 throughput = vec3(1.0);
+
+    for (int i = 0; i < maxBounces; i++) {
+        float t = raymarch(ray);
+        if (t < 0.0) {
+            // Escaped to background
+            color += throughput * backgroundColor;
+            break;
+        }
+
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 normal = calcNormal(p);
+
+        bool entering = dot(ray.dir, normal) < 0.0;
+        vec3 n = entering ? normal : -normal;
+        float eta = entering ? (1.0 / ior) : ior;
+
+        vec3 refracted = refract(ray.dir, n, eta);
+        if (length(refracted) < 0.001) {
+            // Total internal reflection
+            refracted = reflect(ray.dir, n);
+        }
+
+        ray.origin = p + refracted * 0.01;
+        ray.dir = refracted;
+
+        // Optional: attenuate based on distance traveled inside
+        if (!entering) {
+            throughput *= exp(-absorptionColor * t);
+        }
+    }
+
+    return color;
+}
+```
+
+{{< shader-demo refraction/loop >}}
+
+
+## Fresnel for Transparency
+
+Real transparent materials show both refraction and reflection. The Fresnel equations determine the mix:
+
+```glsl
+float F = fresnel(normal, -rayDir, 0.04);
+vec3 reflectColor = traceReflection(...);
+vec3 refractColor = traceRefraction(...);
+color = mix(refractColor, reflectColor, F);
+```
+
+At glancing angles, glass becomes a mirror. Looking straight through, you see what's behind.
+
+{{< shader-demo refraction/fresnel-glass >}}
+
+
+## Chromatic Dispersion
+
+Different wavelengths refract differently — that's why prisms split white light into rainbows. Diamond's high dispersion creates its "fire."
+
+Approximate by tracing three rays with slightly different IOR:
+
+```glsl
+float iorR = 1.50;
+float iorG = 1.52;
+float iorB = 1.54;
+
+vec3 color;
+color.r = traceRefraction(ray, iorR, ...).r;
+color.g = traceRefraction(ray, iorG, ...).g;
+color.b = traceRefraction(ray, iorB, ...).b;
+```
+
+This triples the cost but creates beautiful rainbow caustics.
+
+{{< shader-demo refraction/dispersion >}}
+
+
+## Absorption (Beer's Law)
+
+Light passing through colored glass is absorbed. The absorption follows Beer's law — exponential decay with distance:
+
+```glsl
+vec3 absorption = vec3(0.2, 0.5, 0.8);  // Absorbs red more than blue
+float distance = length(exitPoint - entryPoint);
+vec3 transmittance = exp(-absorption * distance);
+color *= transmittance;
+```
+
+Thicker glass appears more saturated. A blue glass marble is pale at the edges, deep blue at the center.
+
+{{< shader-demo refraction/absorption >}}
+
+
+## Practical Considerations
+
+**Performance:** Each refraction bounce requires a full raymarch. Limit bounces (3-5 is usually enough) and consider early termination when throughput is low.
+
+**Numerical issues:**
+- Offset ray origins to avoid self-intersection
+- Handle the zero-vector case from `refract()`
+- Be careful with normal orientation
+
+**SDF considerations:** Inside transparent objects, the SDF is negative. Some techniques:
+- March with `abs(sdScene(p))`
+- Use a separate SDF for transparent objects
+- Track entry/exit explicitly
+
+
+## Complete Example
+
+A glass sphere demonstrating refraction, reflection, total internal reflection, and absorption:
+
+```glsl
+// TODO: full glass sphere example
+```
+
+{{< shader-demo refraction/glass-sphere >}}
+
+
+## What's Next
+
+You now have the tools to render complex transparent materials. Combined with the previous chapters, you can create scenes with:
+- Soft shadows and ambient occlusion (Lighting & Shadows)
+- Metallic and dielectric materials with reflections (Materials)
+- Transparent objects with refraction (this chapter)
+
+The next section explores **algebraic varieties** — surfaces defined by polynomial equations — and the mathematical techniques for raymarching them.

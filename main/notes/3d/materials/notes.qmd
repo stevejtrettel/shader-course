@@ -1,0 +1,179 @@
+---
+title: "Materials"
+---
+
+So far, surfaces have a single color. Real materials are more complex: metal reflects its environment, plastic has bright specular highlights, skin scatters light beneath the surface. This chapter builds a richer material model.
+
+
+## Beyond Flat Color
+
+Our current shading uses diffuse (Lambertian) reflection plus a specular highlight:
+
+```glsl
+vec3 shade(vec3 normal, vec3 baseColor, vec3 lightDir, vec3 viewDir) {
+    float diff = max(dot(normal, lightDir), 0.0);
+    vec3 h = normalize(lightDir + viewDir);
+    float spec = pow(max(dot(normal, h), 0.0), 32.0);
+    return baseColor * diff + vec3(0.3) * spec;
+}
+```
+
+This is Blinn-Phong shading. The exponent (32.0) controls highlight sharpness — higher values give tighter, glossier highlights.
+
+But this model has limitations:
+- Specular color is always white
+- No view-dependent effects (Fresnel)
+- No environment reflections
+
+
+## Fresnel Effect
+
+Surfaces reflect more light at grazing angles. Look at a table from above — you see the wood. Look at it edge-on — you see reflections.
+
+The Fresnel equations describe this, but we use Schlick's approximation:
+
+```glsl
+float fresnel(vec3 normal, vec3 viewDir, float F0) {
+    float cosTheta = max(dot(normal, viewDir), 0.0);
+    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+}
+```
+
+`F0` is the reflectance at normal incidence — typically 0.04 for dielectrics (plastic, water), higher for metals (0.5-1.0).
+
+{{< shader-demo materials/fresnel >}}
+
+
+## Reflections
+
+We have a raymarcher. We can trace another ray.
+
+From the hit point, compute the reflection direction and march again:
+
+```glsl
+vec3 reflectDir = reflect(-viewDir, normal);
+Ray reflectRay = Ray(p + normal * 0.01, reflectDir);
+float t2 = raymarch(reflectRay);
+
+vec3 reflectColor = backgroundColor;
+if (t2 > 0.0) {
+    vec3 p2 = reflectRay.origin + t2 * reflectRay.dir;
+    vec3 n2 = calcNormal(p2);
+    reflectColor = shade(n2, getMaterial(p2), light, -reflectDir);
+}
+```
+
+Blend the reflection with the surface color using the Fresnel term:
+
+```glsl
+float F = fresnel(normal, viewDir, 0.04);
+color = mix(surfaceColor, reflectColor, F);
+```
+
+{{< shader-demo materials/reflections >}}
+
+### Recursive Reflections
+
+One bounce is often enough. For mirrors facing mirrors, you'd need multiple bounces — but that gets expensive. In a fragment shader, we can't truly recurse, so we unroll:
+
+```glsl
+// TODO: iterative multi-bounce reflections
+```
+
+
+## Roughness and Glossy Reflections
+
+Perfect mirrors are rare. Most surfaces have micro-roughness that blurs reflections.
+
+**Approach 1: Blur the reflection**
+Sample multiple slightly-perturbed reflection directions and average:
+
+```glsl
+// TODO: show multiple-sample roughness
+```
+
+This is expensive — multiple raymarches per pixel.
+
+**Approach 2: Adjust specular exponent**
+Rougher surfaces have broader, dimmer specular highlights. Not true reflection blur, but often good enough:
+
+```glsl
+float roughness = 0.5;  // 0 = mirror, 1 = matte
+float shininess = mix(256.0, 4.0, roughness);
+float spec = pow(max(dot(normal, h), 0.0), shininess);
+```
+
+{{< shader-demo materials/roughness >}}
+
+
+## Metallic Materials
+
+Metals differ from dielectrics:
+- High Fresnel reflectance (F0 = 0.5-1.0)
+- Specular color matches the base color (gold reflects gold, copper reflects copper)
+- Little to no diffuse reflection
+
+```glsl
+struct Material {
+    vec3 albedo;
+    float metallic;
+    float roughness;
+};
+
+vec3 shadePBR(vec3 p, vec3 normal, vec3 viewDir, Material mat) {
+    vec3 F0 = mix(vec3(0.04), mat.albedo, mat.metallic);
+    float F = fresnel(normal, viewDir, F0);
+
+    // Metals: no diffuse, colored specular
+    // Dielectrics: diffuse + white specular
+    vec3 diffuse = mat.albedo * (1.0 - mat.metallic);
+    vec3 specular = mix(vec3(1.0), mat.albedo, mat.metallic);
+
+    // ... combine with lighting
+}
+```
+
+{{< shader-demo materials/metallic >}}
+
+
+## Rim Lighting
+
+Light wrapping around edges, simulating subsurface scattering or backlighting:
+
+```glsl
+float rim = 1.0 - max(dot(normal, viewDir), 0.0);
+rim = pow(rim, 3.0);
+color += rimColor * rim;
+```
+
+{{< shader-demo materials/rim >}}
+
+
+## Material Structs
+
+Putting it together — a material struct that captures surface properties:
+
+```glsl
+struct Material {
+    vec3 albedo;      // Base color
+    float metallic;   // 0 = dielectric, 1 = metal
+    float roughness;  // 0 = mirror, 1 = matte
+    float reflectivity; // How much to show reflections
+};
+
+// Per-object materials
+Material getMaterial(vec3 p) {
+    if (sdf(p, chrome_sphere) < 0.01)
+        return Material(vec3(0.8), 1.0, 0.1, 0.9);
+    if (sdf(p, plastic_cube) < 0.01)
+        return Material(vec3(1.0, 0.2, 0.2), 0.0, 0.3, 0.2);
+    // ...
+}
+```
+
+{{< shader-demo materials/complete >}}
+
+
+## What's Next
+
+We've built rich material models, but surfaces still have uniform properties. The **Procedural Patterns** chapter introduces noise and mathematical textures — wood grain, marble veins, rust spots — generated entirely in code.
