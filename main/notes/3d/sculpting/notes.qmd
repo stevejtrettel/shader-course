@@ -934,3 +934,100 @@ That's the entire scene. Every shape is a primitive from the SDF library. Every 
 {{< shader-demo sculpting/breakfast-scene >}}
 
 This is the shader from the chapter opening — you've now built every piece of it.
+
+
+## What's Next
+
+We can combine shapes, blend them smoothly, and warp space. But every surface has uniform appearance — a single color, a single material. The **Lighting & Shadows** chapter adds specular highlights, soft shadows, and ambient occlusion to make surfaces respond realistically to light.
+
+
+## Exercises
+
+### Checkpoints
+
+Quick exercises to verify understanding. A few minutes each.
+
+**Checkpoint 1: Two Spheres**
+
+Create a scene with two overlapping spheres using `min`. Move them closer and farther apart. What happens where they overlap?
+
+**Checkpoint 2: Smooth vs Hard Union**
+
+Replace the `min` in Checkpoint 1 with `smin` and a blend radius of 0.3. How does the junction change? Try blend radii from 0.1 to 1.0.
+
+**Checkpoint 3: Subtraction**
+
+Subtract a small sphere from a larger one using `max(sphere, -cutter)`. Position the cutter so it creates a visible hole. What happens if the cutter is entirely inside the larger sphere?
+
+**Checkpoint 4: Mirror Symmetry**
+
+Apply `p.x = abs(p.x)` before evaluating an off-center sphere. How many spheres appear? Add `p.y = abs(p.y)` — now how many?
+
+
+### Explorations
+
+Deeper exercises that build on the core concepts.
+
+**Exploration 1: Lens Shape**
+
+The intersection of two overlapping spheres creates a lens (biconvex shape). Use `max(sphere1, sphere2)` where the spheres overlap. Adjust positions to control the lens thickness.
+
+**Exploration 2: Hollow Sphere**
+
+Create a hollow sphere by subtracting a slightly smaller sphere from a larger one. What thickness gives a good-looking shell?
+
+**Exploration 3: Smooth Subtraction**
+
+Compare hard subtraction `max(a, -b)` with smooth subtraction `ssubtract(a, b, k)`. Create a sphere with a bite taken out — how does the lip change with smoothing?
+
+**Exploration 4: Twisted Box**
+
+Apply the twist operation from the chapter to a box. Experiment with the twist rate $k$ (radians per unit height). At what value does the box complete a full rotation over its height?
+
+**Exploration 5: Infinite Grid**
+
+Use `mod` to repeat a sphere infinitely in all three directions. What spacing gives spheres that almost touch? What if they overlap?
+
+
+### Challenges
+
+Substantial projects requiring creative problem-solving.
+
+**Challenge 1: Dice**
+
+Build a standard six-sided die:
+- Start with a rounded box (use `sdRoundBox` or apply rounding to `sdBox`)
+- Subtract spherical dimples for the pips
+- The 1-face has one central dimple; the 6-face has two rows of three
+
+Remember pip placement: opposite faces sum to 7.
+
+**Challenge 2: Chain Link**
+
+Create a single chain link: a torus with the top and bottom cut flat, or two half-tori connected by cylinders. Use domain repetition to make an infinite chain.
+
+Bonus: alternate the links so every other one is rotated 90° (you'll need to use the repetition index).
+
+**Challenge 3: Gears**
+
+Build a gear with:
+- A central cylinder (the hub)
+- An outer ring with teeth
+- Teeth can be approximated as repeated boxes around the perimeter
+
+Use finite repetition (the `round` + `clamp` pattern) for the teeth. How do you space them evenly around a circle?
+
+**Challenge 4: Smooth Metaballs**
+
+Create 3-4 spheres that smoothly blend together like metaballs. Animate their positions with `iTime` so they move and merge organically.
+
+Use `smin` with a generous blend radius (0.5-1.0). The blobby, organic look is the goal.
+
+**Challenge 5: Architectural Column**
+
+Build a classical column:
+- A twisted fluted shaft (box or cylinder with twist)
+- A capital at the top (stack of cylinders/tori with smooth union)
+- A base at the bottom
+
+Use smooth operations where elements meet, hard operations for sharp architectural details.

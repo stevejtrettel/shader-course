@@ -202,3 +202,87 @@ You now have the tools to render complex transparent materials. Combined with th
 - Transparent objects with refraction (this chapter)
 
 The next section explores **algebraic varieties** — surfaces defined by polynomial equations — and the mathematical techniques for raymarching them.
+
+
+## Exercises
+
+### Checkpoints
+
+Quick exercises to verify understanding. A few minutes each.
+
+**Checkpoint 1: IOR Values**
+
+Render a glass sphere with IOR 1.5 (glass). Try 1.33 (water) and 2.4 (diamond). How does the distortion of the background change?
+
+**Checkpoint 2: Total Internal Reflection**
+
+Position the camera inside a glass sphere looking outward. At what angles do you see refraction vs pure reflection? (The critical angle for glass is about 42°.)
+
+**Checkpoint 3: Absorption Color**
+
+For colored glass, try absorption vectors:
+- `vec3(0.0, 0.5, 0.5)` — red glass (absorbs green and blue)
+- `vec3(0.5, 0.5, 0.0)` — blue glass
+- `vec3(0.5, 0.0, 0.5)` — green glass
+
+
+### Explorations
+
+Deeper exercises that build on the core concepts.
+
+**Exploration 1: Water Surface**
+
+Create a horizontal plane with IOR 1.33. Place an object underwater and observe:
+- Looking down: see the object through refraction
+- Looking from below at a shallow angle: total internal reflection (surface looks like a mirror)
+
+**Exploration 2: Fresnel Glass**
+
+Implement the Fresnel blend between reflection and refraction. At glancing angles, a glass sphere should look more like a mirror.
+
+**Exploration 3: Thick vs Thin**
+
+Compare a glass sphere with radius 1.0 vs 0.3. How does the absorption and distortion change? Thicker glass should show more color saturation.
+
+
+### Challenges
+
+Substantial projects requiring creative problem-solving.
+
+**Challenge 1: Glass Torus**
+
+Refraction through a torus is visually complex — the ray enters and exits multiple times, creating interesting patterns. Implement a glass torus with:
+- Proper entry/exit detection
+- Total internal reflection handling
+- Limit to 4-6 bounces
+
+**Challenge 2: Prism**
+
+Create a triangular prism with chromatic dispersion. A white light ray entering one face should spread into a spectrum exiting another face.
+
+Use three IOR values (RGB) and combine the results.
+
+**Challenge 3: Caustics (Approximation)**
+
+True caustics require tracing from light sources, but we can fake a spot caustic:
+- For each ground point, trace toward the glass object
+- If the ray would reach a bright light after refraction, brighten that ground point
+
+This approximates the bright spots under a glass of water.
+
+**Challenge 4: Bubble**
+
+A soap bubble is a thin film — two surfaces very close together:
+- The SDF is a hollowed sphere: `abs(length(p) - r) - thickness`
+- Light refracts through both surfaces
+- Add iridescence based on view angle (see Materials chapter)
+
+**Challenge 5: Gemstone**
+
+Create a cut gemstone (octahedron or truncated pyramid):
+- High IOR (2.4 for diamond)
+- Chromatic dispersion
+- Multiple internal reflections creating sparkle
+- Faceted surface with flat normals per face
+
+The complexity of the internal light paths creates the "fire" that makes gemstones valuable.

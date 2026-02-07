@@ -449,3 +449,85 @@ float sdTorus(vec3 p, float R, float r) { return length(vec2(length(p.xz)-R, p.y
 float sdCapsule(vec3 p, vec3 a, vec3 b, float r) { vec3 pa=p-a,ba=b-a; return length(pa-ba*clamp(dot(pa,ba)/dot(ba,ba),0.0,1.0))-r; }
 float sdOctahedron(vec3 p, float s) { p=abs(p); return (p.x+p.y+p.z-s)*0.57735027; }
 ```
+
+
+## Exercises
+
+### Checkpoints
+
+Quick exercises to verify understanding. A few minutes each.
+
+**Checkpoint 1: Shape Gallery**
+
+Create a scene with one of each: sphere, box, torus, cylinder, capsule. Arrange them in a row on a ground plane.
+
+**Checkpoint 2: Struct vs Bare**
+
+Rewrite a simple scene using bare functions (`sdSphere`, `sdBox`, etc.) and then with structs. Which is easier to read? Which is easier to modify?
+
+**Checkpoint 3: Platonic Solids**
+
+Render all five Platonic solids in a row: tetrahedron, cube, octahedron, dodecahedron, icosahedron. Scale them to similar apparent sizes.
+
+
+### Explorations
+
+Deeper exercises that build on the core concepts.
+
+**Exploration 1: Robot**
+
+Build a simple robot from library primitives:
+- Body: rounded box
+- Head: sphere or box
+- Arms/legs: capsules
+- Joints: small spheres
+
+Use union (`min`) to combine. Position with translations.
+
+**Exploration 2: Furniture**
+
+Create a simple piece of furniture:
+- Table: a flat box (top) with four capsule or box legs
+- Chair: seat, back, legs
+- Lamp: cylinder base, sphere shade
+
+**Exploration 3: Molecule Visualization**
+
+Represent a water molecule (H₂O):
+- Large sphere for oxygen
+- Two smaller spheres for hydrogen
+- Capsules connecting them (bonds)
+
+Try other simple molecules: CO₂, CH₄ (methane).
+
+
+### Challenges
+
+Substantial projects requiring creative problem-solving.
+
+**Challenge 1: Chess Pieces**
+
+Create a chess piece using library primitives:
+- Pawn: sphere on cylinder on wider cylinder
+- Rook: cylinder with rectangular crenellations (boxes subtracted from top)
+- Bishop: sphere with diagonal slice (box intersection)
+
+Use smooth union for organic connections.
+
+**Challenge 2: Still Life**
+
+Create a tabletop still life:
+- Bowl or vase (hollowed torus or revolution)
+- Fruit: spheres and ellipsoids
+- A book: rounded box with pages (layered boxes)
+
+Pay attention to composition and proportions.
+
+**Challenge 3: Architectural Column**
+
+Build a classical column with:
+- Base (stacked cylinders/tori)
+- Shaft (cylinder, optionally fluted)
+- Capital (stacked cylinders with torus decorations)
+
+This is similar to the Sculpting chapter's column but using only library primitives.

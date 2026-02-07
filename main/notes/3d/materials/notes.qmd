@@ -177,3 +177,110 @@ Material getMaterial(vec3 p) {
 ## What's Next
 
 We've built rich material models, but surfaces still have uniform properties. The **Procedural Patterns** chapter introduces noise and mathematical textures — wood grain, marble veins, rust spots — generated entirely in code.
+
+
+## Exercises
+
+### Checkpoints
+
+Quick exercises to verify understanding. A few minutes each.
+
+**Checkpoint 1: Fresnel Strength**
+
+Change the F0 value in the Fresnel function from 0.04 (typical dielectric) to 0.5 (metal-like). How do the edges of the sphere change?
+
+**Checkpoint 2: Roughness**
+
+Adjust the roughness parameter from 0.0 (mirror) to 1.0 (matte). Watch the specular highlight spread and dim.
+
+**Checkpoint 3: Metallic Color**
+
+For a metallic material, the specular color matches the base color. Try a gold sphere (albedo = `vec3(1.0, 0.84, 0.0)`, metallic = 1.0). What color are the highlights?
+
+
+### Explorations
+
+Deeper exercises that build on the core concepts.
+
+**Exploration 1: Material Gallery**
+
+Create a row of spheres with different materials:
+- Matte plastic (metallic=0, roughness=0.8)
+- Glossy plastic (metallic=0, roughness=0.2)
+- Brushed metal (metallic=1, roughness=0.5)
+- Polished chrome (metallic=1, roughness=0.1)
+
+Use domain repetition or just multiple spheres with different positions.
+
+**Exploration 2: Environment Reflection**
+
+Instead of raymarching reflections, fake an environment with a gradient:
+
+```glsl
+vec3 fakeEnv(vec3 dir) {
+    float t = dir.y * 0.5 + 0.5;
+    return mix(vec3(0.5, 0.4, 0.3), vec3(0.3, 0.5, 0.8), t);
+}
+```
+
+Use `fakeEnv(reflectDir)` as the reflection color. This is fast and often good enough.
+
+**Exploration 3: Per-Object Materials**
+
+Create a scene with 3+ objects, each with a different material. Use the Material struct and a `getMaterial(p)` function that returns different properties based on which object is closest.
+
+
+### Challenges
+
+Substantial projects requiring creative problem-solving.
+
+**Challenge 1: Two-Bounce Reflections**
+
+Extend the single-bounce reflection to two bounces. When the reflection ray hits a surface:
+1. Compute the first reflection color
+2. Compute a second reflection from that hit point
+3. Blend based on both surfaces' reflectivity
+
+Watch for diminishing returns — weight each bounce by the reflectivity.
+
+**Challenge 2: Anisotropic Highlights**
+
+Brushed metal has directional highlights (stretched along the brush direction). Modify the specular calculation:
+
+```glsl
+// Stretched highlight
+vec3 tangent = normalize(cross(normal, vec3(0,1,0)));
+float aniso = dot(h, tangent);
+float spec = pow(max(0.0, dot(normal, h)), shininess) * (1.0 - aniso*aniso*0.8);
+```
+
+Experiment with different tangent directions for different brush patterns.
+
+**Challenge 3: Iridescence**
+
+Create an iridescent material where the color shifts based on view angle:
+
+```glsl
+float theta = acos(dot(normal, viewDir));
+vec3 iridescent = vec3(
+    sin(theta * 6.0),
+    sin(theta * 6.0 + 2.094),
+    sin(theta * 6.0 + 4.189)
+) * 0.5 + 0.5;
+```
+
+This simulates thin-film interference (like oil on water or a beetle's shell).
+
+**Challenge 4: Subsurface Scattering Approximation**
+
+Light penetrating translucent materials (skin, wax, marble) scatters inside. A cheap approximation:
+
+```glsl
+// Light wrapping around edges
+float wrap = max(0.0, dot(normal, lightDir) + wrapAmount) / (1.0 + wrapAmount);
+
+// Backlight bleeding through
+float backlight = max(0.0, dot(-normal, lightDir)) * thickness;
+```
+
+Apply to a sphere to simulate a waxy or fleshy appearance.

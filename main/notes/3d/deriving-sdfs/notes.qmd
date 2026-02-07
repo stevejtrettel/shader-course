@@ -489,3 +489,105 @@ Same folds, swap one line, get the dual. This is the payoff of understanding sym
 You now have the toolkit to derive SDFs for most common shapes. The **SDF Library** chapter provides a reference of ready-to-use functions — both the bare `sdShape(p, params)` forms from this chapter and struct-wrapped versions for scene building.
 
 The **Sculpting** chapter shows how to combine shapes with boolean operations, smooth blending, and domain transformations — building complex geometry from the primitives developed here.
+
+
+## Exercises
+
+### Checkpoints
+
+Quick exercises to verify understanding. A few minutes each.
+
+**Checkpoint 1: Ellipse**
+
+A circle has SDF `length(p) - r`. An ellipse with half-axes $(a, b)$ can be approximated by scaling coordinates:
+
+```glsl
+float sdEllipse(vec2 p, vec2 radii) {
+    return (length(p / radii) - 1.0) * min(radii.x, radii.y);
+}
+```
+
+Why do we multiply by `min(radii.x, radii.y)` at the end? (Hint: what would `length(p / radii) - 1.0` give without correction?)
+
+**Checkpoint 2: Hollow Box**
+
+Pattern 5 shows hollowing with `abs(sdf) - thickness`. Apply this to `sdBox`:
+
+```glsl
+float sdHollowBox(vec3 p, vec3 halfSize, float thickness) {
+    return abs(sdBox(p, halfSize)) - thickness;
+}
+```
+
+What does this produce? What happens at the corners?
+
+**Checkpoint 3: Pentagon**
+
+The equilateral triangle uses 3-fold symmetry with specific fold normals. A regular pentagon has 5-fold symmetry. Without implementing it, sketch which fold lines you'd need. (Hint: think about $\cos(2\pi/5)$ and $\sin(2\pi/5)$.)
+
+
+### Explorations
+
+Deeper exercises that build on the core concepts.
+
+**Exploration 1: Cone**
+
+A cone with apex at the origin, opening along $+y$ with half-angle $\theta$. In the meridional half-plane, the cone boundary is a line through the origin at angle $\theta$ from vertical.
+
+Use Pattern 3 (symmetry reduction): collapse to 2D with `vec2(length(p.xz), p.y)`, then compute distance to a line through the origin.
+
+Hint: the line has direction `vec2(sin(theta), cos(theta))`.
+
+**Exploration 2: Infinite Cylinder**
+
+An infinite cylinder along the $y$-axis with radius $r$. This is simpler than the capped cylinder — there's no case decomposition needed.
+
+What is the SDF? (It's one line.) How does this relate to the capped cylinder derivation?
+
+**Exploration 3: Triangular Prism**
+
+Use Pattern 4 (extrusion) to create a triangular prism. Start with the 2D triangle SDF from Pattern 6, then extrude it along $z$.
+
+```glsl
+float sdTriangularPrism(vec3 p, float r, float h) {
+    float d2d = sdTriangle(p.xy, r);
+    // Use opExtrude pattern...
+}
+```
+
+**Exploration 4: Torus Knot (Conceptual)**
+
+A $(p,q)$ torus knot winds $p$ times around the major circle while winding $q$ times around the tube. The curve itself doesn't have an SDF, but we can get a tube around it using Pattern 5.
+
+Without implementing, describe the approach: how would you parametrize the curve, find the nearest point on it, and apply Pattern 5?
+
+
+### Challenges
+
+Substantial projects requiring creative problem-solving.
+
+**Challenge 1: Hexagonal Prism**
+
+Derive the SDF for a regular hexagonal prism. Approach:
+1. Use Pattern 6 (symmetry folding) to derive the 2D hexagon SDF
+2. Use Pattern 4 (extrusion) to extend it to 3D
+
+The hexagon has 6-fold symmetry. What fold normals do you need?
+
+**Challenge 2: Rounded Cone**
+
+Combine the cone from Exploration 1 with rounding (Pattern 5). The result should have a spherical cap at the apex and a circular edge at the base.
+
+Hint: you'll need to derive the sharp cone first, then think about how rounding affects both ends.
+
+**Challenge 3: Stadium (2D Capsule)**
+
+The 2D analog of a capsule: two semicircles connected by a rectangle. Derive this from first principles using Pattern 1 (direct distance to a line segment) and Pattern 5 (rounding).
+
+Compare your derivation to the 3D capsule from the chapter. The patterns should match exactly.
+
+**Challenge 4: Cube with Beveled Edges**
+
+A cube where the 12 edges are chamfered (cut at 45°) rather than rounded. This requires case decomposition similar to the box, but with additional regions for the beveled edges.
+
+One approach: intersect the cube with 12 half-spaces that cut off the edges. The half-space normals point diagonally — e.g., `normalize(vec3(1, 1, 0))` for one edge.

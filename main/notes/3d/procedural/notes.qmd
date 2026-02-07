@@ -140,3 +140,137 @@ A realistic material combines multiple procedural elements:
 ## What's Next
 
 We can now create rich, varied surfaces. The **Refraction** chapter tackles transparent materials — glass, water, gems — where light bends as it passes through.
+
+
+## Exercises
+
+### Checkpoints
+
+Quick exercises to verify understanding. A few minutes each.
+
+**Checkpoint 1: FBM Octaves**
+
+Change the number of octaves in FBM from 5 to 2 (blobby) and 8 (highly detailed). What's the tradeoff?
+
+**Checkpoint 2: Stripe Frequency**
+
+In `sin(p.x * 20.0)`, the 20.0 controls stripe density. Try 5.0 (wide stripes) and 50.0 (fine stripes). What happens when you use `p.y` instead of `p.x`?
+
+**Checkpoint 3: Checkerboard Scale**
+
+The basic checker uses `floor(p)`. Scale it with `floor(p * 4.0)` for smaller squares, `floor(p * 0.5)` for larger ones.
+
+
+### Explorations
+
+Deeper exercises that build on the core concepts.
+
+**Exploration 1: Wood Grain**
+
+Create a wood-like pattern using cylindrical coordinates and noise:
+
+```glsl
+float rings = sin(length(p.xz) * 10.0 + fbm(p * 2.0) * 3.0);
+vec3 woodColor = mix(vec3(0.4, 0.2, 0.1), vec3(0.6, 0.3, 0.15), rings * 0.5 + 0.5);
+```
+
+The FBM distorts the rings, making them less mechanical.
+
+**Exploration 2: Marble Veins**
+
+Use domain-warped noise for marble:
+
+```glsl
+float marble = abs(sin(p.x * 4.0 + fbm(p * 4.0) * 4.0));
+vec3 color = mix(vec3(0.1), vec3(0.95), marble);
+```
+
+The veins follow distorted vertical lines.
+
+**Exploration 3: Noisy Displacement**
+
+Apply FBM to displace a sphere's surface:
+
+```glsl
+float d = length(p) - 1.0;
+d += 0.15 * fbm(p * 3.0);
+```
+
+Adjust the amplitude (0.15) and frequency (3.0) for different effects.
+
+
+### Challenges
+
+Substantial projects requiring creative problem-solving.
+
+**Challenge 1: Voronoi Cells**
+
+Implement basic Voronoi (distance to nearest random point in a grid cell):
+
+```glsl
+float voronoi(vec2 p) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+
+    float minDist = 1.0;
+    for (int y = -1; y <= 1; y++) {
+        for (int x = -1; x <= 1; x++) {
+            vec2 neighbor = vec2(x, y);
+            vec2 point = hash22(i + neighbor);  // random 0-1 per cell
+            minDist = min(minDist, length(neighbor + point - f));
+        }
+    }
+    return minDist;
+}
+```
+
+Use it for scales, cells, or cracked mud patterns.
+
+**Challenge 2: Animated Noise**
+
+Add time to the noise input for animation:
+
+```glsl
+float animNoise = fbm(vec3(p.xy, iTime * 0.3));
+```
+
+Create flowing lava, drifting clouds, or rippling water.
+
+**Challenge 3: Triplanar Mapping**
+
+For arbitrary surfaces, sample patterns from three directions and blend:
+
+```glsl
+vec3 n = abs(normal);
+n = pow(n, vec3(4.0));  // sharpen blend
+n /= n.x + n.y + n.z;   // normalize
+
+vec3 color = pattern(p.yz) * n.x
+           + pattern(p.xz) * n.y
+           + pattern(p.xy) * n.z;
+```
+
+This avoids stretching on surfaces not aligned with coordinate planes.
+
+**Challenge 4: Weathered Metal**
+
+Create a rusted metal surface:
+- Base metal color with subtle noise variation
+- Rust spots using noise threshold: `if (noise > 0.6) use rustColor`
+- Blend smoothly at rust edges
+- Add edge wear where the normal faces sideways (using `abs(normal.y) < 0.3`)
+
+**Challenge 5: Terrain Generator**
+
+Use FBM as a height map for procedural terrain:
+
+```glsl
+float height = fbm(p.xz * 0.5) * 2.0;
+float terrain = p.y - height;
+```
+
+Add layers:
+- Snow above a certain height
+- Grass in moderate slopes
+- Rock on steep slopes
+- Sand/dirt near sea level

@@ -315,6 +315,106 @@ But meshes require vertex data, connectivity, and substantial infrastructure. Fo
 :::
 
 
+## Exercises
+
+### Checkpoints
+
+Quick exercises to verify understanding. A few minutes each.
+
+**Checkpoint 1: Field of View**
+
+The FOV is set to 90°. Try changing it:
+- 60° (telephoto) — what happens to the sphere's apparent size?
+- 120° (wide angle) — what distortion do you notice at the edges?
+
+**Checkpoint 2: Move the Sphere**
+
+The sphere is at `vec3(0.0, 0.0, -3.0)`. Move it:
+- To the left: `vec3(-1.0, 0.0, -3.0)`
+- Closer: `vec3(0.0, 0.0, -2.0)` — how does it change?
+- Behind the camera: `vec3(0.0, 0.0, 1.0)` — what happens?
+
+**Checkpoint 3: Normal Variations**
+
+We visualized normals with `normal * 0.5 + 0.5`. Try these variations:
+- `abs(normal)` — what's different?
+- `vec3(normal.y * 0.5 + 0.5)` — what does this show?
+- `vec3(dot(normal, vec3(0,1,0)) * 0.5 + 0.5)` — height-based shading
+
+
+### Explorations
+
+Deeper exercises that build on the core concepts.
+
+**Exploration 1: Two Spheres**
+
+Add a second sphere to the scene. You'll need to:
+1. Create another `Sphere` variable
+2. Test intersection with both
+3. Keep track of which hit is closer
+
+Hint: intersect both, then use the smaller positive `t`.
+
+**Exploration 2: Animate Position**
+
+Make the sphere move. Use `iTime` to vary the position:
+
+```glsl
+float y = sin(iTime);
+Sphere sphere = Sphere(vec3(0.0, y, -3.0), 1.0, vec3(1.0, 0.0, 0.0));
+```
+
+Try:
+- Circular motion: `vec3(cos(iTime), 0.0, sin(iTime) - 3.0)`
+- Bouncing with `abs(sin(iTime))`
+
+**Exploration 3: Ray-Plane Intersection**
+
+Add a ground plane at $y = -1$. A plane at height $h$ satisfies $y = h$. Substituting the ray equation $y = o_y + t \cdot d_y$:
+
+$$t = \frac{h - o_y}{d_y}$$
+
+Implement this and give the ground a different color. Watch for division by zero when $d_y = 0$ (ray parallel to plane).
+
+
+### Challenges
+
+Substantial projects requiring creative problem-solving.
+
+**Challenge 1: Solar System**
+
+Create a mini solar system:
+- A yellow sphere at the origin (the sun)
+- A smaller sphere orbiting the sun using `iTime`
+- A tiny sphere orbiting that one (a moon)
+
+Use trigonometry for circular orbits: position at `(R * cos(speed * iTime), 0, R * sin(speed * iTime))`.
+
+**Challenge 2: Reflection**
+
+When the ray hits a surface, compute the reflection direction:
+
+```glsl
+vec3 reflectDir = reflect(ray.dir, normal);
+```
+
+Trace a second ray from the hit point in this direction. If it hits another sphere, blend that color into the result. This is the first step toward recursive raytracing.
+
+Start simple: just color the reflection ray's direction to verify it's correct, then add intersection.
+
+**Challenge 3: Multiple Lights**
+
+The `shade` function has one hardcoded light. Modify it to accept a light direction as a parameter, then call it twice with different directions:
+
+```glsl
+vec3 color = ambient;
+color += shade(normal, surfaceColor, normalize(vec3(1, 1, 1)));
+color += shade(normal, surfaceColor, normalize(vec3(-1, 0.5, 0)));
+```
+
+Try a warm key light and a cool fill light by multiplying each contribution by a color.
+
+
 ## What's Next
 
 We need a different approach. Instead of asking "where exactly does this ray hit the surface?" and solving polynomial equations, what if we asked an easier question?

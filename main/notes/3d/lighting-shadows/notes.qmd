@@ -281,3 +281,120 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 ## What's Next
 
 We've improved *how* light interacts with surfaces, but surfaces still have only a single color. The **Materials** chapter introduces richer surface properties: specular highlights, Fresnel effects, and reflections.
+
+
+## Exercises
+
+### Checkpoints
+
+Quick exercises to verify understanding. A few minutes each.
+
+**Checkpoint 1: Light Direction**
+
+The default light comes from `normalize(vec3(1.0, 1.0, 1.0))` — upper-right-front. Try:
+- Light from directly above: `vec3(0.0, 1.0, 0.0)`
+- Light from the left: `vec3(-1.0, 0.5, 0.5)`
+
+Where do the highlights and shadows move?
+
+**Checkpoint 2: Specular Sharpness**
+
+Change the specular exponent from 32.0 to 8.0 (soft, plastic-like) and 128.0 (tight, metallic). What happens to the highlight size?
+
+**Checkpoint 3: Shadow Softness**
+
+In `softShadow`, try `k` values of 4.0 (very soft), 16.0 (medium), and 64.0 (nearly hard). How do the shadow edges change?
+
+**Checkpoint 4: Gamma Comparison**
+
+Render a scene with and without gamma correction. The difference is subtle but important — which looks more natural? Which has better shadow detail?
+
+
+### Explorations
+
+Deeper exercises that build on the core concepts.
+
+**Exploration 1: Animated Light**
+
+Rotate the light direction with `iTime`:
+
+```glsl
+vec3 lightDir = normalize(vec3(cos(iTime), 1.0, sin(iTime)));
+```
+
+Watch the shadows and highlights move. Try varying the vertical component too.
+
+**Exploration 2: Two Lights**
+
+Add a second light source. Compute shading for both and sum the results:
+
+```glsl
+Light key = Light(normalize(vec3(1.0, 1.0, 1.0)), vec3(1.0, 0.9, 0.8));   // warm
+Light fill = Light(normalize(vec3(-1.0, 0.5, 0.0)), vec3(0.2, 0.3, 0.5)); // cool
+
+vec3 color = ambient;
+color += shade(normal, material, key, viewDir) * softShadow(p, key.dir, 16.0);
+color += shade(normal, material, fill, viewDir) * softShadow(p, fill.dir, 16.0);
+```
+
+A warm key light with a cool fill is a classic look.
+
+**Exploration 3: AO Visualization**
+
+Render just the ambient occlusion term as grayscale: `color = vec3(ao)`. This shows the "contact shadows" in corners and crevices. Adjust the sampling distances to control how wide the occlusion spreads.
+
+**Exploration 4: Dense Fog**
+
+Create thick fog by increasing the density coefficient:
+
+```glsl
+float fog = 1.0 - exp(-distance * 0.2);  // denser than 0.05
+```
+
+How close can objects get before they're fully visible? Try matching the fog color to the background.
+
+
+### Challenges
+
+Substantial projects requiring creative problem-solving.
+
+**Challenge 1: Colored Shadows**
+
+Instead of pure black shadows, tint them toward a color (simulating bounce light or ambient sky):
+
+```glsl
+float sh = softShadow(p, lightDir, 16.0);
+vec3 shadowColor = vec3(0.1, 0.15, 0.2);  // cool ambient
+color = mix(shadowColor * material, litColor, sh);
+```
+
+**Challenge 2: Multiple Point Lights**
+
+Create a scene with 2-3 point lights at different positions with different colors. Each light needs:
+- A direction computed from position: `normalize(lightPos - p)`
+- Distance attenuation: `1.0 / (1.0 + dist * dist * 0.1)`
+- Its own shadow ray
+
+Animate the positions with `iTime` for a dynamic scene.
+
+**Challenge 3: Rim Lighting**
+
+Add a rim light effect — a glow around object edges facing away from the viewer:
+
+```glsl
+float rim = 1.0 - max(dot(normal, viewDir), 0.0);
+rim = pow(rim, 3.0);
+color += rimColor * rim;
+```
+
+This simulates backlighting or subsurface scattering at edges.
+
+**Challenge 4: Day/Night Cycle**
+
+Animate the entire lighting setup to simulate a day/night cycle:
+- Sun rises (light from below horizon) → noon (from above) → sets
+- Sky color shifts from dark blue → orange → light blue → orange → dark
+- Fog color matches the sky
+- Maybe add a "moon" light at night
+
+Use `iTime` to control the sun angle: `vec3(cos(iTime*0.5), sin(iTime*0.5), 0.5)`
