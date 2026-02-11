@@ -36,12 +36,38 @@ shader-course/
 Each project is independent. Preview whichever you're working on:
 
 ```bash
+# One-time setup
+npm install
+
 # Work on CIRM course
 cd cirm && quarto preview
 
 # Work on main site
 cd main && quarto preview
 ```
+
+### Shader Build Pipeline
+
+Shader demos are compiled from `*.glsl` files into per-demo `embed.js` files using
+`@stevejtrettel/shader-sandbox`.
+
+- Quarto runs this automatically via `project.pre-render` in both `main/_quarto.yml`
+  and `cirm/_quarto.yml`.
+- Manual build commands:
+  - `npm run shaders:build:cirm`
+  - `npm run shaders:build:main`
+  - `npm run shaders:build`
+
+The build script scans each project's `demos/` tree and compiles any folder
+containing `image.glsl`.
+
+If your local `shader-sandbox` CLI uses a different command shape, set:
+
+```bash
+SHADER_SANDBOX_BUILD_CMD="npx @stevejtrettel/shader-sandbox build {demoDir} --name {demoName} --output {outFile}"
+```
+
+Supported placeholders are `{demoDir}`, `{demoName}`, and `{outFile}`.
 
 ## Build Process
 

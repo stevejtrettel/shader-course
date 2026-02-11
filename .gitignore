@@ -16,6 +16,10 @@ _book/
 # IDE
 .idea/
 
+# Node
+node_modules/
+**/node_modules/
+
 # LaTeX auxiliary files
 *.aux
 *.log

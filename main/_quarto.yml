@@ -1,6 +1,10 @@
 project:
   type: website
   output-dir: _site
+  pre-render:
+    - npm --prefix .. run shaders:build:main
+  resources:
+    - demos/**
 
 website:
   title: "Shader Programming"

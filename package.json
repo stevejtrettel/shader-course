@@ -1,0 +1,12 @@
+{
+  "name": "shader-course",
+  "private": true,
+  "scripts": {
+    "shaders:build": "npm run shaders:build:cirm && npm run shaders:build:main",
+    "shaders:build:cirm": "node scripts/build-shaders.mjs cirm",
+    "shaders:build:main": "node scripts/build-shaders.mjs main"
+  },
+  "dependencies": {
+    "@stevejtrettel/shader-sandbox": "latest"
+  }
+}
