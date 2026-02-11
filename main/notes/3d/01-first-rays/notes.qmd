@@ -8,7 +8,7 @@ By the end of this chapter you'll have a lit, interactive 3D sphere that you can
 
 {{< shader-demo first-rays/sphere-orbit >}}
 
-We start with the simplest case: one sphere, one light, analytical intersection. This establishes the machinery — rays, hits, lighting, camera control — that carries through the rest of the 3D rendering chapters.
+We start with the simplest case: one sphere, one light, analytical intersection. This establishes the machinery — rays, hits, shading, camera control — that carries through the rest of the 3D rendering chapters.
 
 
 ## Cameras and Rays
@@ -100,7 +100,7 @@ struct Sphere {
 };
 ```
 
-Even with just one object, this establishes the pattern we'll use throughout: shapes carry their own data, including color.
+Even with just one object, this establishes the pattern we'll use throughout: shapes carry their own data, including an intrinsic color. Think of this color as the object's **albedo** — its inherent reflectance, independent of lighting. A red sphere is red whether it's in bright light or shadow; the albedo is a property of the material, not the illumination.
 
 
 ### Ray-Sphere Intersection
@@ -159,7 +159,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 }
 ```
 
-A red disk. We found the sphere and used its color, but it looks flat — every hit pixel gets the same shade. To see the curvature, we need lighting, and lighting depends on surface orientation.
+A red disk. We found the sphere and used its color, but it looks flat — every hit pixel gets the same shade. To see the curvature, we need to vary the color across the surface. That requires knowing the surface orientation.
 
 
 ## Surface Normals
@@ -168,7 +168,34 @@ The **surface normal** is the unit vector perpendicular to the surface. For a sp
 
 $$\mathbf{n} = \frac{\mathbf{p} - \mathbf{c}}{r}$$
 
-where $\mathbf{p}$ is the hit point. We can visualize normals as colors by mapping components from $[-1,1]$ to $[0,1]$:
+where $\mathbf{p}$ is the hit point. The normal is the fundamental geometric quantity at a surface point — it tells us which way the surface faces. Everything in shading depends on it.
+
+Computing the normal at a hit point:
+
+```glsl
+vec3 hitPoint = ray.origin + t * ray.dir;
+vec3 normal = (hitPoint - sphere.center) / sphere.radius;
+```
+
+Now we need to turn this geometric data into color. That's the job of a **shading function**.
+
+
+## Shading
+
+We've found a surface and computed its normal. Now we need to assign colors to pixels — turning geometric data into a visible image. This is **shading**.
+
+Later chapters will develop physically-based lighting from the rendering equation. For now, we need something simpler: visualization tools that let us *see* our geometry. We'll build three shading functions, each revealing different information about the surface. These are utilities — quick ways to make geometry readable — not physical light simulation.
+
+
+### Normal Shading
+
+The most direct visualization: map the normal vector to a color. Normal components live in $[-1, 1]$; RGB values live in $[0, 1]$. The standard conversion:
+
+```glsl
+vec3 shadeNormal(vec3 normal) {
+    return normal * 0.5 + 0.5;
+}
+```
 
 {{< shader-demo first-rays/sphere-normals >}}
 
@@ -176,40 +203,48 @@ where $\mathbf{p}$ is the hit point. We can visualize normals as colors by mappi
 if (t > 0.0) {
     vec3 hitPoint = ray.origin + t * ray.dir;
     vec3 normal = (hitPoint - sphere.center) / sphere.radius;
-    color = normal * 0.5 + 0.5;
+    color = shadeNormal(normal);
 }
 ```
 
-Now we see the shape: red on the right ($+x$), green on top ($+y$), blue facing us ($+z$). The sphere is revealing its geometry through the normal vectors.
+Red on the right ($+x$), green on top ($+y$), blue facing us ($+z$). The sphere is revealing its geometry through the normal vectors. Normal shading ignores the object's color entirely — it's purely diagnostic. You'll use it constantly for debugging: if normals look wrong, nothing downstream will look right.
 
 
-## Lighting
+### Depth Shading
 
-A flat-colored sphere looks like a disk. To see the curvature, we need lighting — surfaces facing the light should be bright, surfaces facing away should be dark.
-
-The key insight: brightness depends on the angle between the surface normal and the light direction. When they align (surface faces the light directly), maximum brightness. When perpendicular or facing away, darkness. The dot product captures this:
-
-$$\text{brightness} = \max(0, \mathbf{n} \cdot \mathbf{l})$$
-
-where $\mathbf{n}$ is the normal and $\mathbf{l}$ points toward the light. The $\max$ prevents negative values for surfaces facing away.
-
-
-### The Shade Function
+Color by distance from the camera. Nearby surfaces are bright; distant surfaces fade to black:
 
 ```glsl
-vec3 shade(vec3 normal, vec3 surfaceColor) {
-    vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
-    float diffuse = max(0.0, dot(normal, lightDir));
-    return surfaceColor * diffuse;
+vec3 shadeDepth(float t) {
+    float brightness = 1.0 - clamp(t / 10.0, 0.0, 1.0);
+    return vec3(brightness);
 }
 ```
 
-Three lines. The light direction is baked in — we'll generalize this later. For now, it just works: pass in the normal and color, get back a lit color.
+{{< shader-demo first-rays/sphere-depth >}}
+
+The divisor (10.0) sets the range — surfaces farther than 10 units fade to black. Adjust this to match your scene's scale. Like normal shading, this ignores the object's color. It's useful for verifying intersection distances and understanding the spatial layout of a scene.
 
 
-### Lit Sphere
+### Diffuse Shading
 
-Putting it together:
+Normal shading shows orientation; depth shading shows distance. Neither looks like a 3D object under illumination. For that, we need brightness to depend on which way the surface faces relative to some fixed direction.
+
+Pick a direction — say, `normalize(vec3(1.0, 1.0, 1.0))`, from the upper right. Surfaces facing toward this direction should be bright; surfaces facing away should be dark. The dot product measures exactly this:
+
+$$\text{brightness} = \max(0, \; \mathbf{n} \cdot \mathbf{l})$$
+
+The $\max$ prevents negative values for surfaces facing away. Multiply by the object's albedo to get a colored result:
+
+```glsl
+vec3 shadeDiffuse(vec3 normal, vec3 albedo) {
+    vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+    float brightness = max(0.0, dot(normal, lightDir));
+    return albedo * (0.15 + 0.85 * brightness);
+}
+```
+
+The `0.15` floor prevents surfaces facing away from going completely black — a crude stand-in for light arriving from directions we're ignoring. The `0.85` scales the lit contribution so the total doesn't exceed 1.0.
 
 {{< shader-demo first-rays/sphere-lit >}}
 
@@ -225,16 +260,33 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     if (t > 0.0) {
         vec3 hitPoint = ray.origin + t * ray.dir;
         vec3 normal = (hitPoint - sphere.center) / sphere.radius;
-
-        vec3 ambient = sphere.color * 0.15;
-        color = ambient + shade(normal, sphere.color);
+        color = shadeDiffuse(normal, sphere.color);
     }
 
     fragColor = vec4(color, 1.0);
 }
 ```
 
-The sphere looks 3D: bright where it faces the light, dark on the opposite side. The ambient term prevents the dark side from going completely black.
+The sphere looks 3D: bright where it faces the "light" direction, dark on the opposite side. Same contract as the other two shading functions — pass in hit data, get back a final color.
+
+Why does the dot product give a convincing 3D look? There's real physics behind it — the dot product is the cosine of the angle between the surface and the light beam, which determines how much energy the surface intercepts. We'll derive this properly in the **Lighting** chapter from the rendering equation. For now, it's a one-line function that makes geometry look solid, and that's enough.
+
+::: {.callout-note}
+## The Hardcoded Direction
+
+The light direction in `shadeDiffuse` is baked in — `normalize(vec3(1.0, 1.0, 1.0))`. This is a deliberate choice: for these early chapters, we don't want to manage light objects. We just want to see our geometry. In the Lighting chapter, this magic constant becomes a proper light source with direction, color, and physical justification.
+:::
+
+
+### Choosing a Shading Function
+
+All three functions are tools. Use whichever reveals what you need:
+
+- **`shadeNormal`** — debugging geometry, verifying normals point the right way
+- **`shadeDepth`** — checking intersection distances, understanding scene layout
+- **`shadeDiffuse`** — the default for "make it look 3D." Used throughout the next several chapters
+
+In the demos and exercises that follow, we'll mostly use `shadeDiffuse`. But keep the others handy — when something looks wrong, switching to normal or depth shading often reveals the problem immediately.
 
 
 ## Camera Motion
@@ -273,13 +325,13 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     Ray ray = makeRay(fragCoord);
     ray = orbitRay(ray, 5.0);
 
-    // ... rest of shading
+    // ... intersection and shading
 }
 ```
 
 {{< shader-demo first-rays/sphere-orbit >}}
 
-Drag to orbit. The sphere stays at the origin; the camera circles it. This is our complete first raytracer: one sphere, one light, full mouse control.
+Drag to orbit. The sphere stays at the origin; the camera circles it. This is our complete first raytracer: one sphere, diffuse shading, full mouse control.
 
 
 ## The Limits of Analytical Intersection
@@ -334,10 +386,19 @@ The sphere is at `vec3(0.0, 0.0, -3.0)`. Move it:
 - Closer: `vec3(0.0, 0.0, -2.0)` — how does it change?
 - Behind the camera: `vec3(0.0, 0.0, 1.0)` — what happens?
 
-**Checkpoint 3: Normal Variations**
+**Checkpoint 3: Shading Comparison**
 
-We visualized normals with `normal * 0.5 + 0.5`. Try these variations:
-- `abs(normal)` — what's different?
+Render the sphere with each shading function:
+- `shadeNormal(normal)` — which directions map to which colors?
+- `shadeDepth(t)` — how does the brightness vary across the sphere?
+- `shadeDiffuse(normal, sphere.color)` — where is the bright spot?
+
+Change the light direction in `shadeDiffuse` to `normalize(vec3(-1.0, 0.0, 0.0))`. Where does the bright region move?
+
+**Checkpoint 4: Normal Variations**
+
+Try these variations on normal shading:
+- `abs(normal)` — what's different from `normal * 0.5 + 0.5`?
 - `vec3(normal.y * 0.5 + 0.5)` — what does this show?
 - `vec3(dot(normal, vec3(0,1,0)) * 0.5 + 0.5)` — height-based shading
 
@@ -351,9 +412,8 @@ Deeper exercises that build on the core concepts.
 Add a second sphere to the scene. You'll need to:
 1. Create another `Sphere` variable
 2. Test intersection with both
-3. Keep track of which hit is closer
-
-Hint: intersect both, then use the smaller positive `t`.
+3. Keep track of which hit is closer (smaller positive `t`)
+4. Use the closer sphere's color in `shadeDiffuse`
 
 **Exploration 2: Animate Position**
 
@@ -374,7 +434,7 @@ Add a ground plane at $y = -1$. A plane at height $h$ satisfies $y = h$. Substit
 
 $$t = \frac{h - o_y}{d_y}$$
 
-Implement this and give the ground a different color. Watch for division by zero when $d_y = 0$ (ray parallel to plane).
+Implement this and shade the ground with `shadeDiffuse` using a gray color. Watch for division by zero when $d_y = 0$ (ray parallel to plane).
 
 
 ### Challenges
@@ -400,19 +460,14 @@ vec3 reflectDir = reflect(ray.dir, normal);
 
 Trace a second ray from the hit point in this direction. If it hits another sphere, blend that color into the result. This is the first step toward recursive raytracing.
 
-Start simple: just color the reflection ray's direction to verify it's correct, then add intersection.
+Start simple: use `shadeNormal` on the reflected ray's direction to verify it's correct, then add intersection.
 
-**Challenge 3: Multiple Lights**
+**Challenge 3: Custom Shading**
 
-The `shade` function has one hardcoded light. Modify it to accept a light direction as a parameter, then call it twice with different directions:
-
-```glsl
-vec3 color = ambient;
-color += shade(normal, surfaceColor, normalize(vec3(1, 1, 1)));
-color += shade(normal, surfaceColor, normalize(vec3(-1, 0.5, 0)));
-```
-
-Try a warm key light and a cool fill light by multiplying each contribution by a color.
+Write your own shading function. Some ideas:
+- **Fresnel shading**: surfaces facing the camera are dark, edges are bright — `pow(1.0 - dot(normal, -ray.dir), 3.0)`
+- **Toon shading**: quantize the dot product into 3-4 discrete bands using `floor`
+- **Matcap**: use the normal's $xy$ components as texture coordinates into a 2D lookup (use a procedural pattern if you don't have textures)
 
 
 ## What's Next

@@ -148,7 +148,7 @@ A horizontal plane at $y = h$. Points above have positive distance; points below
 
 ## Normals from SDFs
 
-For lighting, we need surface normals. An SDF is an implicit function — the surface is where $d(\mathbf{p}) = 0$. The gradient $\nabla d$ points perpendicular to level sets, so it gives us the normal direction.
+For shading, we need surface normals. An SDF is an implicit function — the surface is where $d(\mathbf{p}) = 0$. The gradient $\nabla d$ points perpendicular to level sets, so it gives us the normal direction.
 
 We estimate the gradient numerically using central differences:
 
@@ -176,9 +176,9 @@ float sdScene(vec3 p) {
 }
 ```
 
-That's the entire scene definition. Combined with `raymarch`, `calcNormal`, and the same `shade` function from the previous chapter:
+That's the entire scene definition. Combined with `raymarch` and `calcNormal`:
 
-{{< shader-demo raymarching/sphere >}}
+{{< shader-demo raymarching/sphere-normals >}}
 
 ```glsl
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
@@ -191,16 +191,14 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     if (t > 0.0) {
         vec3 p = ray.origin + t * ray.dir;
         vec3 normal = calcNormal(p);
-
-        vec3 ambient = vec3(1.0, 0.0, 0.0) * 0.15;
-        color = ambient + shade(normal, vec3(1.0, 0.0, 0.0));
+        color = shadeNormal(normal);
     }
 
     fragColor = vec4(color, 1.0);
 }
 ```
 
-The result looks identical to our analytical sphere — same shape, same lighting. But we found the intersection by marching, not by solving a quadratic.
+Normal shading confirms we found the same sphere — the colors match our analytical version from the previous chapter. But we found the intersection by marching, not by solving a quadratic. The sphere looks the same; the machinery is completely different.
 
 
 ## The Torus, Redeemed
@@ -213,11 +211,11 @@ float sdScene(vec3 p) {
 }
 ```
 
-Four lines. The raymarching loop doesn't change. The normal calculation doesn't change. The lighting doesn't change.
-
 {{< shader-demo raymarching/torus >}}
 
-Compare: 80 lines of quartic algebra reduced to 4 lines of distance calculation. The raymarching framework absorbs all the complexity — we just answer "how far is the surface?"
+Four lines of distance calculation replace 80 lines of quartic algebra. The raymarching loop doesn't change. The normal calculation doesn't change. We just answer a different distance question and a new shape appears.
+
+Normal shading is especially revealing on the torus — the swirling color bands trace out the surface orientation, showing how the normal rotates around the tube as it wraps around the ring.
 
 
 ## Building Scenes
@@ -250,14 +248,12 @@ float sdScene(vec3 p) {
 }
 ```
 
-{{< shader-demo raymarching/scene-multi >}}
-
-Three objects, one `min` chain. Drag to orbit and see them from all angles.
+With just `shadeDiffuse`, every object gets the same color treatment — readable, but we can't tell the sphere from the torus by appearance alone. To give each object its own color, we need to know *which* one we hit.
 
 
 ### The Color Problem
 
-But wait — everything is the same color. `sdScene` returns a distance, not information about *which* object we hit. How do we color the sphere red and the torus blue?
+`sdScene` returns a distance, not information about *which* object we hit. How do we color the sphere red and the torus blue?
 
 We need a separate function that, given a hit point, determines which object is there and returns its color. The approach: check each object's distance and return the color of whichever is closest.
 
@@ -369,9 +365,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
         vec3 p = ray.origin + t * ray.dir;
         vec3 normal = calcNormal(p);
         vec3 material = getMaterial(p);
-
-        vec3 ambient = material * 0.15;
-        color = ambient + shade(normal, material);
+        color = shadeDiffuse(normal, material);
     }
 
     fragColor = vec4(color, 1.0);
@@ -380,61 +374,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 
 {{< shader-demo raymarching/scene-complete >}}
 
-
-## Shadows
-
-We have a raymarcher. We can trace rays from the camera through the scene. But there's no reason to stop at one ray per pixel — we can trace additional rays to determine lighting.
-
-**The idea:** From a hit point, march toward the light source. If we hit something before reaching the light, the point is in shadow.
-
-```glsl
-float shadow(vec3 p) {
-    vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
-    float t = 0.02;  // Start slightly off the surface
-
-    for (int i = 0; i < 50; i++) {
-        float d = sdScene(p + lightDir * t);
-
-        if (d < 0.001) return 0.0;  // Hit something: in shadow
-
-        t += d;
-
-        if (t > 20.0) break;  // Reached the light
-    }
-
-    return 1.0;  // Nothing blocking: lit
-}
-```
-
-The logic mirrors our main raymarch loop. We start a small distance off the surface (to avoid self-intersection), march toward the light, and return 0 if we hit geometry or 1 if we reach the light. The light direction is embedded — the same direction used in `shade`.
-
-Using it in the shading:
-
-```glsl
-vec3 p = ray.origin + t * ray.dir;
-vec3 normal = calcNormal(p);
-vec3 material = getMaterial(p);
-
-float sh = shadow(p + normal * 0.01);
-
-vec3 ambient = material * 0.15;
-vec3 lit = shade(normal, material);
-color = ambient + lit * sh;
-```
-
-We offset the shadow ray origin slightly along the normal to prevent self-shadowing artifacts. The shadow factor `sh` is either 0 or 1 — multiplying the lit color by it gives us hard shadows.
-
-{{< shader-demo raymarching/shadows >}}
-
-The sphere casts a shadow on the ground. The torus casts a shadow too. We didn't write any special shadow code for each shape — the same `sdScene` function that defines our geometry also defines what blocks light.
-
-::: {.callout-tip}
-## Soft Shadows
-
-The shadows above are "hard" — a point is either fully lit or fully shadowed. Real shadows have soft edges where light is partially blocked.
-
-Soft shadows are possible by tracking how close we came to hitting something during the shadow march, not just whether we hit. This creates penumbra regions at shadow boundaries. The technique is straightforward but beyond our scope here.
-:::
+Three objects, three colors, one `shadeDiffuse` call. The raymarcher finds the surface; `getMaterial` identifies it; the shading function makes it visible.
 
 
 ## What's Next
@@ -443,20 +383,7 @@ We've seen that SDFs make raymarching flexible — swap one distance function fo
 
 The next chapter, **Deriving SDFs**, explores the mathematical patterns behind distance functions. You'll learn to derive SDFs for new shapes yourself, not just copy them from a library.
 
-After that, the **SDF Library** provides a comprehensive reference of shapes you can use directly. And **Sculpting** shows how to combine shapes with boolean operations, smooth blending, and domain transformations.
-
-
-::: {.callout-note}
-## Constructive Solid Geometry
-
-An SDF represents a shape as a function $f: \mathbb{R}^3 \to \mathbb{R}$. Set operations become pointwise operations:
-
-- **Union** $A \cup B$: `min(a, b)`
-- **Intersection** $A \cap B$: `max(a, b)`
-- **Subtraction** $A \setminus B$: `max(a, -b)`
-
-This is **constructive solid geometry** (CSG) — building complex shapes from simple primitives. With SDFs, CSG is just arithmetic. The Sculpting chapter explores this in depth.
-:::
+After that, the **SDF Library** provides a comprehensive reference of shapes you can use directly. And **Sculpting** shows how to go beyond `min` — intersection, subtraction, smooth blending, and domain transformations that let you carve, warp, and repeat shapes to build complex objects from simple primitives.
 
 
 ## Exercises
@@ -467,22 +394,25 @@ Quick exercises to verify understanding. A few minutes each.
 
 **Checkpoint 1: Move the Sphere**
 
-In `raymarch-sphere`, the sphere is at the origin. Move it to `vec3(1.0, 0.5, 0.0)`. What changes in the code? (Just one number in `sdScene`.)
+In the first raymarched render, the sphere is at the origin. Move it to `vec3(1.0, 0.5, 0.0)`. What changes in the code? (Just one line in `sdScene`.)
 
 **Checkpoint 2: Torus Proportions**
 
-In `raymarch-torus`, the torus has major radius 1.0 and minor radius 0.4. Try:
-- A thin ring: `vec2(1.0, 0.1)`
-- A fat donut: `vec2(1.0, 0.8)`
+The torus has major radius 1.0 and minor radius 0.4. Try:
+- A thin ring: major 1.0, minor 0.1
+- A fat donut: major 1.0, minor 0.8
 - What happens when minor radius exceeds major radius?
 
-**Checkpoint 3: Add a Sphere to the Scene**
+**Checkpoint 3: Shading Comparison**
 
-In `scene-multi`, add a third sphere floating above the others. You'll need one more `min()` in the chain.
+Render the multi-object scene with each shading function:
+- `shadeNormal(normal)` — what do the color boundaries between objects look like?
+- `shadeDepth(t)` — which object is closest to the camera?
+- `shadeDiffuse(normal, material)` — the default for readable scenes
 
 **Checkpoint 4: Field of View**
 
-In `generateRay`, the FOV is 90°. Try 60° (telephoto) and 120° (wide angle). How does the scene change?
+In `makeRay`, the FOV is 90°. Try 60° (telephoto) and 120° (wide angle). How does the scene change?
 
 
 ### Explorations
@@ -491,50 +421,9 @@ Deeper exercises that build on the core concepts.
 
 **Exploration 1: Per-Object Colors**
 
-In `scene-multi`, everything is orange. Give each object its own color.
+Starting from a single-color scene using `shadeDiffuse(normal, vec3(1.0, 0.5, 0.0))`, add per-object colors using the `getMaterial` approach from the chapter. Give the sphere, torus, and ground plane distinct colors.
 
-One approach: write a `sceneColor(vec3 p)` function that checks which object is closest and returns the appropriate color:
-
-```glsl
-vec3 sceneColor(vec3 p) {
-    float sphere = length(p - vec3(-1.5, 0.0, 0.0)) - 1.0;
-    float torus = sdTorus(p - vec3(1.5, 0.0, 0.0), vec2(0.8, 0.3));
-    float ground = p.y + 1.0;
-
-    float d = sceneSDF(p);
-    if (d == sphere) return vec3(1.0, 0.0, 0.0);  // red
-    if (d == torus) return vec3(0.0, 0.7, 1.0);   // cyan
-    return vec3(0.5, 0.5, 0.5);                    // gray
-}
-```
-
-Then use `hit.color = sceneColor(p)` after raymarching.
-
-**Exploration 2: Fog**
-
-Add distance-based fog to create depth. After shading, blend toward a fog color based on distance traveled:
-
-```glsl
-vec3 fogColor = vec3(0.5, 0.6, 0.7);
-float fogAmount = 1.0 - exp(-t * 0.1);
-color = mix(color, fogColor, fogAmount);
-```
-
-Adjust the `0.1` to control fog density.
-
-**Exploration 3: Animate the Light**
-
-The light direction is `normalize(vec3(1.0, 1.0, 1.0))`—from the upper-right-front. Try:
-- Light from above: `vec3(0.0, 1.0, 0.0)`
-- Light from the left: `vec3(-1.0, 0.5, 0.5)`
-
-Where do the shadows move?
-
-Now try animating the light:
-- Rotate the light direction with `iTime`: use `vec3(cos(iTime), 1.0, sin(iTime))`
-- Watch the shadows sweep across the scene
-
-**Exploration 4: Object Animation**
+**Exploration 2: Object Animation**
 
 Make the sphere or torus move. Modify its position in `sdScene` to depend on `iTime`:
 
@@ -547,39 +436,34 @@ Try:
 - Circular orbit: `vec3(cos(iTime) * 2.0, 0.0, sin(iTime) * 2.0)`
 - Bouncing: `abs(sin(iTime))`
 
+**Exploration 3: Add More Objects**
+
+Add a third and fourth object to the scene. Each one needs:
+- An SDF primitive in `sdScene` (with `min`)
+- A color check in `getMaterial`
+
+Try a box: `sdBox(p - center, halfSize)` where `sdBox` is:
+```glsl
+float sdBox(vec3 p, vec3 halfSize) {
+    vec3 d = abs(p) - halfSize;
+    return length(max(d, 0.0)) + min(max(d.x, max(d.y, d.z)), 0.0);
+}
+```
+
 
 ### Challenges
 
 Substantial projects requiring creative problem-solving.
 
-**Challenge 1: Hard Shadows**
-
-Implement the shadow function described in the chapter. From the hit point, march toward the light. If you hit something before reaching the light, the point is in shadow:
-
-```glsl
-float shadow(vec3 origin, vec3 lightDir, float maxDist) {
-    float t = 0.02;  // Start slightly off surface
-    for (int i = 0; i < 50; i++) {
-        float d = sceneSDF(origin + lightDir * t);
-        if (d < 0.001) return 0.0;  // In shadow
-        t += d;
-        if (t > maxDist) break;
-    }
-    return 1.0;  // Lit
-}
-```
-
-Multiply your diffuse term by the shadow result.
-
-**Challenge 2: Infinite Repetition**
+**Challenge 1: Infinite Repetition**
 
 The `mod` function can repeat space infinitely:
 
 ```glsl
-float sceneSDF(vec3 p) {
+float sdScene(vec3 p) {
     vec3 spacing = vec3(4.0);
     vec3 q = mod(p + spacing * 0.5, spacing) - spacing * 0.5;
-    return length(q) - 1.0;  // Infinite grid of spheres
+    return sdSphere(q, 0.5);
 }
 ```
 
@@ -588,11 +472,18 @@ Experiment with:
 - Repeating only in 2D (an infinite floor of objects)
 - Mixing repeated and non-repeated objects
 
-**Challenge 3: Normal Visualization**
+Render with `shadeNormal` — the repeating normal pattern is visually striking.
 
-Replace shading with normal visualization: `color = normal * 0.5 + 0.5`. This maps the normal components to RGB—a useful debugging tool that also looks striking.
+**Challenge 2: Normal Visualization**
 
-Try variations:
-- `abs(normal)` — what changes?
-- `vec3(normal.y * 0.5 + 0.5)` — height-based coloring
-- Blend between normal colors and lit shading based on mouse position
+Use `shadeNormal` as a debugging and visualization tool:
+- Render the torus with normal shading and identify where each RGB component dominates
+- Try `abs(normal)` — what changes?
+- Try `vec3(normal.y * 0.5 + 0.5)` — height-based coloring
+- Blend between `shadeNormal` and `shadeDiffuse` based on mouse $x$ position
+
+**Challenge 3: Step Count Visualization**
+
+Write a new shading function that colors by how many raymarching steps were needed to find the surface. Modify `raymarch` to return the step count (you'll need to change what it returns — try a struct). Color low step counts blue and high step counts red.
+
+This reveals where the raymarcher works hardest: near edges, grazing angles, and thin features. It's a useful profiling tool — if a region is red, that's where your frame rate is being spent.

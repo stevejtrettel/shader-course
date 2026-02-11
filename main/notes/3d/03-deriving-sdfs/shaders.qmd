@@ -1,0 +1,1351 @@
+# Deriving SDFs: Shaders
+
+Complete, runnable shaders for each demo in the deriving-sdfs chapter.
+13 demos total.
+
+---
+
+## infinite-cylinder
+
+Raymarched infinite cylinder along y-axis. `shadeNormal`, single shape in the void.
+Demonstrates "ignoring a coordinate."
+
+```glsl
+const int MAX_STEPS = 100;
+const float MAX_DIST = 100.0;
+const float HIT_THRESHOLD = 0.001;
+
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+Ray makeRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+mat3 rotateX(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(1, 0, 0, 0, c, -s, 0, s, c);
+}
+
+mat3 rotateY(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
+}
+
+Ray orbitRay(Ray ray, float distance) {
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) mouse = vec2(0.6, 0.55);
+
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
+
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+// --- Scene ---
+
+float sdScene(vec3 p) {
+    return length(p.xz) - 1.0;
+}
+
+// --- Raymarching ---
+
+vec3 calcNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sdScene(p + vec3(eps, 0, 0)) - sdScene(p - vec3(eps, 0, 0)),
+        sdScene(p + vec3(0, eps, 0)) - sdScene(p - vec3(0, eps, 0)),
+        sdScene(p + vec3(0, 0, eps)) - sdScene(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+
+    for (int i = 0; i < MAX_STEPS; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sdScene(p);
+
+        if (d < HIT_THRESHOLD) return t;
+
+        t += d;
+
+        if (t > MAX_DIST) return -1.0;
+    }
+
+    return -1.0;
+}
+
+// --- Shading ---
+
+vec3 shadeNormal(vec3 normal) {
+    return normal * 0.5 + 0.5;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = makeRay(fragCoord);
+    ray = orbitRay(ray, 4.0);
+
+    float t = raymarch(ray);
+
+    vec3 color = vec3(0.1, 0.1, 0.2);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 normal = calcNormal(p);
+        color = shadeNormal(normal);
+    }
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## box-regions
+
+2D box with three regions colored differently: corner (red), edge (green), inside (blue).
+Contour lines and zero set on top.
+
+```glsl
+float sdBox(vec2 p, vec2 halfSize) {
+    vec2 q = abs(p) - halfSize;
+    return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 3.0;
+
+    vec2 halfSize = vec2(1.0, 0.6);
+    float d = sdBox(p, halfSize);
+
+    // Classify region using the excess vector
+    vec2 q = abs(p) - halfSize;
+
+    vec3 color;
+    if (q.x > 0.0 && q.y > 0.0) {
+        // Corner region
+        color = vec3(0.85, 0.3, 0.25);
+    } else if (q.x > 0.0 || q.y > 0.0) {
+        // Edge region
+        color = vec3(0.3, 0.7, 0.3);
+    } else {
+        // Inside
+        color = vec3(0.2, 0.4, 0.8);
+    }
+
+    // Darken near the boundary
+    color *= 1.0 - exp(-6.0 * abs(d));
+
+    // Contour lines
+    float contour = abs(fract(d * 4.0 + 0.5) - 0.5);
+    color = mix(vec3(1.0), color, smoothstep(0.0, 0.05, contour));
+
+    // Highlight the zero level set
+    color = mix(vec3(1.0), color, smoothstep(0.0, 0.02, abs(d)));
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## box-2d
+
+Standard 2D SDF visualization of a box.
+
+```glsl
+float sdBox(vec2 p, vec2 halfSize) {
+    vec2 q = abs(p) - halfSize;
+    return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 3.0;
+
+    float d = sdBox(p, vec2(1.0, 0.6));
+
+    // Color by sign: blue inside, orange outside
+    vec3 color;
+    if (d < 0.0) {
+        color = vec3(0.2, 0.4, 0.8);
+    } else {
+        color = vec3(0.9, 0.6, 0.2);
+    }
+
+    // Darken near the boundary
+    color *= 1.0 - exp(-6.0 * abs(d));
+
+    // Contour lines
+    float contour = abs(fract(d * 4.0 + 0.5) - 0.5);
+    color = mix(vec3(1.0), color, smoothstep(0.0, 0.05, contour));
+
+    // Highlight the zero level set
+    color = mix(vec3(1.0), color, smoothstep(0.0, 0.02, abs(d)));
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## box-3d
+
+Raymarched box, `shadeNormal`. Single shape in the void.
+
+```glsl
+const int MAX_STEPS = 100;
+const float MAX_DIST = 100.0;
+const float HIT_THRESHOLD = 0.001;
+
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+Ray makeRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+mat3 rotateX(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(1, 0, 0, 0, c, -s, 0, s, c);
+}
+
+mat3 rotateY(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
+}
+
+Ray orbitRay(Ray ray, float distance) {
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) mouse = vec2(0.6, 0.55);
+
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
+
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+// --- Scene ---
+
+float sdBox(vec3 p, vec3 halfSize) {
+    vec3 d = abs(p) - halfSize;
+    return length(max(d, 0.0)) + min(max(d.x, max(d.y, d.z)), 0.0);
+}
+
+float sdScene(vec3 p) {
+    return sdBox(p, vec3(1.0, 0.5, 0.75));
+}
+
+// --- Raymarching ---
+
+vec3 calcNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sdScene(p + vec3(eps, 0, 0)) - sdScene(p - vec3(eps, 0, 0)),
+        sdScene(p + vec3(0, eps, 0)) - sdScene(p - vec3(0, eps, 0)),
+        sdScene(p + vec3(0, 0, eps)) - sdScene(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+
+    for (int i = 0; i < MAX_STEPS; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sdScene(p);
+
+        if (d < HIT_THRESHOLD) return t;
+
+        t += d;
+
+        if (t > MAX_DIST) return -1.0;
+    }
+
+    return -1.0;
+}
+
+// --- Shading ---
+
+vec3 shadeNormal(vec3 normal) {
+    return normal * 0.5 + 0.5;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = makeRay(fragCoord);
+    ray = orbitRay(ray, 4.0);
+
+    float t = raymarch(ray);
+
+    vec3 color = vec3(0.1, 0.1, 0.2);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 normal = calcNormal(p);
+        color = shadeNormal(normal);
+    }
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## torus
+
+Raymarched torus, `shadeNormal`. Single shape in the void.
+
+```glsl
+const int MAX_STEPS = 100;
+const float MAX_DIST = 100.0;
+const float HIT_THRESHOLD = 0.001;
+
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+Ray makeRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+mat3 rotateX(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(1, 0, 0, 0, c, -s, 0, s, c);
+}
+
+mat3 rotateY(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
+}
+
+Ray orbitRay(Ray ray, float distance) {
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) mouse = vec2(0.6, 0.55);
+
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
+
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+// --- Scene ---
+
+float sdTorus(vec3 p, float R, float r) {
+    vec2 q = vec2(length(p.xz) - R, p.y);
+    return length(q) - r;
+}
+
+float sdScene(vec3 p) {
+    return sdTorus(p, 1.0, 0.4);
+}
+
+// --- Raymarching ---
+
+vec3 calcNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sdScene(p + vec3(eps, 0, 0)) - sdScene(p - vec3(eps, 0, 0)),
+        sdScene(p + vec3(0, eps, 0)) - sdScene(p - vec3(0, eps, 0)),
+        sdScene(p + vec3(0, 0, eps)) - sdScene(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+
+    for (int i = 0; i < MAX_STEPS; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sdScene(p);
+
+        if (d < HIT_THRESHOLD) return t;
+
+        t += d;
+
+        if (t > MAX_DIST) return -1.0;
+    }
+
+    return -1.0;
+}
+
+// --- Shading ---
+
+vec3 shadeNormal(vec3 normal) {
+    return normal * 0.5 + 0.5;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = makeRay(fragCoord);
+    ray = orbitRay(ray, 5.0);
+
+    float t = raymarch(ray);
+
+    vec3 color = vec3(0.1, 0.1, 0.2);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 normal = calcNormal(p);
+        color = shadeNormal(normal);
+    }
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## cylinder
+
+Raymarched capped cylinder, `shadeNormal`. Single shape in the void.
+
+```glsl
+const int MAX_STEPS = 100;
+const float MAX_DIST = 100.0;
+const float HIT_THRESHOLD = 0.001;
+
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+Ray makeRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+mat3 rotateX(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(1, 0, 0, 0, c, -s, 0, s, c);
+}
+
+mat3 rotateY(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
+}
+
+Ray orbitRay(Ray ray, float distance) {
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) mouse = vec2(0.6, 0.55);
+
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
+
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+// --- Scene ---
+
+float sdCylinder(vec3 p, float r, float h) {
+    vec2 d = vec2(length(p.xz) - r, abs(p.y) - h);
+    return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
+}
+
+float sdScene(vec3 p) {
+    return sdCylinder(p, 0.8, 1.0);
+}
+
+// --- Raymarching ---
+
+vec3 calcNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sdScene(p + vec3(eps, 0, 0)) - sdScene(p - vec3(eps, 0, 0)),
+        sdScene(p + vec3(0, eps, 0)) - sdScene(p - vec3(0, eps, 0)),
+        sdScene(p + vec3(0, 0, eps)) - sdScene(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+
+    for (int i = 0; i < MAX_STEPS; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sdScene(p);
+
+        if (d < HIT_THRESHOLD) return t;
+
+        t += d;
+
+        if (t > MAX_DIST) return -1.0;
+    }
+
+    return -1.0;
+}
+
+// --- Shading ---
+
+vec3 shadeNormal(vec3 normal) {
+    return normal * 0.5 + 0.5;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = makeRay(fragCoord);
+    ray = orbitRay(ray, 4.0);
+
+    float t = raymarch(ray);
+
+    vec3 color = vec3(0.1, 0.1, 0.2);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 normal = calcNormal(p);
+        color = shadeNormal(normal);
+    }
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## cone
+
+Raymarched infinite cone, `shadeNormal`. Single shape in the void.
+Apex at origin, opening downward, half-angle 0.5 rad (~28.6°).
+
+```glsl
+const int MAX_STEPS = 100;
+const float MAX_DIST = 100.0;
+const float HIT_THRESHOLD = 0.001;
+
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+Ray makeRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+mat3 rotateX(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(1, 0, 0, 0, c, -s, 0, s, c);
+}
+
+mat3 rotateY(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
+}
+
+Ray orbitRay(Ray ray, float distance) {
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) mouse = vec2(0.6, 0.55);
+
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
+
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+// --- Scene ---
+
+float sdCone(vec3 p, float angle) {
+    vec2 q = vec2(length(p.xz), p.y);
+    vec2 n = vec2(cos(angle), sin(angle));
+    return dot(q, n);
+}
+
+float sdScene(vec3 p) {
+    return sdCone(p, 0.5);
+}
+
+// --- Raymarching ---
+
+vec3 calcNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sdScene(p + vec3(eps, 0, 0)) - sdScene(p - vec3(eps, 0, 0)),
+        sdScene(p + vec3(0, eps, 0)) - sdScene(p - vec3(0, eps, 0)),
+        sdScene(p + vec3(0, 0, eps)) - sdScene(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+
+    for (int i = 0; i < MAX_STEPS; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sdScene(p);
+
+        if (d < HIT_THRESHOLD) return t;
+
+        t += d;
+
+        if (t > MAX_DIST) return -1.0;
+    }
+
+    return -1.0;
+}
+
+// --- Shading ---
+
+vec3 shadeNormal(vec3 normal) {
+    return normal * 0.5 + 0.5;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = makeRay(fragCoord);
+    ray = orbitRay(ray, 5.0);
+
+    float t = raymarch(ray);
+
+    vec3 color = vec3(0.1, 0.1, 0.2);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 normal = calcNormal(p);
+        color = shadeNormal(normal);
+    }
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## round-box
+
+Raymarched rounded box, `shadeNormal`. Single shape in the void.
+
+```glsl
+const int MAX_STEPS = 100;
+const float MAX_DIST = 100.0;
+const float HIT_THRESHOLD = 0.001;
+
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+Ray makeRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+mat3 rotateX(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(1, 0, 0, 0, c, -s, 0, s, c);
+}
+
+mat3 rotateY(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
+}
+
+Ray orbitRay(Ray ray, float distance) {
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) mouse = vec2(0.6, 0.55);
+
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
+
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+// --- Scene ---
+
+float sdBox(vec3 p, vec3 halfSize) {
+    vec3 d = abs(p) - halfSize;
+    return length(max(d, 0.0)) + min(max(d.x, max(d.y, d.z)), 0.0);
+}
+
+float sdRoundBox(vec3 p, vec3 halfSize, float r) {
+    return sdBox(p, halfSize - r) - r;
+}
+
+float sdScene(vec3 p) {
+    return sdRoundBox(p, vec3(1.0, 0.5, 0.75), 0.15);
+}
+
+// --- Raymarching ---
+
+vec3 calcNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sdScene(p + vec3(eps, 0, 0)) - sdScene(p - vec3(eps, 0, 0)),
+        sdScene(p + vec3(0, eps, 0)) - sdScene(p - vec3(0, eps, 0)),
+        sdScene(p + vec3(0, 0, eps)) - sdScene(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+
+    for (int i = 0; i < MAX_STEPS; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sdScene(p);
+
+        if (d < HIT_THRESHOLD) return t;
+
+        t += d;
+
+        if (t > MAX_DIST) return -1.0;
+    }
+
+    return -1.0;
+}
+
+// --- Shading ---
+
+vec3 shadeNormal(vec3 normal) {
+    return normal * 0.5 + 0.5;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = makeRay(fragCoord);
+    ray = orbitRay(ray, 4.0);
+
+    float t = raymarch(ray);
+
+    vec3 color = vec3(0.1, 0.1, 0.2);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 normal = calcNormal(p);
+        color = shadeNormal(normal);
+    }
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## capsule
+
+Raymarched capsule, `shadeNormal`. Single shape in the void.
+
+```glsl
+const int MAX_STEPS = 100;
+const float MAX_DIST = 100.0;
+const float HIT_THRESHOLD = 0.001;
+
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+Ray makeRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+mat3 rotateX(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(1, 0, 0, 0, c, -s, 0, s, c);
+}
+
+mat3 rotateY(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
+}
+
+Ray orbitRay(Ray ray, float distance) {
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) mouse = vec2(0.6, 0.55);
+
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
+
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+// --- Scene ---
+
+float sdCapsule(vec3 p, vec3 a, vec3 b, float r) {
+    vec3 pa = p - a, ba = b - a;
+    float t = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
+    return length(pa - ba * t) - r;
+}
+
+float sdScene(vec3 p) {
+    return sdCapsule(p, vec3(-0.8, -0.5, 0.0), vec3(0.8, 0.5, 0.3), 0.35);
+}
+
+// --- Raymarching ---
+
+vec3 calcNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sdScene(p + vec3(eps, 0, 0)) - sdScene(p - vec3(eps, 0, 0)),
+        sdScene(p + vec3(0, eps, 0)) - sdScene(p - vec3(0, eps, 0)),
+        sdScene(p + vec3(0, 0, eps)) - sdScene(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+
+    for (int i = 0; i < MAX_STEPS; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sdScene(p);
+
+        if (d < HIT_THRESHOLD) return t;
+
+        t += d;
+
+        if (t > MAX_DIST) return -1.0;
+    }
+
+    return -1.0;
+}
+
+// --- Shading ---
+
+vec3 shadeNormal(vec3 normal) {
+    return normal * 0.5 + 0.5;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = makeRay(fragCoord);
+    ray = orbitRay(ray, 4.0);
+
+    float t = raymarch(ray);
+
+    vec3 color = vec3(0.1, 0.1, 0.2);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 normal = calcNormal(p);
+        color = shadeNormal(normal);
+    }
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## triangle-2d
+
+2D SDF visualization of equilateral triangle via symmetry folding.
+
+```glsl
+float sdTriangle(vec2 p, float r) {
+    p.x = abs(p.x);
+    p -= 2.0 * min(dot(p, vec2(-0.5, -sqrt(3.0) / 2.0)), 0.0)
+             * vec2(-0.5, -sqrt(3.0) / 2.0);
+    p.x = abs(p.x);
+
+    return -(p.y + r * 0.5);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 p = uv * 3.0;
+
+    float d = sdTriangle(p, 2.0);
+
+    // Color by sign: blue inside, orange outside
+    vec3 color;
+    if (d < 0.0) {
+        color = vec3(0.2, 0.4, 0.8);
+    } else {
+        color = vec3(0.9, 0.6, 0.2);
+    }
+
+    // Darken near the boundary
+    color *= 1.0 - exp(-6.0 * abs(d));
+
+    // Contour lines
+    float contour = abs(fract(d * 4.0 + 0.5) - 0.5);
+    color = mix(vec3(1.0), color, smoothstep(0.0, 0.05, contour));
+
+    // Highlight the zero level set
+    color = mix(vec3(1.0), color, smoothstep(0.0, 0.02, abs(d)));
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## octahedron
+
+Raymarched octahedron via `abs` folding, `shadeNormal`. Single shape in the void.
+
+```glsl
+const int MAX_STEPS = 100;
+const float MAX_DIST = 100.0;
+const float HIT_THRESHOLD = 0.001;
+
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+Ray makeRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+mat3 rotateX(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(1, 0, 0, 0, c, -s, 0, s, c);
+}
+
+mat3 rotateY(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
+}
+
+Ray orbitRay(Ray ray, float distance) {
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) mouse = vec2(0.6, 0.55);
+
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
+
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+// --- Scene ---
+
+float sdOctahedron(vec3 p, float s) {
+    p = abs(p);
+    return (p.x + p.y + p.z - s) * 0.57735027;
+}
+
+float sdScene(vec3 p) {
+    return sdOctahedron(p, 1.0);
+}
+
+// --- Raymarching ---
+
+vec3 calcNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sdScene(p + vec3(eps, 0, 0)) - sdScene(p - vec3(eps, 0, 0)),
+        sdScene(p + vec3(0, eps, 0)) - sdScene(p - vec3(0, eps, 0)),
+        sdScene(p + vec3(0, 0, eps)) - sdScene(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+
+    for (int i = 0; i < MAX_STEPS; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sdScene(p);
+
+        if (d < HIT_THRESHOLD) return t;
+
+        t += d;
+
+        if (t > MAX_DIST) return -1.0;
+    }
+
+    return -1.0;
+}
+
+// --- Shading ---
+
+vec3 shadeNormal(vec3 normal) {
+    return normal * 0.5 + 0.5;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = makeRay(fragCoord);
+    ray = orbitRay(ray, 4.0);
+
+    float t = raymarch(ray);
+
+    vec3 color = vec3(0.1, 0.1, 0.2);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 normal = calcNormal(p);
+        color = shadeNormal(normal);
+    }
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## icosahedron
+
+Raymarched icosahedron via golden-ratio reflections, `shadeNormal`.
+Single shape in the void.
+
+```glsl
+const int MAX_STEPS = 100;
+const float MAX_DIST = 100.0;
+const float HIT_THRESHOLD = 0.001;
+
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+Ray makeRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+mat3 rotateX(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(1, 0, 0, 0, c, -s, 0, s, c);
+}
+
+mat3 rotateY(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
+}
+
+Ray orbitRay(Ray ray, float distance) {
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) mouse = vec2(0.6, 0.55);
+
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
+
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+// --- Scene ---
+
+#define PHI (0.5 + 0.5 * sqrt(5.0))
+
+float sdIcosahedron(vec3 p, float r) {
+    p = abs(p);
+    float invPHI = PHI - 1.0;
+
+    float d = p.x + p.y + p.z;
+    d = max(d, p.y * invPHI + p.z * PHI);
+    d = max(d, p.x * invPHI + p.y * PHI);
+    d = max(d, p.x * PHI + p.z * invPHI);
+
+    return d * 0.57735027 - r;
+}
+
+float sdScene(vec3 p) {
+    return sdIcosahedron(p, 1.2);
+}
+
+// --- Raymarching ---
+
+vec3 calcNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sdScene(p + vec3(eps, 0, 0)) - sdScene(p - vec3(eps, 0, 0)),
+        sdScene(p + vec3(0, eps, 0)) - sdScene(p - vec3(0, eps, 0)),
+        sdScene(p + vec3(0, 0, eps)) - sdScene(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+
+    for (int i = 0; i < MAX_STEPS; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sdScene(p);
+
+        if (d < HIT_THRESHOLD) return t;
+
+        t += d;
+
+        if (t > MAX_DIST) return -1.0;
+    }
+
+    return -1.0;
+}
+
+// --- Shading ---
+
+vec3 shadeNormal(vec3 normal) {
+    return normal * 0.5 + 0.5;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = makeRay(fragCoord);
+    ray = orbitRay(ray, 4.0);
+
+    float t = raymarch(ray);
+
+    vec3 color = vec3(0.1, 0.1, 0.2);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 normal = calcNormal(p);
+        color = shadeNormal(normal);
+    }
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## objects-scene
+
+Sphere + icosahedron + ground plane. Full pattern with structs,
+overloaded `sdf()`, `getMaterial`, `shadeDiffuse`.
+
+```glsl
+const int MAX_STEPS = 100;
+const float MAX_DIST = 100.0;
+const float HIT_THRESHOLD = 0.001;
+
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+Ray makeRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+mat3 rotateX(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(1, 0, 0, 0, c, -s, 0, s, c);
+}
+
+mat3 rotateY(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
+}
+
+Ray orbitRay(Ray ray, float distance) {
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) mouse = vec2(0.6, 0.55);
+
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
+
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+// --- Primitives ---
+
+float sdPlane(vec3 p, float height) {
+    return p.y - height;
+}
+
+#define PHI (0.5 + 0.5 * sqrt(5.0))
+
+float sdIcosahedron(vec3 p, float r) {
+    p = abs(p);
+    float invPHI = PHI - 1.0;
+
+    float d = p.x + p.y + p.z;
+    d = max(d, p.y * invPHI + p.z * PHI);
+    d = max(d, p.x * invPHI + p.y * PHI);
+    d = max(d, p.x * PHI + p.z * invPHI);
+
+    return d * 0.57735027 - r;
+}
+
+// --- Objects ---
+
+struct Sphere {
+    vec3 center;
+    float radius;
+    vec3 color;
+};
+
+struct Icosahedron {
+    vec3 center;
+    float size;
+    vec3 color;
+};
+
+float sdf(vec3 p, Sphere s) {
+    vec3 q = p - s.center;
+    return length(q) - s.radius;
+}
+
+float sdf(vec3 p, Icosahedron ico) {
+    return sdIcosahedron(p - ico.center, ico.size);
+}
+
+// --- Scene ---
+
+Sphere ball = Sphere(vec3(-1.0, 0.0, 0.0), 0.8, vec3(0.2, 0.5, 0.9));
+Icosahedron gem = Icosahedron(vec3(1.2, 0.0, 0.0), 0.7, vec3(0.9, 0.3, 0.2));
+
+float sdScene(vec3 p) {
+    float d = sdf(p, ball);
+    d = min(d, sdf(p, gem));
+    d = min(d, sdPlane(p, -0.8));
+    return d;
+}
+
+vec3 getMaterial(vec3 p) {
+    float eps = 0.01;
+
+    if (sdf(p, ball) < eps) return ball.color;
+    if (sdf(p, gem) < eps) return gem.color;
+    if (sdPlane(p, -0.8) < eps) return vec3(0.35, 0.3, 0.3);
+
+    return vec3(1.0, 0.0, 1.0);  // magenta = error
+}
+
+// --- Raymarching ---
+
+vec3 calcNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sdScene(p + vec3(eps, 0, 0)) - sdScene(p - vec3(eps, 0, 0)),
+        sdScene(p + vec3(0, eps, 0)) - sdScene(p - vec3(0, eps, 0)),
+        sdScene(p + vec3(0, 0, eps)) - sdScene(p - vec3(0, 0, eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+
+    for (int i = 0; i < MAX_STEPS; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sdScene(p);
+
+        if (d < HIT_THRESHOLD) return t;
+
+        t += d;
+
+        if (t > MAX_DIST) return -1.0;
+    }
+
+    return -1.0;
+}
+
+// --- Shading ---
+
+vec3 shadeDiffuse(vec3 normal, vec3 albedo) {
+    vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+    float brightness = max(0.0, dot(normal, lightDir));
+    return albedo * (0.15 + 0.85 * brightness);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = makeRay(fragCoord);
+    ray = orbitRay(ray, 6.0);
+
+    float t = raymarch(ray);
+
+    vec3 color = vec3(0.1, 0.1, 0.2);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 normal = calcNormal(p);
+        vec3 material = getMaterial(p);
+        color = shadeDiffuse(normal, material);
+    }
+
+    fragColor = vec4(color, 1.0);
+}
+```

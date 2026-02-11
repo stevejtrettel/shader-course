@@ -4,9 +4,119 @@ title: "Materials"
 
 The rendering equation's BRDF term $f_r(\mathbf{p}, \omega_i, \omega_o)$ describes how a surface scatters light. So far we've used a constant kernel (Lambertian diffuse) plus a Blinn-Phong specular lobe — serviceable, but it treats every surface the same way. Real materials differ dramatically: metal reflects its environment with colored highlights, plastic has bright white specular spots, skin scatters light beneath the surface.
 
-This chapter refines $f_r$. Each section modifies the BRDF to capture a different physical property — Fresnel reflectance, roughness, the metal–dielectric distinction — building toward a material model that handles all of them.
+Recall our Blinn-Phong BRDF from the previous chapter:
+
+$$f_r = \frac{\rho}{\pi} + k_s (\mathbf{n} \cdot \mathbf{h})^n$$
+
+Three numbers control its behavior: the albedo $\rho$ (base color), the specular exponent $n$ (highlight sharpness), and the specular intensity $k_s$. We hardcoded the last two — $n = 32$, $k_s = 0.3$ — so every surface gets the same highlight. To model different materials, we need to parameterize them. This chapter builds toward three material properties:
+
+- **albedo** — base color ($\rho$). We already have this as the `vec3 mat` argument to our shade function.
+- **roughness** — how rough vs. smooth the surface is. Controls the specular exponent $n$: rough surfaces have broad, dim highlights; smooth surfaces have tight, bright ones.
+- **metallic** — whether the surface is a metal or an insulator. Controls $k_s$ and the specular color, and determines whether there's any diffuse component at all.
+
+Each section adds one property to a `Material` struct, modifying the BRDF to capture a new physical effect — building toward a material model that handles all of them.
 
 {{< shader-demo materials/complete >}}
+
+
+## The Material Struct
+
+In the lighting chapter, our shade function took a `vec3` color as the material:
+
+```glsl
+vec3 shade(vec3 p, vec3 n, vec3 mat, vec3 v, DirLight light) {
+    float diff = max(0.0, dot(n, light.dir));
+    vec3 h = normalize(light.dir + v);
+    float spec = pow(max(0.0, dot(n, h)), 32.0);
+
+    float sh = softShadow(p + n * 0.01, light.dir, 16.0);
+    return (mat * diff + vec3(0.3) * spec) * light.color * sh;
+}
+```
+
+That single `vec3` is the albedo — the surface color. Everything else is hardcoded: the specular exponent (32.0), the specular intensity (0.3), even the specular color (white). We replace this with a struct that gives us a place to put new parameters as we introduce them:
+
+```glsl
+struct Material {
+    vec3 albedo;
+};
+
+vec3 shade(vec3 p, vec3 n, Material mat, vec3 v, DirLight light) {
+    float diff = max(0.0, dot(n, light.dir));
+    vec3 h = normalize(light.dir + v);
+    float spec = pow(max(0.0, dot(n, h)), 32.0);
+
+    float sh = softShadow(p + n * 0.01, light.dir, 16.0);
+    return (mat.albedo * diff + vec3(0.3) * spec) * light.color * sh;
+}
+```
+
+And we define a `getMaterial` function that returns different properties for different objects:
+
+```glsl
+Material getMaterial(vec3 p) {
+    if (sdSphere(p - vec3(-1.5, 0.0, 0.0), 0.8) < 0.01)
+        return Material(vec3(1.0, 0.2, 0.2));  // red
+    if (sdSphere(p - vec3(1.5, 0.0, 0.0), 0.8) < 0.01)
+        return Material(vec3(0.2, 0.5, 1.0));  // blue
+    return Material(vec3(0.5));                  // ground
+}
+```
+
+Nothing has changed visually — `mat.albedo` is the same `vec3` we had before, just accessed through a struct. But the struct gives us a place to put new properties.
+
+
+## Roughness
+
+### Microfacet surfaces
+
+A perfect mirror has a delta-function BRDF — all reflected energy goes in one direction. Real surfaces aren't perfectly smooth. At a microscopic scale, a "smooth" surface is a field of tiny mirror-like facets (**microfacets**), each with its own normal tilted slightly from the macroscopic normal $\mathbf{n}$.
+
+The macroscopic BRDF is the aggregate behavior of these microfacets. If most facets align with $\mathbf{n}$, the surface appears smooth and the specular lobe is tight. If the facet normals are widely distributed, the surface appears rough and the lobe is broad. **Roughness parameterizes the width of this distribution.**
+
+### The microfacet BRDF
+
+A microfacet contributes to the reflection from $\omega_i$ to $\omega_o$ only if its normal equals the halfway vector $\mathbf{h}$. Summing over all facets gives a BRDF of the form:
+
+$$f_r(\omega_i, \omega_o) = \frac{D(\mathbf{h}) \; F(\theta_h) \; G(\omega_i, \omega_o)}{4 \; (\omega_i \cdot \mathbf{n})(\omega_o \cdot \mathbf{n})}$$
+
+The three terms in the numerator each capture a different piece of the geometry:
+
+- $D(\mathbf{h})$ — the **normal distribution function** (NDF): the density of microfacets whose normals point along $\mathbf{h}$. This is where roughness lives. A common choice is the GGX (Trowbridge-Reitz) distribution:
+
+$$D(\mathbf{h}) = \frac{\alpha^2}{\pi\bigl((\mathbf{n} \cdot \mathbf{h})^2(\alpha^2 - 1) + 1\bigr)^2}$$
+
+where $\alpha$ is the roughness parameter. At $\alpha \to 0$, $D$ approaches a delta function (mirror). At $\alpha = 1$, it's broad. The GGX distribution has heavier tails than a Gaussian, which produces highlights that fall off more gradually — matching real materials better.
+
+- $F(\theta_h)$ — the **Fresnel term**, evaluated at the angle between the light and the halfway vector (the angle of incidence on the individual microfacet). This describes how much light is reflected vs. transmitted at each microfacet — we derive it in the next section.
+
+- $G(\omega_i, \omega_o)$ — the **geometry/masking function**: not all microfacets that face the right direction are visible. Some are blocked by neighboring facets (shadowed from the light, or hidden from the viewer). $G$ models this statistical self-occlusion; it approaches 1 for smooth surfaces and attenuates the BRDF at grazing angles for rough ones.
+
+The denominator $4(\omega_i \cdot \mathbf{n})(\omega_o \cdot \mathbf{n})$ corrects for the change of variables from microfacet normals to the macroscopic surface — a Jacobian factor.
+
+### Relationship to Blinn-Phong
+
+The Blinn-Phong model $(\mathbf{n} \cdot \mathbf{h})^n$ is a rough approximation to $D(\mathbf{h})$ with $G = F = 1$ and no normalization. This is why it looks plausible but doesn't conserve energy — and why cranking up the exponent makes the highlight brighter (it shouldn't; a smoother surface should just concentrate the same energy into a tighter lobe, not create more).
+
+For our shaders, we use a simplified version. We add `roughness` to the Material struct:
+
+```glsl
+struct Material {
+    vec3 albedo;
+    float roughness;  // 0 = mirror, 1 = matte
+};
+```
+
+Roughness maps to the specular exponent:
+
+```glsl
+float shininess = mix(256.0, 4.0, mat.roughness * mat.roughness);
+float spec = pow(max(dot(n, h), 0.0), shininess);
+```
+
+The `roughness * roughness` mapping gives a more perceptually linear progression from mirror to matte. This isn't the full microfacet model, but it captures the primary effect: roughness controls the width and intensity of specular highlights.
+
+{{< shader-demo materials/roughness >}}
 
 
 ## Fresnel Reflectance
@@ -37,7 +147,7 @@ Typical $F_0$ values:
 | Iron | ~0.56 |
 | Gold | ~0.74 (wavelength-dependent) |
 
-For dielectrics, $F_0$ is small and nearly achromatic — all wavelengths reflect equally at the surface. For metals, $F_0$ is large and often colored (gold absorbs blue, reflects red/green). We'll return to this distinction in the Metallic section.
+For dielectrics, $F_0$ is small and nearly achromatic — all wavelengths reflect equally at the surface. For metals, $F_0$ is large and often colored (gold absorbs blue, reflects red/green). We'll return to this distinction in the next section.
 
 **In the BRDF:** Fresnel modulates the specular term. The fraction $F$ is reflected specularly; the complement $1 - F$ is available for diffuse scattering (or absorption). This is how we split energy between the diffuse and specular lobes — not with an arbitrary constant, but from the physics of the interface.
 
@@ -50,6 +160,76 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0) {
 Note that `F0` is a `vec3` — for metals, the reflectance at normal incidence differs per color channel.
 
 {{< shader-demo materials/fresnel >}}
+
+
+## Metallic vs. Dielectric
+
+### Two kinds of surface
+
+The distinction between metals and dielectrics isn't cosmetic — it reflects fundamentally different physics.
+
+**Dielectrics** (plastic, wood, glass, skin) are electrical insulators. Light that isn't reflected at the surface *enters* the material and scatters off internal structures — pigment particles, fibers, cell boundaries. Some fraction exits the surface at a different point and in a random direction. This subsurface scattering is what produces diffuse reflection: the light has bounced around inside and lost all memory of its incoming direction. The Lambertian BRDF from the previous chapter models exactly this. The surface reflection (Fresnel) is specular and achromatic — dielectrics reflect all wavelengths equally, typically ~4% at normal incidence.
+
+**Metals** (iron, gold, copper, aluminum) are conductors. Free electrons in the metal absorb any light that penetrates the surface — within nanometers. There is no subsurface scattering and hence no diffuse reflection. All reflected light comes from the surface itself, via Fresnel reflection. Because the free-electron response is wavelength-dependent (the complex refractive index varies with $\lambda$), metals have **colored specular reflections**: gold preferentially reflects long wavelengths, copper reflects orange, aluminum is roughly neutral.
+
+In BRDF terms:
+
+| Property | Dielectric | Metal |
+|----------|-----------|-------|
+| $F_0$ | Low (~0.04), achromatic | High (0.5–1.0), colored |
+| Diffuse | Yes (subsurface) | No |
+| Specular color | White | Matches base color |
+
+### The metallic parameter
+
+We add `metallic` to complete the struct:
+
+```glsl
+struct Material {
+    vec3 albedo;
+    float roughness;
+    float metallic;
+};
+```
+
+A single parameter $m \in [0, 1]$ interpolates between the two models:
+
+```glsl
+// Dielectrics: F0 = 0.04 (achromatic). Metals: F0 = base color.
+vec3 F0 = mix(vec3(0.04), mat.albedo, mat.metallic);
+
+// Metals have no diffuse component.
+vec3 diffuseColor = mat.albedo * (1.0 - mat.metallic);
+```
+
+The full shading function uses Fresnel to split energy between diffuse and specular:
+
+```glsl
+vec3 shade(vec3 p, vec3 n, Material mat, vec3 v, DirLight light) {
+    vec3 h = normalize(light.dir + v);
+    float NdotL = max(dot(n, light.dir), 0.0);
+    float NdotH = max(dot(n, h), 0.0);
+
+    // Fresnel
+    vec3 F0 = mix(vec3(0.04), mat.albedo, mat.metallic);
+    vec3 F = fresnelSchlick(max(dot(h, v), 0.0), F0);
+
+    // Specular: roughness controls highlight width
+    float shininess = mix(256.0, 4.0, mat.roughness * mat.roughness);
+    vec3 specular = F * pow(NdotH, shininess);
+
+    // Diffuse: energy not reflected specularly is available for diffuse.
+    // Metals have no diffuse component.
+    vec3 diffuse = (vec3(1.0) - F) * mat.albedo * (1.0 - mat.metallic);
+
+    float sh = softShadow(p + n * 0.01, light.dir, 16.0);
+    return (diffuse + specular) * light.color * NdotL * sh;
+}
+```
+
+The `(vec3(1.0) - F)` factor on the diffuse term is energy conservation: what Fresnel reflects specularly can't also scatter diffusely. The lighting chapter's energy conservation callout noted that Blinn-Phong doesn't enforce this — here we fix it. The diffuse and specular contributions sum to at most the incoming light, because $F + (1 - F) = 1$.
+
+{{< shader-demo materials/metallic >}}
 
 
 ## Reflections
@@ -75,7 +255,7 @@ vec3 reflectColor = skyColor;
 if (t2 > 0.0) {
     vec3 p2 = reflectRay.origin + t2 * reflectRay.dir;
     vec3 n2 = calcNormal(p2);
-    reflectColor = shadeDirect(n2, getMaterial(p2), light, -reflectDir);
+    reflectColor = shade(p2, n2, getMaterial(p2), -reflectDir, light);
 }
 ```
 
@@ -108,11 +288,13 @@ for (int bounce = 0; bounce < 3; bounce++) {
 
     vec3 p2 = reflectRay.origin + t2 * reflectRay.dir;
     vec3 n2 = calcNormal(p2);
+    Material hitMat = getMaterial(p2);
 
     // Direct lighting at this bounce
-    reflectedLight += throughput * shadeDirect(p2, n2, getMaterial(p2), light);
+    reflectedLight += throughput * shade(p2, n2, hitMat, -reflectRay.dir, light);
 
     // Fresnel attenuation for the next bounce
+    vec3 F0 = mix(vec3(0.04), hitMat.albedo, hitMat.metallic);
     vec3 F2 = fresnelSchlick(max(dot(n2, -reflectRay.dir), 0.0), F0);
     throughput *= F2;
 
@@ -121,117 +303,6 @@ for (int bounce = 0; bounce < 3; bounce++) {
 ```
 
 The `throughput` accumulates the product of Fresnel terms along the path — each bounce reflects less energy. Two or three bounces are usually sufficient; throughput drops quickly because $F < 1$ at each surface.
-
-
-## Roughness
-
-### Microfacet surfaces
-
-A perfect mirror has a delta-function BRDF — all reflected energy goes in one direction. Real surfaces aren't perfectly smooth. At a microscopic scale, a "smooth" surface is a field of tiny mirror-like facets (**microfacets**), each with its own normal tilted slightly from the macroscopic normal $\mathbf{n}$.
-
-The macroscopic BRDF is the aggregate behavior of these microfacets. If most facets align with $\mathbf{n}$, the surface appears smooth and the specular lobe is tight. If the facet normals are widely distributed, the surface appears rough and the lobe is broad. **Roughness parameterizes the width of this distribution.**
-
-### The microfacet BRDF
-
-A microfacet contributes to the reflection from $\omega_i$ to $\omega_o$ only if its normal equals the halfway vector $\mathbf{h}$. Summing over all facets gives a BRDF of the form:
-
-$$f_r(\omega_i, \omega_o) = \frac{D(\mathbf{h}) \; F(\theta_h) \; G(\omega_i, \omega_o)}{4 \; (\omega_i \cdot \mathbf{n})(\omega_o \cdot \mathbf{n})}$$
-
-The three terms in the numerator each capture a different piece of the geometry:
-
-- $D(\mathbf{h})$ — the **normal distribution function** (NDF): the density of microfacets whose normals point along $\mathbf{h}$. This is where roughness lives. A common choice is the GGX (Trowbridge-Reitz) distribution:
-
-$$D(\mathbf{h}) = \frac{\alpha^2}{\pi\bigl((\mathbf{n} \cdot \mathbf{h})^2(\alpha^2 - 1) + 1\bigr)^2}$$
-
-where $\alpha$ is the roughness parameter. At $\alpha \to 0$, $D$ approaches a delta function (mirror). At $\alpha = 1$, it's broad. The GGX distribution has heavier tails than a Gaussian, which produces highlights that fall off more gradually — matching real materials better.
-
-- $F(\theta_h)$ — the Fresnel term from the previous section, evaluated at the angle between the light and the halfway vector (the angle of incidence on the individual microfacet).
-
-- $G(\omega_i, \omega_o)$ — the **geometry/masking function**: not all microfacets that face the right direction are visible. Some are blocked by neighboring facets (shadowed from the light, or hidden from the viewer). $G$ models this statistical self-occlusion; it approaches 1 for smooth surfaces and attenuates the BRDF at grazing angles for rough ones.
-
-The denominator $4(\omega_i \cdot \mathbf{n})(\omega_o \cdot \mathbf{n})$ corrects for the change of variables from microfacet normals to the macroscopic surface — a Jacobian factor.
-
-### Relationship to Blinn-Phong
-
-The Blinn-Phong model $(\mathbf{n} \cdot \mathbf{h})^n$ is a rough approximation to $D(\mathbf{h})$ with $G = F = 1$ and no normalization. This is why it looks plausible but doesn't conserve energy — and why cranking up the exponent makes the highlight brighter (it shouldn't; a smoother surface should just concentrate the same energy into a tighter lobe, not create more).
-
-For our shaders, we use a simplified version. The key visual effect is that roughness controls the width and intensity of specular highlights:
-
-```glsl
-float roughness = 0.5;  // 0 = mirror, 1 = matte
-float shininess = mix(256.0, 4.0, roughness * roughness);
-float spec = pow(max(dot(normal, h), 0.0), shininess);
-```
-
-The `roughness * roughness` mapping gives a more perceptually linear progression from mirror to matte. This isn't the full microfacet model, but it captures the primary effect.
-
-{{< shader-demo materials/roughness >}}
-
-
-## Metallic vs. Dielectric
-
-### Two kinds of surface
-
-The distinction between metals and dielectrics isn't cosmetic — it reflects fundamentally different physics.
-
-**Dielectrics** (plastic, wood, glass, skin) are electrical insulators. Light that isn't reflected at the surface *enters* the material and scatters off internal structures — pigment particles, fibers, cell boundaries. Some fraction exits the surface at a different point and in a random direction. This subsurface scattering is what produces diffuse reflection: the light has bounced around inside and lost all memory of its incoming direction. The Lambertian BRDF from the previous chapter models exactly this. The surface reflection (Fresnel) is specular and achromatic — dielectrics reflect all wavelengths equally, typically ~4% at normal incidence.
-
-**Metals** (iron, gold, copper, aluminum) are conductors. Free electrons in the metal absorb any light that penetrates the surface — within nanometers. There is no subsurface scattering and hence no diffuse reflection. All reflected light comes from the surface itself, via Fresnel reflection. Because the free-electron response is wavelength-dependent (the complex refractive index varies with $\lambda$), metals have **colored specular reflections**: gold preferentially reflects long wavelengths, copper reflects orange, aluminum is roughly neutral.
-
-In BRDF terms:
-
-| Property | Dielectric | Metal |
-|----------|-----------|-------|
-| $F_0$ | Low (~0.04), achromatic | High (0.5–1.0), colored |
-| Diffuse | Yes (subsurface) | No |
-| Specular color | White | Matches base color |
-
-### The metallic parameter
-
-We encode this with a single parameter $m \in [0, 1]$ that interpolates between the two models:
-
-```glsl
-// Dielectrics: F0 = 0.04 (achromatic). Metals: F0 = base color.
-vec3 F0 = mix(vec3(0.04), albedo, metallic);
-
-// Metals have no diffuse component.
-vec3 diffuseColor = albedo * (1.0 - metallic);
-```
-
-The full shading function uses Fresnel to split energy between diffuse and specular:
-
-```glsl
-struct Material {
-    vec3 albedo;
-    float metallic;
-    float roughness;
-};
-
-vec3 shadeMaterial(vec3 normal, vec3 viewDir, vec3 lightDir,
-                   vec3 lightColor, Material mat) {
-    vec3 h = normalize(lightDir + viewDir);
-    float NdotL = max(dot(normal, lightDir), 0.0);
-    float NdotH = max(dot(normal, h), 0.0);
-
-    // Fresnel
-    vec3 F0 = mix(vec3(0.04), mat.albedo, mat.metallic);
-    vec3 F = fresnelSchlick(max(dot(h, viewDir), 0.0), F0);
-
-    // Specular: roughness controls highlight width
-    float shininess = mix(256.0, 4.0, mat.roughness * mat.roughness);
-    vec3 specular = F * pow(NdotH, shininess);
-
-    // Diffuse: energy not reflected specularly is available for diffuse.
-    // Metals have no diffuse component.
-    vec3 diffuse = (vec3(1.0) - F) * mat.albedo * (1.0 - mat.metallic);
-
-    return (diffuse + specular) * lightColor * NdotL;
-}
-```
-
-The `(vec3(1.0) - F)` factor on the diffuse term is energy conservation: what Fresnel reflects specularly can't also scatter diffusely. The lighting chapter's energy conservation callout noted that Blinn-Phong doesn't enforce this — here we fix it. The diffuse and specular contributions sum to at most the incoming light, because $F + (1 - F) = 1$.
-
-{{< shader-demo materials/metallic >}}
 
 
 ## Rim Lighting
@@ -258,23 +329,23 @@ A complete material system with per-object properties. Each object gets an albed
 ```glsl
 struct Material {
     vec3 albedo;
-    float metallic;
     float roughness;
+    float metallic;
 };
 
 Material getMaterial(vec3 p) {
     float eps = 0.01;
     // Chrome sphere
     if (sdSphere(p - vec3(-1.5, 0.0, 0.0), 0.8) < eps)
-        return Material(vec3(0.8), 1.0, 0.1);
+        return Material(vec3(0.8), 0.1, 1.0);
     // Red plastic sphere
     if (sdSphere(p - vec3(1.5, 0.0, 0.0), 0.8) < eps)
-        return Material(vec3(1.0, 0.2, 0.2), 0.0, 0.3);
+        return Material(vec3(1.0, 0.2, 0.2), 0.3, 0.0);
     // Gold sphere
     if (sdSphere(p, 0.8) < eps)
-        return Material(vec3(1.0, 0.84, 0.0), 1.0, 0.3);
+        return Material(vec3(1.0, 0.84, 0.0), 0.3, 1.0);
     // Ground
-    return Material(vec3(0.4), 0.0, 0.8);
+    return Material(vec3(0.4), 0.8, 0.0);
 }
 ```
 

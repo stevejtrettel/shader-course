@@ -13,23 +13,21 @@ website:
       - section: "3D Rendering"
         contents:
           - text: "First Rays"
-            href: notes/3d/first-rays/notes.qmd
+            href: notes/3d/01-first-rays/notes.qmd
           - text: "Raymarching"
-            href: notes/3d/raymarching/notes.qmd
+            href: notes/3d/02-raymarching/notes.qmd
           - text: "Deriving SDFs"
-            href: notes/3d/deriving-sdfs/notes.qmd
-          - text: "SDF Library"
-            href: notes/3d/sdf-library/notes.qmd
+            href: notes/3d/03-deriving-sdfs/notes.qmd
           - text: "Sculpting"
             href: notes/3d/sculpting/notes.qmd
           - text: "Lighting & Shadows"
-            href: notes/3d/lighting-shadows/notes.qmd
+            href: notes/3d/05-lighting-shadows/notes.qmd
           - text: "Materials"
-            href: notes/3d/materials/notes.qmd
+            href: notes/3d/06-materials/notes.qmd
           - text: "Refraction"
             href: notes/3d/refraction/notes.qmd
           - text: "Procedural Patterns"
-            href: notes/3d/procedural/notes.qmd
+            href: notes/3d/08-procedural/notes.qmd
 
       # - section: "Fundamentals"
       #   contents:

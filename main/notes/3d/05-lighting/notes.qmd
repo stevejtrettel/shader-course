@@ -95,19 +95,25 @@ $$f_r = \frac{\rho}{\pi} + k_s (\mathbf{n} \cdot \mathbf{h})^n$$
 The coefficient $k_s$ controls the specular intensity (we use 0.3). The exponent $n$ controls the sharpness of the lobe. At $n = 1$ the highlight is broad and soft (rubber); at $n = 128$ it's tight and bright (polished plastic). Physically, you can think of the exponent as controlling a **distribution of microfacet orientations**: most facets align with $\mathbf{n}$, but some are tilted. The exponent parameterizes how tightly concentrated they are around $\mathbf{n}$. A high exponent means most facets agree — the surface is smooth and highlights are sharp. In code, $\omega_o$ is the view direction — from the surface toward the camera (`-ray.dir`):
 
 ```glsl
-vec3 shade(vec3 normal, vec3 surfaceColor, vec3 lightDir, vec3 viewDir) {
+struct DirLight {
+    vec3 dir;
+    vec3 color;
+};
+
+vec3 shade(vec3 n, vec3 mat, vec3 v, DirLight light) {
     // Diffuse: Lambertian
-    float diff = max(0.0, dot(normal, lightDir));
+    float diff = max(0.0, dot(n, light.dir));
 
     // Specular: Blinn-Phong lobe
-    vec3 h = normalize(lightDir + viewDir);
-    float spec = pow(max(0.0, dot(normal, h)), 32.0);
+    vec3 h = normalize(light.dir + v);
+    float spec = pow(max(0.0, dot(n, h)), 32.0);
 
-    return surfaceColor * diff + vec3(0.3) * spec;
+    vec3 ambient = mat * 0.15;
+    return ambient + (mat * diff + vec3(0.3) * spec) * light.color;
 }
 ```
 
-The specular color (`vec3(0.3)`) is white-ish for non-metallic surfaces — dielectrics reflect all wavelengths equally at the specular peak. Metals color their specular reflections, but that's the Materials chapter.
+We package the light direction and color into a `DirLight` struct from the start — this keeps the interface clean as we add more light types later. The specular color (`vec3(0.3)`) is white-ish for non-metallic surfaces — dielectrics reflect all wavelengths equally at the specular peak. Metals color their specular reflections, but that's the Materials chapter.
 
 {{< shader-demo lighting-shadows/specular >}}
 
@@ -118,22 +124,18 @@ Our Blinn-Phong BRDF doesn't conserve energy — the diffuse and specular terms 
 :::
 
 
-## The Light Struct
+## Shadows and the Shade Function
 
-Before we go further, let's clean up. Extract the light direction and add a color. We also pull ambient out of `shade` — it'll need to be modulated by ambient occlusion later, so it belongs at the call site:
+Before shadows, `shade` included ambient. Now we pull ambient out — it'll need to be modulated by ambient occlusion later, so it belongs at the call site. And `shade` gains the surface point `p`, because it now handles shadow computation internally:
 
 ```glsl
-struct Light {
-    vec3 dir;
-    vec3 color;
-};
+vec3 shade(vec3 p, vec3 n, vec3 mat, vec3 v, DirLight light) {
+    float diff = max(0.0, dot(n, light.dir));
+    vec3 h = normalize(light.dir + v);
+    float spec = pow(max(0.0, dot(n, h)), 32.0);
 
-vec3 shade(vec3 normal, vec3 surfaceColor, Light light, vec3 viewDir) {
-    float diff = max(0.0, dot(normal, light.dir));
-    vec3 h = normalize(light.dir + viewDir);
-    float spec = pow(max(0.0, dot(normal, h)), 32.0);
-
-    return surfaceColor * light.color * diff + light.color * spec * 0.3;
+    float sh = softShadow(p + n * 0.01, light.dir, 16.0);
+    return (mat * diff + vec3(0.3) * spec) * light.color * sh;
 }
 ```
 
@@ -348,12 +350,11 @@ The rendering equation is linear in $L_i$: if light arrives from two sources, th
 ```glsl
 vec3 totalLight = ambient;
 for each light {
-    float sh = softShadow(p, light.dir, 16.0);
-    totalLight += shade(normal, material, light, viewDir) * sh;
+    totalLight += shade(p, normal, material, viewDir, light);
 }
 ```
 
-Each light gets its own shadow ray. The cost scales linearly with the number of lights.
+Each light gets its own shadow ray (inside `shade`). The cost scales linearly with the number of lights.
 
 ### Directional vs Point Lights
 
@@ -437,12 +438,11 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 
         // Key light: warm, from upper right
         DirLight key = DirLight(normalize(vec3(1.0, 1.0, 1.0)), vec3(1.0, 0.9, 0.8));
-        float keyShadow = softShadow(p + normal * 0.01, key.dir, 16.0);
-        vec3 keyContrib = shade(normal, material, key, viewDir) * keyShadow;
+        vec3 keyContrib = shade(p, normal, material, viewDir, key);
 
-        // Fill light: cool, from the left, no shadows
+        // Fill light: cool, from the left
         DirLight fill = DirLight(normalize(vec3(-1.0, 0.3, 0.0)), vec3(0.15, 0.2, 0.3));
-        vec3 fillContrib = shade(normal, material, fill, viewDir);
+        vec3 fillContrib = shade(p, normal, material, viewDir, fill);
 
         color = ambient + keyContrib + fillContrib;
 
@@ -570,12 +570,12 @@ Watch the shadows and highlights move. Try varying the vertical component too.
 Add a second light source. Compute shading for both and sum the results:
 
 ```glsl
-Light key = Light(normalize(vec3(1.0, 1.0, 1.0)), vec3(1.0, 0.9, 0.8));   // warm
-Light fill = Light(normalize(vec3(-1.0, 0.5, 0.0)), vec3(0.2, 0.3, 0.5)); // cool
+DirLight key = DirLight(normalize(vec3(1.0, 1.0, 1.0)), vec3(1.0, 0.9, 0.8));   // warm
+DirLight fill = DirLight(normalize(vec3(-1.0, 0.5, 0.0)), vec3(0.2, 0.3, 0.5)); // cool
 
 vec3 color = ambient;
-color += shade(normal, material, key, viewDir) * softShadow(p, key.dir, 16.0);
-color += shade(normal, material, fill, viewDir) * softShadow(p, fill.dir, 16.0);
+color += shade(p, normal, material, viewDir, key);
+color += shade(p, normal, material, viewDir, fill);
 ```
 
 A warm key light with a cool fill is a classic look. Why does superposition work here? (Linearity of the rendering equation.)

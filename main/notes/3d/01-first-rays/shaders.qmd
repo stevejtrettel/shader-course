@@ -1,10 +1,12 @@
 # First Rays: Shaders
 
-Complete, runnable shaders for each demo in the notes.
+Complete, runnable shaders for each demo in the first-rays chapter.
 
 ---
 
 ## ray-visualization
+
+Colors pixels by ray direction. No intersection, no shading.
 
 ```glsl
 struct Ray {
@@ -35,6 +37,8 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 ---
 
 ## sphere-flat
+
+First intersection test. Flat color on hit — no normals, no shading function.
 
 ```glsl
 struct Ray {
@@ -97,6 +101,8 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 
 ## sphere-normals
 
+Introduces `shadeNormal`. Static camera.
+
 ```glsl
 struct Ray {
     vec3 origin;
@@ -140,6 +146,12 @@ float intersect(Ray ray, Sphere s) {
     return -1.0;
 }
 
+// --- Shading ---
+
+vec3 shadeNormal(vec3 normal) {
+    return normal * 0.5 + 0.5;
+}
+
 Sphere sphere = Sphere(vec3(0.0, 0.0, -3.0), 1.0, vec3(1.0, 0.0, 0.0));
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
@@ -151,7 +163,79 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     if (t > 0.0) {
         vec3 hitPoint = ray.origin + t * ray.dir;
         vec3 normal = (hitPoint - sphere.center) / sphere.radius;
-        color = normal * 0.5 + 0.5;
+        color = shadeNormal(normal);
+    }
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## sphere-depth
+
+Introduces `shadeDepth`. Static camera.
+
+```glsl
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+
+struct Sphere {
+    vec3 center;
+    float radius;
+    vec3 color;
+};
+
+Ray makeRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+
+float intersect(Ray ray, Sphere s) {
+    vec3 delta = ray.origin - s.center;
+
+    float b = dot(delta, ray.dir);
+    float c = dot(delta, delta) - s.radius * s.radius;
+    float discriminant = b * b - c;
+
+    if (discriminant < 0.0) return -1.0;
+
+    float sqrtDisc = sqrt(discriminant);
+    float t1 = -b - sqrtDisc;
+    float t2 = -b + sqrtDisc;
+
+    if (t1 > 0.0) return t1;
+    if (t2 > 0.0) return t2;
+    return -1.0;
+}
+
+// --- Shading ---
+
+vec3 shadeDepth(float t) {
+    float brightness = 1.0 - clamp(t / 10.0, 0.0, 1.0);
+    return vec3(brightness);
+}
+
+Sphere sphere = Sphere(vec3(0.0, 0.0, -3.0), 1.0, vec3(1.0, 0.0, 0.0));
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = makeRay(fragCoord);
+
+    float t = intersect(ray, sphere);
+
+    vec3 color = vec3(0.0);
+    if (t > 0.0) {
+        color = shadeDepth(t);
     }
 
     fragColor = vec4(color, 1.0);
@@ -162,6 +246,8 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 
 ## sphere-lit
 
+Introduces `shadeDiffuse`. Static camera. First "looks 3D" render.
+
 ```glsl
 struct Ray {
     vec3 origin;
@@ -205,10 +291,12 @@ float intersect(Ray ray, Sphere s) {
     return -1.0;
 }
 
-vec3 shade(vec3 normal, vec3 surfaceColor) {
+// --- Shading ---
+
+vec3 shadeDiffuse(vec3 normal, vec3 albedo) {
     vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
-    float diffuse = max(0.0, dot(normal, lightDir));
-    return surfaceColor * diffuse;
+    float brightness = max(0.0, dot(normal, lightDir));
+    return albedo * (0.15 + 0.85 * brightness);
 }
 
 Sphere sphere = Sphere(vec3(0.0, 0.0, -3.0), 1.0, vec3(1.0, 0.0, 0.0));
@@ -222,9 +310,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     if (t > 0.0) {
         vec3 hitPoint = ray.origin + t * ray.dir;
         vec3 normal = (hitPoint - sphere.center) / sphere.radius;
-
-        vec3 ambient = sphere.color * 0.15;
-        color = ambient + shade(normal, sphere.color);
+        color = shadeDiffuse(normal, sphere.color);
     }
 
     fragColor = vec4(color, 1.0);
@@ -234,6 +320,8 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 ---
 
 ## sphere-orbit
+
+Adds orbit camera. Sphere at origin, camera circles it. Chapter hero image.
 
 ```glsl
 struct Ray {
@@ -272,6 +360,8 @@ mat3 rotateY(float a) {
 
 Ray orbitRay(Ray ray, float distance) {
     vec2 mouse = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) mouse = vec2(0.6, 0.55);
+
     float angleY = (mouse.x - 0.5) * 6.28;
     float angleX = (0.5 - mouse.y) * 3.14;
 
@@ -299,10 +389,12 @@ float intersect(Ray ray, Sphere s) {
     return -1.0;
 }
 
-vec3 shade(vec3 normal, vec3 surfaceColor) {
+// --- Shading ---
+
+vec3 shadeDiffuse(vec3 normal, vec3 albedo) {
     vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
-    float diffuse = max(0.0, dot(normal, lightDir));
-    return surfaceColor * diffuse;
+    float brightness = max(0.0, dot(normal, lightDir));
+    return albedo * (0.15 + 0.85 * brightness);
 }
 
 Sphere sphere = Sphere(vec3(0.0), 1.0, vec3(1.0, 0.0, 0.0));
@@ -317,9 +409,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     if (t > 0.0) {
         vec3 hitPoint = ray.origin + t * ray.dir;
         vec3 normal = (hitPoint - sphere.center) / sphere.radius;
-
-        vec3 ambient = sphere.color * 0.15;
-        color = ambient + shade(normal, sphere.color);
+        color = shadeDiffuse(normal, sphere.color);
     }
 
     fragColor = vec4(color, 1.0);
@@ -330,7 +420,12 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 
 ## torus-analytical
 
-The 80-line quartic solver, included to show why we need a better approach.
+Analytical ray-torus intersection via quartic solver. Demonstrates the complexity
+that motivates raymarching. Orbit camera, `shadeDiffuse`.
+
+The solver is by Inigo Quilez (https://iquilezles.org/articles/intersectors/).
+It's included verbatim — the complexity is the point. Compare ~80 lines here
+to the 4-line torus SDF in the next chapter.
 
 ```glsl
 struct Ray {
@@ -370,6 +465,8 @@ mat3 rotateY(float a) {
 
 Ray orbitRay(Ray ray, float distance) {
     vec2 mouse = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) mouse = vec2(0.6, 0.55);
+
     float angleY = (mouse.x - 0.5) * 6.28;
     float angleX = (0.5 - mouse.y) * 3.14;
 
@@ -379,8 +476,9 @@ Ray orbitRay(Ray ray, float distance) {
     return ray;
 }
 
-// Torus intersection by Inigo Quilez
+// --- Torus Intersection (Inigo Quilez) ---
 // https://iquilezles.org/articles/intersectors/
+
 float intersectTorusRaw(Ray ray, vec2 tor) {
     float po = 1.0;
     float Ra2 = tor.x * tor.x;
@@ -471,8 +569,7 @@ float intersectTorusRaw(Ray ray, vec2 tor) {
     return result;
 }
 
-vec3 torusNormal(vec3 p, vec2 tor) {
-    float R = tor.x;
+vec3 torusNormal(vec3 p, float R) {
     float k = sqrt(p.x*p.x + p.z*p.z);
     return normalize(vec3(p.x * (1.0 - R/k), p.y, p.z * (1.0 - R/k)));
 }
@@ -484,10 +581,12 @@ float intersect(Ray ray, Torus t) {
     return intersectTorusRaw(localRay, vec2(t.majorRadius, t.minorRadius));
 }
 
-vec3 shade(vec3 normal, vec3 surfaceColor) {
+// --- Shading ---
+
+vec3 shadeDiffuse(vec3 normal, vec3 albedo) {
     vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
-    float diffuse = max(0.0, dot(normal, lightDir));
-    return surfaceColor * diffuse;
+    float brightness = max(0.0, dot(normal, lightDir));
+    return albedo * (0.15 + 0.85 * brightness);
 }
 
 Torus torus = Torus(vec3(0.0), 1.0, 0.4, vec3(0.0, 0.7, 1.0));
@@ -502,10 +601,8 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     if (t > 0.0) {
         vec3 hitPoint = ray.origin + t * ray.dir;
         vec3 localHit = hitPoint - torus.center;
-        vec3 normal = torusNormal(localHit, vec2(torus.majorRadius, torus.minorRadius));
-
-        vec3 ambient = torus.color * 0.15;
-        color = ambient + shade(normal, torus.color);
+        vec3 normal = torusNormal(localHit, torus.majorRadius);
+        color = shadeDiffuse(normal, torus.color);
     }
 
     fragColor = vec4(color, 1.0);
