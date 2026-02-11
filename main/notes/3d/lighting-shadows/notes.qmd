@@ -1,70 +1,105 @@
----
-title: "Lighting & Shadows"
----
+# Lighting & Shadows
 
-We've been using a simple `shade` function with the light direction baked in. Let's open it up, understand what it's doing, and make it more powerful.
+## Overview
+
+We've been using a simple `shade` function — `dot(normal, lightDir)` — to make surfaces look 3D. It works, but we never asked *why* it works, or what it's approximating.
+
+This chapter answers that question. Everything we do with lighting is an approximation to a single integral — the **rendering equation**. We'll state it, then spend the chapter building increasingly good approximations: diffuse shading, specular highlights, shadows, ambient occlusion. Each technique adds a piece of the integral. By the end, we'll have a complete lighting pass:
+
+{{< shader-demo lighting-shadows/complete >}}
+
+The rendering equation is too expensive to solve exactly in real time. But understanding it tells you *what* each approximation captures and *what* it ignores — which matters when something looks wrong.
 
 
-## What We Have
+## The Rendering Equation
 
-Here's the `shade` function we've been using:
+The question we're trying to answer is deceptively simple: **how much light leaves a surface point toward the camera?**
+
+The answer isn't simple because light arrives at a surface from *every* direction — the sun, the sky, light bouncing off walls, light bouncing off floors that bounced off walls. Each incoming direction contributes some amount, filtered by the surface's material properties. To get the total, you have to sum over all directions — that sum is continuous, so it's an integral.
+
+Worse: the light arriving from any given direction is itself the light *leaving* some other surface point, which depends on the light arriving *there* from every direction — which depends on light leaving yet more surfaces, and so on. The quantity we're solving for (outgoing light) appears on both sides. This makes it an **integral equation**, not just an integral: the unknown is inside the integrand.
+
+This is the rendering equation (Kajiya, 1986). At a surface point $\mathbf{p}$ with normal $\mathbf{n}$, the outgoing light in direction $\omega_o$ (toward the camera) is:
+
+$$L_o(\mathbf{p}, \omega_o) = L_e(\mathbf{p}, \omega_o) + \int_\Omega f_r(\mathbf{p}, \omega_i, \omega_o) \; L_i(\mathbf{p}, \omega_i) \; (\omega_i \cdot \mathbf{n}) \; d\omega_i$$
+
+Both $L_o$ and $L_i$ are **radiance** — power per unit projected area per unit solid angle ($\text{W}\,\text{m}^{-2}\,\text{sr}^{-1}$). If the units look unfamiliar: solid angle is the 2D analogue of angle, measuring the "size" of a cone of directions in steradians (sr); the full sphere subtends $4\pi$ sr. Radiance is the right density for this integral because it's conserved along rays in vacuum — the radiance leaving one surface equals the radiance arriving at the next, regardless of distance.
+
+The terms:
+
+- $L_e$ — light emitted by the surface itself (we'll ignore this; our surfaces don't glow)
+- $\Omega$ — the hemisphere of incoming directions above the surface ($2\pi$ sr)
+- $f_r$ — the **BRDF** (bidirectional reflectance distribution function): the kernel of this integral operator. It weights how much incoming radiance from direction $\omega_i$ is scattered toward $\omega_o$. Units: $\text{sr}^{-1}$ — a density with respect to solid angle
+- $L_i(\mathbf{p}, \omega_i)$ — incoming radiance at $\mathbf{p}$ from direction $\omega_i$. This is $L_o$ evaluated at whatever surface point is visible from $\mathbf{p}$ along $\omega_i$ — which is where the integral equation becomes recursive
+- $\omega_i \cdot \mathbf{n}$ — the cosine factor: light arriving at a grazing angle spreads over more surface area, contributing less per unit area. We derive this geometrically below
+
+This is a Fredholm integral equation of the second kind — $L_o$ appears on the left, but $L_i$ on the right depends on $L_o$ at other points (light bounces). Solving it exactly requires tracking all light paths through the scene. Path tracers do this with Monte Carlo integration; we can't afford that at 60fps.
+
+Instead, we'll make three simplifying assumptions, one at a time, and see what falls out.
+
+
+## Diffuse Lighting
+
+### Assumption 1: One directional light
+
+Replace the continuous hemisphere of incoming light with a single direction $\mathbf{l}$ carrying all the light. A directional light (like the sun) sends parallel rays from one fixed direction — no light arrives from anywhere else. Formally, we model this as $L_i(\mathbf{p}, \omega_i) = L \cdot \delta(\omega_i - \mathbf{l})$, where $\delta$ is the Dirac delta on the sphere and $L$ is the source radiance. By the sifting property, the integral collapses:
+
+$$L_o = f_r(\mathbf{p}, \mathbf{l}, \omega_o) \; L \; (\mathbf{l} \cdot \mathbf{n})$$
+
+No integral remains — just evaluate the kernel $f_r$ at the single light direction and multiply by the cosine. This is the key simplification that makes real-time shading possible: we replace an integral over the hemisphere with a finite sum (one term per light source).
+
+### Assumption 2: Lambertian BRDF
+
+A perfectly matte surface (chalk, unfinished wood) scatters incoming light equally in all directions — the outgoing radiance doesn't depend on which direction you look from. Mathematically, the BRDF is constant (independent of both $\omega_i$ and $\omega_o$):
+
+$$f_r = \frac{\rho}{\pi}$$
+
+The parameter $\rho \in [0, 1]$ is the **albedo**: the fraction of incoming energy the surface reflects rather than absorbs ($\rho = 0$ is perfectly black; $\rho = 1$ reflects everything). The factor of $\pi$ is a normalization constant that enforces energy conservation — the surface can't scatter more power than it receives. To see why it's $\pi$: integrate the outgoing radiance over the full hemisphere, weighted by the cosine (since we're computing total outgoing power, not radiance):
+
+$$\int_\Omega \frac{\rho}{\pi} \cos\theta \; d\omega = \frac{\rho}{\pi} \int_0^{2\pi}\!\int_0^{\pi/2} \cos\theta \sin\theta \; d\theta \; d\phi = \frac{\rho}{\pi} \cdot \pi = \rho$$
+
+So the total reflected fraction is exactly $\rho$, as intended. Without the $\pi$, a "Lambertian" surface with $\rho = 1$ would radiate $\pi$ times more power than it receives — violating conservation.
+
+With both assumptions, outgoing light becomes:
+
+$$L_o = \frac{\rho}{\pi} \; L \; \max(0, \; \mathbf{n} \cdot \mathbf{l})$$
+
+The $\max$ clamps negative values — light from behind the surface contributes nothing. Since $L / \pi$ is just a scalar brightness we can absorb into our light color, the code reduces to:
 
 ```glsl
-vec3 shade(vec3 normal, vec3 surfaceColor) {
-    vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
-    float diffuse = max(0.0, dot(normal, lightDir));
-    return surfaceColor * diffuse;
-}
+float diffuse = max(0.0, dot(normal, lightDir));
+vec3 color = surfaceColor * diffuse;
 ```
 
-And our `shadow` function:
+This is the `shade` function we've been using. One line of code, but it contains two assumptions: a delta-function light source and a constant BRDF.
 
-```glsl
-float shadow(vec3 p) {
-    vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
-    // ... march toward light
-}
-```
+### Why the cosine?
 
-Both have the same light direction hardcoded. Let's extract it:
-
-```glsl
-vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
-
-vec3 shade(vec3 normal, vec3 surfaceColor, vec3 lightDir) {
-    float diffuse = max(0.0, dot(normal, lightDir));
-    return surfaceColor * diffuse;
-}
-
-float shadow(vec3 p, vec3 lightDir) {
-    // ... march toward light
-}
-```
-
-Now we can change the light direction in one place.
+The factor $\mathbf{n} \cdot \mathbf{l} = \cos\theta$ isn't an arbitrary choice — it's geometry. A surface patch of area $dA$ with normal $\mathbf{n}$ intercepts a beam of parallel light over a cross-section of area $dA \cos\theta$. At normal incidence the full patch is lit; at grazing incidence only a sliver is. The dot product measures the **projected area** of the patch onto the light beam — the same quantity that appears in the flux integral $\int_S \mathbf{F} \cdot d\mathbf{A}$.
 
 
-## Understanding Diffuse Lighting
+## Specular Highlights
 
-The `dot(normal, lightDir)` isn't arbitrary — it's the **Lambertian** model of diffuse reflection. A matte surface scatters incoming light equally in all directions. The brightness depends on how much light hits the surface, which is proportional to the cosine of the angle between the normal and light direction.
+A Lambertian surface scatters light equally in all directions, so it looks the same from every viewpoint. Real surfaces often have **specular highlights** — bright spots that move as you move your head. These come from the BRDF having a peak around the mirror-reflection direction.
 
-$$I_{\text{diffuse}} = \max(0, \mathbf{n} \cdot \mathbf{l})$$
+### Assumption 3: Blinn-Phong BRDF
 
-Head-on light ($\mathbf{n} \parallel \mathbf{l}$) gives maximum brightness. Glancing light gives less. Light from behind (negative dot product) gives zero — that's what the `max` handles.
+We add a concentrated lobe to the BRDF. Define the **halfway vector**:
 
+$$\mathbf{h} = \frac{\mathbf{l} + \omega_o}{|\mathbf{l} + \omega_o|}$$
 
-## Adding Specular Highlights
+This is the surface orientation that would produce a perfect mirror reflection from $\mathbf{l}$ to $\omega_o$. If the actual normal $\mathbf{n}$ aligns with $\mathbf{h}$, the surface *is* a mirror for this light-view pair, and we see a bright reflection. The Blinn-Phong BRDF models this as:
 
-Diffuse-only surfaces look matte, like chalk. Real surfaces often have **specular highlights** — bright spots where light reflects toward the viewer.
+$$f_r = \frac{\rho}{\pi} + k_s (\mathbf{n} \cdot \mathbf{h})^n$$
 
-The Blinn-Phong model computes a "halfway vector" between the light and view directions, then checks how closely the normal aligns with it:
+The coefficient $k_s$ controls the specular intensity (we use 0.3). The exponent $n$ controls the sharpness of the lobe. At $n = 1$ the highlight is broad and soft (rubber); at $n = 128$ it's tight and bright (polished plastic). Physically, you can think of the exponent as controlling a **distribution of microfacet orientations**: most facets align with $\mathbf{n}$, but some are tilted. The exponent parameterizes how tightly concentrated they are around $\mathbf{n}$. A high exponent means most facets agree — the surface is smooth and highlights are sharp. In code, $\omega_o$ is the view direction — from the surface toward the camera (`-ray.dir`):
 
 ```glsl
 vec3 shade(vec3 normal, vec3 surfaceColor, vec3 lightDir, vec3 viewDir) {
-    // Diffuse
+    // Diffuse: Lambertian
     float diff = max(0.0, dot(normal, lightDir));
 
-    // Specular
+    // Specular: Blinn-Phong lobe
     vec3 h = normalize(lightDir + viewDir);
     float spec = pow(max(0.0, dot(normal, h)), 32.0);
 
@@ -72,14 +107,20 @@ vec3 shade(vec3 normal, vec3 surfaceColor, vec3 lightDir, vec3 viewDir) {
 }
 ```
 
-The exponent (32.0) controls highlight sharpness — higher values give tighter, glossier highlights. The specular color (here `vec3(0.3)`) is typically white or near-white for non-metallic surfaces.
+The specular color (`vec3(0.3)`) is white-ish for non-metallic surfaces — dielectrics reflect all wavelengths equally at the specular peak. Metals color their specular reflections, but that's the Materials chapter.
 
 {{< shader-demo lighting-shadows/specular >}}
+
+::: {.callout-note}
+## Energy Conservation
+
+Our Blinn-Phong BRDF doesn't conserve energy — the diffuse and specular terms can sum to more than the incoming light. For our purposes this is fine; the visual result is convincing. Physically-based rendering (PBR) fixes this by ensuring $\int_\Omega f_r \cos\theta \, d\omega \leq 1$. The Materials chapter moves in this direction.
+:::
 
 
 ## The Light Struct
 
-For scenes with multiple lights or colored lights, we bundle light properties:
+Before we go further, let's clean up. Extract the light direction and add a color. We also pull ambient out of `shade` — it'll need to be modulated by ambient occlusion later, so it belongs at the call site:
 
 ```glsl
 struct Light {
@@ -96,14 +137,45 @@ vec3 shade(vec3 normal, vec3 surfaceColor, Light light, vec3 viewDir) {
 }
 ```
 
-Now we can have warm lights, cool lights, bright lights, dim lights.
 
+## Shadows
 
-## Soft Shadows
+### The Visibility Term
 
-Our `shadow` function returns 0 or 1 — fully shadowed or fully lit. Real shadows have soft edges (penumbra) where light is partially blocked.
+Look at the rendering equation again. The incoming radiance $L_i(\mathbf{p}, \omega_i)$ is zero if something blocks the light before it reaches $\mathbf{p}$. We can make this explicit with a **visibility function**:
 
-**The idea:** During the shadow march, track not just *whether* we hit something, but *how close* we came. Near-misses mean partial occlusion.
+$$V(\mathbf{p}, \omega_i) = \begin{cases} 1 & \text{if } \mathbf{p} \text{ can see direction } \omega_i \\ 0 & \text{if something blocks it} \end{cases}$$
+
+The rendering equation becomes:
+
+$$L_o = \int_\Omega f_r \; L_i \; V \; (\omega_i \cdot \mathbf{n}) \; d\omega_i$$
+
+For a single directional light, this reduces to multiplying the shading by $V(\mathbf{p}, \mathbf{l})$ — either the point sees the light or it doesn't.
+
+We already know how to evaluate $V$: march a ray from $\mathbf{p}$ toward the light. If it hits geometry, $V = 0$. This is the hard shadow function from the Raymarching chapter:
+
+```glsl
+float shadow(vec3 p, vec3 lightDir) {
+    float t = 0.02;  // Start slightly off the surface
+
+    for (int i = 0; i < 50; i++) {
+        float d = sdScene(p + lightDir * t);
+        if (d < 0.001) return 0.0;  // Hit something: in shadow
+        t += d;
+        if (t > 20.0) break;
+    }
+
+    return 1.0;  // Nothing blocking: lit
+}
+```
+
+The starting offset `t = 0.02` prevents **self-shadowing**: without it, the ray starts on the surface where $d \approx 0$ and immediately declares a hit. Offsetting along the light direction (or along the normal: `p + normal * 0.01`) moves the origin safely away from the surface. Too small and you get shadow acne (speckled dark spots); too large and shadows detach from contact points. The value should be a small multiple of `HIT_THRESHOLD`.
+
+### Soft Shadows
+
+Hard shadows are binary — $V \in \{0, 1\}$. Real shadows have soft edges (**penumbra**) because real light sources have nonzero area. A point in penumbra can see *part* of the light source but not all of it, so $V$ is somewhere between 0 and 1.
+
+Computing the true penumbra requires integrating visibility over the light's area. We approximate it during the shadow march by tracking how close the ray passed to occluding geometry:
 
 ```glsl
 float softShadow(vec3 p, vec3 lightDir, float k) {
@@ -124,30 +196,74 @@ float softShadow(vec3 p, vec3 lightDir, float k) {
 }
 ```
 
-The parameter `k` controls shadow sharpness — higher values give harder shadows. The ratio `d / t` captures how close the ray passed to geometry relative to how far it has traveled.
+**The geometry of $d/t$.** At each step, the ray is at distance $t$ from the surface point, and the nearest geometry is at distance $d$. The ratio $d/t$ is approximately the **sine of the angle** subtended by the nearest occluder as seen from the shadow ray's current position. Small $d/t$ means geometry nearly blocks the ray — a near miss that would partially occlude an extended light source.
+
+The parameter $k$ controls how this maps to shadow intensity. Geometrically, $k$ is proportional to $1/\sin\alpha$ where $\alpha$ is the angular radius of the light source. Larger $k$ means a smaller (more pointlike) light, hence harder shadows. Smaller $k$ means a larger light, hence softer penumbra.
+
+The `min` over all steps keeps the darkest near-miss. The result is a smooth $V \in [0, 1]$ — fully lit where nothing came close, fully shadowed where the ray hit, and partially shadowed where it narrowly passed by.
 
 {{< shader-demo lighting-shadows/soft-shadows >}}
 
+Shadows are softer farther from the occluder. This is physically correct: the penumbra of a finite-area light grows with the distance between the occluder and the receiver. The formula captures this because $d/t$ decreases as $t$ grows (geometry of the same size subtends a smaller angle at greater distance).
+
 ### Improved Soft Shadows
 
-The basic formula can produce banding artifacts. A smoother version uses:
+The basic `k * d / t` formula can produce banding artifacts where the shadow transitions too abruptly. Applying `smoothstep` gives a smoother falloff:
 
 ```glsl
 res = min(res, smoothstep(0.0, 1.0, k * d / t));
 ```
 
-Or the "improved" formulation that tracks the previous distance:
+A further improvement tracks the previous step's distance to better estimate the closest approach. This avoids artifacts where the ray passes through a narrow gap:
 
 ```glsl
-// TODO: Show the ph formulation from iq
+float softShadow(vec3 p, vec3 lightDir, float k) {
+    float res = 1.0;
+    float t = 0.02;
+    float prev = 1e20;
+
+    for (int i = 0; i < 50; i++) {
+        float d = sdScene(p + lightDir * t);
+        if (d < 0.001) return 0.0;
+
+        float y = d * d / (2.0 * prev);
+        float h = sqrt(d * d - y * y);
+        res = min(res, k * h / max(0.0, t - y));
+
+        prev = d;
+        t += d;
+
+        if (t > 20.0) break;
+    }
+
+    return res;
+}
 ```
+
+The variable `h` estimates the true closest-approach distance by fitting a circle through the current and previous SDF samples. This gives smoother penumbra with fewer artifacts.
+
+{{< shader-demo lighting-shadows/improved-soft-shadows >}}
 
 
 ## Ambient Occlusion
 
-Ambient occlusion (AO) approximates how much ambient light reaches a point. Corners and crevices are darker; exposed surfaces are brighter.
+### The Missing Integral
 
-**The idea:** March a short distance along the normal. If we're still inside geometry (or close to it), the point is occluded.
+Our shading uses a single light direction — a delta function in the rendering equation. Real scenes have light arriving from everywhere: the sky, bounced light from walls, scattered light from the environment. This is **ambient light**, and its contribution is the full hemispherical integral:
+
+$$L_{\text{ambient}} = \frac{\rho}{\pi} \int_\Omega L_{\text{env}}(\omega_i) \; V(\mathbf{p}, \omega_i) \; (\omega_i \cdot \mathbf{n}) \; d\omega_i$$
+
+If we assume the environment is constant ($L_{\text{env}} = L_a$), this simplifies to:
+
+$$L_{\text{ambient}} = \rho \, L_a \cdot \underbrace{\frac{1}{\pi}\int_\Omega V(\mathbf{p}, \omega_i) \; (\omega_i \cdot \mathbf{n}) \; d\omega_i}_{A(\mathbf{p})}$$
+
+The factor $A(\mathbf{p}) \in [0, 1]$ is the **ambient occlusion** — the cosine-weighted fraction of the hemisphere that's unoccluded. On an open plain, $A = 1$. In a tight corner between two walls, much of the hemisphere is blocked and $A$ drops toward zero.
+
+### Approximation with the SDF
+
+Evaluating $A(\mathbf{p})$ exactly requires integrating visibility over the hemisphere — expensive. But our SDF gives us occlusion information for free. If we march a short distance $r$ along the normal and find $d(\mathbf{p} + r\mathbf{n}) < r$, there's geometry inside the hemisphere at radius $r$ — that's occlusion.
+
+We sample at a few distances along the normal, treating each sample as a quadrature point for the hemispherical integral:
 
 ```glsl
 float ambientOcclusion(vec3 p, vec3 n) {
@@ -165,14 +281,22 @@ float ambientOcclusion(vec3 p, vec3 n) {
 }
 ```
 
-We sample at increasing distances along the normal. If the SDF value `d` is less than the expected distance `dist`, we're inside geometry — that's occlusion. Closer samples are weighted more heavily.
+At each sample point, `dist - d` measures how much closer the geometry is than expected. If `d == dist`, the hemisphere is clear at this radius — no occlusion contribution. If `d < dist`, there's something intruding. The `scale *= 0.5` weights nearby occlusion more heavily: a wall right next to the surface blocks more of the hemisphere than distant geometry does.
+
+This is a crude 5-point quadrature of the hemispherical integral, using the SDF as a proxy for visibility. It's cheap — 5 SDF evaluations — and captures the most important ambient lighting effect: corners and crevices are darker.
 
 {{< shader-demo lighting-shadows/ambient-occlusion >}}
 
 
 ## Fog and Atmosphere
 
-Distance-based fog adds depth cues and atmosphere. The further away an object, the more it fades toward the fog color.
+### Participating Media
+
+So far we've assumed light travels unimpeded through empty space. In reality, the atmosphere scatters and absorbs light — distant objects fade. Modeling this fully requires volumetric integration along the view ray. We approximate with exponential attenuation:
+
+$$L_{\text{observed}} = L_{\text{surface}} \cdot e^{-\sigma t} + L_{\text{fog}} \cdot (1 - e^{-\sigma t})$$
+
+where $t$ is the distance to the surface and $\sigma$ is the fog density. The first term is the surface color attenuated by the medium; the second is the fog color accumulated along the ray. As $t \to \infty$, the surface vanishes and only fog remains.
 
 ```glsl
 vec3 applyFog(vec3 color, float distance, vec3 fogColor) {
@@ -181,49 +305,157 @@ vec3 applyFog(vec3 color, float distance, vec3 fogColor) {
 }
 ```
 
-Exponential falloff looks more natural than linear. The coefficient controls fog density.
+The exponential falloff comes from Beer's law — the same exponential attenuation that governs absorption in any homogeneous medium. The coefficient 0.05 controls density; match it to the scale of your scene.
+
+{{< shader-demo lighting-shadows/fog >}}
 
 ### Height Fog
 
-Fog that varies with height:
+Real fog is denser near the ground. If density falls off exponentially with height — $\sigma(y) = \sigma_0 \, e^{-\beta y}$ — the integral along a ray from $\mathbf{o}$ to $\mathbf{p}$ has a closed form:
+
+$$\int_0^t \sigma(\mathbf{o} + s\mathbf{d}) \, ds = \frac{\sigma_0}{\beta \, d_y} \left(e^{-\beta \, o_y} - e^{-\beta(o_y + t \, d_y)}\right)$$
+
+where $d_y$ is the $y$-component of the ray direction. This gives fog that pools in valleys and thins at elevation.
 
 ```glsl
-// TODO: height-based fog formula
+float heightFog(vec3 rayOrigin, vec3 rayDir, float t) {
+    float sigma0 = 0.1;
+    float beta = 1.5;
+    float dy = rayDir.y;
+
+    if (abs(dy) < 0.001) {
+        // Nearly horizontal ray: constant density along path
+        return sigma0 * exp(-beta * rayOrigin.y) * t;
+    }
+
+    float startDensity = exp(-beta * rayOrigin.y);
+    float endDensity = exp(-beta * (rayOrigin.y + t * dy));
+    return sigma0 / (beta * dy) * (startDensity - endDensity);
+}
 ```
 
-{{< shader-demo lighting-shadows/fog >}}
+Use `1.0 - exp(-heightFog(...))` as the fog blend factor.
+
+{{< shader-demo lighting-shadows/height-fog >}}
 
 
 ## Multiple Lights
 
-So far we've used a single directional light. Adding more lights is straightforward — sum their contributions:
+### Linearity
+
+The rendering equation is linear in $L_i$: if light arrives from two sources, the contributions add. This is the **superposition principle** — it holds because we're ignoring nonlinear effects like saturation. In code, we simply sum:
 
 ```glsl
 vec3 totalLight = ambient;
 for each light {
-    float shadow = softShadow(p, light.dir, 16.0);
-    totalLight += shade(normal, material, light) * shadow;
+    float sh = softShadow(p, light.dir, 16.0);
+    totalLight += shade(normal, material, light, viewDir) * sh;
 }
 ```
 
-### Point Lights
+Each light gets its own shadow ray. The cost scales linearly with the number of lights.
 
-Point lights have position, not just direction. The light direction varies per surface point:
+### Directional vs Point Lights
+
+So far all our lights have been directional — a constant direction and color, modeling a distant source like the sun. We can package this cleanly:
 
 ```glsl
-vec3 lightDir = normalize(lightPos - p);
-float attenuation = 1.0 / (1.0 + 0.1 * length(lightPos - p));
+struct DirLight {
+    vec3 dir;    // unit direction toward the light
+    vec3 color;
+};
 ```
+
+A **point light** has a position instead of a direction. The light direction and intensity both vary per surface point:
+
+```glsl
+struct PtLight {
+    vec3 pos;
+    vec3 color;
+    float intensity;
+};
+```
+
+To shade a point light, compute the direction and distance at each surface point:
+
+```glsl
+vec3 toLight = light.pos - p;
+float dist = length(toLight);
+vec3 lightDir = toLight / dist;
+float atten = light.intensity / (1.0 + dist * dist);
+```
+
+Intensity falls off as $1/r^2$ — the inverse square law. For a point source radiating uniformly, energy spreads over a sphere of area $4\pi r^2$, so radiance at distance $r$ is proportional to $1/r^2$. The `+ 1.0` in the denominator avoids a singularity at $r = 0$.
+
+Our shadow march needs one adjustment for point lights. Without a distance cap, the ray keeps marching past the light and hits geometry behind it, incorrectly casting shadows. We fix this by passing the light distance as a maximum:
+
+```glsl
+float softShadow(vec3 p, vec3 lightDir, float k, float maxDist) {
+    float res = 1.0;
+    float t = 0.02;
+    for (int i = 0; i < 50; i++) {
+        float d = sdScene(p + lightDir * t);
+        if (d < 0.001) return 0.0;
+        res = min(res, k * d / t);
+        t += d;
+        if (t > maxDist) break;  // stop at the light
+    }
+    return res;
+}
+```
+
+For directional lights we pass a large `maxDist` (the light is at infinity). For point lights we pass `dist`.
+
+The demo below combines a directional key light with a warm point light that orbits the scene. Watch the point light's effect strengthen as it passes near a surface and fade as it moves away — behavior directional lights can't produce. Notice how the shadows swing with the moving source.
 
 {{< shader-demo lighting-shadows/point-lights >}}
 
 
 ## Putting It Together
 
-A complete lighting pass with soft shadows, AO, and fog:
+A complete lighting pass that combines everything — soft shadows, ambient occlusion, fog, and gamma correction:
 
 ```glsl
-// TODO: full example combining all techniques
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = makeRay(fragCoord);
+    ray = orbitRay(ray, 8.0);
+
+    float t = raymarch(ray);
+
+    vec3 color = vec3(0.5, 0.6, 0.7);  // sky/fog color
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 normal = calcNormal(p);
+        vec3 material = getMaterial(p);
+        vec3 viewDir = -ray.dir;
+
+        // Ambient occlusion
+        float ao = ambientOcclusion(p, normal);
+
+        // Ambient light (hemisphere approximation)
+        vec3 ambient = material * 0.15 * ao;
+
+        // Key light: warm, from upper right
+        DirLight key = DirLight(normalize(vec3(1.0, 1.0, 1.0)), vec3(1.0, 0.9, 0.8));
+        float keyShadow = softShadow(p + normal * 0.01, key.dir, 16.0);
+        vec3 keyContrib = shade(normal, material, key, viewDir) * keyShadow;
+
+        // Fill light: cool, from the left, no shadows
+        DirLight fill = DirLight(normalize(vec3(-1.0, 0.3, 0.0)), vec3(0.15, 0.2, 0.3));
+        vec3 fillContrib = shade(normal, material, fill, viewDir);
+
+        color = ambient + keyContrib + fillContrib;
+
+        // Fog
+        vec3 fogColor = vec3(0.5, 0.6, 0.7);
+        float fog = 1.0 - exp(-t * 0.04);
+        color = mix(color, fogColor, fog);
+    }
+
+    // Gamma correction
+    color = pow(color, vec3(1.0 / 2.2));
+    fragColor = vec4(color, 1.0);
+}
 ```
 
 {{< shader-demo lighting-shadows/complete >}}
@@ -231,24 +463,31 @@ A complete lighting pass with soft shadows, AO, and fog:
 
 ## Gamma Correction
 
-There's a problem we've been ignoring: monitors don't display light linearly. A pixel value of 0.5 doesn't emit half the light of 1.0 — it's closer to a quarter.
+### The Problem
 
-This nonlinearity is called **gamma**. Historically, CRT monitors had a power-law response around $\gamma \approx 2.2$. Modern displays maintain this for compatibility. The result: linear values look too dark, and our carefully computed lighting looks wrong.
+There's an issue we've been ignoring. Monitors don't display light linearly: a pixel value of 0.5 doesn't emit half the light of 1.0 — it's closer to a quarter.
+
+This nonlinearity is called **gamma**. CRT monitors had a power-law response $L = v^\gamma$ with $\gamma \approx 2.2$. Modern displays maintain this for compatibility and, more importantly, because it matches human perception.
+
+### Why Gamma Exists
+
+Human vision is approximately logarithmic — we're more sensitive to differences in dark tones than bright ones (the Weber-Fechner law). A gamma-encoded signal allocates more of its numerical range to dark values, where we'd notice banding, and less to bright values, where we can't tell the difference. This is a change of variables $v = L^{1/\gamma}$ that makes quantization error perceptually uniform — the same idea as using a log scale on an axis.
+
+This means gamma encoding is *useful*, not just a historical accident. But it means our lighting math (which is correct in linear space) looks wrong on screen unless we undo the encoding.
 
 ### The Fix
 
-All our lighting math should happen in **linear space** — that's correct. But before displaying, we need to apply the inverse gamma:
+All lighting math should happen in **linear space**. Before output, apply the inverse gamma:
 
 ```glsl
-// At the very end, before output
 color = pow(color, vec3(1.0 / 2.2));
 ```
 
-This "gamma correction" compensates for the display's nonlinearity. Linear 0.5 becomes ~0.73 in the output, which the monitor then displays as half brightness.
+Linear 0.5 becomes ~0.73 in the output. The monitor applies $0.73^{2.2} \approx 0.5$, displaying the intended brightness.
 
 ### sRGB
 
-The sRGB standard (used by most monitors and image formats) is slightly more complex than pure gamma 2.2 — it has a linear segment near black. For most purposes, the simple `pow` is close enough.
+The sRGB standard (used by most monitors and image formats) is slightly more complex than pure gamma 2.2 — it has a linear segment near black to avoid an infinite slope at zero. For most purposes, the simple `pow` is close enough:
 
 ```glsl
 // More accurate sRGB conversion
@@ -263,7 +502,7 @@ vec3 toSRGB(vec3 linear) {
 
 ### When to Apply
 
-Gamma correction is the **last** step before output. All lighting, blending, and color operations should happen in linear space. Apply gamma once at the end:
+Gamma correction is the **last** step before output. All lighting, blending, and color operations must happen in linear space. Apply gamma once at the end:
 
 ```glsl
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
@@ -280,7 +519,9 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 
 ## What's Next
 
-We've improved *how* light interacts with surfaces, but surfaces still have only a single color. The **Materials** chapter introduces richer surface properties: specular highlights, Fresnel effects, and reflections.
+We've built a complete lighting pipeline: diffuse and specular shading, soft shadows, ambient occlusion, fog, and gamma correction — all motivated as approximations to the rendering equation. But every surface still has a uniform appearance.
+
+The **Materials** chapter introduces richer surface properties: Fresnel reflectance, metallic vs. dielectric behavior, and environment reflections — refining the BRDF term $f_r$ in the rendering equation.
 
 
 ## Exercises
@@ -299,15 +540,15 @@ Where do the highlights and shadows move?
 
 **Checkpoint 2: Specular Sharpness**
 
-Change the specular exponent from 32.0 to 8.0 (soft, plastic-like) and 128.0 (tight, metallic). What happens to the highlight size?
+Change the specular exponent from 32.0 to 8.0 (soft, plastic-like) and 128.0 (tight, metallic). What happens to the highlight size? Relate this to the microfacet distribution — what does a higher exponent say about the surface?
 
 **Checkpoint 3: Shadow Softness**
 
-In `softShadow`, try `k` values of 4.0 (very soft), 16.0 (medium), and 64.0 (nearly hard). How do the shadow edges change?
+In `softShadow`, try `k` values of 4.0 (very soft), 16.0 (medium), and 64.0 (nearly hard). How do the shadow edges change? What does each value imply about the size of the light source?
 
 **Checkpoint 4: Gamma Comparison**
 
-Render a scene with and without gamma correction. The difference is subtle but important — which looks more natural? Which has better shadow detail?
+Render a scene with and without gamma correction. Which looks more natural? Which has better shadow detail? Why does the uncorrected version look too dark in the midtones?
 
 
 ### Explorations
@@ -337,11 +578,11 @@ color += shade(normal, material, key, viewDir) * softShadow(p, key.dir, 16.0);
 color += shade(normal, material, fill, viewDir) * softShadow(p, fill.dir, 16.0);
 ```
 
-A warm key light with a cool fill is a classic look.
+A warm key light with a cool fill is a classic look. Why does superposition work here? (Linearity of the rendering equation.)
 
 **Exploration 3: AO Visualization**
 
-Render just the ambient occlusion term as grayscale: `color = vec3(ao)`. This shows the "contact shadows" in corners and crevices. Adjust the sampling distances to control how wide the occlusion spreads.
+Render just the ambient occlusion term as grayscale: `color = vec3(ao)`. This shows the cosine-weighted visibility integral. Adjust the sampling distances to control how wide the occlusion spreads. Try increasing the number of samples from 5 to 10 — does the result change much?
 
 **Exploration 4: Dense Fog**
 
@@ -351,7 +592,11 @@ Create thick fog by increasing the density coefficient:
 float fog = 1.0 - exp(-distance * 0.2);  // denser than 0.05
 ```
 
-How close can objects get before they're fully visible? Try matching the fog color to the background.
+How close can objects get before they're fully visible? Try matching the fog color to the background. This is Beer's law at work — at what distance is transmittance halved?
+
+**Exploration 5: Penumbra Width**
+
+In a scene with a sphere casting a shadow on a ground plane, observe how the shadow edge gets softer farther from the sphere. Move the sphere up (farther from the ground) — the penumbra should widen. This is the $d/t$ ratio at work: the same occluder subtends a smaller angle at greater distance.
 
 
 ### Challenges
@@ -367,6 +612,8 @@ float sh = softShadow(p, lightDir, 16.0);
 vec3 shadowColor = vec3(0.1, 0.15, 0.2);  // cool ambient
 color = mix(shadowColor * material, litColor, sh);
 ```
+
+Why does this look more natural? (In the rendering equation, shadowed points still receive ambient light from the rest of the hemisphere.)
 
 **Challenge 2: Multiple Point Lights**
 
@@ -387,7 +634,7 @@ rim = pow(rim, 3.0);
 color += rimColor * rim;
 ```
 
-This simulates backlighting or subsurface scattering at edges.
+This approximates light scattering through the edges of translucent objects. In BRDF terms, it's adding a term to $f_r$ that peaks at grazing angles — complementary to the Fresnel effect you'll see in the Materials chapter.
 
 **Challenge 4: Day/Night Cycle**
 
@@ -398,3 +645,11 @@ Animate the entire lighting setup to simulate a day/night cycle:
 - Maybe add a "moon" light at night
 
 Use `iTime` to control the sun angle: `vec3(cos(iTime*0.5), sin(iTime*0.5), 0.5)`
+
+**Challenge 5: The Rendering Equation, Visualized**
+
+Render just the cosine-weighted hemisphere for a single point. For each pixel direction $\omega_i$ in the hemisphere above the surface:
+- Color it by $V(\mathbf{p}, \omega_i) \cdot (\omega_i \cdot \mathbf{n})$
+- This shows what the rendering equation "sees" at that point
+
+Display this as a fisheye view. Occluded directions are black; open sky is bright; the cosine weighting darkens the horizon. This is the integral we're approximating.

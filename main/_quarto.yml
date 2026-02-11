@@ -26,10 +26,11 @@ website:
             href: notes/3d/lighting-shadows/notes.qmd
           - text: "Materials"
             href: notes/3d/materials/notes.qmd
-          - text: "Procedural Patterns"
-            href: notes/3d/procedural/notes.qmd
           - text: "Refraction"
             href: notes/3d/refraction/notes.qmd
+          - text: "Procedural Patterns"
+            href: notes/3d/procedural/notes.qmd
+
       # - section: "Fundamentals"
       #   contents:
       #     - fundamentals/coordinates.qmd

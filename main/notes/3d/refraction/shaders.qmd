@@ -5,87 +5,58 @@ format:
     code-fold: true
 ---
 
-```{ojs}
-//| echo: false
-import { createShaderCanvas } from "/lib/shader-utils.js"
-```
-
 
 ## snell
 
 Basic refraction through a flat surface.
 
-```{ojs}
-//| label: snell
-// TODO: implement Snell's law shader
-```
+<!-- TODO: implement Snell's law shader -->
 
 
 ## total-internal-reflection
 
 Demonstration of total internal reflection.
 
-```{ojs}
-//| label: total-internal-reflection
-// TODO: implement TIR shader
-```
+<!-- TODO: implement TIR shader -->
 
 
 ## entry-exit
 
 Tracking entry and exit through a transparent object.
 
-```{ojs}
-//| label: entry-exit
-// TODO: implement entry/exit shader
-```
+<!-- TODO: implement entry/exit shader -->
 
 
 ## loop
 
 Full refraction loop with multiple bounces.
 
-```{ojs}
-//| label: loop
-// TODO: implement refraction loop shader
-```
+<!-- TODO: implement refraction loop shader -->
 
 
 ## fresnel-glass
 
 Glass with Fresnel-blended reflection and refraction.
 
-```{ojs}
-//| label: fresnel-glass
-// TODO: implement fresnel glass shader
-```
+<!-- TODO: implement fresnel glass shader -->
 
 
 ## dispersion
 
 Chromatic dispersion (rainbow effect).
 
-```{ojs}
-//| label: dispersion
-// TODO: implement dispersion shader
-```
+<!-- TODO: implement dispersion shader -->
 
 
 ## absorption
 
 Beer's law absorption in colored glass.
 
-```{ojs}
-//| label: absorption
-// TODO: implement absorption shader
-```
+<!-- TODO: implement absorption shader -->
 
 
 ## glass-sphere
 
 Complete glass sphere with all effects.
 
-```{ojs}
-//| label: glass-sphere
-// TODO: implement glass sphere shader
-```
+<!-- TODO: implement glass sphere shader -->

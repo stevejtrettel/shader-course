@@ -420,7 +420,7 @@ One caveat: displacement can break the Lipschitz-1 condition. If $g$ has gradien
 
 
 
-## Domain Operations
+## 4. Domain Operations
 
 Everything so far has operated on the *output* of an SDF: min, max, smooth blending, displacement — all take SDF values and combine or modify them. Now we transform the *input*.
 
