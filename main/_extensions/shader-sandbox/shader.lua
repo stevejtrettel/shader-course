@@ -68,11 +68,33 @@ return {
 <div id="%s" style="width:75%%;height:%s;display:block;margin:0 auto"></div>
 <script type="module">
 import { mount } from './%s';
-// Workaround: the shader-sandbox bundle injects base.css which sets
-// html,body { overflow: hidden }. Undo that so the page scrolls.
-document.documentElement.style.overflow = 'auto';
-document.body.style.overflow = 'auto';
-mount(document.getElementById('%s'));
+// Lazy mount: only create WebGL context when visible, destroy when off-screen.
+// Browsers limit active WebGL contexts (~8-16), so pages with many shaders
+// will lose contexts without this.
+const el = document.getElementById('%s');
+let handle = null;
+let mounting = false;
+let wantsMounted = false;
+const obs = new IntersectionObserver(([entry]) => {
+  wantsMounted = entry.isIntersecting;
+  if (wantsMounted && !handle && !mounting) {
+    mounting = true;
+    mount(el).then(h => {
+      mounting = false;
+      if (wantsMounted) {
+        handle = h;
+      } else {
+        h.destroy();
+        el.innerHTML = '';
+      }
+    });
+  } else if (!wantsMounted && handle) {
+    handle.destroy();
+    handle = null;
+    el.innerHTML = '';
+  }
+}, { rootMargin: '200px' });
+obs.observe(el);
 </script>
 ]], id, height, src, id)
 
