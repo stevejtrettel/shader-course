@@ -79,24 +79,6 @@ $sidebar-font-family: $font-family-sans-serif;
 }
 
 // ============================================
-// Shader-sandbox base.css overrides
-// ============================================
-// The shader-sandbox Vite bundle injects base.css which sets global resets
-// (html,body { overflow:hidden; height:100%; font-family:... }, * { margin:0; padding:0 }).
-// These !important overrides ensure Quarto's layout wins regardless of load order.
-
-html {
-  overflow: auto !important;
-  height: auto !important;
-}
-
-body {
-  overflow: auto !important;
-  height: auto !important;
-  font-family: $font-family-base !important;
-}
-
-// ============================================
 // Other Custom Styles
 // ============================================
 

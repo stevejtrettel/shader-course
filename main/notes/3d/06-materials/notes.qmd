@@ -16,7 +16,7 @@ Three numbers control its behavior: the albedo $\rho$ (base color), the specular
 
 Each section adds one property to a `Material` struct, modifying the BRDF to capture a new physical effect — building toward a material model that handles all of them.
 
-{{< shader-demo materials/complete >}}
+{{< shader layout="tabbed" materials/complete >}}
 
 
 ## The Material Struct
@@ -116,7 +116,7 @@ float spec = pow(max(dot(n, h), 0.0), shininess);
 
 The `roughness * roughness` mapping gives a more perceptually linear progression from mirror to matte. This isn't the full microfacet model, but it captures the primary effect: roughness controls the width and intensity of specular highlights.
 
-{{< shader-demo materials/roughness >}}
+{{< shader layout="tabbed" materials/roughness >}}
 
 
 ## Fresnel Reflectance
@@ -159,7 +159,7 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0) {
 
 Note that `F0` is a `vec3` — for metals, the reflectance at normal incidence differs per color channel.
 
-{{< shader-demo materials/fresnel >}}
+{{< shader layout="tabbed" materials/fresnel >}}
 
 
 ## Metallic vs. Dielectric
@@ -229,7 +229,7 @@ vec3 shade(vec3 p, vec3 n, Material mat, vec3 v, DirLight light) {
 
 The `(vec3(1.0) - F)` factor on the diffuse term is energy conservation: what Fresnel reflects specularly can't also scatter diffusely. The lighting chapter's energy conservation callout noted that Blinn-Phong doesn't enforce this — here we fix it. The diffuse and specular contributions sum to at most the incoming light, because $F + (1 - F) = 1$.
 
-{{< shader-demo materials/metallic >}}
+{{< shader layout="tabbed" materials/metallic >}}
 
 
 ## Reflections
@@ -269,7 +269,7 @@ color = mix(diffuseColor, reflectColor, F);
 
 At normal incidence (looking head-on), most light passes through to the diffuse term. At grazing angles, the reflection dominates — the table-from-the-side effect.
 
-{{< shader-demo materials/reflections >}}
+{{< shader layout="tabbed" materials/reflections >}}
 
 ### Multiple bounces
 
@@ -319,7 +319,7 @@ color += rimColor * rim;
 
 The `pow` sharpens the falloff — without it the effect spreads too far from the edge. At exponent 3, only the outermost silhouette glows. In BRDF terms, this adds a lobe that peaks at grazing angles, complementary to the Fresnel effect. The Fresnel term diverts energy into specular reflection at grazing angles; rim lighting adds energy from a hypothetical backlight or environment, which is why it's additive rather than a redistribution within the existing BRDF.
 
-{{< shader-demo materials/rim >}}
+{{< shader layout="tabbed" materials/rim >}}
 
 
 ## Putting It Together
@@ -349,7 +349,7 @@ Material getMaterial(vec3 p) {
 }
 ```
 
-{{< shader-demo materials/complete >}}
+{{< shader layout="tabbed" materials/complete >}}
 
 
 ## What's Next

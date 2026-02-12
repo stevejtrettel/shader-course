@@ -8,7 +8,7 @@ The key insight: instead of asking "where exactly does this ray hit the surface?
 
 By the end of this chapter you'll render scenes like this:
 
-{{< shader scene-complete >}}
+{{< shader layout="tabbed" scene-complete >}}
 
 Multiple objects, different colors, all from distance functions. The 80-line torus becomes 4 lines. And shapes with no closed-form intersection become just as easy as spheres.
 
@@ -55,7 +55,7 @@ float sdCircle(vec2 p, float r) {
 }
 ```
 
-{{< shader sdf-circle-2d >}}
+{{< shader layout="tabbed" sdf-circle-2d >}}
 
 The contour lines are level sets — curves where $d = k$ for various $k$. On the boundary ($k = 0$), you're exactly on the circle. Inside is negative (blue); outside is positive (orange).
 
@@ -165,7 +165,7 @@ float sdScene(vec3 p) {
 
 That's the entire scene definition. Combined with `raymarch` and `calcNormal`:
 
-{{< shader sphere-normals >}}
+{{< shader layout="tabbed" sphere-normals >}}
 
 ```glsl
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
@@ -198,7 +198,7 @@ float sdScene(vec3 p) {
 }
 ```
 
-{{< shader torus >}}
+{{< shader layout="tabbed" torus >}}
 
 Four lines of distance calculation replace 80 lines of quartic algebra. The raymarching loop doesn't change. The normal calculation doesn't change. We just answer a different distance question and a new shape appears.
 
@@ -359,7 +359,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 }
 ```
 
-{{< shader scene-complete >}}
+{{< shader layout="tabbed" scene-complete >}}
 
 Three objects, three colors, one `shadeDiffuse` call. The raymarcher finds the surface; `getMaterial` identifies it; the shading function makes it visible.
 

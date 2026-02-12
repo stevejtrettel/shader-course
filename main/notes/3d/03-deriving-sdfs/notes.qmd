@@ -76,7 +76,7 @@ float sdScene(vec3 p) {
 
 We wrote a circle in the $xz$-plane and never mentioned $y$. What does this produce?
 
-{{< shader infinite-cylinder >}}
+{{< shader layout="tabbed" infinite-cylinder >}}
 
 An infinite cylinder along the $y$-axis. Every horizontal slice is the same circle, so the distance at any point depends only on how far that point is from the $y$-axis — which is `length(p.xz)`. The $y$-coordinate is irrelevant.
 
@@ -113,7 +113,7 @@ where the absolute value and subtraction are componentwise. Each component $d_i 
 
 The signs of $d_x$ and $d_y$ partition the plane into three types of region:
 
-{{< shader box-regions >}}
+{{< shader layout="tabbed" box-regions >}}
 
 **Near an edge** (one component positive, the other negative): you've cleared the box along one axis but you're still within its extent along the other. The distance is the positive component — perpendicular distance to the edge.
 
@@ -139,7 +139,7 @@ float sdBox(vec2 p, vec2 halfSize) {
 }
 ```
 
-{{< shader box-2d >}}
+{{< shader layout="tabbed" box-2d >}}
 
 Look at the contour lines. Near an edge, they're straight and parallel — constant distance in one direction. Near a corner, they curve into circular arcs — equidistant from a point. The transition between these behaviors is the case decomposition made visible.
 
@@ -157,7 +157,7 @@ float sdBox(vec3 p, vec3 halfSize) {
 }
 ```
 
-{{< shader box-3d >}}
+{{< shader layout="tabbed" box-3d >}}
 
 With `shadeNormal`, the six faces show as distinct flat colors — the normal is constant across each face. The edges, where the `max` switches between cases, show as sharp color transitions.
 
@@ -196,7 +196,7 @@ float sdTorus(vec3 p, float R, float r) {
 }
 ```
 
-{{< shader torus >}}
+{{< shader layout="tabbed" torus >}}
 
 Four lines. Compare to the 80-line quartic solver from the First Rays chapter — same shape, same pixels, completely different approach. Normal shading reveals the geometry: the colors spiral around the tube as it wraps the ring, showing how the normal rotates through 360° in both directions.
 
@@ -218,7 +218,7 @@ float sdCylinder(vec3 p, float r, float h) {
 }
 ```
 
-{{< shader cylinder >}}
+{{< shader layout="tabbed" cylinder >}}
 
 This *is* the 2D box SDF evaluated at (radial distance to wall, vertical distance to cap). The revolution idea reduces 3D to 2D; the box idea handles the capping. Two techniques, composed.
 
@@ -241,7 +241,7 @@ float sdCone(vec3 p, float angle) {
 }
 ```
 
-{{< shader cone >}}
+{{< shader layout="tabbed" cone >}}
 
 Three lines: collapse to 2D, compute the wall normal, take the dot product. The cone extends infinitely — no base, no cap. Capping it (adding a flat base and a finite apex) requires the projection-and-clamp technique we'll develop in the Offset section for capsules; the capped cone makes a good exercise once you have that tool.
 
@@ -279,7 +279,7 @@ float sdRoundBox(vec3 p, vec3 halfSize, float r) {
 
 Shrink the box by $r$ (so the final size stays correct), then offset by $r$. Sharp corners become spherical caps; edges become cylindrical fillets; faces stay flat.
 
-{{< shader round-box >}}
+{{< shader layout="tabbed" round-box >}}
 
 Compare the normal shading to the sharp box: where the box had abrupt color changes at edges, the rounded box transitions smoothly. The faces are still flat (same uniform color), but the connections between them are now curved.
 
@@ -304,7 +304,7 @@ float sdCapsule(vec3 p, vec3 a, vec3 b, float r) {
 }
 ```
 
-{{< shader capsule >}}
+{{< shader layout="tabbed" capsule >}}
 
 The hemispherical caps appear automatically. Near an endpoint, the clamped projection returns the endpoint itself, and the distance becomes distance-to-a-point minus $r$ — a sphere. In the middle, the projection lands on the segment interior, and the distance becomes distance-to-a-line minus $r$ — a cylinder. No special cases; the clamp handles the transition.
 
@@ -373,7 +373,7 @@ float sdTriangle(vec2 p, float r) {
 }
 ```
 
-{{< shader triangle-2d >}}
+{{< shader layout="tabbed" triangle-2d >}}
 
 Three folds, then a dot product. The folds place the query point into a wedge where the triangle has a single horizontal edge at $y = -r/2$.
 
@@ -393,7 +393,7 @@ float sdOctahedron(vec3 p, float s) {
 }
 ```
 
-{{< shader octahedron >}}
+{{< shader layout="tabbed" octahedron >}}
 
 One fold (`abs`), one dot product. Normal shading makes the eight faces obvious — each face is a single flat color, because the normal is constant across each triangular face.
 
@@ -434,7 +434,7 @@ float sdIcosahedron(vec3 p, float r) {
 }
 ```
 
-{{< shader icosahedron >}}
+{{< shader layout="tabbed" icosahedron >}}
 
 Twenty faces, but only four dot products — `abs` handles the other 16. The final distance uses the same $1/\sqrt{3}$ factor as the octahedron because the face normals are permutations of $(0, 1/\varphi, \varphi)$, which has the same $\ell^1$ norm as $(1,1,1)$.
 
@@ -521,7 +521,7 @@ if (t > 0.0) {
 }
 ```
 
-{{< shader objects-scene >}}
+{{< shader layout="tabbed" objects-scene >}}
 
 A sphere and an icosahedron on a ground plane — each with its own color, using `shadeDiffuse`. This is the pattern we'll use for every scene going forward.
 

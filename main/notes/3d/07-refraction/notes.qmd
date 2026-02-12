@@ -27,7 +27,7 @@ vec3 refractedDir = refract(rayDir, normal, n1 / n2);
 
 The ratio `n1 / n2` is called $\eta$ (eta). When entering glass from air, $\eta = 1.0 / 1.5 \approx 0.67$.
 
-{{< shader-demo refraction/snell >}}
+{{< shader layout="tabbed" refraction/snell >}}
 
 
 ## Total Internal Reflection
@@ -46,7 +46,7 @@ if (length(refractedDir) < 0.001) {
 
 This is why diamonds sparkle — light bounces around inside before escaping, and why underwater surfaces look like mirrors from below.
 
-{{< shader-demo refraction/total-internal-reflection >}}
+{{< shader layout="tabbed" refraction/total-internal-reflection >}}
 
 
 ## Entering and Exiting
@@ -65,7 +65,7 @@ vec3 n = entering ? normal : -normal;
 float eta = entering ? (1.0 / ior) : ior;
 ```
 
-{{< shader-demo refraction/entry-exit >}}
+{{< shader layout="tabbed" refraction/entry-exit >}}
 
 
 ## The Refraction Loop
@@ -111,7 +111,7 @@ vec3 traceRefraction(Ray ray, float ior, int maxBounces) {
 }
 ```
 
-{{< shader-demo refraction/loop >}}
+{{< shader layout="tabbed" refraction/loop >}}
 
 
 ## Fresnel for Transparency
@@ -127,7 +127,7 @@ color = mix(refractColor, reflectColor, F);
 
 At glancing angles, glass becomes a mirror. Looking straight through, you see what's behind.
 
-{{< shader-demo refraction/fresnel-glass >}}
+{{< shader layout="tabbed" refraction/fresnel-glass >}}
 
 
 ## Chromatic Dispersion
@@ -149,7 +149,7 @@ color.b = traceRefraction(ray, iorB, ...).b;
 
 This triples the cost but creates beautiful rainbow caustics.
 
-{{< shader-demo refraction/dispersion >}}
+{{< shader layout="tabbed" refraction/dispersion >}}
 
 
 ## Absorption (Beer's Law)
@@ -165,7 +165,7 @@ color *= transmittance;
 
 Thicker glass appears more saturated. A blue glass marble is pale at the edges, deep blue at the center.
 
-{{< shader-demo refraction/absorption >}}
+{{< shader layout="tabbed" refraction/absorption >}}
 
 
 ## Practical Considerations
@@ -191,7 +191,7 @@ A glass sphere demonstrating refraction, reflection, total internal reflection, 
 // TODO: full glass sphere example
 ```
 
-{{< shader-demo refraction/glass-sphere >}}
+{{< shader layout="tabbed" refraction/glass-sphere >}}
 
 
 ## What's Next

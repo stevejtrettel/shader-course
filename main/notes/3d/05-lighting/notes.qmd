@@ -4,7 +4,7 @@
 
 Real scenes have light that pools in crevices, casts soft shadows across surfaces, and shifts highlights as the viewer moves. Producing this in a shader requires understanding where light comes from, how surfaces respond to it, and what happens when geometry blocks it. This chapter builds a complete lighting pipeline, one effect at a time, until we get here:
 
-{{< shader complete >}}
+{{< shader layout="tabbed" complete >}}
 
 Every technique in this chapter is an approximation to a single integral — the **rendering equation**. We'll state it first, then spend the chapter building increasingly faithful approximations: diffuse shading, specular highlights, shadows, ambient occlusion, and multi-light setups. Each technique improves one factor in the integral. Understanding the equation tells you *what* each approximation captures and *what* it ignores — which matters when something looks wrong.
 
@@ -166,7 +166,7 @@ color = pow(color, vec3(1.0 / 2.2));
 
 The two functions mirror the two terms in our decomposition: `ambient` handles the environment integral, `shade` handles the direct term. The `shade` function currently ignores `p` and `v` — both will matter soon.
 
-{{< shader diffuse >}}
+{{< shader layout="tabbed" diffuse >}}
 
 
 
@@ -216,7 +216,7 @@ vec3 shade(vec3 p, vec3 n, vec3 mat, vec3 v, DirLight light) {
 
 Now the view direction `v` matters. Rotate the camera and the highlight moves — the specular lobe tracks the alignment between $\mathbf{n}$ and the halfway vector $\mathbf{h}$.
 
-{{< shader specular >}}
+{{< shader layout="tabbed" specular >}}
 
 
 
@@ -273,7 +273,7 @@ vec3 shade(vec3 p, vec3 n, vec3 mat, vec3 v, DirLight light) {
 
 One multiplication by `sh`. The shadow ray costs another full raymarch per light per pixel — the rendering cost doubles for one shadow-casting light. But the visual payoff is large: shadows ground objects in the scene and reveal spatial relationships.
 
-{{< shader hard-shadows >}}
+{{< shader layout="tabbed" hard-shadows >}}
 
 The shadow has a perfectly sharp edge — every point is either fully lit or fully dark. Real shadows from area lights have soft edges. We can approximate that.
 
@@ -344,7 +344,7 @@ vec3 shade(vec3 p, vec3 n, vec3 mat, vec3 v, DirLight light) {
 }
 ```
 
-{{< shader soft-shadows >}}
+{{< shader layout="tabbed" soft-shadows >}}
 
 
 
@@ -440,7 +440,7 @@ color = pow(color, vec3(1.0 / 2.2));
 
 This is the same separation as before — `ambient` handles the environment integral, `shade` handles direct lights — but the environment estimate is now spatially varying.
 
-{{< shader ambient-occlusion >}}
+{{< shader layout="tabbed" ambient-occlusion >}}
 
 
 
@@ -524,7 +524,7 @@ vec3 shade(vec3 p, vec3 n, vec3 mat, vec3 v, PtLight light) {
 
 GLSL allows function overloading, so both `shade` functions — one taking a `DirLight`, one taking a `PtLight` — can share the same name. The compiler dispatches based on the argument type.
 
-{{< shader point-light >}}
+{{< shader layout="tabbed" point-light >}}
 
 
 ---
@@ -594,11 +594,11 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 
 Each line corresponds to a section of this chapter. The `ambient` function handles the environment integral (constant radiance, modulated by occlusion). Each `shade` call handles one direct light (diffuse + specular + soft shadow). The call site sums them — superposition. Adding a third light is one more call to `shade`. Nothing gets rearranged.
 
-{{< shader complete >}}
+{{< shader layout="tabbed" complete >}}
 
 The demo below adds an orbiting point light to the scene. Watch the shadows swing with the moving source, and the intensity strengthen as it passes near a surface and fade as it moves away — behavior that directional lights can't produce.
 
-{{< shader point-lights >}}
+{{< shader layout="tabbed" point-lights >}}
 
 ::: {.callout-note}
 ## Tone Mapping

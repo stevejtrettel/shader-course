@@ -1,10 +1,8 @@
 project:
   type: website
   output-dir: _site
-  # pre-render:
-  #   - node build-shaders.mjs
   resources:
-    - dist/**
+    - notes/**/shaders/**
 
 website:
   title: "Shader Programming"
@@ -48,27 +46,6 @@ highlight-style: arrow
 
 format:
   html:
-    include-in-header:
-      - text: |
-          <script>
-          // Intercept the shader-sandbox base.css injection before it can cause
-          // a font/layout flash. The bundle injects a <style> with global resets
-          // (html,body { overflow:hidden; font-family:... }). This observer
-          // removes it the instant it's added to the DOM.
-          new MutationObserver((mutations, obs) => {
-            for (const m of mutations) {
-              for (const node of m.addedNodes) {
-                if (node.tagName === 'STYLE' && node.textContent &&
-                    node.textContent.includes('overflow:hidden') &&
-                    node.textContent.includes('box-sizing:border-box')) {
-                  node.remove();
-                  obs.disconnect();
-                  return;
-                }
-              }
-            }
-          }).observe(document.head, { childNodes: true });
-          </script>
     theme:
       light: [cosmo, styles/website.scss]
       dark: [darkly, styles/website.scss]

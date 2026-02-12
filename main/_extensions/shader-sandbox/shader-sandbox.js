@@ -1,17 +1,17 @@
-(function(){"use strict";try{if(typeof document<"u"){var o=document.createElement("style");o.appendChild(document.createTextNode('*{margin:0;padding:0;box-sizing:border-box}html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif}body{background:var(--bg-primary);color:var(--text-primary);transition:background-color .2s ease,color .2s ease}#app{width:100%;height:100%}canvas{display:block}:root,[data-theme=light]{--bg-primary: #f5f5f5;--bg-secondary: #ffffff;--bg-tertiary: #f8f8f8;--bg-canvas: #000000;--text-primary: #000000;--text-secondary: #333333;--text-muted: #666666;--text-disabled: #999999;--border-primary: #e0e0e0;--border-secondary: #cccccc;--accent-primary: #4a9eff;--accent-primary-hover: #3a8eef;--accent-primary-active: #2a7edf;--accent-secondary: #7c4dff;--error-bg: #fff0f0;--error-text: #cc0000;--error-border: #ffcccc;--success-bg: #e8f5e9;--success-text: #4caf50;--success-border: #4caf50;--overlay-bg: rgba(0, 0, 0, .75);--overlay-backdrop: rgba(0, 0, 0, .95);--shadow-sm: 0 2px 8px rgba(0, 0, 0, .1);--shadow-md: 0 10px 30px rgba(0, 0, 0, .2);--shadow-lg: 0 20px 60px rgba(0, 0, 0, .25);--code-bg: #ffffff;--code-text: #000000;--code-line-number: #999999;--code-line-border: #e0e0e0;--code-selection: rgba(173, 214, 255, .4);--syntax-comment: #6a9955;--syntax-keyword: #0000ff;--syntax-string: #a31515;--syntax-number: #098658;--syntax-operator: #000000;--syntax-function: #795e26;--syntax-class: #267f99;--syntax-punctuation: #000000;--tab-bg: #f8f8f8;--tab-text: #666666;--tab-text-hover: #333333;--tab-text-active: #000000;--tab-border-active: #4a9eff;--button-bg: transparent;--button-border: #cccccc;--button-text: #666666;--button-bg-hover: #f0f0f0;--button-border-hover: #999999;--button-text-hover: #333333;--recompile-bg: #e8e8e8;--recompile-text: #333333;--recompile-bg-hover: #d8d8d8;--recompile-bg-active: #c8c8c8;--image-viewer-bg: #f5f5f5;--pane-radius: 8px;--pane-shadow: var(--shadow-lg), var(--shadow-sm)}[data-theme=dark]{--bg-primary: #1a1a1a;--bg-secondary: #252525;--bg-tertiary: #2a2a2a;--bg-canvas: #000000;--text-primary: #ffffff;--text-secondary: #e0e0e0;--text-muted: #a0a0a0;--text-disabled: #666666;--border-primary: #3a3a3a;--border-secondary: #4a4a4a;--accent-primary: #4a9eff;--accent-primary-hover: #5aadff;--accent-primary-active: #3a8eef;--accent-secondary: #9c7cff;--error-bg: #3a1a1a;--error-text: #ff6b6b;--error-border: #5a2a2a;--success-bg: #1a3a1a;--success-text: #6bcf6b;--success-border: #2a5a2a;--overlay-bg: rgba(0, 0, 0, .85);--overlay-backdrop: rgba(0, 0, 0, .98);--shadow-sm: 0 2px 8px rgba(0, 0, 0, .3);--shadow-md: 0 10px 30px rgba(0, 0, 0, .4);--shadow-lg: 0 20px 60px rgba(0, 0, 0, .5);--code-bg: #1e1e1e;--code-text: #d4d4d4;--code-line-number: #858585;--code-line-border: #3a3a3a;--code-selection: rgba(38, 79, 120, .6);--syntax-comment: #6a9955;--syntax-keyword: #569cd6;--syntax-string: #ce9178;--syntax-number: #b5cea8;--syntax-operator: #d4d4d4;--syntax-function: #dcdcaa;--syntax-class: #4ec9b0;--syntax-punctuation: #d4d4d4;--tab-bg: #2a2a2a;--tab-text: #a0a0a0;--tab-text-hover: #d0d0d0;--tab-text-active: #ffffff;--tab-border-active: #4a9eff;--button-bg: transparent;--button-border: #4a4a4a;--button-text: #a0a0a0;--button-bg-hover: #3a3a3a;--button-border-hover: #5a5a5a;--button-text-hover: #e0e0e0;--recompile-bg: #3a3a3a;--recompile-text: #e0e0e0;--recompile-bg-hover: #4a4a4a;--recompile-bg-active: #5a5a5a;--image-viewer-bg: #2a2a2a;--pane-radius: 8px;--pane-shadow: var(--shadow-lg), var(--shadow-sm)}[data-theme=system]{--bg-primary: #f5f5f5;--bg-secondary: #ffffff;--bg-tertiary: #f8f8f8;--bg-canvas: #000000;--text-primary: #000000;--text-secondary: #333333;--text-muted: #666666;--text-disabled: #999999;--border-primary: #e0e0e0;--border-secondary: #cccccc;--accent-primary: #4a9eff;--accent-primary-hover: #3a8eef;--accent-primary-active: #2a7edf;--accent-secondary: #7c4dff;--error-bg: #fff0f0;--error-text: #cc0000;--error-border: #ffcccc;--success-bg: #e8f5e9;--success-text: #4caf50;--success-border: #4caf50;--overlay-bg: rgba(0, 0, 0, .75);--overlay-backdrop: rgba(0, 0, 0, .95);--shadow-sm: 0 2px 8px rgba(0, 0, 0, .1);--shadow-md: 0 10px 30px rgba(0, 0, 0, .2);--shadow-lg: 0 20px 60px rgba(0, 0, 0, .25);--code-bg: #ffffff;--code-text: #000000;--code-line-number: #999999;--code-line-border: #e0e0e0;--code-selection: rgba(173, 214, 255, .4);--syntax-comment: #6a9955;--syntax-keyword: #0000ff;--syntax-string: #a31515;--syntax-number: #098658;--syntax-operator: #000000;--syntax-function: #795e26;--syntax-class: #267f99;--syntax-punctuation: #000000;--tab-bg: #f8f8f8;--tab-text: #666666;--tab-text-hover: #333333;--tab-text-active: #000000;--tab-border-active: #4a9eff;--button-bg: transparent;--button-border: #cccccc;--button-text: #666666;--button-bg-hover: #f0f0f0;--button-border-hover: #999999;--button-text-hover: #333333;--recompile-bg: #e8e8e8;--recompile-text: #333333;--recompile-bg-hover: #d8d8d8;--recompile-bg-active: #c8c8c8;--image-viewer-bg: #f5f5f5;--pane-radius: 8px;--pane-shadow: var(--shadow-lg), var(--shadow-sm)}@media (prefers-color-scheme: dark){[data-theme=system]{--bg-primary: #1a1a1a;--bg-secondary: #252525;--bg-tertiary: #2a2a2a;--bg-canvas: #000000;--text-primary: #ffffff;--text-secondary: #e0e0e0;--text-muted: #a0a0a0;--text-disabled: #666666;--border-primary: #3a3a3a;--border-secondary: #4a4a4a;--accent-primary: #4a9eff;--accent-primary-hover: #5aadff;--accent-primary-active: #3a8eef;--accent-secondary: #9c7cff;--error-bg: #3a1a1a;--error-text: #ff6b6b;--error-border: #5a2a2a;--success-bg: #1a3a1a;--success-text: #6bcf6b;--success-border: #2a5a2a;--overlay-bg: rgba(0, 0, 0, .85);--overlay-backdrop: rgba(0, 0, 0, .98);--shadow-sm: 0 2px 8px rgba(0, 0, 0, .3);--shadow-md: 0 10px 30px rgba(0, 0, 0, .4);--shadow-lg: 0 20px 60px rgba(0, 0, 0, .5);--code-bg: #1e1e1e;--code-text: #d4d4d4;--code-line-number: #858585;--code-line-border: #3a3a3a;--code-selection: rgba(38, 79, 120, .6);--syntax-comment: #6a9955;--syntax-keyword: #569cd6;--syntax-string: #ce9178;--syntax-number: #b5cea8;--syntax-operator: #d4d4d4;--syntax-function: #dcdcaa;--syntax-class: #4ec9b0;--syntax-punctuation: #d4d4d4;--tab-bg: #2a2a2a;--tab-text: #a0a0a0;--tab-text-hover: #d0d0d0;--tab-text-active: #ffffff;--tab-border-active: #4a9eff;--button-bg: transparent;--button-border: #4a4a4a;--button-text: #a0a0a0;--button-bg-hover: #3a3a3a;--button-border-hover: #5a5a5a;--button-text-hover: #e0e0e0;--recompile-bg: #3a3a3a;--recompile-text: #e0e0e0;--recompile-bg-hover: #4a4a4a;--recompile-bg-active: #5a5a5a;--image-viewer-bg: #2a2a2a;--pane-radius: 8px;--pane-shadow: var(--shadow-lg), var(--shadow-sm)}}.unstyled{--pane-radius: 0 !important;--pane-shadow: none !important}:root{--glass-bg: rgba(30, 30, 35, .65);--glass-bg-hover: rgba(30, 30, 35, .8);--glass-border: 1px solid rgba(255, 255, 255, .1);--glass-shadow: 0 4px 16px rgba(0, 0, 0, .25), 0 2px 4px rgba(0, 0, 0, .15), inset 0 1px 0 rgba(255, 255, 255, .1);--glass-shadow-sm: 0 2px 8px rgba(0, 0, 0, .25), inset 0 1px 0 rgba(255, 255, 255, .08);--glass-blur: blur(20px);--glass-radius: 6px;--glass-radius-sm: 6px;--glass-text: rgba(255, 255, 255, .9);--glass-text-muted: rgba(255, 255, 255, .6)}.stats-container{position:absolute;bottom:12px;left:12px;z-index:1000;display:flex;flex-direction:column;align-items:flex-start;gap:6px}.fps-counter{padding:6px 10px;background:var(--glass-bg);color:var(--glass-text);font-family:Monaco,Menlo,Courier New,monospace;font-size:11px;font-weight:500;border-radius:var(--glass-radius-sm);border:var(--glass-border);cursor:pointer;-webkit-user-select:none;user-select:none;backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow-sm);transition:all .2s ease}.fps-counter:hover{background:var(--glass-bg-hover)}.stats-grid{display:flex;flex-direction:row;gap:6px;opacity:0;visibility:hidden;transform:translateY(8px);transition:opacity .2s ease,transform .2s ease,visibility .2s;pointer-events:none}.stats-grid.open{opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto}.stat-item{padding:6px 10px;background:var(--glass-bg);border-radius:var(--glass-radius-sm);border:var(--glass-border);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow-sm);display:flex;flex-direction:column;align-items:center;gap:2px;min-width:48px}.stat-value{color:var(--glass-text);font-family:Monaco,Menlo,Courier New,monospace;font-size:11px;font-weight:600;white-space:nowrap}.stat-label{color:var(--glass-text-muted);font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.5px}.playback-controls{position:absolute;bottom:12px;right:12px;z-index:1000}.controls-menu-button{padding:6px 8px;background:var(--glass-bg);color:var(--glass-text);border:var(--glass-border);border-radius:var(--glass-radius-sm);cursor:pointer;backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow-sm);transition:all .2s ease;display:flex;align-items:center;justify-content:center;width:44px;height:44px;font-size:20px;font-weight:300;line-height:1}.controls-menu-button:hover{background:var(--glass-bg-hover);transform:scale(1.05)}.controls-menu-button:active{transform:scale(.95)}.controls-grid{position:absolute;bottom:0;right:0;display:grid;grid-template-columns:44px 44px 44px 44px;grid-template-rows:44px 44px;gap:6px;opacity:0;visibility:hidden;transform:scale(.8);transform-origin:bottom right;transition:opacity .2s ease,transform .2s ease,visibility .2s;pointer-events:none}.controls-grid.open{opacity:1;visibility:visible;transform:scale(1);pointer-events:auto}.control-button{padding:6px 8px;background:var(--glass-bg);color:var(--glass-text);border:var(--glass-border);border-radius:var(--glass-radius-sm);cursor:pointer;backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow-sm);transition:all .2s ease;display:flex;align-items:center;justify-content:center;width:44px;height:44px}.control-button:hover{background:var(--glass-bg-hover);transform:scale(1.05)}.control-button:active{transform:scale(.95)}.control-button svg{width:16px;height:16px;fill:currentColor}.playback-controls .controls-menu-button{position:relative;z-index:1}.playback-controls.open>.controls-menu-button{opacity:0;pointer-events:none}.shader-error-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:#000000f2;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:2000;padding:60px;overflow-y:auto}.error-overlay-content{background:#1a1a1a;border-radius:6px;max-width:900px;width:100%;display:flex;flex-direction:column;box-shadow:0 20px 60px #000c,0 0 1px #ffffff1a;border:1px solid #2a2a2a;max-height:calc(100vh - 120px)}.error-header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;background:linear-gradient(135deg,#c62828,#b71c1c);color:#fff;border-radius:6px 6px 0 0;border-bottom:1px solid rgba(0,0,0,.3);box-shadow:0 2px 8px #0003}.error-title{font-size:15px;font-weight:600;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;display:flex;align-items:center;gap:8px;letter-spacing:-.01em}.error-close{background:transparent;border:none;color:#ffffffe6;font-size:24px;line-height:1;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all .2s ease;opacity:.8}.error-close:hover{background:#ffffff26;opacity:1;transform:scale(1.05)}.error-body{padding:24px;overflow-y:auto;flex:1}.error-section{margin-bottom:24px}.error-section:last-child{margin-bottom:0}.error-pass-name{font-size:13px;font-weight:600;color:#ffa726;font-family:Monaco,Menlo,Courier New,monospace;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #2a2a2a;letter-spacing:.02em}.error-content{margin:0;padding:14px 16px;background:#0f0f0f;border-radius:4px;color:#ff6b6b;font-size:13px;font-family:Monaco,Menlo,Courier New,monospace;line-height:1.6;overflow-x:auto;border:1px solid #2a2a2a;white-space:pre-wrap;word-break:break-word}.error-code-context{margin:12px 0 0;padding:14px 16px;background:#0d0d0d;border-radius:4px;color:#b0b0b0;font-size:12px;font-family:Monaco,Menlo,Courier New,monospace;line-height:1.6;overflow-x:auto;border:1px solid #2a2a2a;white-space:pre}.error-code-context .context-line{color:#666;display:block}.error-code-context .error-line-highlight{color:#fff;background:#c6282840;display:block;font-weight:600;border-left:3px solid #c62828;margin-left:-16px;padding-left:13px}.context-lost-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:#000000e6;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:3000}.context-lost-content{text-align:center;color:#fff;padding:40px}.context-lost-icon{margin-bottom:16px;opacity:.8}.context-lost-spinner{width:48px;height:48px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;margin:0 auto 16px;animation:context-lost-spin 1s linear infinite}@keyframes context-lost-spin{to{transform:rotate(360deg)}}.context-lost-title{font-size:18px;font-weight:600;margin-bottom:8px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}.context-lost-message{font-size:14px;opacity:.7;margin-bottom:20px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}.context-lost-reload{background:#fff;color:#000;border:none;padding:10px 24px;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;transition:transform .2s,box-shadow .2s;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}.context-lost-reload:hover{transform:scale(1.02);box-shadow:0 4px 12px #fff3}.context-lost-reload:active{transform:scale(.98)}.recording-indicator{position:absolute;top:12px;right:12px;z-index:1000;display:flex;align-items:center;gap:6px;padding:6px 10px;background:#dc2626d9;border-radius:var(--glass-radius-sm);border:1px solid rgba(255,100,100,.3);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow-sm)}.recording-dot{width:8px;height:8px;background:#fff;border-radius:50%;animation:recording-pulse 1s ease-in-out infinite}@keyframes recording-pulse{0%,to{opacity:1}50%{opacity:.4}}.recording-text{color:#fff;font-family:Monaco,Menlo,Courier New,monospace;font-size:11px;font-weight:600;letter-spacing:.5px}.control-button.recording{background:#dc2626b3;border-color:#ff64644d}.control-button.recording:hover{background:#dc2626d9}.control-button.recording svg{fill:#fff}.media-permission-banner{position:absolute;bottom:48px;left:50%;transform:translate(-50%);background:var(--glass-bg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:var(--glass-border);box-shadow:var(--glass-shadow);color:#ffffffe6;padding:8px 16px;border-radius:6px;font-size:13px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;display:flex;align-items:center;gap:12px;z-index:100;white-space:nowrap}.media-banner-button{background:#4a9effcc;color:#fff;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:13px;font-family:inherit}.media-banner-button:hover{background:#4a9eff}.script-error-overlay{position:absolute;bottom:48px;left:12px;right:12px;z-index:1500;pointer-events:auto}.script-error-content{background:#1a1a1a;border-radius:6px;box-shadow:0 8px 32px #0009,0 0 1px #ffffff1a;border:1px solid #2a2a2a;overflow:hidden}.script-error-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:linear-gradient(135deg,#e65100,#bf360c);color:#fff;border-bottom:1px solid rgba(0,0,0,.3)}.script-error-header.disabled{background:linear-gradient(135deg,#6d4c41,#4e342e)}.script-error-header.warning{background:linear-gradient(135deg,#f9a825,#f57f17);color:#1a1a1a}.script-error-header.warning .script-error-close{color:#000000b3}.script-error-header.warning .script-error-close:hover{background:#00000026;color:#000000e6}.script-error-title{font-size:13px;font-weight:600;font-family:Monaco,Menlo,Courier New,monospace;display:flex;align-items:center;gap:6px}.script-error-close{background:transparent;border:none;color:#ffffffe6;font-size:20px;line-height:1;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:4px;opacity:.8;transition:all .2s ease}.script-error-close:hover{background:#ffffff26;opacity:1}.script-error-message{margin:0;padding:10px 14px;color:#ffab91;font-size:12px;font-family:Monaco,Menlo,Courier New,monospace;line-height:1.5;white-space:pre-wrap;word-break:break-word;max-height:80px;overflow-y:auto}.script-error-stack{margin:0;padding:6px 14px 10px;color:#888;font-size:11px;font-family:Monaco,Menlo,Courier New,monospace;line-height:1.4;white-space:pre-wrap;word-break:break-word;max-height:60px;overflow-y:auto;border-top:1px solid #2a2a2a}.script-overlay{position:absolute;z-index:500;padding:6px 10px;background:var(--glass-bg);color:var(--glass-text);font-family:Monaco,Menlo,Courier New,monospace;font-size:11px;border-radius:var(--glass-radius-sm);border:var(--glass-border);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow-sm);pointer-events:none;white-space:pre;max-width:calc(100% - 24px);overflow:hidden;text-overflow:ellipsis}.script-overlay.hidden{display:none}.script-overlay.top-left{top:12px;left:12px}.script-overlay.top-right{top:12px;right:12px}.script-overlay.bottom-left{bottom:12px;left:12px}.script-overlay.bottom-right{bottom:12px;right:12px}@media (prefers-reduced-motion: reduce){*,*:before,*:after{transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}@media (max-width: 428px){.stats-container{bottom:8px;left:8px}.playback-controls{bottom:8px;right:8px}.script-error-overlay{left:8px;right:8px;bottom:40px}.script-overlay.top-left{top:8px;left:8px}.script-overlay.top-right{top:8px;right:8px}.script-overlay.bottom-left{bottom:8px;left:8px}.script-overlay.bottom-right{bottom:8px;right:8px}}.uniforms-panel-wrapper{position:absolute;top:16px;right:16px;z-index:100;display:flex;flex-direction:column;align-items:flex-end}.uniforms-toggle-button{width:44px;height:44px;padding:6px;background:var(--glass-bg);border:var(--glass-border);border-radius:var(--glass-radius-sm);color:var(--glass-text);cursor:pointer;backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow-sm);transition:all .2s ease,opacity .15s ease;display:flex;align-items:center;justify-content:center}.uniforms-toggle-button:hover{background:var(--glass-bg-hover);transform:scale(1.05)}.uniforms-toggle-button:active{transform:scale(.95)}.uniforms-toggle-button svg{width:16px;height:16px}.uniforms-toggle-button.hidden{opacity:0;transform:scale(.8);pointer-events:none;position:absolute}.uniforms-panel{width:175px;max-height:calc(100vh - 100px);background:var(--glass-bg);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-radius:var(--glass-radius);border:var(--glass-border);box-shadow:var(--glass-shadow);overflow:hidden;display:flex;flex-direction:column;transform-origin:top right;transition:opacity .2s ease,transform .2s ease,max-height .2s ease}.uniforms-panel.closed{opacity:0;transform:scale(.25) translate(0);transform-origin:top right;pointer-events:none;max-height:0;padding:0}.uniforms-panel-header{padding:10px 14px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--glass-text-muted);background:#ffffff08;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;display:flex;justify-content:space-between;align-items:center}.uniforms-panel-close{background:transparent;border:none;color:var(--glass-text-muted);font-size:18px;line-height:1;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all .15s ease}.uniforms-panel-close:hover{background:#ffffff1a;color:var(--glass-text)}.uniforms-panel-content{flex:1;overflow-y:auto;overflow-x:hidden}.uniforms-panel .uniform-controls{padding:12px;gap:12px;background:transparent}.uniforms-panel .uniform-controls-header{display:none}.uniforms-panel .uniform-controls-list{gap:14px}.uniforms-panel .uniform-control{gap:6px}.uniforms-panel .uniform-control-label{font-size:11px;color:var(--glass-text)}.uniforms-panel .uniform-control-value{font-size:10px;padding:1px 4px;min-width:40px;color:var(--glass-text-muted);background:#0003;border-radius:3px}.uniforms-panel .uniform-control-slider{height:4px;background:#ffffff26}.uniforms-panel .uniform-control-slider::-webkit-slider-runnable-track{height:4px;background:#ffffff26}.uniforms-panel .uniform-control-slider::-webkit-slider-thumb{width:12px;height:12px;margin-top:-4px;background:#ffffffe6;box-shadow:0 1px 4px #0000004d}.uniforms-panel .uniform-control-slider::-moz-range-track{height:4px;background:#ffffff26}.uniforms-panel .uniform-control-slider::-moz-range-thumb{width:12px;height:12px;background:#ffffffe6;box-shadow:0 1px 4px #0000004d}.uniforms-panel .uniform-control-toggle{width:34px;height:18px}.uniforms-panel .uniform-control-toggle-slider{border-radius:18px}.uniforms-panel .uniform-control-toggle-slider:before{width:12px;height:12px;left:3px;bottom:3px}.uniforms-panel .uniform-control-toggle input:checked+.uniform-control-toggle-slider:before{transform:translate(16px)}.uniforms-panel .uniform-control-xy-pad{height:100px}.uniforms-panel .uniform-control-xy-handle{width:12px;height:12px}.uniforms-panel .uniform-control-color-swatch{height:28px}.uniforms-panel .uniform-control-vec-slider-row{gap:6px}.uniforms-panel .uniform-control-vec-component{font-size:9px;width:12px;color:var(--glass-text-muted)}.uniforms-panel .uniform-control-vec-value{font-size:9px;min-width:32px;color:var(--glass-text-muted);background:#0003;border-radius:3px}.uniforms-panel .uniform-control-xy-pad{background:#00000040;border:1px solid rgba(255,255,255,.1)}.uniforms-panel .uniform-control-xy-handle{background:#ffffffe6;box-shadow:0 1px 4px #0006}.uniforms-panel-content::-webkit-scrollbar{width:6px}.uniforms-panel-content::-webkit-scrollbar-track{background:transparent}.uniforms-panel-content::-webkit-scrollbar-thumb{background:#fff3;border-radius:3px}.uniforms-panel-content::-webkit-scrollbar-thumb:hover{background:#ffffff59}.uniform-controls{display:flex;flex-direction:column;gap:16px;padding:16px;height:100%;overflow-y:auto;background:var(--bg-secondary)}.uniform-controls-empty{color:var(--text-muted);font-size:13px;text-align:center;padding:20px}.uniform-controls-header{display:flex;justify-content:flex-end;padding-bottom:8px;border-bottom:1px solid var(--border-primary);margin-bottom:8px}.uniform-controls-reset{font-family:inherit;font-size:11px;padding:4px 10px;background:var(--bg-tertiary);color:var(--text-secondary);border:1px solid var(--border-primary);border-radius:4px;cursor:pointer;transition:background .15s ease,color .15s ease}.uniform-controls-reset:hover{background:var(--border-primary);color:var(--text-primary)}.uniform-controls-reset:active{transform:translateY(1px)}.uniform-controls-list{display:flex;flex-direction:column;gap:16px}.uniform-control{display:flex;flex-direction:column;gap:8px}.uniform-control-label-row{display:flex;justify-content:space-between;align-items:center}.uniform-control-label{font-family:Monaco,Menlo,Courier New,monospace;font-size:12px;font-weight:500;color:var(--text-primary)}.uniform-control-value{font-family:Monaco,Menlo,Courier New,monospace;font-size:11px;color:var(--text-muted);background:var(--bg-tertiary);padding:2px 6px;border-radius:3px;min-width:50px;text-align:right}.uniform-control-slider{-webkit-appearance:none;-moz-appearance:none;appearance:none;width:100%;height:6px;background:var(--border-primary);border-radius:3px;outline:none;cursor:pointer}.uniform-control-slider::-webkit-slider-runnable-track{height:6px;background:var(--border-primary);border-radius:3px}.uniform-control-slider::-webkit-slider-thumb{-webkit-appearance:none;-moz-appearance:none;appearance:none;width:14px;height:14px;background:var(--accent-primary);border-radius:50%;cursor:pointer;margin-top:-4px;transition:transform .15s ease,box-shadow .15s ease}.uniform-control-slider::-webkit-slider-thumb:hover{transform:scale(1.1);box-shadow:0 2px 6px #0003}.uniform-control-slider::-webkit-slider-thumb:active{transform:scale(.95)}.uniform-control-slider::-moz-range-track{height:6px;background:var(--border-primary);border-radius:3px}.uniform-control-slider::-moz-range-thumb{width:14px;height:14px;background:var(--accent-primary);border:none;border-radius:50%;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease}.uniform-control-slider::-moz-range-thumb:hover{transform:scale(1.1);box-shadow:0 2px 6px #0003}.uniform-control-slider::-moz-range-thumb:active{transform:scale(.95)}.uniform-control-slider:focus{outline:none}.uniform-control-slider:focus::-webkit-slider-thumb{box-shadow:0 0 0 3px var(--code-selection)}.uniform-control-slider:focus::-moz-range-thumb{box-shadow:0 0 0 3px var(--code-selection)}.uniform-control-toggle{position:relative;display:inline-block;width:40px;height:22px;cursor:pointer}.uniform-control-toggle input{opacity:0;width:0;height:0}.uniform-control-toggle-slider{position:absolute;top:0;left:0;right:0;bottom:0;background:var(--border-primary);border-radius:22px;transition:background .2s ease}.uniform-control-toggle-slider:before{content:"";position:absolute;width:16px;height:16px;left:3px;bottom:3px;background:var(--text-muted);border-radius:50%;transition:transform .2s ease,background .2s ease}.uniform-control-toggle input:checked+.uniform-control-toggle-slider{background:var(--accent-primary)}.uniform-control-toggle input:checked+.uniform-control-toggle-slider:before{transform:translate(18px);background:#fff}.uniform-control-toggle input:focus+.uniform-control-toggle-slider{box-shadow:0 0 0 2px var(--code-selection)}.uniform-control-xy-pad{position:relative;width:100%;height:120px;background:var(--bg-tertiary);border:1px solid var(--border-primary);border-radius:4px;cursor:crosshair;overflow:hidden}.uniform-control-xy-pad:before,.uniform-control-xy-pad:after{content:"";position:absolute;background:var(--border-primary);opacity:.5}.uniform-control-xy-pad:before{left:50%;top:0;bottom:0;width:1px}.uniform-control-xy-pad:after{top:50%;left:0;right:0;height:1px}.uniform-control-xy-handle{position:absolute;width:14px;height:14px;background:var(--accent-primary);border:2px solid white;border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 2px 4px #0000004d;pointer-events:none;z-index:1}.uniform-control-color-wrapper{display:flex;align-items:center;gap:8px}.uniform-control-color-swatch{width:100%;height:32px;border-radius:4px;border:1px solid var(--border-primary);cursor:pointer;transition:box-shadow .15s ease}.uniform-control-color-swatch:hover{box-shadow:0 0 0 2px var(--accent-primary)}.uniform-control-color-input{position:absolute;width:0;height:0;opacity:0;pointer-events:none}.uniform-control-vec3{gap:6px}.uniform-control-vec-slider-row{display:flex;align-items:center;gap:8px}.uniform-control-vec-component{font-family:Monaco,Menlo,Courier New,monospace;font-size:10px;font-weight:600;color:var(--text-muted);width:14px;text-align:center}.uniform-control-vec-slider{flex:1}.uniform-control-vec-value{min-width:40px;font-size:10px}.render-dialog-backdrop{position:absolute;top:0;left:0;right:0;bottom:0;background:#000000b3;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:4000}.render-dialog{background:#1a1a1f;border:1px solid rgba(255,255,255,.1);border-radius:10px;box-shadow:0 20px 60px #0009;width:360px;max-width:calc(100% - 32px);overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;color:#e0e0e0}.render-dialog-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:linear-gradient(135deg,#1565c0,#0d47a1);color:#fff;border-bottom:1px solid rgba(0,0,0,.3)}.render-dialog-title{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}.render-dialog-close{background:transparent;border:none;color:#fffc;font-size:20px;line-height:1;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all .15s ease}.render-dialog-close:hover{background:#ffffff26;color:#fff}.render-dialog-body{padding:18px;display:flex;flex-direction:column;gap:14px}.render-field{display:flex;flex-direction:column;gap:5px}.render-field-label{font-size:12px;font-weight:500;color:#fff9;text-transform:uppercase;letter-spacing:.5px}.render-field-row{display:flex;gap:8px;align-items:center}.render-field-row span{color:#fff6;font-size:13px}.render-input{flex:1;background:#0f0f14;border:1px solid rgba(255,255,255,.1);border-radius:5px;color:#e0e0e0;font-family:Monaco,Menlo,monospace;font-size:13px;padding:7px 10px;outline:none;transition:border-color .15s}.render-input:focus{border-color:#648cff80}.render-input[type=number]{-moz-appearance:textfield}.render-input[type=number]::-webkit-inner-spin-button,.render-input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}.render-format-group{display:flex;gap:8px}.render-format-option{flex:1;position:relative}.render-format-option input[type=radio]{position:absolute;opacity:0;pointer-events:none}.render-format-option label{display:block;text-align:center;padding:8px 12px;background:#0f0f14;border:1px solid rgba(255,255,255,.1);border-radius:5px;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s}.render-format-option input[type=radio]:checked+label{background:#648cff26;border-color:#648cff80;color:#8ab4ff}.render-format-option label:hover{border-color:#fff3}.render-estimate{font-size:11px;color:#fff6;font-family:Monaco,Menlo,monospace;text-align:center;padding:4px 0}.render-dialog-actions{display:flex;gap:8px;padding:0 18px 18px}.render-btn{flex:1;padding:9px 16px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s;font-family:inherit}.render-btn-primary{background:linear-gradient(135deg,#1565c0,#0d47a1);color:#fff}.render-btn-primary:hover{filter:brightness(1.1)}.render-btn-primary:disabled{opacity:.5;cursor:not-allowed;filter:none}.render-btn-cancel{background:#ffffff14;color:#ffffffb3;border:1px solid rgba(255,255,255,.1)}.render-btn-cancel:hover{background:#ffffff1f}.render-progress{display:none;flex-direction:column;gap:8px;padding:18px}.render-progress.active{display:flex}.render-progress-bar-bg{height:6px;background:#0f0f14;border-radius:3px;overflow:hidden}.render-progress-bar{height:100%;background:linear-gradient(90deg,#1565c0,#42a5f5);border-radius:3px;width:0%;transition:width .1s ease}.render-progress-text{font-size:12px;color:#ffffff80;font-family:Monaco,Menlo,monospace;text-align:center}.multi-view-controls-wrapper{position:absolute;top:16px;right:16px;z-index:100;display:flex;flex-direction:column;align-items:flex-end}.multi-view-controls-toggle{width:44px;height:44px;padding:6px;background:var(--glass-bg);border:var(--glass-border);border-radius:var(--glass-radius-sm);color:var(--glass-text);cursor:pointer;backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow-sm);transition:all .2s ease,opacity .15s ease;display:flex;align-items:center;justify-content:center}.multi-view-controls-toggle:hover{background:var(--glass-bg-hover);transform:scale(1.05)}.multi-view-controls-toggle:active{transform:scale(.95)}.multi-view-controls-toggle svg{width:16px;height:16px}.multi-view-controls-toggle.hidden{opacity:0;transform:scale(.8);pointer-events:none;position:absolute}.multi-view-controls-panel{width:175px;max-height:calc(100vh - 100px);background:var(--glass-bg);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-radius:var(--glass-radius);border:var(--glass-border);box-shadow:var(--glass-shadow);overflow:hidden;display:flex;flex-direction:column;transform-origin:top right;transition:opacity .2s ease,transform .2s ease,max-height .2s ease}.multi-view-controls-panel.closed{opacity:0;transform:scale(.25) translate(0);transform-origin:top right;pointer-events:none;max-height:0;padding:0}.multi-view-controls-header{padding:10px 14px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--glass-text-muted);background:#ffffff08;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;display:flex;justify-content:space-between;align-items:center}.multi-view-controls-close{background:transparent;border:none;color:var(--glass-text-muted);font-size:18px;line-height:1;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all .15s ease}.multi-view-controls-close:hover{background:#ffffff1a;color:var(--glass-text)}.controls-section{display:flex;flex-direction:column;gap:8px;padding:12px}.controls-section+.controls-section{padding-top:0}.section-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--glass-text-muted);padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:4px}.playback-controls{flex-direction:row;gap:8px;padding:12px}.control-btn{width:44px;height:44px;border:none;border-radius:var(--glass-radius-sm);background:#ffffff1a;color:var(--glass-text);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s ease}.control-btn:hover{background:#fff3}.control-btn:active{transform:scale(.95)}.control-btn svg{width:16px;height:16px}.uniforms-section{border-top:1px solid rgba(255,255,255,.06)}.uniforms-container{display:flex;flex-direction:column;gap:8px}.multi-view-controls-panel .uniform-controls{padding:0;gap:12px;background:transparent}.multi-view-controls-panel .uniform-controls-header{display:none}.multi-view-controls-panel .uniform-controls-list{gap:14px}.multi-view-controls-panel .uniform-control{gap:6px}.multi-view-controls-panel .uniform-control-label{font-size:11px;color:var(--glass-text)}.multi-view-controls-panel .uniform-control-value{font-size:10px;padding:1px 4px;min-width:40px;color:var(--glass-text-muted);background:#0003;border-radius:3px}.multi-view-controls-panel .uniform-control-slider{height:4px;background:#ffffff26}.multi-view-controls-panel .uniform-control-slider::-webkit-slider-runnable-track{height:4px;background:#ffffff26}.multi-view-controls-panel .uniform-control-slider::-webkit-slider-thumb{width:12px;height:12px;margin-top:-4px;background:#ffffffe6;box-shadow:0 1px 4px #0000004d}.multi-view-controls-panel .uniform-control-slider::-moz-range-track{height:4px;background:#ffffff26}.multi-view-controls-panel .uniform-control-slider::-moz-range-thumb{width:12px;height:12px;background:#ffffffe6;box-shadow:0 1px 4px #0000004d}.multi-view-controls-panel .uniform-control-toggle{width:34px;height:18px}.multi-view-controls-panel .uniform-control-toggle-slider{border-radius:18px}.multi-view-controls-panel .uniform-control-toggle-slider:before{width:12px;height:12px;left:3px;bottom:3px}.multi-view-controls-panel .uniform-control-toggle input:checked+.uniform-control-toggle-slider:before{transform:translate(16px)}.layout-fullscreen{width:100%;height:100%}.layout-fullscreen .canvas-container{position:relative;width:100%;height:100%;background:#000}.layout-default{width:100%;height:100%}.layout-default .canvas-container{position:relative;width:100%;height:100%;background:var(--bg-canvas);border-radius:var(--pane-radius);box-shadow:var(--pane-shadow);overflow:hidden}.layout-split{width:100%;height:100%;display:flex;gap:24px}.layout-split .canvas-container{position:relative;flex:1;background:var(--bg-canvas);border-radius:var(--pane-radius);box-shadow:var(--pane-shadow);overflow:hidden}.layout-split .code-panel{position:relative;flex:1;display:flex;flex-direction:column;background:var(--bg-secondary);border-radius:var(--pane-radius);box-shadow:var(--pane-shadow);overflow:hidden}.tab-bar{display:flex;background:var(--tab-bg);border-bottom:1px solid var(--border-primary);padding:8px 8px 0;gap:4px}.tab-button{padding:8px 16px;background:transparent;border:none;border-radius:6px 6px 0 0;font-size:13px;font-family:Monaco,Menlo,Courier New,monospace;cursor:pointer;transition:background .2s,color .2s;color:var(--tab-text)}.tab-button:hover{background:var(--button-bg-hover);color:var(--tab-text-hover)}.tab-button.active{background:var(--bg-secondary);color:var(--tab-text-active);font-weight:500}.copy-button{position:absolute;top:12px;right:12px;padding:6px;background:var(--button-bg);border:none;border-radius:4px;color:var(--button-text);cursor:pointer;transition:all .2s;z-index:10;display:flex;align-items:center;justify-content:center}.copy-button:hover{background:var(--button-bg-hover);color:var(--button-text-hover)}.copy-button:active{transform:scale(.9)}.copy-button.copied{color:var(--success-text)}.code-viewer{flex:1;min-height:0;overflow:auto;position:relative;background:var(--code-bg)}.code-viewer pre{margin:0;padding:16px;font-size:13px;line-height:1.5;font-family:Monaco,Menlo,Courier New,monospace;background:var(--code-bg);color:var(--code-text)}.code-viewer code{font-family:inherit;font-size:inherit}.token.comment{color:var(--syntax-comment)}.token.keyword{color:var(--syntax-keyword)}.token.string{color:var(--syntax-string)}.token.number{color:var(--syntax-number)}.token.operator{color:var(--syntax-operator)}.token.function{color:var(--syntax-function)}.token.class-name{color:var(--syntax-class)}.token.punctuation{color:var(--syntax-punctuation)}.tab-button.image-tab,.tab-button.image-tab.active{color:var(--accent-secondary)}.image-viewer{display:flex;align-items:center;justify-content:center;height:100%;padding:16px;background:var(--image-viewer-bg)}.image-viewer img{max-width:100%;max-height:100%;object-fit:contain;border-radius:4px;box-shadow:var(--shadow-sm)}@media (max-width: 800px){.layout-split{flex-direction:column}}.layout-tabbed{width:100%;height:100%;display:flex;flex-direction:column;box-sizing:border-box}.tabbed-wrapper{display:flex;flex-direction:column;width:100%;height:100%;border-radius:var(--pane-radius);box-shadow:var(--pane-shadow);overflow:hidden}.tabbed-toolbar{display:flex;align-items:center;flex-shrink:0;background:var(--tab-bg);border-bottom:1px solid var(--border-primary);padding-right:8px}.tabbed-tab-bar{display:flex;flex:1;gap:4px;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin}.tabbed-tab-bar::-webkit-scrollbar{height:4px}.tabbed-tab-bar::-webkit-scrollbar-thumb{background:var(--border-secondary);border-radius:2px}.tabbed-tab-button{padding:10px 16px;background:transparent;border:none;border-bottom:2px solid transparent;font-size:12px;font-family:Monaco,Menlo,Courier New,monospace;cursor:pointer;transition:color .15s,border-color .15s;color:var(--tab-text);white-space:nowrap;flex-shrink:0}.tabbed-tab-button:hover{color:var(--tab-text-hover)}.tabbed-tab-button.active{color:var(--tab-text-active);border-bottom-color:var(--tab-border-active)}.tabbed-tab-button.shader-tab{font-family:system-ui,-apple-system,sans-serif}.tabbed-tab-button.image-tab{color:var(--accent-secondary)}.tabbed-tab-button.image-tab.active{color:var(--accent-secondary);border-bottom-color:var(--accent-secondary)}.tabbed-tab-button.uniforms-tab{color:var(--accent-tertiary, var(--accent-primary));padding:8px 12px}.tabbed-tab-button.uniforms-tab.active{color:var(--accent-tertiary, var(--accent-primary));border-bottom-color:var(--accent-tertiary, var(--accent-primary))}.tabbed-tab-button .uniforms-icon{width:18px;height:18px;display:block}.tabbed-content{flex:1;min-height:0;position:relative;background:var(--bg-canvas);overflow:hidden}.tabbed-canvas-container{position:absolute;top:0;left:0;width:100%;height:100%}.tabbed-code-viewer{position:absolute;top:0;left:0;width:100%;height:100%;overflow:auto;background:var(--code-bg)}.tabbed-code-viewer pre{margin:0;padding:16px 16px 16px 0;font-size:13px;line-height:1.6;font-family:Monaco,Menlo,Courier New,monospace;background:var(--code-bg);color:var(--code-text);display:flex}.tabbed-code-viewer code{font-family:inherit;font-size:inherit}.tabbed-line-numbers{text-align:right;padding-right:16px;margin-right:16px;border-right:1px solid var(--code-line-border);color:var(--code-line-number);-webkit-user-select:none;user-select:none;flex-shrink:0;padding-left:16px}.tabbed-code-content{flex:1;overflow-x:auto}.tabbed-image-viewer{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--image-viewer-bg);padding:20px;box-sizing:border-box}.tabbed-image-viewer img{max-width:100%;max-height:100%;object-fit:contain;border-radius:4px;box-shadow:var(--shadow-sm)}.tabbed-code-viewer .token.comment{color:var(--syntax-comment)}.tabbed-code-viewer .token.keyword{color:var(--syntax-keyword)}.tabbed-code-viewer .token.string{color:var(--syntax-string)}.tabbed-code-viewer .token.number{color:var(--syntax-number)}.tabbed-code-viewer .token.operator{color:var(--syntax-operator)}.tabbed-code-viewer .token.function{color:var(--syntax-function)}.tabbed-code-viewer .token.class-name{color:var(--syntax-class)}.tabbed-code-viewer .token.punctuation{color:var(--syntax-punctuation)}@media (max-width: 600px){.tabbed-tab-button{padding:8px 12px;font-size:12px}}.tabbed-editor-container{position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden;background:var(--code-bg)}.tabbed-button-container{display:flex;align-items:center;gap:6px;flex-shrink:0}.tabbed-copy-button{display:flex;align-items:center;justify-content:center;background:var(--button-bg);border:1px solid var(--button-border);color:var(--button-text);width:44px;height:44px;border-radius:4px;cursor:pointer;transition:background .15s,border-color .15s,color .15s}.tabbed-copy-button:hover{background:var(--button-bg-hover);border-color:var(--button-border-hover);color:var(--button-text-hover)}.tabbed-copy-button:active{background:var(--button-bg-hover)}.tabbed-copy-button.copied{background:var(--success-bg);border-color:var(--success-border);color:var(--success-text)}.tabbed-recompile-button{display:flex;align-items:center;gap:6px;background:var(--recompile-bg);border:none;color:var(--recompile-text);padding:6px 12px;border-radius:4px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;transition:background .15s,color .15s}.tabbed-recompile-button:hover{background:var(--recompile-bg-hover)}.tabbed-recompile-button:active{background:var(--recompile-bg-active)}.tabbed-recompile-button svg{flex-shrink:0}.tabbed-error-display{position:absolute;bottom:0;left:0;right:0;background:var(--error-bg);color:var(--error-text);padding:10px 14px;font-family:Monaco,Menlo,Courier New,monospace;font-size:12px;white-space:pre-wrap;overflow:auto;max-height:120px;border-top:1px solid var(--error-border);z-index:10}.tabbed-fallback-textarea{width:100%;height:100%;background:var(--code-bg);color:var(--code-text);border:none;padding:12px;font-family:Monaco,Menlo,Courier New,monospace;font-size:13px;resize:none;outline:none}.tabbed-uniforms-container{position:absolute;top:0;left:0;width:100%;height:100%;overflow-y:auto;background:#00000080;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:flex;justify-content:center;padding:20px;box-sizing:border-box}.tabbed-uniforms-container .uniform-controls{max-width:400px;width:100%;background:#1e1e23f2;border-radius:12px;padding:20px;box-shadow:0 4px 20px #0006;height:fit-content}.tabbed-uniforms-container .uniform-control-label{color:#e0e0e0}.tabbed-uniforms-container .uniform-control-value{color:#a0a0a0;background:#0000004d}.tabbed-uniforms-container .uniform-controls-header{color:#909090;border-bottom-color:#ffffff1a}.tabbed-uniforms-container .uniform-control-slider{background:#ffffff1a}.tabbed-uniforms-container .uniform-control-slider::-webkit-slider-thumb{background:#fff}.tabbed-uniforms-container .uniform-control-slider::-moz-range-thumb{background:#fff}.tabbed-uniforms-container .uniform-control-vec-component{color:#909090}.tabbed-uniforms-container .uniform-control-vec-value{color:#a0a0a0;background:#0000004d}.layout-multi-view{position:relative;width:100%;height:100%;box-sizing:border-box;background:var(--bg-primary)}.multi-view-canvas{position:relative;background:var(--bg-canvas);border-radius:var(--pane-radius);box-shadow:var(--pane-shadow);overflow:hidden}.multi-view-label{position:absolute;top:12px;left:12px;padding:4px 10px;background:#0009;color:#fff;font-family:var(--font-mono);font-size:12px;font-weight:500;border-radius:4px;text-transform:capitalize;z-index:5;pointer-events:none}.multi-view-info{position:absolute;bottom:12px;left:12px;padding:6px 10px;background:#0009;color:#fff;font-family:var(--font-mono);font-size:11px;border-radius:4px;z-index:5;pointer-events:none}.layout-grid-view{display:grid;gap:16px}.layout-grid-view .multi-view-canvas{min-height:0;min-width:0}.layout-grid-view[data-view-count="2"].grid-horizontal{grid-template-columns:1fr 1fr;grid-template-rows:1fr}.layout-grid-view[data-view-count="2"].grid-vertical{grid-template-columns:1fr;grid-template-rows:1fr 1fr}.layout-grid-view[data-view-count="3"].grid-horizontal{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}.layout-grid-view[data-view-count="3"].grid-horizontal .multi-view-canvas:last-child{grid-column:1 / -1}.layout-grid-view[data-view-count="3"].grid-vertical{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}.layout-grid-view[data-view-count="3"].grid-vertical .multi-view-canvas:first-child{grid-column:1 / -1}.layout-grid-view[data-view-count="4"]{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}.layout-inset-view .multi-view-canvas.inset-main{width:100%;height:100%}.layout-inset-view .multi-view-canvas.inset-overlay{position:absolute;bottom:40px;right:40px;width:25%;min-width:200px;aspect-ratio:16 / 9;z-index:10;transition:all .2s ease}.layout-inset-view .multi-view-canvas.inset-overlay.minimized{width:48px;height:48px;min-width:unset;aspect-ratio:unset;cursor:pointer;opacity:.8}.layout-inset-view .multi-view-canvas.inset-overlay.minimized:hover{opacity:1}.inset-minimize-btn{position:absolute;top:8px;right:8px;width:24px;height:24px;border:none;border-radius:4px;background:#00000080;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;z-index:11;transition:background .2s}.inset-minimize-btn:hover{background:#000000b3}.editor-toolbar{display:flex;align-items:center;background:var(--tab-bg);border-bottom:1px solid var(--border-primary);padding-right:8px}.editor-tab-bar{display:flex;flex:1;overflow-x:auto;scrollbar-width:thin}.editor-tab-button{background:transparent;border:none;color:var(--tab-text);padding:10px 16px;cursor:pointer;font-family:Monaco,Menlo,Courier New,monospace;font-size:12px;white-space:nowrap;border-bottom:2px solid transparent;transition:color .15s,border-color .15s}.editor-tab-button:hover{color:var(--tab-text-hover)}.editor-tab-button.active{color:var(--tab-text-active);border-bottom-color:var(--tab-border-active)}.editor-tab-button.image-tab{color:var(--accent-secondary)}.editor-tab-button.image-tab.active{color:var(--accent-secondary);border-bottom-color:var(--accent-secondary)}.editor-tab-button.uniforms-tab{color:var(--accent-tertiary, var(--accent-primary));padding:8px 12px}.editor-tab-button.uniforms-tab.active{color:var(--accent-tertiary, var(--accent-primary));border-bottom-color:var(--accent-tertiary, var(--accent-primary))}.editor-tab-button .uniforms-icon{width:18px;height:18px;display:block}.editor-copy-button{display:flex;align-items:center;justify-content:center;background:var(--button-bg);border:1px solid var(--button-border);color:var(--button-text);width:32px;height:32px;border-radius:4px;cursor:pointer;transition:background .15s,border-color .15s,color .15s;flex-shrink:0;margin-right:6px}.editor-copy-button:hover{background:var(--button-bg-hover);border-color:var(--button-border-hover);color:var(--button-text-hover)}.editor-copy-button:active{background:var(--button-bg-hover)}.editor-copy-button.copied{background:var(--success-bg);border-color:var(--success-border);color:var(--success-text)}.editor-copy-button svg{flex-shrink:0}.editor-recompile-button{display:flex;align-items:center;gap:6px;background:var(--recompile-bg);border:none;color:var(--recompile-text);padding:6px 12px;border-radius:4px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;transition:background .15s,color .15s;flex-shrink:0}.editor-recompile-button:hover{background:var(--recompile-bg-hover)}.editor-recompile-button:active{background:var(--recompile-bg-active)}.editor-recompile-button svg{flex-shrink:0}.editor-content-area{flex:1;overflow:hidden;position:relative;background:var(--code-bg)}.editor-prism-container{height:100%;width:100%}.editor-fallback-textarea{width:100%;height:100%;background:var(--code-bg);color:var(--code-text);border:none;padding:12px;font-family:Monaco,Menlo,Courier New,monospace;font-size:13px;resize:none;outline:none}.editor-image-viewer{display:flex;align-items:center;justify-content:center;height:100%;background:var(--image-viewer-bg);padding:20px}.editor-uniforms-container{height:100%;overflow-y:auto;background:var(--bg-secondary)}.editor-image-viewer img{max-width:100%;max-height:100%;object-fit:contain;border-radius:4px;box-shadow:var(--shadow-sm)}.editor-error-display{background:var(--error-bg);color:var(--error-text);padding:10px 14px;font-family:Monaco,Menlo,Courier New,monospace;font-size:12px;white-space:pre-wrap;overflow:auto;max-height:120px;border-top:1px solid var(--error-border)}.prism-editor-wrapper{display:flex;height:100%;background:var(--code-bg);font-family:Monaco,Menlo,Courier New,monospace;font-size:13px;line-height:1.6}.prism-editor-line-numbers{flex-shrink:0;padding:16px 12px 16px 16px;text-align:right;color:var(--code-line-number);border-right:1px solid var(--code-line-border);-webkit-user-select:none;user-select:none;overflow:hidden}.prism-editor-line-numbers span{display:block}.prism-editor-area{flex:1;position:relative;overflow:hidden}.prism-editor-textarea,.prism-editor-highlight{position:absolute;top:0;left:0;width:100%;height:100%;padding:16px;margin:0;border:none;outline:none;font-family:inherit;font-size:inherit;line-height:inherit;white-space:pre-wrap;word-wrap:break-word;overflow:auto;box-sizing:border-box}.prism-editor-textarea{background:transparent;color:transparent;caret-color:var(--code-text);resize:none;z-index:1;-webkit-text-fill-color:transparent}.prism-editor-textarea::selection{background:var(--code-selection)}.prism-editor-textarea::-moz-selection{background:var(--code-selection)}.prism-editor-highlight{background:var(--code-bg);color:var(--code-text);pointer-events:none;z-index:0}.prism-editor-highlight code{font-family:inherit;font-size:inherit;background:none;padding:0}.prism-editor-highlight .token.comment{color:var(--syntax-comment)}.prism-editor-highlight .token.keyword{color:var(--syntax-keyword)}.prism-editor-highlight .token.string{color:var(--syntax-string)}.prism-editor-highlight .token.number{color:var(--syntax-number)}.prism-editor-highlight .token.operator{color:var(--syntax-operator)}.prism-editor-highlight .token.function{color:var(--syntax-function)}.prism-editor-highlight .token.class-name{color:var(--syntax-class)}.prism-editor-highlight .token.punctuation{color:var(--syntax-punctuation)}')),document.head.appendChild(o)}}catch(r){console.error("vite-plugin-css-injected-by-js",r)}})();
-function A(i) {
+(function(){"use strict";try{if(typeof document<"u"){var o=document.createElement("style");o.appendChild(document.createTextNode(':root,[data-theme=light]{--bg-primary: #f5f5f5;--bg-secondary: #ffffff;--bg-tertiary: #f8f8f8;--bg-canvas: #000000;--text-primary: #000000;--text-secondary: #333333;--text-muted: #666666;--text-disabled: #999999;--border-primary: #e0e0e0;--border-secondary: #cccccc;--accent-primary: #4a9eff;--accent-primary-hover: #3a8eef;--accent-primary-active: #2a7edf;--accent-secondary: #7c4dff;--error-bg: #fff0f0;--error-text: #cc0000;--error-border: #ffcccc;--success-bg: #e8f5e9;--success-text: #4caf50;--success-border: #4caf50;--overlay-bg: rgba(0, 0, 0, .75);--overlay-backdrop: rgba(0, 0, 0, .95);--shadow-sm: 0 2px 8px rgba(0, 0, 0, .1);--shadow-md: 0 10px 30px rgba(0, 0, 0, .2);--shadow-lg: 0 20px 60px rgba(0, 0, 0, .25);--code-bg: #ffffff;--code-text: #000000;--code-line-number: #999999;--code-line-border: #e0e0e0;--code-selection: rgba(173, 214, 255, .4);--syntax-comment: #6a9955;--syntax-keyword: #0000ff;--syntax-string: #a31515;--syntax-number: #098658;--syntax-operator: #000000;--syntax-function: #795e26;--syntax-class: #267f99;--syntax-punctuation: #000000;--tab-bg: #f8f8f8;--tab-text: #666666;--tab-text-hover: #333333;--tab-text-active: #000000;--tab-border-active: #4a9eff;--button-bg: transparent;--button-border: #cccccc;--button-text: #666666;--button-bg-hover: #f0f0f0;--button-border-hover: #999999;--button-text-hover: #333333;--recompile-bg: #e8e8e8;--recompile-text: #333333;--recompile-bg-hover: #d8d8d8;--recompile-bg-active: #c8c8c8;--image-viewer-bg: #f5f5f5;--pane-radius: 8px;--pane-shadow: var(--shadow-lg), var(--shadow-sm)}[data-theme=dark]{--bg-primary: #1a1a1a;--bg-secondary: #252525;--bg-tertiary: #2a2a2a;--bg-canvas: #000000;--text-primary: #ffffff;--text-secondary: #e0e0e0;--text-muted: #a0a0a0;--text-disabled: #666666;--border-primary: #3a3a3a;--border-secondary: #4a4a4a;--accent-primary: #4a9eff;--accent-primary-hover: #5aadff;--accent-primary-active: #3a8eef;--accent-secondary: #9c7cff;--error-bg: #3a1a1a;--error-text: #ff6b6b;--error-border: #5a2a2a;--success-bg: #1a3a1a;--success-text: #6bcf6b;--success-border: #2a5a2a;--overlay-bg: rgba(0, 0, 0, .85);--overlay-backdrop: rgba(0, 0, 0, .98);--shadow-sm: 0 2px 8px rgba(0, 0, 0, .3);--shadow-md: 0 10px 30px rgba(0, 0, 0, .4);--shadow-lg: 0 20px 60px rgba(0, 0, 0, .5);--code-bg: #1e1e1e;--code-text: #d4d4d4;--code-line-number: #858585;--code-line-border: #3a3a3a;--code-selection: rgba(38, 79, 120, .6);--syntax-comment: #6a9955;--syntax-keyword: #569cd6;--syntax-string: #ce9178;--syntax-number: #b5cea8;--syntax-operator: #d4d4d4;--syntax-function: #dcdcaa;--syntax-class: #4ec9b0;--syntax-punctuation: #d4d4d4;--tab-bg: #2a2a2a;--tab-text: #a0a0a0;--tab-text-hover: #d0d0d0;--tab-text-active: #ffffff;--tab-border-active: #4a9eff;--button-bg: transparent;--button-border: #4a4a4a;--button-text: #a0a0a0;--button-bg-hover: #3a3a3a;--button-border-hover: #5a5a5a;--button-text-hover: #e0e0e0;--recompile-bg: #3a3a3a;--recompile-text: #e0e0e0;--recompile-bg-hover: #4a4a4a;--recompile-bg-active: #5a5a5a;--image-viewer-bg: #2a2a2a;--pane-radius: 8px;--pane-shadow: var(--shadow-lg), var(--shadow-sm)}[data-theme=system]{--bg-primary: #f5f5f5;--bg-secondary: #ffffff;--bg-tertiary: #f8f8f8;--bg-canvas: #000000;--text-primary: #000000;--text-secondary: #333333;--text-muted: #666666;--text-disabled: #999999;--border-primary: #e0e0e0;--border-secondary: #cccccc;--accent-primary: #4a9eff;--accent-primary-hover: #3a8eef;--accent-primary-active: #2a7edf;--accent-secondary: #7c4dff;--error-bg: #fff0f0;--error-text: #cc0000;--error-border: #ffcccc;--success-bg: #e8f5e9;--success-text: #4caf50;--success-border: #4caf50;--overlay-bg: rgba(0, 0, 0, .75);--overlay-backdrop: rgba(0, 0, 0, .95);--shadow-sm: 0 2px 8px rgba(0, 0, 0, .1);--shadow-md: 0 10px 30px rgba(0, 0, 0, .2);--shadow-lg: 0 20px 60px rgba(0, 0, 0, .25);--code-bg: #ffffff;--code-text: #000000;--code-line-number: #999999;--code-line-border: #e0e0e0;--code-selection: rgba(173, 214, 255, .4);--syntax-comment: #6a9955;--syntax-keyword: #0000ff;--syntax-string: #a31515;--syntax-number: #098658;--syntax-operator: #000000;--syntax-function: #795e26;--syntax-class: #267f99;--syntax-punctuation: #000000;--tab-bg: #f8f8f8;--tab-text: #666666;--tab-text-hover: #333333;--tab-text-active: #000000;--tab-border-active: #4a9eff;--button-bg: transparent;--button-border: #cccccc;--button-text: #666666;--button-bg-hover: #f0f0f0;--button-border-hover: #999999;--button-text-hover: #333333;--recompile-bg: #e8e8e8;--recompile-text: #333333;--recompile-bg-hover: #d8d8d8;--recompile-bg-active: #c8c8c8;--image-viewer-bg: #f5f5f5;--pane-radius: 8px;--pane-shadow: var(--shadow-lg), var(--shadow-sm)}@media (prefers-color-scheme: dark){[data-theme=system]{--bg-primary: #1a1a1a;--bg-secondary: #252525;--bg-tertiary: #2a2a2a;--bg-canvas: #000000;--text-primary: #ffffff;--text-secondary: #e0e0e0;--text-muted: #a0a0a0;--text-disabled: #666666;--border-primary: #3a3a3a;--border-secondary: #4a4a4a;--accent-primary: #4a9eff;--accent-primary-hover: #5aadff;--accent-primary-active: #3a8eef;--accent-secondary: #9c7cff;--error-bg: #3a1a1a;--error-text: #ff6b6b;--error-border: #5a2a2a;--success-bg: #1a3a1a;--success-text: #6bcf6b;--success-border: #2a5a2a;--overlay-bg: rgba(0, 0, 0, .85);--overlay-backdrop: rgba(0, 0, 0, .98);--shadow-sm: 0 2px 8px rgba(0, 0, 0, .3);--shadow-md: 0 10px 30px rgba(0, 0, 0, .4);--shadow-lg: 0 20px 60px rgba(0, 0, 0, .5);--code-bg: #1e1e1e;--code-text: #d4d4d4;--code-line-number: #858585;--code-line-border: #3a3a3a;--code-selection: rgba(38, 79, 120, .6);--syntax-comment: #6a9955;--syntax-keyword: #569cd6;--syntax-string: #ce9178;--syntax-number: #b5cea8;--syntax-operator: #d4d4d4;--syntax-function: #dcdcaa;--syntax-class: #4ec9b0;--syntax-punctuation: #d4d4d4;--tab-bg: #2a2a2a;--tab-text: #a0a0a0;--tab-text-hover: #d0d0d0;--tab-text-active: #ffffff;--tab-border-active: #4a9eff;--button-bg: transparent;--button-border: #4a4a4a;--button-text: #a0a0a0;--button-bg-hover: #3a3a3a;--button-border-hover: #5a5a5a;--button-text-hover: #e0e0e0;--recompile-bg: #3a3a3a;--recompile-text: #e0e0e0;--recompile-bg-hover: #4a4a4a;--recompile-bg-active: #5a5a5a;--image-viewer-bg: #2a2a2a;--pane-radius: 8px;--pane-shadow: var(--shadow-lg), var(--shadow-sm)}}.unstyled{--pane-radius: 0 !important;--pane-shadow: none !important}:root{--glass-bg: rgba(30, 30, 35, .65);--glass-bg-hover: rgba(30, 30, 35, .8);--glass-border: 1px solid rgba(255, 255, 255, .1);--glass-shadow: 0 4px 16px rgba(0, 0, 0, .25), 0 2px 4px rgba(0, 0, 0, .15), inset 0 1px 0 rgba(255, 255, 255, .1);--glass-shadow-sm: 0 2px 8px rgba(0, 0, 0, .25), inset 0 1px 0 rgba(255, 255, 255, .08);--glass-blur: blur(20px);--glass-radius: 6px;--glass-radius-sm: 6px;--glass-text: rgba(255, 255, 255, .9);--glass-text-muted: rgba(255, 255, 255, .6)}.stats-container{position:absolute;bottom:12px;left:12px;z-index:1000;display:flex;flex-direction:column;align-items:flex-start;gap:6px}.fps-counter{padding:6px 10px;background:var(--glass-bg);color:var(--glass-text);font-family:Monaco,Menlo,Courier New,monospace;font-size:11px;font-weight:500;border-radius:var(--glass-radius-sm);border:var(--glass-border);cursor:pointer;-webkit-user-select:none;user-select:none;backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow-sm);transition:all .2s ease}.fps-counter:hover{background:var(--glass-bg-hover)}.stats-grid{display:flex;flex-direction:row;gap:6px;opacity:0;visibility:hidden;transform:translateY(8px);transition:opacity .2s ease,transform .2s ease,visibility .2s;pointer-events:none}.stats-grid.open{opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto}.stat-item{padding:6px 10px;background:var(--glass-bg);border-radius:var(--glass-radius-sm);border:var(--glass-border);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow-sm);display:flex;flex-direction:column;align-items:center;gap:2px;min-width:48px}.stat-value{color:var(--glass-text);font-family:Monaco,Menlo,Courier New,monospace;font-size:11px;font-weight:600;white-space:nowrap}.stat-label{color:var(--glass-text-muted);font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.5px}.playback-controls{position:absolute;bottom:12px;right:12px;z-index:1000}.controls-menu-button{padding:6px 8px;background:var(--glass-bg);color:var(--glass-text);border:var(--glass-border);border-radius:var(--glass-radius-sm);cursor:pointer;backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow-sm);transition:all .2s ease;display:flex;align-items:center;justify-content:center;width:44px;height:44px;font-size:20px;font-weight:300;line-height:1}.controls-menu-button:hover{background:var(--glass-bg-hover);transform:scale(1.05)}.controls-menu-button:active{transform:scale(.95)}.controls-grid{position:absolute;bottom:0;right:0;display:grid;grid-template-columns:44px 44px 44px 44px;grid-template-rows:44px 44px;gap:6px;opacity:0;visibility:hidden;transform:scale(.8);transform-origin:bottom right;transition:opacity .2s ease,transform .2s ease,visibility .2s;pointer-events:none}.controls-grid.open{opacity:1;visibility:visible;transform:scale(1);pointer-events:auto}.control-button{padding:6px 8px;background:var(--glass-bg);color:var(--glass-text);border:var(--glass-border);border-radius:var(--glass-radius-sm);cursor:pointer;backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow-sm);transition:all .2s ease;display:flex;align-items:center;justify-content:center;width:44px;height:44px}.control-button:hover{background:var(--glass-bg-hover);transform:scale(1.05)}.control-button:active{transform:scale(.95)}.control-button svg{width:16px;height:16px;fill:currentColor}.playback-controls .controls-menu-button{position:relative;z-index:1}.playback-controls.open>.controls-menu-button{opacity:0;pointer-events:none}.shader-error-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:#000000f2;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:2000;padding:60px;overflow-y:auto}.error-overlay-content{background:#1a1a1a;border-radius:6px;max-width:900px;width:100%;display:flex;flex-direction:column;box-shadow:0 20px 60px #000c,0 0 1px #ffffff1a;border:1px solid #2a2a2a;max-height:calc(100vh - 120px)}.error-header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;background:linear-gradient(135deg,#c62828,#b71c1c);color:#fff;border-radius:6px 6px 0 0;border-bottom:1px solid rgba(0,0,0,.3);box-shadow:0 2px 8px #0003}.error-title{font-size:15px;font-weight:600;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;display:flex;align-items:center;gap:8px;letter-spacing:-.01em}.error-close{background:transparent;border:none;color:#ffffffe6;font-size:24px;line-height:1;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all .2s ease;opacity:.8}.error-close:hover{background:#ffffff26;opacity:1;transform:scale(1.05)}.error-body{padding:24px;overflow-y:auto;flex:1}.error-section{margin-bottom:24px}.error-section:last-child{margin-bottom:0}.error-pass-name{font-size:13px;font-weight:600;color:#ffa726;font-family:Monaco,Menlo,Courier New,monospace;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #2a2a2a;letter-spacing:.02em}.error-content{margin:0;padding:14px 16px;background:#0f0f0f;border-radius:4px;color:#ff6b6b;font-size:13px;font-family:Monaco,Menlo,Courier New,monospace;line-height:1.6;overflow-x:auto;border:1px solid #2a2a2a;white-space:pre-wrap;word-break:break-word}.error-code-context{margin:12px 0 0;padding:14px 16px;background:#0d0d0d;border-radius:4px;color:#b0b0b0;font-size:12px;font-family:Monaco,Menlo,Courier New,monospace;line-height:1.6;overflow-x:auto;border:1px solid #2a2a2a;white-space:pre}.error-code-context .context-line{color:#666;display:block}.error-code-context .error-line-highlight{color:#fff;background:#c6282840;display:block;font-weight:600;border-left:3px solid #c62828;margin-left:-16px;padding-left:13px}.context-lost-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:#000000e6;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:3000}.context-lost-content{text-align:center;color:#fff;padding:40px}.context-lost-icon{margin-bottom:16px;opacity:.8}.context-lost-spinner{width:48px;height:48px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;margin:0 auto 16px;animation:context-lost-spin 1s linear infinite}@keyframes context-lost-spin{to{transform:rotate(360deg)}}.context-lost-title{font-size:18px;font-weight:600;margin-bottom:8px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}.context-lost-message{font-size:14px;opacity:.7;margin-bottom:20px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}.context-lost-reload{background:#fff;color:#000;border:none;padding:10px 24px;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;transition:transform .2s,box-shadow .2s;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}.context-lost-reload:hover{transform:scale(1.02);box-shadow:0 4px 12px #fff3}.context-lost-reload:active{transform:scale(.98)}.recording-indicator{position:absolute;top:12px;right:12px;z-index:1000;display:flex;align-items:center;gap:6px;padding:6px 10px;background:#dc2626d9;border-radius:var(--glass-radius-sm);border:1px solid rgba(255,100,100,.3);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow-sm)}.recording-dot{width:8px;height:8px;background:#fff;border-radius:50%;animation:recording-pulse 1s ease-in-out infinite}@keyframes recording-pulse{0%,to{opacity:1}50%{opacity:.4}}.recording-text{color:#fff;font-family:Monaco,Menlo,Courier New,monospace;font-size:11px;font-weight:600;letter-spacing:.5px}.control-button.recording{background:#dc2626b3;border-color:#ff64644d}.control-button.recording:hover{background:#dc2626d9}.control-button.recording svg{fill:#fff}.media-permission-banner{position:absolute;bottom:48px;left:50%;transform:translate(-50%);background:var(--glass-bg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:var(--glass-border);box-shadow:var(--glass-shadow);color:#ffffffe6;padding:8px 16px;border-radius:6px;font-size:13px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;display:flex;align-items:center;gap:12px;z-index:100;white-space:nowrap}.media-banner-button{background:#4a9effcc;color:#fff;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:13px;font-family:inherit}.media-banner-button:hover{background:#4a9eff}.script-error-overlay{position:absolute;bottom:48px;left:12px;right:12px;z-index:1500;pointer-events:auto}.script-error-content{background:#1a1a1a;border-radius:6px;box-shadow:0 8px 32px #0009,0 0 1px #ffffff1a;border:1px solid #2a2a2a;overflow:hidden}.script-error-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:linear-gradient(135deg,#e65100,#bf360c);color:#fff;border-bottom:1px solid rgba(0,0,0,.3)}.script-error-header.disabled{background:linear-gradient(135deg,#6d4c41,#4e342e)}.script-error-header.warning{background:linear-gradient(135deg,#f9a825,#f57f17);color:#1a1a1a}.script-error-header.warning .script-error-close{color:#000000b3}.script-error-header.warning .script-error-close:hover{background:#00000026;color:#000000e6}.script-error-title{font-size:13px;font-weight:600;font-family:Monaco,Menlo,Courier New,monospace;display:flex;align-items:center;gap:6px}.script-error-close{background:transparent;border:none;color:#ffffffe6;font-size:20px;line-height:1;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:4px;opacity:.8;transition:all .2s ease}.script-error-close:hover{background:#ffffff26;opacity:1}.script-error-message{margin:0;padding:10px 14px;color:#ffab91;font-size:12px;font-family:Monaco,Menlo,Courier New,monospace;line-height:1.5;white-space:pre-wrap;word-break:break-word;max-height:80px;overflow-y:auto}.script-error-stack{margin:0;padding:6px 14px 10px;color:#888;font-size:11px;font-family:Monaco,Menlo,Courier New,monospace;line-height:1.4;white-space:pre-wrap;word-break:break-word;max-height:60px;overflow-y:auto;border-top:1px solid #2a2a2a}.script-overlay{position:absolute;z-index:500;padding:6px 10px;background:var(--glass-bg);color:var(--glass-text);font-family:Monaco,Menlo,Courier New,monospace;font-size:11px;border-radius:var(--glass-radius-sm);border:var(--glass-border);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow-sm);pointer-events:none;white-space:pre;max-width:calc(100% - 24px);overflow:hidden;text-overflow:ellipsis}.script-overlay.hidden{display:none}.script-overlay.top-left{top:12px;left:12px}.script-overlay.top-right{top:12px;right:12px}.script-overlay.bottom-left{bottom:12px;left:12px}.script-overlay.bottom-right{bottom:12px;right:12px}@media (prefers-reduced-motion: reduce){*,*:before,*:after{transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}@media (max-width: 428px){.stats-container{bottom:8px;left:8px}.playback-controls{bottom:8px;right:8px}.script-error-overlay{left:8px;right:8px;bottom:40px}.script-overlay.top-left{top:8px;left:8px}.script-overlay.top-right{top:8px;right:8px}.script-overlay.bottom-left{bottom:8px;left:8px}.script-overlay.bottom-right{bottom:8px;right:8px}}.uniforms-panel-wrapper{position:absolute;top:16px;right:16px;z-index:100;display:flex;flex-direction:column;align-items:flex-end}.uniforms-toggle-button{width:44px;height:44px;padding:6px;background:var(--glass-bg);border:var(--glass-border);border-radius:var(--glass-radius-sm);color:var(--glass-text);cursor:pointer;backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow-sm);transition:all .2s ease,opacity .15s ease;display:flex;align-items:center;justify-content:center}.uniforms-toggle-button:hover{background:var(--glass-bg-hover);transform:scale(1.05)}.uniforms-toggle-button:active{transform:scale(.95)}.uniforms-toggle-button svg{width:16px;height:16px}.uniforms-toggle-button.hidden{opacity:0;transform:scale(.8);pointer-events:none;position:absolute}.uniforms-panel{width:175px;max-height:calc(100vh - 100px);background:var(--glass-bg);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-radius:var(--glass-radius);border:var(--glass-border);box-shadow:var(--glass-shadow);overflow:hidden;display:flex;flex-direction:column;transform-origin:top right;transition:opacity .2s ease,transform .2s ease,max-height .2s ease}.uniforms-panel.closed{opacity:0;transform:scale(.25) translate(0);transform-origin:top right;pointer-events:none;max-height:0;padding:0}.uniforms-panel-header{padding:10px 14px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--glass-text-muted);background:#ffffff08;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;display:flex;justify-content:space-between;align-items:center}.uniforms-panel-close{background:transparent;border:none;color:var(--glass-text-muted);font-size:18px;line-height:1;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all .15s ease}.uniforms-panel-close:hover{background:#ffffff1a;color:var(--glass-text)}.uniforms-panel-content{flex:1;overflow-y:auto;overflow-x:hidden}.uniforms-panel .uniform-controls{padding:12px;gap:12px;background:transparent}.uniforms-panel .uniform-controls-header{display:none}.uniforms-panel .uniform-controls-list{gap:14px}.uniforms-panel .uniform-control{gap:6px}.uniforms-panel .uniform-control-label{font-size:11px;color:var(--glass-text)}.uniforms-panel .uniform-control-value{font-size:10px;padding:1px 4px;min-width:40px;color:var(--glass-text-muted);background:#0003;border-radius:3px}.uniforms-panel .uniform-control-slider{height:4px;background:#ffffff26}.uniforms-panel .uniform-control-slider::-webkit-slider-runnable-track{height:4px;background:#ffffff26}.uniforms-panel .uniform-control-slider::-webkit-slider-thumb{width:12px;height:12px;margin-top:-4px;background:#ffffffe6;box-shadow:0 1px 4px #0000004d}.uniforms-panel .uniform-control-slider::-moz-range-track{height:4px;background:#ffffff26}.uniforms-panel .uniform-control-slider::-moz-range-thumb{width:12px;height:12px;background:#ffffffe6;box-shadow:0 1px 4px #0000004d}.uniforms-panel .uniform-control-toggle{width:34px;height:18px}.uniforms-panel .uniform-control-toggle-slider{border-radius:18px}.uniforms-panel .uniform-control-toggle-slider:before{width:12px;height:12px;left:3px;bottom:3px}.uniforms-panel .uniform-control-toggle input:checked+.uniform-control-toggle-slider:before{transform:translate(16px)}.uniforms-panel .uniform-control-xy-pad{height:100px}.uniforms-panel .uniform-control-xy-handle{width:12px;height:12px}.uniforms-panel .uniform-control-color-swatch{height:28px}.uniforms-panel .uniform-control-vec-slider-row{gap:6px}.uniforms-panel .uniform-control-vec-component{font-size:9px;width:12px;color:var(--glass-text-muted)}.uniforms-panel .uniform-control-vec-value{font-size:9px;min-width:32px;color:var(--glass-text-muted);background:#0003;border-radius:3px}.uniforms-panel .uniform-control-xy-pad{background:#00000040;border:1px solid rgba(255,255,255,.1)}.uniforms-panel .uniform-control-xy-handle{background:#ffffffe6;box-shadow:0 1px 4px #0006}.uniforms-panel-content::-webkit-scrollbar{width:6px}.uniforms-panel-content::-webkit-scrollbar-track{background:transparent}.uniforms-panel-content::-webkit-scrollbar-thumb{background:#fff3;border-radius:3px}.uniforms-panel-content::-webkit-scrollbar-thumb:hover{background:#ffffff59}.uniform-controls{display:flex;flex-direction:column;gap:16px;padding:16px;height:100%;overflow-y:auto;background:var(--bg-secondary)}.uniform-controls-empty{color:var(--text-muted);font-size:13px;text-align:center;padding:20px}.uniform-controls-header{display:flex;justify-content:flex-end;padding-bottom:8px;border-bottom:1px solid var(--border-primary);margin-bottom:8px}.uniform-controls-reset{font-family:inherit;font-size:11px;padding:4px 10px;background:var(--bg-tertiary);color:var(--text-secondary);border:1px solid var(--border-primary);border-radius:4px;cursor:pointer;transition:background .15s ease,color .15s ease}.uniform-controls-reset:hover{background:var(--border-primary);color:var(--text-primary)}.uniform-controls-reset:active{transform:translateY(1px)}.uniform-controls-list{display:flex;flex-direction:column;gap:16px}.uniform-control{display:flex;flex-direction:column;gap:8px}.uniform-control-label-row{display:flex;justify-content:space-between;align-items:center}.uniform-control-label{font-family:Monaco,Menlo,Courier New,monospace;font-size:12px;font-weight:500;color:var(--text-primary)}.uniform-control-value{font-family:Monaco,Menlo,Courier New,monospace;font-size:11px;color:var(--text-muted);background:var(--bg-tertiary);padding:2px 6px;border-radius:3px;min-width:50px;text-align:right}.uniform-control-slider{-webkit-appearance:none;-moz-appearance:none;appearance:none;width:100%;height:6px;background:var(--border-primary);border-radius:3px;outline:none;cursor:pointer}.uniform-control-slider::-webkit-slider-runnable-track{height:6px;background:var(--border-primary);border-radius:3px}.uniform-control-slider::-webkit-slider-thumb{-webkit-appearance:none;-moz-appearance:none;appearance:none;width:14px;height:14px;background:var(--accent-primary);border-radius:50%;cursor:pointer;margin-top:-4px;transition:transform .15s ease,box-shadow .15s ease}.uniform-control-slider::-webkit-slider-thumb:hover{transform:scale(1.1);box-shadow:0 2px 6px #0003}.uniform-control-slider::-webkit-slider-thumb:active{transform:scale(.95)}.uniform-control-slider::-moz-range-track{height:6px;background:var(--border-primary);border-radius:3px}.uniform-control-slider::-moz-range-thumb{width:14px;height:14px;background:var(--accent-primary);border:none;border-radius:50%;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease}.uniform-control-slider::-moz-range-thumb:hover{transform:scale(1.1);box-shadow:0 2px 6px #0003}.uniform-control-slider::-moz-range-thumb:active{transform:scale(.95)}.uniform-control-slider:focus{outline:none}.uniform-control-slider:focus::-webkit-slider-thumb{box-shadow:0 0 0 3px var(--code-selection)}.uniform-control-slider:focus::-moz-range-thumb{box-shadow:0 0 0 3px var(--code-selection)}.uniform-control-toggle{position:relative;display:inline-block;width:40px;height:22px;cursor:pointer}.uniform-control-toggle input{opacity:0;width:0;height:0}.uniform-control-toggle-slider{position:absolute;top:0;left:0;right:0;bottom:0;background:var(--border-primary);border-radius:22px;transition:background .2s ease}.uniform-control-toggle-slider:before{content:"";position:absolute;width:16px;height:16px;left:3px;bottom:3px;background:var(--text-muted);border-radius:50%;transition:transform .2s ease,background .2s ease}.uniform-control-toggle input:checked+.uniform-control-toggle-slider{background:var(--accent-primary)}.uniform-control-toggle input:checked+.uniform-control-toggle-slider:before{transform:translate(18px);background:#fff}.uniform-control-toggle input:focus+.uniform-control-toggle-slider{box-shadow:0 0 0 2px var(--code-selection)}.uniform-control-xy-pad{position:relative;width:100%;height:120px;background:var(--bg-tertiary);border:1px solid var(--border-primary);border-radius:4px;cursor:crosshair;overflow:hidden}.uniform-control-xy-pad:before,.uniform-control-xy-pad:after{content:"";position:absolute;background:var(--border-primary);opacity:.5}.uniform-control-xy-pad:before{left:50%;top:0;bottom:0;width:1px}.uniform-control-xy-pad:after{top:50%;left:0;right:0;height:1px}.uniform-control-xy-handle{position:absolute;width:14px;height:14px;background:var(--accent-primary);border:2px solid white;border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 2px 4px #0000004d;pointer-events:none;z-index:1}.uniform-control-color-wrapper{display:flex;align-items:center;gap:8px}.uniform-control-color-swatch{width:100%;height:32px;border-radius:4px;border:1px solid var(--border-primary);cursor:pointer;transition:box-shadow .15s ease}.uniform-control-color-swatch:hover{box-shadow:0 0 0 2px var(--accent-primary)}.uniform-control-color-input{position:absolute;width:0;height:0;opacity:0;pointer-events:none}.uniform-control-vec3{gap:6px}.uniform-control-vec-slider-row{display:flex;align-items:center;gap:8px}.uniform-control-vec-component{font-family:Monaco,Menlo,Courier New,monospace;font-size:10px;font-weight:600;color:var(--text-muted);width:14px;text-align:center}.uniform-control-vec-slider{flex:1}.uniform-control-vec-value{min-width:40px;font-size:10px}.render-dialog-backdrop{position:absolute;top:0;left:0;right:0;bottom:0;background:#000000b3;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:4000}.render-dialog{background:#1a1a1f;border:1px solid rgba(255,255,255,.1);border-radius:10px;box-shadow:0 20px 60px #0009;width:360px;max-width:calc(100% - 32px);overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;color:#e0e0e0}.render-dialog-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:linear-gradient(135deg,#1565c0,#0d47a1);color:#fff;border-bottom:1px solid rgba(0,0,0,.3)}.render-dialog-title{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}.render-dialog-close{background:transparent;border:none;color:#fffc;font-size:20px;line-height:1;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all .15s ease}.render-dialog-close:hover{background:#ffffff26;color:#fff}.render-dialog-body{padding:18px;display:flex;flex-direction:column;gap:14px}.render-field{display:flex;flex-direction:column;gap:5px}.render-field-label{font-size:12px;font-weight:500;color:#fff9;text-transform:uppercase;letter-spacing:.5px}.render-field-row{display:flex;gap:8px;align-items:center}.render-field-row span{color:#fff6;font-size:13px}.render-input{flex:1;background:#0f0f14;border:1px solid rgba(255,255,255,.1);border-radius:5px;color:#e0e0e0;font-family:Monaco,Menlo,monospace;font-size:13px;padding:7px 10px;outline:none;transition:border-color .15s}.render-input:focus{border-color:#648cff80}.render-input[type=number]{-moz-appearance:textfield}.render-input[type=number]::-webkit-inner-spin-button,.render-input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}.render-format-group{display:flex;gap:8px}.render-format-option{flex:1;position:relative}.render-format-option input[type=radio]{position:absolute;opacity:0;pointer-events:none}.render-format-option label{display:block;text-align:center;padding:8px 12px;background:#0f0f14;border:1px solid rgba(255,255,255,.1);border-radius:5px;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s}.render-format-option input[type=radio]:checked+label{background:#648cff26;border-color:#648cff80;color:#8ab4ff}.render-format-option label:hover{border-color:#fff3}.render-estimate{font-size:11px;color:#fff6;font-family:Monaco,Menlo,monospace;text-align:center;padding:4px 0}.render-dialog-actions{display:flex;gap:8px;padding:0 18px 18px}.render-btn{flex:1;padding:9px 16px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s;font-family:inherit}.render-btn-primary{background:linear-gradient(135deg,#1565c0,#0d47a1);color:#fff}.render-btn-primary:hover{filter:brightness(1.1)}.render-btn-primary:disabled{opacity:.5;cursor:not-allowed;filter:none}.render-btn-cancel{background:#ffffff14;color:#ffffffb3;border:1px solid rgba(255,255,255,.1)}.render-btn-cancel:hover{background:#ffffff1f}.render-progress{display:none;flex-direction:column;gap:8px;padding:18px}.render-progress.active{display:flex}.render-progress-bar-bg{height:6px;background:#0f0f14;border-radius:3px;overflow:hidden}.render-progress-bar{height:100%;background:linear-gradient(90deg,#1565c0,#42a5f5);border-radius:3px;width:0%;transition:width .1s ease}.render-progress-text{font-size:12px;color:#ffffff80;font-family:Monaco,Menlo,monospace;text-align:center}.multi-view-controls-wrapper{position:absolute;top:16px;right:16px;z-index:100;display:flex;flex-direction:column;align-items:flex-end}.multi-view-controls-toggle{width:44px;height:44px;padding:6px;background:var(--glass-bg);border:var(--glass-border);border-radius:var(--glass-radius-sm);color:var(--glass-text);cursor:pointer;backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow-sm);transition:all .2s ease,opacity .15s ease;display:flex;align-items:center;justify-content:center}.multi-view-controls-toggle:hover{background:var(--glass-bg-hover);transform:scale(1.05)}.multi-view-controls-toggle:active{transform:scale(.95)}.multi-view-controls-toggle svg{width:16px;height:16px}.multi-view-controls-toggle.hidden{opacity:0;transform:scale(.8);pointer-events:none;position:absolute}.multi-view-controls-panel{width:175px;max-height:calc(100vh - 100px);background:var(--glass-bg);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-radius:var(--glass-radius);border:var(--glass-border);box-shadow:var(--glass-shadow);overflow:hidden;display:flex;flex-direction:column;transform-origin:top right;transition:opacity .2s ease,transform .2s ease,max-height .2s ease}.multi-view-controls-panel.closed{opacity:0;transform:scale(.25) translate(0);transform-origin:top right;pointer-events:none;max-height:0;padding:0}.multi-view-controls-header{padding:10px 14px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--glass-text-muted);background:#ffffff08;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;display:flex;justify-content:space-between;align-items:center}.multi-view-controls-close{background:transparent;border:none;color:var(--glass-text-muted);font-size:18px;line-height:1;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all .15s ease}.multi-view-controls-close:hover{background:#ffffff1a;color:var(--glass-text)}.controls-section{display:flex;flex-direction:column;gap:8px;padding:12px}.controls-section+.controls-section{padding-top:0}.section-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--glass-text-muted);padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:4px}.playback-controls{flex-direction:row;gap:8px;padding:12px}.control-btn{width:44px;height:44px;border:none;border-radius:var(--glass-radius-sm);background:#ffffff1a;color:var(--glass-text);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s ease}.control-btn:hover{background:#fff3}.control-btn:active{transform:scale(.95)}.control-btn svg{width:16px;height:16px}.uniforms-section{border-top:1px solid rgba(255,255,255,.06)}.uniforms-container{display:flex;flex-direction:column;gap:8px}.multi-view-controls-panel .uniform-controls{padding:0;gap:12px;background:transparent}.multi-view-controls-panel .uniform-controls-header{display:none}.multi-view-controls-panel .uniform-controls-list{gap:14px}.multi-view-controls-panel .uniform-control{gap:6px}.multi-view-controls-panel .uniform-control-label{font-size:11px;color:var(--glass-text)}.multi-view-controls-panel .uniform-control-value{font-size:10px;padding:1px 4px;min-width:40px;color:var(--glass-text-muted);background:#0003;border-radius:3px}.multi-view-controls-panel .uniform-control-slider{height:4px;background:#ffffff26}.multi-view-controls-panel .uniform-control-slider::-webkit-slider-runnable-track{height:4px;background:#ffffff26}.multi-view-controls-panel .uniform-control-slider::-webkit-slider-thumb{width:12px;height:12px;margin-top:-4px;background:#ffffffe6;box-shadow:0 1px 4px #0000004d}.multi-view-controls-panel .uniform-control-slider::-moz-range-track{height:4px;background:#ffffff26}.multi-view-controls-panel .uniform-control-slider::-moz-range-thumb{width:12px;height:12px;background:#ffffffe6;box-shadow:0 1px 4px #0000004d}.multi-view-controls-panel .uniform-control-toggle{width:34px;height:18px}.multi-view-controls-panel .uniform-control-toggle-slider{border-radius:18px}.multi-view-controls-panel .uniform-control-toggle-slider:before{width:12px;height:12px;left:3px;bottom:3px}.multi-view-controls-panel .uniform-control-toggle input:checked+.uniform-control-toggle-slider:before{transform:translate(16px)}.layout-fullscreen{width:100%;height:100%}.layout-fullscreen .canvas-container{position:relative;width:100%;height:100%;background:#000}.layout-default{width:100%;height:100%}.layout-default .canvas-container{position:relative;width:100%;height:100%;background:var(--bg-canvas);border-radius:var(--pane-radius);box-shadow:var(--pane-shadow);overflow:hidden}.layout-split{width:100%;height:100%;display:flex;gap:24px}.layout-split .canvas-container{position:relative;flex:1;background:var(--bg-canvas);border-radius:var(--pane-radius);box-shadow:var(--pane-shadow);overflow:hidden}.layout-split .code-panel{position:relative;flex:1;display:flex;flex-direction:column;background:var(--bg-secondary);border-radius:var(--pane-radius);box-shadow:var(--pane-shadow);overflow:hidden}.tab-bar{display:flex;background:var(--tab-bg);border-bottom:1px solid var(--border-primary);padding:8px 8px 0;gap:4px}.tab-button{padding:8px 16px;background:transparent;border:none;border-radius:6px 6px 0 0;font-size:13px;font-family:Monaco,Menlo,Courier New,monospace;cursor:pointer;transition:background .2s,color .2s;color:var(--tab-text)}.tab-button:hover{background:var(--button-bg-hover);color:var(--tab-text-hover)}.tab-button.active{background:var(--bg-secondary);color:var(--tab-text-active);font-weight:500}.copy-button{position:absolute;top:12px;right:12px;padding:6px;background:var(--button-bg);border:none;border-radius:4px;color:var(--button-text);cursor:pointer;transition:all .2s;z-index:10;display:flex;align-items:center;justify-content:center}.copy-button:hover{background:var(--button-bg-hover);color:var(--button-text-hover)}.copy-button:active{transform:scale(.9)}.copy-button.copied{color:var(--success-text)}.code-viewer{flex:1;min-height:0;overflow:auto;position:relative;background:var(--code-bg)}.code-viewer pre{margin:0;padding:16px;font-size:13px;line-height:1.5;font-family:Monaco,Menlo,Courier New,monospace;background:var(--code-bg);color:var(--code-text)}.code-viewer code{font-family:inherit;font-size:inherit}.token.comment{color:var(--syntax-comment)}.token.keyword{color:var(--syntax-keyword)}.token.string{color:var(--syntax-string)}.token.number{color:var(--syntax-number)}.token.operator{color:var(--syntax-operator)}.token.function{color:var(--syntax-function)}.token.class-name{color:var(--syntax-class)}.token.punctuation{color:var(--syntax-punctuation)}.tab-button.image-tab,.tab-button.image-tab.active{color:var(--accent-secondary)}.image-viewer{display:flex;align-items:center;justify-content:center;height:100%;padding:16px;background:var(--image-viewer-bg)}.image-viewer img{max-width:100%;max-height:100%;object-fit:contain;border-radius:4px;box-shadow:var(--shadow-sm)}@media (max-width: 800px){.layout-split{flex-direction:column}}.layout-tabbed{width:100%;height:100%;display:flex;flex-direction:column;box-sizing:border-box}.tabbed-wrapper{display:flex;flex-direction:column;width:100%;height:100%;border-radius:var(--pane-radius);box-shadow:var(--pane-shadow);overflow:hidden}.tabbed-toolbar{display:flex;align-items:center;flex-shrink:0;background:var(--tab-bg);border-bottom:1px solid var(--border-primary);padding-right:8px}.tabbed-tab-bar{display:flex;flex:1;gap:4px;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin}.tabbed-tab-bar::-webkit-scrollbar{height:4px}.tabbed-tab-bar::-webkit-scrollbar-thumb{background:var(--border-secondary);border-radius:2px}.tabbed-tab-button{padding:10px 16px;background:transparent;border:none;border-bottom:2px solid transparent;font-size:12px;font-family:Monaco,Menlo,Courier New,monospace;cursor:pointer;transition:color .15s,border-color .15s;color:var(--tab-text);white-space:nowrap;flex-shrink:0}.tabbed-tab-button:hover{color:var(--tab-text-hover)}.tabbed-tab-button.active{color:var(--tab-text-active);border-bottom-color:var(--tab-border-active)}.tabbed-tab-button.shader-tab{font-family:system-ui,-apple-system,sans-serif}.tabbed-tab-button.image-tab{color:var(--accent-secondary)}.tabbed-tab-button.image-tab.active{color:var(--accent-secondary);border-bottom-color:var(--accent-secondary)}.tabbed-tab-button.uniforms-tab{color:var(--accent-tertiary, var(--accent-primary));padding:8px 12px}.tabbed-tab-button.uniforms-tab.active{color:var(--accent-tertiary, var(--accent-primary));border-bottom-color:var(--accent-tertiary, var(--accent-primary))}.tabbed-tab-button .uniforms-icon{width:18px;height:18px;display:block}.tabbed-content{flex:1;min-height:0;position:relative;background:var(--bg-canvas);overflow:hidden}.tabbed-canvas-container{position:absolute;top:0;left:0;width:100%;height:100%}.tabbed-code-viewer{position:absolute;top:0;left:0;width:100%;height:100%;overflow:auto;background:var(--code-bg)}.tabbed-code-viewer pre{margin:0;padding:16px 16px 16px 0;font-size:13px;line-height:1.6;font-family:Monaco,Menlo,Courier New,monospace;background:var(--code-bg);color:var(--code-text);display:flex}.tabbed-code-viewer code{font-family:inherit;font-size:inherit}.tabbed-line-numbers{text-align:right;padding-right:16px;margin-right:16px;border-right:1px solid var(--code-line-border);color:var(--code-line-number);-webkit-user-select:none;user-select:none;flex-shrink:0;padding-left:16px}.tabbed-code-content{flex:1;overflow-x:auto}.tabbed-image-viewer{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--image-viewer-bg);padding:20px;box-sizing:border-box}.tabbed-image-viewer img{max-width:100%;max-height:100%;object-fit:contain;border-radius:4px;box-shadow:var(--shadow-sm)}.tabbed-code-viewer .token.comment{color:var(--syntax-comment)}.tabbed-code-viewer .token.keyword{color:var(--syntax-keyword)}.tabbed-code-viewer .token.string{color:var(--syntax-string)}.tabbed-code-viewer .token.number{color:var(--syntax-number)}.tabbed-code-viewer .token.operator{color:var(--syntax-operator)}.tabbed-code-viewer .token.function{color:var(--syntax-function)}.tabbed-code-viewer .token.class-name{color:var(--syntax-class)}.tabbed-code-viewer .token.punctuation{color:var(--syntax-punctuation)}@media (max-width: 600px){.tabbed-tab-button{padding:8px 12px;font-size:12px}}.tabbed-editor-container{position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden;background:var(--code-bg)}.tabbed-button-container{display:flex;align-items:center;gap:6px;flex-shrink:0}.tabbed-copy-button{display:flex;align-items:center;justify-content:center;background:var(--button-bg);border:1px solid var(--button-border);color:var(--button-text);width:44px;height:44px;border-radius:4px;cursor:pointer;transition:background .15s,border-color .15s,color .15s}.tabbed-copy-button:hover{background:var(--button-bg-hover);border-color:var(--button-border-hover);color:var(--button-text-hover)}.tabbed-copy-button:active{background:var(--button-bg-hover)}.tabbed-copy-button.copied{background:var(--success-bg);border-color:var(--success-border);color:var(--success-text)}.tabbed-recompile-button{display:flex;align-items:center;gap:6px;background:var(--recompile-bg);border:none;color:var(--recompile-text);padding:6px 12px;border-radius:4px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;transition:background .15s,color .15s}.tabbed-recompile-button:hover{background:var(--recompile-bg-hover)}.tabbed-recompile-button:active{background:var(--recompile-bg-active)}.tabbed-recompile-button svg{flex-shrink:0}.tabbed-error-display{position:absolute;bottom:0;left:0;right:0;background:var(--error-bg);color:var(--error-text);padding:10px 14px;font-family:Monaco,Menlo,Courier New,monospace;font-size:12px;white-space:pre-wrap;overflow:auto;max-height:120px;border-top:1px solid var(--error-border);z-index:10}.tabbed-fallback-textarea{width:100%;height:100%;background:var(--code-bg);color:var(--code-text);border:none;padding:12px;font-family:Monaco,Menlo,Courier New,monospace;font-size:13px;resize:none;outline:none}.tabbed-uniforms-container{position:absolute;top:0;left:0;width:100%;height:100%;overflow-y:auto;background:#00000080;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:flex;justify-content:center;padding:20px;box-sizing:border-box}.tabbed-uniforms-container .uniform-controls{max-width:400px;width:100%;background:#1e1e23f2;border-radius:12px;padding:20px;box-shadow:0 4px 20px #0006;height:fit-content}.tabbed-uniforms-container .uniform-control-label{color:#e0e0e0}.tabbed-uniforms-container .uniform-control-value{color:#a0a0a0;background:#0000004d}.tabbed-uniforms-container .uniform-controls-header{color:#909090;border-bottom-color:#ffffff1a}.tabbed-uniforms-container .uniform-control-slider{background:#ffffff1a}.tabbed-uniforms-container .uniform-control-slider::-webkit-slider-thumb{background:#fff}.tabbed-uniforms-container .uniform-control-slider::-moz-range-thumb{background:#fff}.tabbed-uniforms-container .uniform-control-vec-component{color:#909090}.tabbed-uniforms-container .uniform-control-vec-value{color:#a0a0a0;background:#0000004d}.layout-multi-view{position:relative;width:100%;height:100%;box-sizing:border-box;background:var(--bg-primary)}.multi-view-canvas{position:relative;background:var(--bg-canvas);border-radius:var(--pane-radius);box-shadow:var(--pane-shadow);overflow:hidden}.multi-view-label{position:absolute;top:12px;left:12px;padding:4px 10px;background:#0009;color:#fff;font-family:var(--font-mono);font-size:12px;font-weight:500;border-radius:4px;text-transform:capitalize;z-index:5;pointer-events:none}.multi-view-info{position:absolute;bottom:12px;left:12px;padding:6px 10px;background:#0009;color:#fff;font-family:var(--font-mono);font-size:11px;border-radius:4px;z-index:5;pointer-events:none}.layout-grid-view{display:grid;gap:16px}.layout-grid-view .multi-view-canvas{min-height:0;min-width:0}.layout-grid-view[data-view-count="2"].grid-horizontal{grid-template-columns:1fr 1fr;grid-template-rows:1fr}.layout-grid-view[data-view-count="2"].grid-vertical{grid-template-columns:1fr;grid-template-rows:1fr 1fr}.layout-grid-view[data-view-count="3"].grid-horizontal{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}.layout-grid-view[data-view-count="3"].grid-horizontal .multi-view-canvas:last-child{grid-column:1 / -1}.layout-grid-view[data-view-count="3"].grid-vertical{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}.layout-grid-view[data-view-count="3"].grid-vertical .multi-view-canvas:first-child{grid-column:1 / -1}.layout-grid-view[data-view-count="4"]{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}.layout-inset-view .multi-view-canvas.inset-main{width:100%;height:100%}.layout-inset-view .multi-view-canvas.inset-overlay{position:absolute;bottom:40px;right:40px;width:25%;min-width:200px;aspect-ratio:16 / 9;z-index:10;transition:all .2s ease}.layout-inset-view .multi-view-canvas.inset-overlay.minimized{width:48px;height:48px;min-width:unset;aspect-ratio:unset;cursor:pointer;opacity:.8}.layout-inset-view .multi-view-canvas.inset-overlay.minimized:hover{opacity:1}.inset-minimize-btn{position:absolute;top:8px;right:8px;width:24px;height:24px;border:none;border-radius:4px;background:#00000080;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;z-index:11;transition:background .2s}.inset-minimize-btn:hover{background:#000000b3}.editor-toolbar{display:flex;align-items:center;background:var(--tab-bg);border-bottom:1px solid var(--border-primary);padding-right:8px}.editor-tab-bar{display:flex;flex:1;overflow-x:auto;scrollbar-width:thin}.editor-tab-button{background:transparent;border:none;color:var(--tab-text);padding:10px 16px;cursor:pointer;font-family:Monaco,Menlo,Courier New,monospace;font-size:12px;white-space:nowrap;border-bottom:2px solid transparent;transition:color .15s,border-color .15s}.editor-tab-button:hover{color:var(--tab-text-hover)}.editor-tab-button.active{color:var(--tab-text-active);border-bottom-color:var(--tab-border-active)}.editor-tab-button.image-tab{color:var(--accent-secondary)}.editor-tab-button.image-tab.active{color:var(--accent-secondary);border-bottom-color:var(--accent-secondary)}.editor-tab-button.uniforms-tab{color:var(--accent-tertiary, var(--accent-primary));padding:8px 12px}.editor-tab-button.uniforms-tab.active{color:var(--accent-tertiary, var(--accent-primary));border-bottom-color:var(--accent-tertiary, var(--accent-primary))}.editor-tab-button .uniforms-icon{width:18px;height:18px;display:block}.editor-copy-button{display:flex;align-items:center;justify-content:center;background:var(--button-bg);border:1px solid var(--button-border);color:var(--button-text);width:32px;height:32px;border-radius:4px;cursor:pointer;transition:background .15s,border-color .15s,color .15s;flex-shrink:0;margin-right:6px}.editor-copy-button:hover{background:var(--button-bg-hover);border-color:var(--button-border-hover);color:var(--button-text-hover)}.editor-copy-button:active{background:var(--button-bg-hover)}.editor-copy-button.copied{background:var(--success-bg);border-color:var(--success-border);color:var(--success-text)}.editor-copy-button svg{flex-shrink:0}.editor-recompile-button{display:flex;align-items:center;gap:6px;background:var(--recompile-bg);border:none;color:var(--recompile-text);padding:6px 12px;border-radius:4px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;transition:background .15s,color .15s;flex-shrink:0}.editor-recompile-button:hover{background:var(--recompile-bg-hover)}.editor-recompile-button:active{background:var(--recompile-bg-active)}.editor-recompile-button svg{flex-shrink:0}.editor-content-area{flex:1;overflow:hidden;position:relative;background:var(--code-bg)}.editor-prism-container{height:100%;width:100%}.editor-fallback-textarea{width:100%;height:100%;background:var(--code-bg);color:var(--code-text);border:none;padding:12px;font-family:Monaco,Menlo,Courier New,monospace;font-size:13px;resize:none;outline:none}.editor-image-viewer{display:flex;align-items:center;justify-content:center;height:100%;background:var(--image-viewer-bg);padding:20px}.editor-uniforms-container{height:100%;overflow-y:auto;background:var(--bg-secondary)}.editor-image-viewer img{max-width:100%;max-height:100%;object-fit:contain;border-radius:4px;box-shadow:var(--shadow-sm)}.editor-error-display{background:var(--error-bg);color:var(--error-text);padding:10px 14px;font-family:Monaco,Menlo,Courier New,monospace;font-size:12px;white-space:pre-wrap;overflow:auto;max-height:120px;border-top:1px solid var(--error-border)}.prism-editor-wrapper{display:flex;height:100%;background:var(--code-bg);font-family:Monaco,Menlo,Courier New,monospace;font-size:13px;line-height:1.6}.prism-editor-line-numbers{flex-shrink:0;padding:16px 12px 16px 16px;text-align:right;color:var(--code-line-number);border-right:1px solid var(--code-line-border);-webkit-user-select:none;user-select:none;overflow:hidden}.prism-editor-line-numbers span{display:block}.prism-editor-area{flex:1;position:relative;overflow:hidden}.prism-editor-textarea,.prism-editor-highlight{position:absolute;top:0;left:0;width:100%;height:100%;padding:16px;margin:0;border:none;outline:none;font-family:inherit;font-size:inherit;line-height:inherit;white-space:pre-wrap;word-wrap:break-word;overflow:auto;box-sizing:border-box}.prism-editor-textarea{background:transparent;color:transparent;caret-color:var(--code-text);resize:none;z-index:1;-webkit-text-fill-color:transparent}.prism-editor-textarea::selection{background:var(--code-selection)}.prism-editor-textarea::-moz-selection{background:var(--code-selection)}.prism-editor-highlight{background:var(--code-bg);color:var(--code-text);pointer-events:none;z-index:0}.prism-editor-highlight code{font-family:inherit;font-size:inherit;background:none;padding:0}.prism-editor-highlight .token.comment{color:var(--syntax-comment)}.prism-editor-highlight .token.keyword{color:var(--syntax-keyword)}.prism-editor-highlight .token.string{color:var(--syntax-string)}.prism-editor-highlight .token.number{color:var(--syntax-number)}.prism-editor-highlight .token.operator{color:var(--syntax-operator)}.prism-editor-highlight .token.function{color:var(--syntax-function)}.prism-editor-highlight .token.class-name{color:var(--syntax-class)}.prism-editor-highlight .token.punctuation{color:var(--syntax-punctuation)}')),document.head.appendChild(o)}}catch(r){console.error("vite-plugin-css-injected-by-js",r)}})();
+var He = Object.defineProperty;
+var Ve = (i, e, t) => e in i ? He(i, e, { enumerable: !0, configurable: !0, writable: !0, value: t }) : i[e] = t;
+var l = (i, e, t) => Ve(i, typeof e != "symbol" ? e + "" : e, t);
+function L(i) {
   return "count" in i && typeof i.count == "number";
 }
 function se(i) {
-  return !A(i) && !i.hidden;
+  return !L(i) && !i.hidden;
 }
-function Ye(i) {
+function Re(i) {
   return "views" in i && Array.isArray(i.views);
 }
-function Ce(i) {
-  return "views" in i && Array.isArray(i.views);
-}
-function de(i, e, t) {
+function ue(i, e, t) {
   const n = i.createShader(e);
   if (!n)
     throw new Error("Failed to create shader object");
@@ -22,18 +22,18 @@ ${r}`);
   }
   return n;
 }
-function he(i, e, t) {
-  const n = de(i, i.VERTEX_SHADER, e), s = de(i, i.FRAGMENT_SHADER, t), r = i.createProgram();
+function de(i, e, t) {
+  const n = ue(i, i.VERTEX_SHADER, e), s = ue(i, i.FRAGMENT_SHADER, t), r = i.createProgram();
   if (!r)
     throw new Error("Failed to create program object");
   if (i.attachShader(r, n), i.attachShader(r, s), i.linkProgram(r), !i.getProgramParameter(r, i.LINK_STATUS)) {
-    const a = i.getProgramInfoLog(r);
+    const o = i.getProgramInfoLog(r);
     throw i.deleteProgram(r), i.deleteShader(n), i.deleteShader(s), new Error(`Program linking failed:
-${a}`);
+${o}`);
   }
   return i.detachShader(r, n), i.detachShader(r, s), i.deleteShader(n), i.deleteShader(s), r;
 }
-function Ke(i) {
+function Xe(i) {
   const e = i.createVertexArray();
   if (!e)
     throw new Error("Failed to create VAO");
@@ -66,7 +66,7 @@ function Ke(i) {
     // offset
   ), i.bindVertexArray(null), i.bindBuffer(i.ARRAY_BUFFER, null), e;
 }
-function z(i, e, t) {
+function Y(i, e, t) {
   const n = i.createTexture();
   if (!n)
     throw new Error("Failed to create texture");
@@ -88,7 +88,7 @@ function z(i, e, t) {
     // no data (allocate only)
   ), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_MIN_FILTER, i.NEAREST), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_MAG_FILTER, i.NEAREST), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_WRAP_S, i.CLAMP_TO_EDGE), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_WRAP_T, i.CLAMP_TO_EDGE), i.bindTexture(i.TEXTURE_2D, null), n;
 }
-function me(i, e) {
+function he(i, e) {
   const t = i.createFramebuffer();
   if (!t)
     throw new Error("Failed to create framebuffer");
@@ -102,32 +102,52 @@ function me(i, e) {
   );
   const n = i.checkFramebufferStatus(i.FRAMEBUFFER);
   if (n !== i.FRAMEBUFFER_COMPLETE)
-    throw i.deleteFramebuffer(t), new Error(`Framebuffer incomplete: ${et(i, n)}`);
+    throw i.deleteFramebuffer(t), new Error(`Framebuffer incomplete: ${Ze(i, n)}`);
   return i.bindFramebuffer(i.FRAMEBUFFER, null), t;
 }
-function ze(i) {
+function je(i) {
   const e = i.createTexture();
   if (!e)
     throw new Error("Failed to create black texture");
   i.bindTexture(i.TEXTURE_2D, e);
   const t = new Float32Array([0, 0, 0, 1]);
-  return i.texImage2D(i.TEXTURE_2D, 0, i.RGBA32F, 1, 1, 0, i.RGBA, i.FLOAT, t), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_MIN_FILTER, i.NEAREST), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_MAG_FILTER, i.NEAREST), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_WRAP_S, i.CLAMP_TO_EDGE), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_WRAP_T, i.CLAMP_TO_EDGE), i.bindTexture(i.TEXTURE_2D, null), e;
+  return i.texImage2D(
+    i.TEXTURE_2D,
+    0,
+    i.RGBA32F,
+    1,
+    1,
+    0,
+    i.RGBA,
+    i.FLOAT,
+    t
+  ), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_MIN_FILTER, i.NEAREST), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_MAG_FILTER, i.NEAREST), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_WRAP_S, i.CLAMP_TO_EDGE), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_WRAP_T, i.CLAMP_TO_EDGE), i.bindTexture(i.TEXTURE_2D, null), e;
 }
-function Ge(i) {
+function Ke(i) {
   const e = i.createTexture();
   if (!e)
     throw new Error("Failed to create keyboard texture");
   i.bindTexture(i.TEXTURE_2D, e);
   const t = 256, n = 3, s = new Float32Array(t * n * 4);
-  return i.texImage2D(i.TEXTURE_2D, 0, i.RGBA32F, t, n, 0, i.RGBA, i.FLOAT, s), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_MIN_FILTER, i.NEAREST), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_MAG_FILTER, i.NEAREST), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_WRAP_S, i.CLAMP_TO_EDGE), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_WRAP_T, i.CLAMP_TO_EDGE), i.bindTexture(i.TEXTURE_2D, null), e;
+  return i.texImage2D(
+    i.TEXTURE_2D,
+    0,
+    i.RGBA32F,
+    t,
+    n,
+    0,
+    i.RGBA,
+    i.FLOAT,
+    s
+  ), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_MIN_FILTER, i.NEAREST), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_MAG_FILTER, i.NEAREST), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_WRAP_S, i.CLAMP_TO_EDGE), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_WRAP_T, i.CLAMP_TO_EDGE), i.bindTexture(i.TEXTURE_2D, null), e;
 }
-function We(i, e, t, n) {
-  const o = new Float32Array(3072);
-  for (let a = 0; a < 256; a++) {
-    const c = t.get(a) || !1, l = n.get(a) || 0, u = (0 * 256 + a) * 4;
-    o[u + 0] = c ? 1 : 0, o[u + 1] = c ? 1 : 0, o[u + 2] = c ? 1 : 0, o[u + 3] = 1;
-    const d = (2 * 256 + a) * 4;
-    o[d + 0] = l, o[d + 1] = l, o[d + 2] = l, o[d + 3] = 1;
+function Ye(i, e, t, n) {
+  const a = new Float32Array(3072);
+  for (let o = 0; o < 256; o++) {
+    const c = t.get(o) || !1, u = n.get(o) || 0, d = (0 * 256 + o) * 4;
+    a[d + 0] = c ? 1 : 0, a[d + 1] = c ? 1 : 0, a[d + 2] = c ? 1 : 0, a[d + 3] = 1;
+    const h = (2 * 256 + o) * 4;
+    a[h + 0] = u, a[h + 1] = u, a[h + 2] = u, a[h + 3] = 1;
   }
   i.bindTexture(i.TEXTURE_2D, e), i.texSubImage2D(
     i.TEXTURE_2D,
@@ -139,36 +159,33 @@ function We(i, e, t, n) {
     3,
     i.RGBA,
     i.FLOAT,
-    o
+    a
   ), i.bindTexture(i.TEXTURE_2D, null);
 }
-function qe(i) {
+function ze(i) {
   const e = i.createTexture();
-  if (!e)
-    throw new Error("Failed to create audio texture");
+  if (!e) throw new Error("Failed to create audio texture");
   i.bindTexture(i.TEXTURE_2D, e);
   const t = 512, n = 2, s = new Uint8Array(t * n);
   return i.texImage2D(i.TEXTURE_2D, 0, i.R8, t, n, 0, i.RED, i.UNSIGNED_BYTE, s), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_MIN_FILTER, i.LINEAR), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_MAG_FILTER, i.LINEAR), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_WRAP_S, i.CLAMP_TO_EDGE), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_WRAP_T, i.CLAMP_TO_EDGE), i.bindTexture(i.TEXTURE_2D, null), e;
 }
-function Ze(i, e, t, n) {
+function Ge(i, e, t, n) {
   i.bindTexture(i.TEXTURE_2D, e), i.texSubImage2D(i.TEXTURE_2D, 0, 0, 0, 512, 1, i.RED, i.UNSIGNED_BYTE, t), i.texSubImage2D(i.TEXTURE_2D, 0, 0, 1, 512, 1, i.RED, i.UNSIGNED_BYTE, n), i.bindTexture(i.TEXTURE_2D, null);
 }
-function pe(i) {
+function me(i) {
   const e = i.createTexture();
-  if (!e)
-    throw new Error("Failed to create video texture");
+  if (!e) throw new Error("Failed to create video texture");
   return i.bindTexture(i.TEXTURE_2D, e), i.texImage2D(i.TEXTURE_2D, 0, i.RGBA, 1, 1, 0, i.RGBA, i.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 255])), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_MIN_FILTER, i.LINEAR), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_MAG_FILTER, i.LINEAR), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_WRAP_S, i.CLAMP_TO_EDGE), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_WRAP_T, i.CLAMP_TO_EDGE), i.bindTexture(i.TEXTURE_2D, null), e;
 }
-function Je(i, e, t) {
+function We(i, e, t) {
   i.bindTexture(i.TEXTURE_2D, e), i.pixelStorei(i.UNPACK_FLIP_Y_WEBGL, !0), i.texImage2D(i.TEXTURE_2D, 0, i.RGBA, i.RGBA, i.UNSIGNED_BYTE, t), i.pixelStorei(i.UNPACK_FLIP_Y_WEBGL, !1), i.bindTexture(i.TEXTURE_2D, null);
 }
-function Qe(i, e, t, n, s) {
+function qe(i, e, t, n, s) {
   const r = e ?? i.createTexture();
-  if (!r)
-    throw new Error("Failed to create script texture");
+  if (!r) throw new Error("Failed to create script texture");
   return i.bindTexture(i.TEXTURE_2D, r), s instanceof Float32Array ? i.texImage2D(i.TEXTURE_2D, 0, i.RGBA32F, t, n, 0, i.RGBA, i.FLOAT, s) : i.texImage2D(i.TEXTURE_2D, 0, i.RGBA, t, n, 0, i.RGBA, i.UNSIGNED_BYTE, s), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_MIN_FILTER, i.NEAREST), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_MAG_FILTER, i.NEAREST), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_WRAP_S, i.CLAMP_TO_EDGE), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_WRAP_T, i.CLAMP_TO_EDGE), i.bindTexture(i.TEXTURE_2D, null), r;
 }
-function et(i, e) {
+function Ze(i, e) {
   switch (e) {
     case i.FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
       return "FRAMEBUFFER_INCOMPLETE_ATTACHMENT";
@@ -184,7 +201,7 @@ function et(i, e) {
       return `Unknown status: ${e}`;
   }
 }
-const Se = {
+const Ce = {
   float: 1,
   vec2: 2,
   vec3: 3,
@@ -206,35 +223,35 @@ const Se = {
   // 4 columns × 4 floats, no padding
 };
 function O(i, e) {
-  return Se[i] * e;
+  return Ce[i] * e;
 }
-function tt(i, e) {
+function Je(i, e) {
   return re[i] * e * 4;
 }
-function nt(i, e) {
+function Qe(i, e) {
   return re[i] * e;
 }
-function it(i, e, t, n) {
-  const s = Se[i], r = re[i];
+function et(i, e, t, n) {
+  const s = Ce[i], r = re[i];
   if (s === r)
     return t;
-  const o = r * e, a = n && n.length >= o ? n : new Float32Array(o);
+  const a = r * e, o = n && n.length >= a ? n : new Float32Array(a);
   if (i === "mat3")
     for (let c = 0; c < e; c++) {
-      const l = c * 9, u = c * 12;
-      a[u + 0] = t[l + 0], a[u + 1] = t[l + 1], a[u + 2] = t[l + 2], a[u + 3] = 0, a[u + 4] = t[l + 3], a[u + 5] = t[l + 4], a[u + 6] = t[l + 5], a[u + 7] = 0, a[u + 8] = t[l + 6], a[u + 9] = t[l + 7], a[u + 10] = t[l + 8], a[u + 11] = 0;
+      const u = c * 9, d = c * 12;
+      o[d + 0] = t[u + 0], o[d + 1] = t[u + 1], o[d + 2] = t[u + 2], o[d + 3] = 0, o[d + 4] = t[u + 3], o[d + 5] = t[u + 4], o[d + 6] = t[u + 5], o[d + 7] = 0, o[d + 8] = t[u + 6], o[d + 9] = t[u + 7], o[d + 10] = t[u + 8], o[d + 11] = 0;
     }
   else
     for (let c = 0; c < e; c++) {
-      const l = c * s, u = c * 4;
-      for (let d = 0; d < s; d++)
-        a[u + d] = t[l + d];
-      for (let d = s; d < 4; d++)
-        a[u + d] = 0;
+      const u = c * s, d = c * 4;
+      for (let h = 0; h < s; h++)
+        o[d + h] = t[u + h];
+      for (let h = s; h < 4; h++)
+        o[d + h] = 0;
     }
-  return a;
+  return o;
 }
-const fe = `#version 300 es
+const pe = `#version 300 es
 precision highp float;
 
 layout(location = 0) in vec2 position;
@@ -242,7 +259,7 @@ layout(location = 0) in vec2 position;
 void main() {
   gl_Position = vec4(position, 0.0, 1.0);
 }
-`, st = `#version 300 es
+`, tt = `#version 300 es
 precision highp float;
 
 // Shadertoy compatibility: equirectangular texture sampling
@@ -253,7 +270,7 @@ vec2 _st_dirToEquirect(vec3 dir) {
   float theta = asin(dir.y);
   return vec2(phi / ST_TWOPI + 0.5, theta / ST_PI + 0.5);
 }
-`, rt = `// --- Keyboard helpers (auto-injected) ---
+`, nt = `// --- Keyboard helpers (auto-injected) ---
 // Letter keys
 const int KEY_A = 65; const int KEY_B = 66; const int KEY_C = 67; const int KEY_D = 68;
 const int KEY_E = 69; const int KEY_F = 70; const int KEY_G = 71; const int KEY_H = 72;
@@ -301,8 +318,8 @@ float keyToggle(int key) {
 bool isKeyDown(int key) { return keyDown(key) > 0.5; }
 bool isKeyToggled(int key) { return keyToggle(key) > 0.5; }
 `;
-function ot(i, e, t) {
-  const n = [st];
+function it(i, e, t) {
+  const n = [tt];
   if (t.commonSource && (n.push("// Common code"), n.push(t.commonSource), n.push("")), t.namedSamplers && t.namedSamplers.size > 0) {
     if (n.push(`// Core uniforms
 uniform vec3  iResolution;
@@ -324,14 +341,14 @@ uniform float iPinchDelta;
 uniform vec2  iPinchCenter;
 `), t.viewNames && t.viewNames.length > 1) {
       n.push("// Cross-view uniforms (multi-view project)");
-      for (const d of t.viewNames)
-        n.push(`uniform vec4  iMouse_${d};`), n.push(`uniform vec3  iResolution_${d};`), n.push(`uniform bool  iMousePressed_${d};`);
+      for (const h of t.viewNames)
+        n.push(`uniform vec4  iMouse_${h};`), n.push(`uniform vec3  iResolution_${h};`), n.push(`uniform bool  iMousePressed_${h};`);
       n.push("");
     }
     n.push("// Named samplers");
-    for (const [d] of t.namedSamplers)
-      n.push(`uniform sampler2D ${d};`), n.push(`uniform vec3 ${d}_resolution;`);
-    n.push(""), t.namedSamplers.has("keyboard") && (n.push(rt), n.push(""));
+    for (const [h] of t.namedSamplers)
+      n.push(`uniform sampler2D ${h};`), n.push(`uniform vec3 ${h}_resolution;`);
+    n.push(""), t.namedSamplers.has("keyboard") && (n.push(nt), n.push(""));
   } else if (n.push(`// Shadertoy built-in uniforms
 uniform vec3  iResolution;
 uniform float iTime;
@@ -357,55 +374,57 @@ uniform float iPinchDelta;          // Pinch change since last frame
 uniform vec2  iPinchCenter;         // Center point of pinch gesture
 `), t.viewNames && t.viewNames.length > 1) {
     n.push("// Cross-view uniforms (multi-view project)");
-    for (const d of t.viewNames)
-      n.push(`uniform vec4  iMouse_${d};`), n.push(`uniform vec3  iResolution_${d};`), n.push(`uniform bool  iMousePressed_${d};`);
+    for (const h of t.viewNames)
+      n.push(`uniform vec4  iMouse_${h};`), n.push(`uniform vec3  iResolution_${h};`), n.push(`uniform bool  iMousePressed_${h};`);
     n.push("");
   }
-  for (const d of t.ubos)
-    n.push(`// Array uniform: ${d.name} (max ${d.count})`), n.push(`layout(std140) uniform _ub_${d.name} {`), n.push(`  ${d.def.type} ${d.name}[${d.count}];`), n.push("};"), n.push(`uniform int ${d.name}_count;`), n.push("");
-  const s = Object.entries(t.uniforms).filter(([, d]) => !A(d));
+  for (const h of t.ubos)
+    n.push(`// Array uniform: ${h.name} (max ${h.count})`), n.push(`layout(std140) uniform _ub_${h.name} {`), n.push(`  ${h.def.type} ${h.name}[${h.count}];`), n.push("};"), n.push(`uniform int ${h.name}_count;`), n.push("");
+  const s = Object.entries(t.uniforms).filter(([, h]) => !L(h));
   if (s.length > 0) {
     n.push("// Custom uniforms");
-    for (const [d, E] of s) {
-      const y = E.type === "bool" ? "bool" : E.type;
-      n.push(`uniform ${y} ${d};`);
+    for (const [h, T] of s) {
+      const _ = T.type === "bool" ? "bool" : T.type;
+      n.push(`uniform ${_} ${h};`);
     }
     n.push("");
   }
-  const r = at(i, e);
+  const r = st(i, e);
   n.push("// User shader code"), n.push(r), n.push(""), n.push(`// Main wrapper
 out vec4 fragColor;
 
 void main() {
   mainImage(fragColor, gl_FragCoord.xy);
 }`);
-  const o = n.join(`
-`), a = o.split(`
+  const a = n.join(`
+`), o = a.split(`
 `);
-  let c = 0, l = 0, u = 0;
-  for (let d = 0; d < a.length; d++)
-    a[d] === "// Common code" && (c = d + 2, l = t.commonSource ? t.commonSource.split(`
-`).length : 0), a[d] === "// User shader code" && (u = d + 2);
+  let c = 0, u = 0, d = 0;
+  for (let h = 0; h < o.length; h++)
+    o[h] === "// Common code" && (c = h + 2, u = t.commonSource ? t.commonSource.split(`
+`).length : 0), o[h] === "// User shader code" && (d = h + 2);
   return {
-    source: o,
-    lineMapping: { commonStartLine: c, commonLines: l, userCodeStartLine: u }
+    source: a,
+    lineMapping: { commonStartLine: c, commonLines: u, userCodeStartLine: d }
   };
 }
-function at(i, e) {
+function st(i, e) {
   const t = /* @__PURE__ */ new Set();
   if (e.forEach((s, r) => {
     s.kind === "texture" && s.cubemap && t.add(`iChannel${r}`);
   }), t.size === 0)
     return i;
   const n = /texture\s*\(\s*(iChannel[0-3])\s*,\s*([^)]+)\)/g;
-  return i.replace(n, (s, r, o) => t.has(r) ? `texture(${r}, _st_dirToEquirect(${o}))` : s);
+  return i.replace(n, (s, r, a) => t.has(r) ? `texture(${r}, _st_dirToEquirect(${a}))` : s);
 }
-class ct {
+class rt {
   constructor(e, t) {
-    this._audioTexture = null, this._needsAudio = !1, this._videoTextures = [];
+    l(this, "_audioTexture", null);
+    l(this, "_needsAudio", !1);
+    l(this, "_videoTextures", []);
     const n = this.getAllChannelSources(t);
     n.some((s) => s.kind === "audio") && (this._needsAudio = !0, this._audioTexture = {
-      texture: qe(e),
+      texture: ze(e),
       audioContext: null,
       analyser: null,
       stream: null,
@@ -416,16 +435,16 @@ class ct {
       initialized: !1
     });
     for (const s of n)
-      s.kind === "webcam" ? this._videoTextures.find((o) => o.kind === "webcam") || this._videoTextures.push({
-        texture: pe(e),
+      s.kind === "webcam" ? this._videoTextures.find((a) => a.kind === "webcam") || this._videoTextures.push({
+        texture: me(e),
         video: null,
         stream: null,
         width: 1,
         height: 1,
         ready: !1,
         kind: "webcam"
-      }) : s.kind === "video" && (this._videoTextures.find((o) => o.kind === "video" && o.src === s.src) || this._videoTextures.push({
-        texture: pe(e),
+      }) : s.kind === "video" && (this._videoTextures.find((a) => a.kind === "video" && a.src === s.src) || this._videoTextures.push({
+        texture: me(e),
         video: null,
         stream: null,
         width: 1,
@@ -479,8 +498,7 @@ class ct {
   }
   async initVideo(e) {
     const t = this._videoTextures.find((s) => s.kind === "video" && s.src === e && !s.ready);
-    if (!t)
-      return;
+    if (!t) return;
     const n = document.createElement("video");
     n.src = e, n.muted = !0, n.loop = !0, n.playsInline = !0, n.crossOrigin = "anonymous", n.addEventListener("loadedmetadata", () => {
       t.width = n.videoWidth, t.height = n.videoHeight;
@@ -496,20 +514,25 @@ class ct {
   // ===========================================================================
   updateAudioTexture(e) {
     var t;
-    (t = this._audioTexture) != null && t.analyser && (this._audioTexture.analyser.getByteFrequencyData(this._audioTexture.frequencyData), this._audioTexture.analyser.getByteTimeDomainData(this._audioTexture.waveformData), Ze(e, this._audioTexture.texture, this._audioTexture.frequencyData, this._audioTexture.waveformData));
+    (t = this._audioTexture) != null && t.analyser && (this._audioTexture.analyser.getByteFrequencyData(this._audioTexture.frequencyData), this._audioTexture.analyser.getByteTimeDomainData(this._audioTexture.waveformData), Ge(
+      e,
+      this._audioTexture.texture,
+      this._audioTexture.frequencyData,
+      this._audioTexture.waveformData
+    ));
   }
   updateVideoTextures(e) {
     for (const t of this._videoTextures)
-      !t.ready || !t.video || t.video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA || (Je(e, t.texture, t.video), t.video.videoWidth > 0 && (t.width = t.video.videoWidth, t.height = t.video.videoHeight));
+      !t.ready || !t.video || t.video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA || (We(e, t.texture, t.video), t.video.videoWidth > 0 && (t.width = t.video.videoWidth, t.height = t.video.videoHeight));
   }
   // ===========================================================================
   // Cleanup
   // ===========================================================================
   dispose(e) {
     var t, n, s, r;
-    this._audioTexture && ((t = this._audioTexture.stream) == null || t.getTracks().forEach((o) => o.stop()), (n = this._audioTexture.audioContext) == null || n.close(), e.deleteTexture(this._audioTexture.texture));
-    for (const o of this._videoTextures)
-      (s = o.stream) == null || s.getTracks().forEach((a) => a.stop()), (r = o.video) == null || r.pause(), e.deleteTexture(o.texture);
+    this._audioTexture && ((t = this._audioTexture.stream) == null || t.getTracks().forEach((a) => a.stop()), (n = this._audioTexture.audioContext) == null || n.close(), e.deleteTexture(this._audioTexture.texture));
+    for (const a of this._videoTextures)
+      (s = a.stream) == null || s.getTracks().forEach((o) => o.stop()), (r = a.video) == null || r.pause(), e.deleteTexture(a.texture);
     this._audioTexture = null, this._videoTextures = [];
   }
   // ===========================================================================
@@ -522,16 +545,18 @@ class ct {
     return t;
   }
 }
-class lt {
+class at {
   constructor(e) {
-    this.values = {}, this.definitions = e, this.initializeDefaults();
+    l(this, "definitions");
+    l(this, "values", {});
+    this.definitions = e, this.initializeDefaults();
   }
   /**
    * Initialize all values to their definition defaults.
    */
   initializeDefaults() {
     for (const [e, t] of Object.entries(this.definitions))
-      A(t) ? this.values[e] = new Float32Array(O(t.type, t.count)) : this.values[e] = this.cloneValue(t.value);
+      L(t) ? this.values[e] = new Float32Array(O(t.type, t.count)) : this.values[e] = this.cloneValue(t.value);
   }
   /**
    * Clone a value to avoid mutation of arrays.
@@ -592,7 +617,7 @@ class lt {
    */
   reset(e) {
     const t = this.definitions[e];
-    return t ? (A(t) ? this.values[e] = new Float32Array(O(t.type, t.count)) : this.values[e] = this.cloneValue(t.value), !0) : !1;
+    return t ? (L(t) ? this.values[e] = new Float32Array(O(t.type, t.count)) : this.values[e] = this.cloneValue(t.value), !0) : !1;
   }
   /**
    * Reset all uniforms to their default values.
@@ -606,7 +631,7 @@ class lt {
   getDefault(e) {
     const t = this.definitions[e];
     if (t)
-      return A(t) ? new Float32Array(O(t.type, t.count)) : this.cloneValue(t.value);
+      return L(t) ? new Float32Array(O(t.type, t.count)) : this.cloneValue(t.value);
   }
   /**
    * Iterate over all uniforms (name, definition, current value).
@@ -628,11 +653,15 @@ class lt {
     return this.size === 0;
   }
 }
-class ut {
+class ot {
   constructor(e, t) {
-    this._ubos = [], this._dirtyScalars = /* @__PURE__ */ new Set(), this._uniforms = t, this._store = new lt(t), this.initUBOs(e);
+    l(this, "_store");
+    l(this, "_ubos", []);
+    l(this, "_dirtyScalars", /* @__PURE__ */ new Set());
+    l(this, "_uniforms");
+    this._uniforms = t, this._store = new at(t), this.initUBOs(e);
     for (const [n, s] of Object.entries(t))
-      A(s) || this._dirtyScalars.add(n);
+      L(s) || this._dirtyScalars.add(n);
   }
   // ===========================================================================
   // Accessors
@@ -664,7 +693,7 @@ class ut {
       console.warn(`setUniformValue('${e}'): uniform not defined in config`);
       return;
     }
-    if (!A(n)) {
+    if (!L(n)) {
       const s = n.type;
       if ((s === "float" || s === "int") && typeof t != "number") {
         console.warn(`setUniformValue('${e}'): expected number for ${s}, got ${typeof t}`);
@@ -686,22 +715,26 @@ class ut {
         }
       }
     }
-    if (this._store.set(e, t), A(n)) {
+    if (this._store.set(e, t), L(n)) {
       const s = this._ubos.find((r) => r.name === e);
       if (s) {
-        const r = t, o = O(n.type, n.count), a = O(n.type, 1);
-        if (r.length > o) {
-          console.warn(`setUniformValue('${e}'): Float32Array length ${r.length} exceeds max ${o} (${n.count} × ${n.type})`);
+        const r = t, a = O(n.type, n.count), o = O(n.type, 1);
+        if (r.length > a) {
+          console.warn(
+            `setUniformValue('${e}'): Float32Array length ${r.length} exceeds max ${a} (${n.count} × ${n.type})`
+          );
           return;
         }
-        if (r.length % a !== 0) {
-          console.warn(`setUniformValue('${e}'): Float32Array length ${r.length} is not a multiple of ${a} (components per ${n.type})`);
+        if (r.length % o !== 0) {
+          console.warn(
+            `setUniformValue('${e}'): Float32Array length ${r.length} is not a multiple of ${o} (components per ${n.type})`
+          );
           return;
         }
-        const c = r.length / a, l = it(n.type, c, r, s.paddedData);
-        l !== s.paddedData && s.paddedData.set(l);
-        const u = nt(n.type, c), d = s.paddedData.length;
-        u < d && s.paddedData.fill(0, u), s.activeCount = c, s.dirty = !0;
+        const c = r.length / o, u = et(n.type, c, r, s.paddedData);
+        u !== s.paddedData && s.paddedData.set(u);
+        const d = Qe(n.type, c), h = s.paddedData.length;
+        d < h && s.paddedData.fill(0, d), s.activeCount = c, s.dirty = !0;
       }
     } else
       this._dirtyScalars.add(e);
@@ -725,36 +758,34 @@ class ut {
     }
     for (const n of this._dirtyScalars) {
       const s = this._uniforms[n];
-      if (!s || A(s))
-        continue;
+      if (!s || L(s)) continue;
       const r = this._store.get(n);
-      if (r === void 0)
-        continue;
-      const o = t.custom.get(n);
-      if (o)
+      if (r === void 0) continue;
+      const a = t.custom.get(n);
+      if (a)
         switch (s.type) {
           case "float":
-            e.uniform1f(o, r);
+            e.uniform1f(a, r);
             break;
           case "int":
-            e.uniform1i(o, r);
+            e.uniform1i(a, r);
             break;
           case "bool":
-            e.uniform1i(o, r ? 1 : 0);
+            e.uniform1i(a, r ? 1 : 0);
             break;
           case "vec2": {
-            const a = r;
-            e.uniform2f(o, a[0], a[1]);
+            const o = r;
+            e.uniform2f(a, o[0], o[1]);
             break;
           }
           case "vec3": {
-            const a = r;
-            e.uniform3f(o, a[0], a[1], a[2]);
+            const o = r;
+            e.uniform3f(a, o[0], o[1], o[2]);
             break;
           }
           case "vec4": {
-            const a = r;
-            e.uniform4f(o, a[0], a[1], a[2], a[3]);
+            const o = r;
+            e.uniform4f(a, o[0], o[1], o[2], o[3]);
             break;
           }
         }
@@ -767,7 +798,7 @@ class ut {
   /** Mark all scalar uniforms dirty (e.g., after recompilation). */
   markAllScalarsDirty() {
     for (const [e, t] of Object.entries(this._uniforms))
-      A(t) || this._dirtyScalars.add(e);
+      L(t) || this._dirtyScalars.add(e);
   }
   /**
    * Bind UBO block indices for a newly compiled program.
@@ -793,41 +824,75 @@ class ut {
   initUBOs(e) {
     const t = e.getParameter(e.MAX_UNIFORM_BLOCK_SIZE), n = e.getParameter(e.MAX_UNIFORM_BUFFER_BINDINGS);
     let s = 0;
-    for (const [r, o] of Object.entries(this._uniforms)) {
-      if (!A(o))
-        continue;
-      const a = tt(o.type, o.count);
-      if (a > t)
-        throw new Error(`Array uniform '${r}' requires ${a} bytes but GL MAX_UNIFORM_BLOCK_SIZE is ${t}`);
+    for (const [r, a] of Object.entries(this._uniforms)) {
+      if (!L(a)) continue;
+      const o = Je(a.type, a.count);
+      if (o > t)
+        throw new Error(
+          `Array uniform '${r}' requires ${o} bytes but GL MAX_UNIFORM_BLOCK_SIZE is ${t}`
+        );
       const c = e.createBuffer();
-      if (!c)
-        throw new Error(`Failed to create UBO buffer for '${r}'`);
-      if (e.bindBuffer(e.UNIFORM_BUFFER, c), e.bufferData(e.UNIFORM_BUFFER, a, e.DYNAMIC_DRAW), e.bindBuffer(e.UNIFORM_BUFFER, null), s >= n)
-        throw new Error(`Too many array uniforms: binding point ${s} exceeds GL MAX_UNIFORM_BUFFER_BINDINGS (${n})`);
+      if (!c) throw new Error(`Failed to create UBO buffer for '${r}'`);
+      if (e.bindBuffer(e.UNIFORM_BUFFER, c), e.bufferData(e.UNIFORM_BUFFER, o, e.DYNAMIC_DRAW), e.bindBuffer(e.UNIFORM_BUFFER, null), s >= n)
+        throw new Error(
+          `Too many array uniforms: binding point ${s} exceeds GL MAX_UNIFORM_BUFFER_BINDINGS (${n})`
+        );
       e.bindBufferBase(e.UNIFORM_BUFFER, s, c);
-      const l = new Float32Array(a / 4);
+      const u = new Float32Array(o / 4);
       this._ubos.push({
         name: r,
-        def: o,
+        def: a,
         buffer: c,
         bindingPoint: s,
-        byteSize: a,
+        byteSize: o,
         dirty: !1,
-        paddedData: l,
+        paddedData: u,
         activeCount: 0
       }), s++;
     }
   }
 }
-class ge {
+class fe {
   constructor(e) {
-    this._frame = 0, this._time = 0, this._lastStepTime = null, this._passes = [], this._textures = [], this._keyboardTexture = null, this._blackTexture = null, this._keyStates = /* @__PURE__ */ new Map(), this._toggleStates = /* @__PURE__ */ new Map(), this._compilationErrors = [], this._scriptTextures = /* @__PURE__ */ new Map(), this._sharedVAO = null, this._disposed = !1, this._viewNames = [], this.gl = e.gl, this.project = e.project, this._onAssetError = e.onAssetError, this._width = this.gl.drawingBufferWidth, this._height = this.gl.drawingBufferHeight, this.initExtensions(), this._blackTexture = ze(this.gl);
-    const t = Ge(this.gl);
+    l(this, "project");
+    l(this, "gl");
+    l(this, "_width");
+    l(this, "_height");
+    l(this, "_frame", 0);
+    l(this, "_time", 0);
+    l(this, "_lastStepTime", null);
+    l(this, "_passes", []);
+    l(this, "_textures", []);
+    l(this, "_keyboardTexture", null);
+    l(this, "_blackTexture", null);
+    // Keyboard state tracking (Maps keycodes to state)
+    l(this, "_keyStates", /* @__PURE__ */ new Map());
+    // true = down, false = up
+    l(this, "_toggleStates", /* @__PURE__ */ new Map());
+    // 0.0 or 1.0
+    // Compilation errors (if any occurred during initialization)
+    l(this, "_compilationErrors", []);
+    // Custom uniforms (scalars + UBO-backed arrays)
+    l(this, "_uniformMgr");
+    // Media (audio, video, webcam)
+    l(this, "_media");
+    // Script-uploaded textures
+    l(this, "_scriptTextures", /* @__PURE__ */ new Map());
+    // Shared VAO for fullscreen triangle (all passes reference this)
+    l(this, "_sharedVAO", null);
+    // Disposal flag — guards async callbacks (e.g. image loads) after engine is destroyed
+    l(this, "_disposed", !1);
+    // View names for multi-view projects (enables cross-view uniforms)
+    l(this, "_viewNames", []);
+    // Asset error callback
+    l(this, "_onAssetError");
+    this.gl = e.gl, this.project = e.project, this._onAssetError = e.onAssetError, this._width = this.gl.drawingBufferWidth, this._height = this.gl.drawingBufferHeight, this.initExtensions(), this._blackTexture = je(this.gl);
+    const t = Ke(this.gl);
     this._keyboardTexture = {
       texture: t,
       width: 256,
       height: 3
-    }, this.initProjectTextures(), this._media = new ct(this.gl, e.project), this._uniformMgr = new ut(this.gl, e.project.uniforms), e.viewNames && e.viewNames.length > 1 && (this._viewNames = e.viewNames), this.initRuntimePasses();
+    }, this.initProjectTextures(), this._media = new rt(this.gl, e.project), this._uniformMgr = new ot(this.gl, e.project.uniforms), e.viewNames && e.viewNames.length > 1 && (this._viewNames = e.viewNames), this.initRuntimePasses();
   }
   // ===========================================================================
   // Media Delegates (forwarded to MediaManager)
@@ -863,26 +928,32 @@ class ge {
    * Upload or update a named texture from JavaScript (for script channel).
    */
   updateTexture(e, t, n, s) {
-    const r = this._scriptTextures.get(e), o = s instanceof Float32Array;
-    if (r && r.width === t && r.height === n && r.isFloat === o) {
-      const a = this.gl;
-      a.bindTexture(a.TEXTURE_2D, r.texture), o ? a.texSubImage2D(a.TEXTURE_2D, 0, 0, 0, t, n, a.RGBA, a.FLOAT, s) : a.texSubImage2D(a.TEXTURE_2D, 0, 0, 0, t, n, a.RGBA, a.UNSIGNED_BYTE, s), a.bindTexture(a.TEXTURE_2D, null);
+    const r = this._scriptTextures.get(e), a = s instanceof Float32Array;
+    if (r && r.width === t && r.height === n && r.isFloat === a) {
+      const o = this.gl;
+      o.bindTexture(o.TEXTURE_2D, r.texture), a ? o.texSubImage2D(o.TEXTURE_2D, 0, 0, 0, t, n, o.RGBA, o.FLOAT, s) : o.texSubImage2D(o.TEXTURE_2D, 0, 0, 0, t, n, o.RGBA, o.UNSIGNED_BYTE, s), o.bindTexture(o.TEXTURE_2D, null);
     } else {
-      const a = Qe(this.gl, (r == null ? void 0 : r.texture) ?? null, t, n, s);
-      this._scriptTextures.set(e, { texture: a, width: t, height: n, isFloat: o });
+      const o = qe(
+        this.gl,
+        (r == null ? void 0 : r.texture) ?? null,
+        t,
+        n,
+        s
+      );
+      this._scriptTextures.set(e, { texture: o, width: t, height: n, isFloat: a });
     }
   }
   /**
    * Read pixels from a buffer pass (reads previous frame's data).
    */
   readPixels(e, t, n, s, r) {
-    const o = this._passes.find((l) => l.name === e);
-    if (!o)
+    const a = this._passes.find((u) => u.name === e);
+    if (!a)
       return console.warn(`readPixels: pass '${e}' not found`), new Uint8Array(s * r * 4);
-    const a = this.gl;
-    a.bindFramebuffer(a.FRAMEBUFFER, o.framebuffer), a.framebufferTexture2D(a.FRAMEBUFFER, a.COLOR_ATTACHMENT0, a.TEXTURE_2D, o.previousTexture, 0);
+    const o = this.gl;
+    o.bindFramebuffer(o.FRAMEBUFFER, a.framebuffer), o.framebufferTexture2D(o.FRAMEBUFFER, o.COLOR_ATTACHMENT0, o.TEXTURE_2D, a.previousTexture, 0);
     const c = new Uint8Array(s * r * 4);
-    return a.readPixels(t, n, s, r, a.RGBA, a.UNSIGNED_BYTE, c), a.framebufferTexture2D(a.FRAMEBUFFER, a.COLOR_ATTACHMENT0, a.TEXTURE_2D, o.currentTexture, 0), a.bindFramebuffer(a.FRAMEBUFFER, null), c;
+    return o.readPixels(t, n, s, r, o.RGBA, o.UNSIGNED_BYTE, c), o.framebufferTexture2D(o.FRAMEBUFFER, o.COLOR_ATTACHMENT0, o.TEXTURE_2D, a.currentTexture, 0), o.bindFramebuffer(o.FRAMEBUFFER, null), c;
   }
   // ===========================================================================
   // Public API
@@ -957,7 +1028,13 @@ class ge {
    */
   bindImageForRead() {
     const e = this.gl, t = this._passes.find((n) => n.name === "Image");
-    return t ? (e.bindFramebuffer(e.READ_FRAMEBUFFER, t.framebuffer), e.framebufferTexture2D(e.READ_FRAMEBUFFER, e.COLOR_ATTACHMENT0, e.TEXTURE_2D, t.previousTexture, 0), !0) : !1;
+    return t ? (e.bindFramebuffer(e.READ_FRAMEBUFFER, t.framebuffer), e.framebufferTexture2D(
+      e.READ_FRAMEBUFFER,
+      e.COLOR_ATTACHMENT0,
+      e.TEXTURE_2D,
+      t.previousTexture,
+      0
+    ), !0) : !1;
   }
   /**
    * Restore the Image pass framebuffer to its normal state (attached to currentTexture).
@@ -965,7 +1042,13 @@ class ge {
    */
   unbindImageForRead() {
     const e = this.gl, t = this._passes.find((n) => n.name === "Image");
-    t && (e.framebufferTexture2D(e.READ_FRAMEBUFFER, e.COLOR_ATTACHMENT0, e.TEXTURE_2D, t.currentTexture, 0), e.bindFramebuffer(e.READ_FRAMEBUFFER, null));
+    t && (e.framebufferTexture2D(
+      e.READ_FRAMEBUFFER,
+      e.COLOR_ATTACHMENT0,
+      e.TEXTURE_2D,
+      t.currentTexture,
+      0
+    ), e.bindFramebuffer(e.READ_FRAMEBUFFER, null));
   }
   /**
    * Run one full frame of all passes.
@@ -975,18 +1058,18 @@ class ge {
    * @param touch - optional touch state for touch uniforms
    */
   step(e, t, n, s, r) {
-    const o = this.gl, a = this._lastStepTime === null ? 0 : e - this._lastStepTime;
+    const a = this.gl, o = this._lastStepTime === null ? 0 : e - this._lastStepTime;
     this._lastStepTime = e, this._time = e;
-    const c = /* @__PURE__ */ new Date(), l = s ?? {
+    const c = /* @__PURE__ */ new Date(), u = s ?? {
       count: 0,
       touches: [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]],
       pinch: 1,
       pinchDelta: 0,
       pinchCenter: [0, 0]
-    }, u = {
+    }, d = {
       iResolution: [this._width, this._height, 1],
       iTime: this._time,
-      iTimeDelta: a,
+      iTimeDelta: o,
       iFrame: this._frame,
       iMouse: t,
       iMousePressed: n,
@@ -998,19 +1081,19 @@ class ge {
         // 1-31
         c.getHours() * 3600 + c.getMinutes() * 60 + c.getSeconds() + c.getMilliseconds() / 1e3
       ],
-      iFrameRate: a > 0 ? 1 / a : 60,
-      iTouchCount: l.count,
-      iTouch: l.touches,
-      iPinch: l.pinch,
-      iPinchDelta: l.pinchDelta,
-      iPinchCenter: l.pinchCenter,
+      iFrameRate: o > 0 ? 1 / o : 60,
+      iTouchCount: u.count,
+      iTouch: u.touches,
+      iPinch: u.pinch,
+      iPinchDelta: u.pinchDelta,
+      iPinchCenter: u.pinchCenter,
       crossViewStates: r
     };
-    o.viewport(0, 0, this._width, this._height);
-    const d = ["BufferA", "BufferB", "BufferC", "BufferD", "Image"];
-    for (const E of d) {
-      const y = this._passes.find((b) => b.name === E);
-      y && (this.executePass(y, u), this.swapPassTextures(y));
+    a.viewport(0, 0, this._width, this._height);
+    const h = ["BufferA", "BufferB", "BufferC", "BufferD", "Image"];
+    for (const T of h) {
+      const _ = this._passes.find((y) => y.name === T);
+      _ && (this.executePass(_, d), this.swapPassTextures(_));
     }
     this._uniformMgr.clearDirty(), this._frame += 1;
   }
@@ -1022,7 +1105,7 @@ class ge {
     this._width = e, this._height = t;
     const n = this.gl;
     for (const s of this._passes)
-      n.deleteTexture(s.currentTexture), n.deleteTexture(s.previousTexture), n.deleteFramebuffer(s.framebuffer), s.currentTexture = z(n, e, t), s.previousTexture = z(n, e, t), s.framebuffer = me(n, s.currentTexture);
+      n.deleteTexture(s.currentTexture), n.deleteTexture(s.previousTexture), n.deleteFramebuffer(s.framebuffer), s.currentTexture = Y(n, e, t), s.previousTexture = Y(n, e, t), s.framebuffer = he(n, s.currentTexture);
   }
   /**
    * Reset frame counter and clear all render targets.
@@ -1032,7 +1115,19 @@ class ge {
     this._frame = 0;
     const e = this.gl;
     for (const t of this._passes)
-      e.bindFramebuffer(e.FRAMEBUFFER, t.framebuffer), e.clearColor(0, 0, 0, 0), e.clear(e.COLOR_BUFFER_BIT), e.framebufferTexture2D(e.FRAMEBUFFER, e.COLOR_ATTACHMENT0, e.TEXTURE_2D, t.previousTexture, 0), e.clear(e.COLOR_BUFFER_BIT), e.framebufferTexture2D(e.FRAMEBUFFER, e.COLOR_ATTACHMENT0, e.TEXTURE_2D, t.currentTexture, 0);
+      e.bindFramebuffer(e.FRAMEBUFFER, t.framebuffer), e.clearColor(0, 0, 0, 0), e.clear(e.COLOR_BUFFER_BIT), e.framebufferTexture2D(
+        e.FRAMEBUFFER,
+        e.COLOR_ATTACHMENT0,
+        e.TEXTURE_2D,
+        t.previousTexture,
+        0
+      ), e.clear(e.COLOR_BUFFER_BIT), e.framebufferTexture2D(
+        e.FRAMEBUFFER,
+        e.COLOR_ATTACHMENT0,
+        e.TEXTURE_2D,
+        t.currentTexture,
+        0
+      );
     e.bindFramebuffer(e.FRAMEBUFFER, null);
   }
   /**
@@ -1053,7 +1148,12 @@ class ge {
    * Should be called once per frame before rendering.
    */
   updateKeyboardTexture() {
-    this._keyboardTexture && We(this.gl, this._keyboardTexture.texture, this._keyStates, this._toggleStates);
+    this._keyboardTexture && Ye(
+      this.gl,
+      this._keyboardTexture.texture,
+      this._keyStates,
+      this._toggleStates
+    );
   }
   /**
    * Recompile a single pass with new GLSL source code.
@@ -1064,18 +1164,18 @@ class ge {
    * @returns Object with success status and error message if failed
    */
   recompilePass(e, t) {
-    const n = this.gl, s = this._passes.find((a) => a.name === e);
+    const n = this.gl, s = this._passes.find((o) => o.name === e);
     if (!s)
       return { success: !1, error: `Pass '${e}' not found` };
     const r = this.project.passes[e];
     if (!r)
       return { success: !1, error: `Project pass '${e}' not found` };
-    const { source: o } = this.buildFragmentShader(t, r.channels, r.namedSamplers);
+    const { source: a } = this.buildFragmentShader(t, r.channels, r.namedSamplers);
     try {
-      const a = he(n, fe, o);
-      return n.deleteProgram(s.uniforms.program), s.uniforms = this.cacheUniformLocations(a, r.namedSamplers), r.glslSource = t, this._compilationErrors = this._compilationErrors.filter((c) => c.passName !== e), this._uniformMgr.markAllScalarsDirty(), { success: !0 };
-    } catch (a) {
-      return { success: !1, error: a instanceof Error ? a.message : String(a) };
+      const o = de(n, pe, a);
+      return n.deleteProgram(s.uniforms.program), s.uniforms = this.cacheUniformLocations(o, r.namedSamplers), r.glslSource = t, this._compilationErrors = this._compilationErrors.filter((c) => c.passName !== e), this._uniformMgr.markAllScalarsDirty(), { success: !0 };
+    } catch (o) {
+      return { success: !1, error: o instanceof Error ? o.message : String(o) };
     }
   }
   /**
@@ -1090,20 +1190,18 @@ class ge {
     this.project.commonSource = e;
     const n = [], s = ["BufferA", "BufferB", "BufferC", "BufferD", "Image"];
     for (const r of s) {
-      const o = this.project.passes[r];
-      if (!o)
-        continue;
-      const a = this.recompilePass(r, o.glslSource);
-      a.success || n.push({ passName: r, error: a.error || "Unknown error" });
+      const a = this.project.passes[r];
+      if (!a) continue;
+      const o = this.recompilePass(r, a.glslSource);
+      o.success || n.push({ passName: r, error: o.error || "Unknown error" });
     }
     if (n.length > 0) {
       this.project.commonSource = t;
       for (const r of s) {
-        const o = this.project.passes[r];
-        if (!o || n.some((c) => c.passName === r))
-          continue;
-        const a = this.recompilePass(r, o.glslSource);
-        a.success || (console.error(`Failed to revert ${r} to old common source:`, a.error), n.push({ passName: r, error: `Revert failed: ${a.error}` }));
+        const a = this.project.passes[r];
+        if (!a || n.some((c) => c.passName === r)) continue;
+        const o = this.recompilePass(r, a.glslSource);
+        o.success || (console.error(`Failed to revert ${r} to old common source:`, o.error), n.push({ passName: r, error: `Revert failed: ${o.error}` }));
       }
       return { success: !1, errors: n };
     }
@@ -1131,7 +1229,9 @@ class ge {
   initExtensions() {
     const e = this.gl;
     if (!e.getExtension("EXT_color_buffer_float"))
-      throw new Error("EXT_color_buffer_float not supported. WebGL2 with float rendering is required.");
+      throw new Error(
+        "EXT_color_buffer_float not supported. WebGL2 with float rendering is required."
+      );
     e.getExtension("OES_texture_float_linear");
   }
   /**
@@ -1140,8 +1240,8 @@ class ge {
    */
   cacheUniformLocations(e, t) {
     const n = this.gl, s = /* @__PURE__ */ new Map();
-    for (const [r, o] of Object.entries(this.project.uniforms))
-      A(o) || s.set(r, n.getUniformLocation(e, r));
+    for (const [r, a] of Object.entries(this.project.uniforms))
+      L(a) || s.set(r, n.getUniformLocation(e, r));
     return this._uniformMgr.bindUBOsToProgram(n, e, s), {
       program: e,
       iResolution: n.getUniformLocation(e, "iResolution"),
@@ -1178,37 +1278,37 @@ class ge {
       namedSamplers: (() => {
         const r = /* @__PURE__ */ new Map();
         if (t)
-          for (const [o] of t)
-            r.set(o, n.getUniformLocation(e, o));
+          for (const [a] of t)
+            r.set(a, n.getUniformLocation(e, a));
         return r;
       })(),
       namedSamplerResolutions: (() => {
         const r = /* @__PURE__ */ new Map();
         if (t)
-          for (const [o] of t)
-            r.set(o, n.getUniformLocation(e, `${o}_resolution`));
+          for (const [a] of t)
+            r.set(a, n.getUniformLocation(e, `${a}_resolution`));
         return r;
       })(),
       // Cross-view uniforms for multi-view projects
       crossViewMouse: (() => {
         const r = /* @__PURE__ */ new Map();
         if (this._viewNames.length > 1)
-          for (const o of this._viewNames)
-            r.set(o, n.getUniformLocation(e, `iMouse_${o}`));
+          for (const a of this._viewNames)
+            r.set(a, n.getUniformLocation(e, `iMouse_${a}`));
         return r;
       })(),
       crossViewResolution: (() => {
         const r = /* @__PURE__ */ new Map();
         if (this._viewNames.length > 1)
-          for (const o of this._viewNames)
-            r.set(o, n.getUniformLocation(e, `iResolution_${o}`));
+          for (const a of this._viewNames)
+            r.set(a, n.getUniformLocation(e, `iResolution_${a}`));
         return r;
       })(),
       crossViewMousePressed: (() => {
         const r = /* @__PURE__ */ new Map();
         if (this._viewNames.length > 1)
-          for (const o of this._viewNames)
-            r.set(o, n.getUniformLocation(e, `iMousePressed_${o}`));
+          for (const a of this._viewNames)
+            r.set(a, n.getUniformLocation(e, `iMousePressed_${a}`));
         return r;
       })()
     };
@@ -1237,16 +1337,15 @@ class ge {
       this._textures.push(s);
       const r = new Image();
       r.crossOrigin = "anonymous", r.onload = () => {
-        if (this._disposed || e.isContextLost())
-          return;
+        if (this._disposed || e.isContextLost()) return;
         e.bindTexture(e.TEXTURE_2D, n), e.pixelStorei(e.UNPACK_FLIP_Y_WEBGL, !0), e.texImage2D(e.TEXTURE_2D, 0, e.RGBA, e.RGBA, e.UNSIGNED_BYTE, r), e.pixelStorei(e.UNPACK_FLIP_Y_WEBGL, !1);
-        const o = t.filter !== "nearest";
-        e.texParameteri(e.TEXTURE_2D, e.TEXTURE_MAG_FILTER, o ? e.LINEAR : e.NEAREST), e.texParameteri(e.TEXTURE_2D, e.TEXTURE_MIN_FILTER, o ? e.LINEAR_MIPMAP_LINEAR : e.NEAREST);
-        const a = t.wrap === "clamp" ? e.CLAMP_TO_EDGE : e.REPEAT;
-        e.texParameteri(e.TEXTURE_2D, e.TEXTURE_WRAP_S, a), e.texParameteri(e.TEXTURE_2D, e.TEXTURE_WRAP_T, a), o && e.generateMipmap(e.TEXTURE_2D), s.width = r.width, s.height = r.height, console.log(`Loaded texture '${t.name}': ${r.width}x${r.height}`);
+        const a = t.filter !== "nearest";
+        e.texParameteri(e.TEXTURE_2D, e.TEXTURE_MAG_FILTER, a ? e.LINEAR : e.NEAREST), e.texParameteri(e.TEXTURE_2D, e.TEXTURE_MIN_FILTER, a ? e.LINEAR_MIPMAP_LINEAR : e.NEAREST);
+        const o = t.wrap === "clamp" ? e.CLAMP_TO_EDGE : e.REPEAT;
+        e.texParameteri(e.TEXTURE_2D, e.TEXTURE_WRAP_S, o), e.texParameteri(e.TEXTURE_2D, e.TEXTURE_WRAP_T, o), a && e.generateMipmap(e.TEXTURE_2D), s.width = r.width, s.height = r.height, console.log(`Loaded texture '${t.name}': ${r.width}x${r.height}`);
       }, r.onerror = () => {
-        var o;
-        console.error(`Failed to load texture '${t.name}' from ${t.source}`), (o = this._onAssetError) == null || o.call(this, { type: "texture", name: t.name, detail: t.source });
+        var a;
+        console.error(`Failed to load texture '${t.name}' from ${t.source}`), (a = this._onAssetError) == null || a.call(this, { type: "texture", name: t.name, detail: t.source });
       }, r.src = t.source;
     }
   }
@@ -1254,45 +1353,44 @@ class ge {
    * Compile shaders, create VAOs/FBOs/textures, and build RuntimePass array.
    */
   initRuntimePasses() {
-    const e = this.gl, t = this.project, n = Ke(e);
+    const e = this.gl, t = this.project, n = Xe(e);
     this._sharedVAO = n;
     const s = ["BufferA", "BufferB", "BufferC", "BufferD", "Image"];
     for (const r of s) {
-      const o = t.passes[r];
-      if (!o)
-        continue;
-      const { source: a, lineMapping: c } = this.buildFragmentShader(o.glslSource, o.channels, o.namedSamplers);
+      const a = t.passes[r];
+      if (!a) continue;
+      const { source: o, lineMapping: c } = this.buildFragmentShader(a.glslSource, a.channels, a.namedSamplers);
       try {
-        const l = he(e, fe, a), u = this.cacheUniformLocations(l, o.namedSamplers), d = z(e, this._width, this._height), E = z(e, this._width, this._height), y = me(e, d), b = {
+        const u = de(e, pe, o), d = this.cacheUniformLocations(u, a.namedSamplers), h = Y(e, this._width, this._height), T = Y(e, this._width, this._height), _ = he(e, h), y = {
           name: r,
-          projectChannels: o.channels,
+          projectChannels: a.channels,
           vao: n,
-          uniforms: u,
-          framebuffer: y,
-          currentTexture: d,
-          previousTexture: E,
-          namedSamplers: o.namedSamplers
+          uniforms: d,
+          framebuffer: _,
+          currentTexture: h,
+          previousTexture: T,
+          namedSamplers: a.namedSamplers
         };
-        this._passes.push(b);
-      } catch (l) {
-        const u = l instanceof Error ? l.message : String(l), d = u.match(/ERROR:\s*\d+:(\d+):/);
-        let E = !1, y = null;
-        if (d) {
-          const b = parseInt(d[1], 10);
+        this._passes.push(y);
+      } catch (u) {
+        const d = u instanceof Error ? u.message : String(u), h = d.match(/ERROR:\s*\d+:(\d+):/);
+        let T = !1, _ = null;
+        if (h) {
+          const y = parseInt(h[1], 10);
           if (c.commonStartLine > 0 && c.commonLines > 0) {
-            const T = c.commonStartLine + c.commonLines - 1;
-            b >= c.commonStartLine && b <= T && (E = !0, y = b - c.commonStartLine + 1);
+            const b = c.commonStartLine + c.commonLines - 1;
+            y >= c.commonStartLine && y <= b && (T = !0, _ = y - c.commonStartLine + 1);
           }
-          !E && c.userCodeStartLine > 0 && b >= c.userCodeStartLine && (y = b - c.userCodeStartLine + 1);
+          !T && c.userCodeStartLine > 0 && y >= c.userCodeStartLine && (_ = y - c.userCodeStartLine + 1);
         }
         this._compilationErrors.push({
           passName: r,
-          error: u,
-          source: a,
-          isFromCommon: E,
-          originalLine: y,
+          error: d,
+          source: o,
+          isFromCommon: T,
+          originalLine: _,
           lineMapping: c
-        }), console.error(`Failed to compile ${r}:`, u);
+        }), console.error(`Failed to compile ${r}:`, d);
       }
     }
   }
@@ -1300,7 +1398,7 @@ class ge {
    * Build complete fragment shader source with Shadertoy boilerplate.
    */
   buildFragmentShader(e, t, n) {
-    return ot(e, t, {
+    return it(e, t, {
       commonSource: this.project.commonSource ?? "",
       ubos: this._uniformMgr.ubos.map((s) => ({ name: s.name, def: s.def, count: s.def.count })),
       uniforms: this.project.uniforms,
@@ -1329,16 +1427,16 @@ class ge {
     for (let s = 0; s < 3; s++) {
       const r = e.iTouch[s];
       if (r) {
-        const o = t.iTouch[s];
-        n.uniform4f(r, o[0], o[1], o[2], o[3]);
+        const a = t.iTouch[s];
+        n.uniform4f(r, a[0], a[1], a[2], a[3]);
       }
     }
     if (e.iPinch && n.uniform1f(e.iPinch, t.iPinch), e.iPinchDelta && n.uniform1f(e.iPinchDelta, t.iPinchDelta), e.iPinchCenter && n.uniform2f(e.iPinchCenter, t.iPinchCenter[0], t.iPinchCenter[1]), t.crossViewStates)
       for (const [s, r] of t.crossViewStates) {
-        const o = e.crossViewMouse.get(s);
-        o && n.uniform4f(o, r.mouse[0], r.mouse[1], r.mouse[2], r.mouse[3]);
-        const a = e.crossViewResolution.get(s);
-        a && n.uniform3f(a, r.resolution[0], r.resolution[1], r.resolution[2]);
+        const a = e.crossViewMouse.get(s);
+        a && n.uniform4f(a, r.mouse[0], r.mouse[1], r.mouse[2], r.mouse[3]);
+        const o = e.crossViewResolution.get(s);
+        o && n.uniform3f(o, r.resolution[0], r.resolution[1], r.resolution[2]);
         const c = e.crossViewMousePressed.get(s);
         c && n.uniform1i(c, r.mousePressed ? 1 : 0);
       }
@@ -1346,12 +1444,12 @@ class ge {
   bindChannelTextures(e) {
     const t = this.gl;
     for (let n = 0; n < 4; n++) {
-      const s = e.projectChannels[n], r = this.resolveChannelTexture(s), o = this.resolveChannelResolution(s);
+      const s = e.projectChannels[n], r = this.resolveChannelTexture(s), a = this.resolveChannelResolution(s);
       t.activeTexture(t.TEXTURE0 + n), t.bindTexture(t.TEXTURE_2D, r);
-      const a = e.uniforms.iChannel[n];
-      a && t.uniform1i(a, n);
+      const o = e.uniforms.iChannel[n];
+      o && t.uniform1i(o, n);
       const c = e.uniforms.iChannelResolution[n];
-      c && t.uniform3f(c, o[0], o[1], 1);
+      c && t.uniform3f(c, a[0], a[1], 1);
     }
   }
   /**
@@ -1362,12 +1460,12 @@ class ge {
     const t = this.gl;
     let n = 0;
     for (const [s, r] of e.namedSamplers) {
-      const o = this.resolveChannelTexture(r), a = this.resolveChannelResolution(r);
-      t.activeTexture(t.TEXTURE0 + n), t.bindTexture(t.TEXTURE_2D, o);
+      const a = this.resolveChannelTexture(r), o = this.resolveChannelResolution(r);
+      t.activeTexture(t.TEXTURE0 + n), t.bindTexture(t.TEXTURE_2D, a);
       const c = e.uniforms.namedSamplers.get(s);
       c && t.uniform1i(c, n);
-      const l = e.uniforms.namedSamplerResolutions.get(s);
-      l && t.uniform3f(l, a[0], a[1], 1), n++;
+      const u = e.uniforms.namedSamplerResolutions.get(s);
+      u && t.uniform3f(u, o[0], o[1], 1), n++;
     }
   }
   /**
@@ -1445,40 +1543,48 @@ class ge {
    */
   swapPassTextures(e) {
     const t = this.gl, n = e.currentTexture;
-    e.currentTexture = e.previousTexture, e.previousTexture = n, t.bindFramebuffer(t.FRAMEBUFFER, e.framebuffer), t.framebufferTexture2D(t.FRAMEBUFFER, t.COLOR_ATTACHMENT0, t.TEXTURE_2D, e.currentTexture, 0), t.bindFramebuffer(t.FRAMEBUFFER, null);
+    e.currentTexture = e.previousTexture, e.previousTexture = n, t.bindFramebuffer(t.FRAMEBUFFER, e.framebuffer), t.framebufferTexture2D(
+      t.FRAMEBUFFER,
+      t.COLOR_ATTACHMENT0,
+      t.TEXTURE_2D,
+      e.currentTexture,
+      0
+    ), t.bindFramebuffer(t.FRAMEBUFFER, null);
   }
 }
-class dt {
+class ct {
   constructor(e) {
-    this.overlay = null, this.container = e;
+    l(this, "container");
+    l(this, "overlay", null);
+    this.container = e;
   }
   /**
    * Display shader compilation errors in an overlay.
    */
   show(e, t) {
     this.overlay || (this.overlay = document.createElement("div"), this.overlay.className = "shader-error-overlay", this.container.appendChild(this.overlay));
-    const n = e.filter((u) => u.isFromCommon), s = e.filter((u) => !u.isFromCommon), c = [...n.length > 0 ? [n[0]] : [], ...s].map(({ passName: u, error: d, isFromCommon: E, originalLine: y, lineMapping: b }) => {
-      const T = d.replace(`Shader compilation failed:
-`, ""), w = y;
-      let _ = T;
-      w !== null && (_ = T.replace(/ERROR:\s*\d+:(\d+):/g, `ERROR: 0:${w}:`));
-      let m = null;
-      if (E)
-        m = t.commonSource;
+    const n = e.filter((d) => d.isFromCommon), s = e.filter((d) => !d.isFromCommon), c = [...n.length > 0 ? [n[0]] : [], ...s].map(({ passName: d, error: h, isFromCommon: T, originalLine: _, lineMapping: y }) => {
+      const b = h.replace(`Shader compilation failed:
+`, ""), w = _;
+      let R = b;
+      w !== null && (R = b.replace(/ERROR:\s*\d+:(\d+):/g, `ERROR: 0:${w}:`));
+      let p = null;
+      if (T)
+        p = t.commonSource;
       else {
-        const h = t.passes[u];
-        m = (h == null ? void 0 : h.glslSource) ?? null;
+        const m = t.passes[d];
+        p = (m == null ? void 0 : m.glslSource) ?? null;
       }
       return {
-        passName: E ? "common.glsl" : u,
-        error: ht(_, b, E),
-        codeContext: w !== null && m ? pt(m, w) : null
+        passName: T ? "common.glsl" : d,
+        error: lt(R, y, T),
+        codeContext: w !== null && p ? dt(p, w) : null
       };
-    }).map(({ passName: u, error: d, codeContext: E }) => `
+    }).map(({ passName: d, error: h, codeContext: T }) => `
       <div class="error-section">
-        <div class="error-pass-name">${u}</div>
-        <pre class="error-content">${Fe(d)}</pre>
-        ${E ? `<pre class="error-code-context">${E}</pre>` : ""}
+        <div class="error-pass-name">${d}</div>
+        <pre class="error-content">${Se(h)}</pre>
+        ${T ? `<pre class="error-code-context">${T}</pre>` : ""}
       </div>
     `).join("");
     this.overlay.innerHTML = `
@@ -1497,8 +1603,8 @@ class dt {
         </div>
       </div>
     `;
-    const l = this.overlay.querySelector(".error-close");
-    l && l.addEventListener("click", () => this.hide());
+    const u = this.overlay.querySelector(".error-close");
+    u && u.addEventListener("click", () => this.hide());
   }
   /**
    * Hide the error overlay.
@@ -1513,40 +1619,42 @@ class dt {
     this.hide();
   }
 }
-function ht(i, e, t) {
+function lt(i, e, t) {
   return i.split(`
 `).map((n) => {
     const s = n.match(/^ERROR:\s*(\d+):(\d+):\s*(.+)$/);
     if (s) {
-      const [, , r, o] = s, a = parseInt(r, 10);
-      let c = a;
-      return t && e.commonStartLine > 0 ? c = a - e.commonStartLine + 1 : e.userCodeStartLine > 0 && a >= e.userCodeStartLine && (c = a - e.userCodeStartLine + 1), `Line ${c}: ${mt(o)}`;
+      const [, , r, a] = s, o = parseInt(r, 10);
+      let c = o;
+      return t && e.commonStartLine > 0 ? c = o - e.commonStartLine + 1 : e.userCodeStartLine > 0 && o >= e.userCodeStartLine && (c = o - e.userCodeStartLine + 1), `Line ${c}: ${ut(a)}`;
     }
     return n;
   }).join(`
 `);
 }
-function mt(i) {
+function ut(i) {
   return i.includes("no matching overloaded function found") ? i + " (check function name spelling and argument types)" : i.includes("undeclared identifier") ? i + " (variable not declared — check spelling)" : i.includes("syntax error") ? i + " (check for missing semicolons, brackets, or commas)" : i.includes("is not a function") ? i + " (identifier exists but is not callable)" : i.includes("wrong operand types") ? i + " (type mismatch — check vec/float/int types)" : i;
 }
-function pt(i, e) {
+function dt(i, e) {
   const t = i.split(`
 `);
-  if (e < 1 || e > t.length)
-    return null;
+  if (e < 1 || e > t.length) return null;
   const n = 3, s = Math.max(0, e - n - 1), r = Math.min(t.length, e + n);
-  return t.slice(s, r).map((a, c) => {
-    const l = s + c + 1, u = l === e, d = String(l).padStart(4, " "), E = Fe(a);
-    return u ? `<span class="error-line-highlight">${d} │ ${E}</span>` : `<span class="context-line">${d} │ ${E}</span>`;
+  return t.slice(s, r).map((o, c) => {
+    const u = s + c + 1, d = u === e, h = String(u).padStart(4, " "), T = Se(o);
+    return d ? `<span class="error-line-highlight">${h} │ ${T}</span>` : `<span class="context-line">${h} │ ${T}</span>`;
   }).join("");
 }
-function Fe(i) {
+function Se(i) {
   const e = document.createElement("div");
   return e.textContent = i, e.innerHTML;
 }
-class H {
+const $ = class $ {
   constructor(e) {
-    this.overlay = null, this.autoHideTimer = null, this.container = e;
+    l(this, "container");
+    l(this, "overlay", null);
+    l(this, "autoHideTimer", null);
+    this.container = e;
   }
   /**
    * Show an error from setup() or onFrame().
@@ -1567,10 +1675,10 @@ class H {
           </span>
           <button class="script-error-close" title="Dismiss">×</button>
         </div>
-        <pre class="script-error-message">${G(n)}</pre>
-        ${s ? `<pre class="script-error-stack">${G(s)}</pre>` : ""}
+        <pre class="script-error-message">${z(n)}</pre>
+        ${s ? `<pre class="script-error-stack">${z(s)}</pre>` : ""}
       </div>
-    `, this.wireClose(), this.autoHideTimer = setTimeout(() => this.hide(), H.AUTO_HIDE_MS);
+    `, this.wireClose(), this.autoHideTimer = setTimeout(() => this.hide(), $.AUTO_HIDE_MS);
   }
   /**
    * Show a persistent warning when onFrame() has been disabled.
@@ -1602,13 +1710,13 @@ class H {
             <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: text-bottom;">
               <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
             </svg>
-            ${G(e)}
+            ${z(e)}
           </span>
           <button class="script-error-close" title="Dismiss">×</button>
         </div>
-        <pre class="script-error-message">${G(t)}</pre>
+        <pre class="script-error-message">${z(t)}</pre>
       </div>
-    `, this.wireClose(), this.autoHideTimer = setTimeout(() => this.hide(), H.AUTO_HIDE_MS);
+    `, this.wireClose(), this.autoHideTimer = setTimeout(() => this.hide(), $.AUTO_HIDE_MS);
   }
   /**
    * Hide the overlay.
@@ -1633,20 +1741,21 @@ class H {
   clearAutoHide() {
     this.autoHideTimer !== null && (clearTimeout(this.autoHideTimer), this.autoHideTimer = null);
   }
-}
-H.AUTO_HIDE_MS = 5e3;
-function G(i) {
+};
+l($, "AUTO_HIDE_MS", 5e3);
+let ne = $;
+function z(i) {
   const e = document.createElement("div");
   return e.textContent = i, e.innerHTML;
 }
-const V = {};
+const H = {};
 for (let i = 0; i < 26; i++)
-  V[`Key${String.fromCharCode(65 + i)}`] = 65 + i;
+  H[`Key${String.fromCharCode(65 + i)}`] = 65 + i;
 for (let i = 0; i < 10; i++)
-  V[`Digit${i}`] = 48 + i;
+  H[`Digit${i}`] = 48 + i;
 for (let i = 1; i <= 12; i++)
-  V[`F${i}`] = 111 + i;
-Object.assign(V, {
+  H[`F${i}`] = 111 + i;
+Object.assign(H, {
   Backspace: 8,
   Tab: 9,
   Enter: 13,
@@ -1684,25 +1793,40 @@ Object.assign(V, {
   BracketRight: 221,
   Quote: 222
 });
-function Ee(i) {
-  const e = V[i.code];
+function ge(i) {
+  const e = H[i.code];
   return e !== void 0 && e >= 0 && e < 256 ? e : null;
 }
-class ft {
-  constructor(e, t) {
-    this.mouse = [0, 0, 0, 0], this.isMouseDown = !1, this.touchState = {
+class ht {
+  constructor(e, t, n) {
+    l(this, "mouse", [0, 0, 0, 0]);
+    l(this, "isMouseDown", !1);
+    l(this, "touchState", {
       count: 0,
       touches: [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]],
       pinch: 1,
       pinchDelta: 0,
       pinchCenter: [0, 0]
-    }, this.onFirstGesture = null, this.activePointers = /* @__PURE__ */ new Map(), this.gestureTriggered = !1, this.keyEvents = [], this.canvasListeners = [], this.canvas = e, this.pixelRatio = t, this.setupMouseTracking(), this.setupTouchTracking(), this.keydownHandler = (n) => {
-      const s = Ee(n);
-      s !== null && this.keyEvents.push({ keycode: s, down: !0 });
-    }, this.keyupHandler = (n) => {
-      const s = Ee(n);
-      s !== null && this.keyEvents.push({ keycode: s, down: !1 });
-    }, document.addEventListener("keydown", this.keydownHandler), document.addEventListener("keyup", this.keyupHandler);
+    });
+    /** Callback fired on first user gesture (for media init). */
+    l(this, "onFirstGesture", null);
+    l(this, "canvas");
+    l(this, "pixelRatio");
+    l(this, "activePointers", /* @__PURE__ */ new Map());
+    l(this, "gestureTriggered", !1);
+    l(this, "keyEvents", []);
+    // Store bound handlers for cleanup
+    l(this, "keydownHandler");
+    l(this, "keyupHandler");
+    l(this, "keyboardTarget");
+    l(this, "canvasListeners", []);
+    this.canvas = e, this.pixelRatio = t, this.keyboardTarget = n ?? document, this.setupMouseTracking(), this.setupTouchTracking(), this.keydownHandler = (s) => {
+      const r = ge(s);
+      r !== null && this.keyEvents.push({ keycode: r, down: !0 });
+    }, this.keyupHandler = (s) => {
+      const r = ge(s);
+      r !== null && this.keyEvents.push({ keycode: r, down: !1 });
+    }, this.keyboardTarget.addEventListener("keydown", this.keydownHandler), this.keyboardTarget.addEventListener("keyup", this.keyupHandler);
   }
   /**
    * Drain and return accumulated key events since last call.
@@ -1715,7 +1839,7 @@ class ft {
    * Clean up all event listeners.
    */
   dispose() {
-    document.removeEventListener("keydown", this.keydownHandler), document.removeEventListener("keyup", this.keyupHandler);
+    this.keyboardTarget.removeEventListener("keydown", this.keydownHandler), this.keyboardTarget.removeEventListener("keyup", this.keyupHandler);
     for (const { event: e, handler: t } of this.canvasListeners)
       this.canvas.removeEventListener(e, t);
     this.canvasListeners = [];
@@ -1726,51 +1850,56 @@ class ft {
   }
   setupMouseTracking() {
     const e = (r) => {
-      const o = this.canvas.getBoundingClientRect(), a = (r.clientX - o.left) * this.pixelRatio, c = (o.height - (r.clientY - o.top)) * this.pixelRatio;
-      return [a, c];
+      const a = this.canvas.getBoundingClientRect(), o = (r.clientX - a.left) * this.pixelRatio, c = (a.height - (r.clientY - a.top)) * this.pixelRatio;
+      return [o, c];
     }, t = (r) => {
-      const [o, a] = e(r);
-      this.isMouseDown = !0, this.mouse[0] = o, this.mouse[1] = a, this.mouse[2] = o, this.mouse[3] = a, this.triggerGesture();
+      const [a, o] = e(r);
+      this.isMouseDown = !0, this.mouse[0] = a, this.mouse[1] = o, this.mouse[2] = a, this.mouse[3] = o, this.triggerGesture();
     }, n = (r) => {
-      if (!this.isMouseDown)
-        return;
-      const [o, a] = e(r);
-      this.mouse[0] = o, this.mouse[1] = a;
+      if (!this.isMouseDown) return;
+      const [a, o] = e(r);
+      this.mouse[0] = a, this.mouse[1] = o;
     }, s = () => {
       this.isMouseDown = !1, this.mouse[2] = -Math.abs(this.mouse[2]), this.mouse[3] = -Math.abs(this.mouse[3]);
     };
-    this.canvas.addEventListener("mousedown", t), this.canvas.addEventListener("mousemove", n), this.canvas.addEventListener("mouseup", s), this.canvasListeners.push({ event: "mousedown", handler: t }, { event: "mousemove", handler: n }, { event: "mouseup", handler: s });
+    this.canvas.addEventListener("mousedown", t), this.canvas.addEventListener("mousemove", n), this.canvas.addEventListener("mouseup", s), this.canvasListeners.push(
+      { event: "mousedown", handler: t },
+      { event: "mousemove", handler: n },
+      { event: "mouseup", handler: s }
+    );
   }
   setupTouchTracking() {
     this.canvas.style.touchAction = "pan-y";
-    const e = (o, a) => {
-      const c = this.canvas.getBoundingClientRect(), l = (o - c.left) * this.pixelRatio, u = (c.height - (a - c.top)) * this.pixelRatio;
-      return [l, u];
-    }, t = (o) => {
-      if (o.pointerType === "mouse")
-        return;
-      const [a, c] = e(o.clientX, o.clientY);
-      this.activePointers.set(o.pointerId, {
-        id: o.pointerId,
-        x: a,
+    const e = (a, o) => {
+      const c = this.canvas.getBoundingClientRect(), u = (a - c.left) * this.pixelRatio, d = (c.height - (o - c.top)) * this.pixelRatio;
+      return [u, d];
+    }, t = (a) => {
+      if (a.pointerType === "mouse") return;
+      const [o, c] = e(a.clientX, a.clientY);
+      this.activePointers.set(a.pointerId, {
+        id: a.pointerId,
+        x: o,
         y: c,
-        startX: a,
+        startX: o,
         startY: c
-      }), this.canvas.setPointerCapture(o.pointerId), this.updateTouchState(), this.activePointers.size === 1 && (this.isMouseDown = !0, this.mouse[0] = a, this.mouse[1] = c, this.mouse[2] = a, this.mouse[3] = c);
-    }, n = (o) => {
-      if (o.pointerType === "mouse")
-        return;
-      const a = this.activePointers.get(o.pointerId);
-      if (!a)
-        return;
-      const [c, l] = e(o.clientX, o.clientY);
-      a.x = c, a.y = l, this.updateTouchState(), this.activePointers.size === 1 && (this.mouse[0] = c, this.mouse[1] = l), o.preventDefault();
-    }, s = (o) => {
-      o.pointerType !== "mouse" && (this.activePointers.delete(o.pointerId), this.canvas.releasePointerCapture(o.pointerId), this.activePointers.size === 0 && (this.isMouseDown = !1, this.mouse[2] = -Math.abs(this.mouse[2]), this.mouse[3] = -Math.abs(this.mouse[3])), this.updateTouchState());
-    }, r = (o) => {
-      s(o);
+      }), this.canvas.setPointerCapture(a.pointerId), this.updateTouchState(), this.activePointers.size === 1 && (this.isMouseDown = !0, this.mouse[0] = o, this.mouse[1] = c, this.mouse[2] = o, this.mouse[3] = c);
+    }, n = (a) => {
+      if (a.pointerType === "mouse") return;
+      const o = this.activePointers.get(a.pointerId);
+      if (!o) return;
+      const [c, u] = e(a.clientX, a.clientY);
+      o.x = c, o.y = u, this.updateTouchState(), this.activePointers.size === 1 && (this.mouse[0] = c, this.mouse[1] = u), a.preventDefault();
+    }, s = (a) => {
+      a.pointerType !== "mouse" && (this.activePointers.delete(a.pointerId), this.canvas.releasePointerCapture(a.pointerId), this.activePointers.size === 0 && (this.isMouseDown = !1, this.mouse[2] = -Math.abs(this.mouse[2]), this.mouse[3] = -Math.abs(this.mouse[3])), this.updateTouchState());
+    }, r = (a) => {
+      s(a);
     };
-    this.canvas.addEventListener("pointerdown", t), this.canvas.addEventListener("pointermove", n), this.canvas.addEventListener("pointerup", s), this.canvas.addEventListener("pointercancel", r), this.canvasListeners.push({ event: "pointerdown", handler: t }, { event: "pointermove", handler: n }, { event: "pointerup", handler: s }, { event: "pointercancel", handler: r });
+    this.canvas.addEventListener("pointerdown", t), this.canvas.addEventListener("pointermove", n), this.canvas.addEventListener("pointerup", s), this.canvas.addEventListener("pointercancel", r), this.canvasListeners.push(
+      { event: "pointerdown", handler: t },
+      { event: "pointermove", handler: n },
+      { event: "pointerup", handler: s },
+      { event: "pointercancel", handler: r }
+    );
   }
   updateTouchState() {
     const e = Array.from(this.activePointers.values()), t = e.length;
@@ -1782,10 +1911,10 @@ class ft {
       } else
         this.touchState.touches[n] = [0, 0, 0, 0];
     if (t >= 2) {
-      const n = e[0], s = e[1], r = s.x - n.x, o = s.y - n.y, a = Math.sqrt(r * r + o * o), c = s.startX - n.startX, l = s.startY - n.startY, u = Math.sqrt(c * c + l * l);
-      if (u > 0) {
-        const d = a / u;
-        this.touchState.pinchDelta = d - this.touchState.pinch, this.touchState.pinch = d;
+      const n = e[0], s = e[1], r = s.x - n.x, a = s.y - n.y, o = Math.sqrt(r * r + a * a), c = s.startX - n.startX, u = s.startY - n.startY, d = Math.sqrt(c * c + u * u);
+      if (d > 0) {
+        const h = o / d;
+        this.touchState.pinchDelta = h - this.touchState.pinch, this.touchState.pinch = h;
       }
       this.touchState.pinchCenter = [
         (n.x + s.x) / 2,
@@ -1795,15 +1924,32 @@ class ft {
       this.touchState.pinchDelta = 0, t === 0 && (this.touchState.pinch = 1, this.touchState.pinchCenter = [0, 0]);
   }
 }
-class ve {
-  get engine() {
-    return this._engine;
-  }
-  get isContextLost() {
-    return this._isContextLost;
-  }
+class Ee {
   constructor(e) {
-    this._resizeDebounceTimer = null, this._contextLostOverlay = null, this._isContextLost = !1, this._mediaBanner = null, this._mediaInitialized = !1, this._overlays = /* @__PURE__ */ new Map(), this.onResize = null, this.onContextRestored = null, this.container = e.container, this._project = e.project, this._pixelRatio = e.pixelRatio, this._viewNames = e.viewNames, this.canvas = document.createElement("canvas"), this.canvas.style.width = "100%", this.canvas.style.height = "100%", this.canvas.style.display = "block", this.container.appendChild(this.canvas), this.errorOverlay = new dt(this.container), this.runtimeErrorOverlay = new H(this.container);
+    l(this, "container");
+    l(this, "canvas");
+    l(this, "gl");
+    l(this, "errorOverlay");
+    l(this, "runtimeErrorOverlay");
+    l(this, "input");
+    l(this, "_engine");
+    l(this, "_project");
+    l(this, "_pixelRatio");
+    l(this, "_viewNames");
+    l(this, "_resizeObserver");
+    l(this, "_resizeDebounceTimer", null);
+    // Context loss
+    l(this, "_contextLostOverlay", null);
+    l(this, "_isContextLost", !1);
+    // Media
+    l(this, "_mediaBanner", null);
+    l(this, "_mediaInitialized", !1);
+    // Script info overlays (one per corner position)
+    l(this, "_overlays", /* @__PURE__ */ new Map());
+    // Callbacks for App to hook into
+    l(this, "onResize", null);
+    l(this, "onContextRestored", null);
+    this.container = e.container, this._project = e.project, this._pixelRatio = e.pixelRatio, this._viewNames = e.viewNames, this.canvas = document.createElement("canvas"), this.canvas.style.width = "100%", this.canvas.style.height = "100%", this.canvas.style.display = "block", this.container.appendChild(this.canvas), this.errorOverlay = new ct(this.container), this.runtimeErrorOverlay = new ne(this.container);
     const t = this.canvas.getContext("webgl2", {
       alpha: !1,
       antialias: !1,
@@ -1814,7 +1960,7 @@ class ve {
     });
     if (!t)
       throw new Error("WebGL2 not supported");
-    this.gl = t, this.setupContextLossHandling(), this.updateCanvasSize(), this._engine = new ge({
+    this.gl = t, this.setupContextLossHandling(), this.updateCanvasSize(), this._engine = new fe({
       gl: this.gl,
       project: e.project,
       viewNames: e.viewNames,
@@ -1827,7 +1973,13 @@ class ve {
         var n;
         this._resizeDebounceTimer = null, this._engine.resize(this.canvas.width, this.canvas.height), this._engine.reset(), (n = this.onResize) == null || n.call(this, this.canvas.width, this.canvas.height);
       }, 150);
-    }), this._resizeObserver.observe(this.container), this.input = new ft(this.canvas, this._pixelRatio), this.input.onFirstGesture = () => this.initMediaOnGesture(), this.initVideoFiles();
+    }), this._resizeObserver.observe(this.container), this.input = new ht(this.canvas, this._pixelRatio, e.keyboardTarget), this.input.onFirstGesture = () => this.initMediaOnGesture(), this.initVideoFiles();
+  }
+  get engine() {
+    return this._engine;
+  }
+  get isContextLost() {
+    return this._isContextLost;
   }
   // ===========================================================================
   // Per-Frame Rendering
@@ -1853,7 +2005,18 @@ class ve {
    */
   presentToScreen() {
     const e = this.gl;
-    this._engine.bindImageForRead() && (e.bindFramebuffer(e.DRAW_FRAMEBUFFER, null), e.blitFramebuffer(0, 0, this.canvas.width, this.canvas.height, 0, 0, this.canvas.width, this.canvas.height, e.COLOR_BUFFER_BIT, e.NEAREST), this._engine.unbindImageForRead());
+    this._engine.bindImageForRead() && (e.bindFramebuffer(e.DRAW_FRAMEBUFFER, null), e.blitFramebuffer(
+      0,
+      0,
+      this.canvas.width,
+      this.canvas.height,
+      0,
+      0,
+      this.canvas.width,
+      this.canvas.height,
+      e.COLOR_BUFFER_BIT,
+      e.NEAREST
+    ), this._engine.unbindImageForRead());
   }
   // ===========================================================================
   // Cross-View State Getters
@@ -1914,7 +2077,7 @@ class ve {
     var e;
     console.log("WebGL context restored. Reinitializing...");
     try {
-      this._engine.dispose(), this._engine = new ge({
+      this._engine.dispose(), this._engine = new fe({
         gl: this.gl,
         project: this._project,
         viewNames: this._viewNames,
@@ -1974,12 +2137,19 @@ class ve {
     this._mediaBanner && (this._mediaBanner.remove(), this._mediaBanner = null);
   }
 }
-class Ae {
+class Fe {
   constructor(e) {
+    l(this, "container");
+    l(this, "uniforms");
+    l(this, "onChange");
+    l(this, "values", {});
+    l(this, "updaters", /* @__PURE__ */ new Map());
+    // Track document-level event listeners for cleanup
+    l(this, "documentListeners", []);
     var t;
-    this.values = {}, this.updaters = /* @__PURE__ */ new Map(), this.documentListeners = [], this.container = e.container, this.uniforms = e.uniforms, this.onChange = e.onChange;
+    this.container = e.container, this.uniforms = e.uniforms, this.onChange = e.onChange;
     for (const [n, s] of Object.entries(this.uniforms))
-      A(s) || s.hidden || (this.values[n] = ((t = e.initialValues) == null ? void 0 : t[n]) ?? s.value);
+      L(s) || s.hidden || (this.values[n] = ((t = e.initialValues) == null ? void 0 : t[n]) ?? s.value);
     this.render();
   }
   /**
@@ -1999,11 +2169,10 @@ class Ae {
     n.className = "uniform-controls-reset", n.textContent = "Reset", n.title = "Reset all uniforms to defaults", n.addEventListener("click", () => this.resetToDefaults()), t.appendChild(n), this.container.appendChild(t);
     const s = document.createElement("div");
     s.className = "uniform-controls-list";
-    for (const [r, o] of e) {
-      if (A(o) || o.hidden)
-        continue;
-      const a = this.createControl(r, o);
-      a && (this.updaters.set(r, a.update), s.appendChild(a.element));
+    for (const [r, a] of e) {
+      if (L(a) || a.hidden) continue;
+      const o = this.createControl(r, a);
+      o && (this.updaters.set(r, o.update), s.appendChild(o.element));
     }
     this.container.appendChild(s);
   }
@@ -2011,8 +2180,7 @@ class Ae {
    * Create a control element for a uniform.
    */
   createControl(e, t) {
-    if (A(t) || t.hidden)
-      return null;
+    if (L(t) || t.hidden) return null;
     switch (t.type) {
       case "float":
         return this.createFloatSlider(e, t);
@@ -2045,8 +2213,8 @@ class Ae {
       const c = parseFloat(r.value);
       e.onInput(c), s.textContent = e.format(c);
     });
-    const o = document.createElement("div");
-    return o.appendChild(t), o.appendChild(r), { element: o, update: (c) => {
+    const a = document.createElement("div");
+    return a.appendChild(t), a.appendChild(r), { element: a, update: (c) => {
       r.value = String(c), s.textContent = e.format(c);
     } };
   }
@@ -2060,14 +2228,14 @@ class Ae {
       max: t.max ?? 1,
       step: n,
       value: this.values[e],
-      format: (a) => this.formatNumber(a, n),
-      onInput: (a) => {
-        this.values[e] = a, this.onChange(e, a);
+      format: (o) => this.formatNumber(o, n),
+      onInput: (o) => {
+        this.values[e] = o, this.onChange(e, o);
       }
-    }), o = document.createElement("div");
-    return o.className = "uniform-control uniform-control-float", o.appendChild(s), {
-      element: o,
-      update: (a) => r(a)
+    }), a = document.createElement("div");
+    return a.className = "uniform-control uniform-control-float", a.appendChild(s), {
+      element: a,
+      update: (o) => r(o)
     };
   }
   // ===========================================================================
@@ -2080,15 +2248,15 @@ class Ae {
       max: t.max ?? 10,
       step: t.step ?? 1,
       value: this.values[e],
-      format: (o) => String(Math.round(o)),
-      onInput: (o) => {
-        const a = Math.round(o);
-        this.values[e] = a, this.onChange(e, a);
+      format: (a) => String(Math.round(a)),
+      onInput: (a) => {
+        const o = Math.round(a);
+        this.values[e] = o, this.onChange(e, o);
       }
     }), r = document.createElement("div");
     return r.className = "uniform-control uniform-control-int", r.appendChild(n), {
       element: r,
-      update: (o) => s(o)
+      update: (a) => s(a)
     };
   }
   // ===========================================================================
@@ -2097,22 +2265,22 @@ class Ae {
   createBoolToggle(e, t) {
     const n = this.values[e], s = t.label ?? e, r = document.createElement("div");
     r.className = "uniform-control uniform-control-bool";
-    const o = document.createElement("div");
-    o.className = "uniform-control-label-row";
-    const a = document.createElement("label");
-    a.className = "uniform-control-label", a.textContent = s;
+    const a = document.createElement("div");
+    a.className = "uniform-control-label-row";
+    const o = document.createElement("label");
+    o.className = "uniform-control-label", o.textContent = s;
     const c = document.createElement("label");
     c.className = "uniform-control-toggle";
-    const l = document.createElement("input");
-    l.type = "checkbox", l.checked = n;
-    const u = document.createElement("span");
-    return u.className = "uniform-control-toggle-slider", l.addEventListener("change", () => {
-      const d = l.checked;
-      this.values[e] = d, this.onChange(e, d);
-    }), c.appendChild(l), c.appendChild(u), o.appendChild(a), o.appendChild(c), r.appendChild(o), {
+    const u = document.createElement("input");
+    u.type = "checkbox", u.checked = n;
+    const d = document.createElement("span");
+    return d.className = "uniform-control-toggle-slider", u.addEventListener("change", () => {
+      const h = u.checked;
+      this.values[e] = h, this.onChange(e, h);
+    }), c.appendChild(u), c.appendChild(d), a.appendChild(o), a.appendChild(c), r.appendChild(a), {
       element: r,
-      update: (d) => {
-        l.checked = d;
+      update: (h) => {
+        u.checked = h;
       }
     };
   }
@@ -2120,47 +2288,47 @@ class Ae {
   // Vec2 XY Pad
   // ===========================================================================
   createVec2Pad(e, t) {
-    const n = this.values[e], s = t.min ?? [0, 0], r = t.max ?? [1, 1], o = t.label ?? e, a = document.createElement("div");
-    a.className = "uniform-control uniform-control-vec2";
+    const n = this.values[e], s = t.min ?? [0, 0], r = t.max ?? [1, 1], a = t.label ?? e, o = document.createElement("div");
+    o.className = "uniform-control uniform-control-vec2";
     const c = document.createElement("div");
     c.className = "uniform-control-label-row";
-    const l = document.createElement("label");
-    l.className = "uniform-control-label", l.textContent = o;
-    const u = document.createElement("span");
-    u.className = "uniform-control-value", u.textContent = this.formatVec2(n), c.appendChild(l), c.appendChild(u);
-    const d = document.createElement("div");
-    d.className = "uniform-control-xy-pad";
-    const E = document.createElement("div");
-    E.className = "uniform-control-xy-handle", d.appendChild(E);
-    const y = (p) => {
-      const g = (p[0] - s[0]) / (r[0] - s[0]) * 100, x = (1 - (p[1] - s[1]) / (r[1] - s[1])) * 100;
-      E.style.left = `${g}%`, E.style.top = `${x}%`;
+    const u = document.createElement("label");
+    u.className = "uniform-control-label", u.textContent = a;
+    const d = document.createElement("span");
+    d.className = "uniform-control-value", d.textContent = this.formatVec2(n), c.appendChild(u), c.appendChild(d);
+    const h = document.createElement("div");
+    h.className = "uniform-control-xy-pad";
+    const T = document.createElement("div");
+    T.className = "uniform-control-xy-handle", h.appendChild(T);
+    const _ = (f) => {
+      const E = (f[0] - s[0]) / (r[0] - s[0]) * 100, x = (1 - (f[1] - s[1]) / (r[1] - s[1])) * 100;
+      T.style.left = `${E}%`, T.style.top = `${x}%`;
     };
-    y(n);
-    let b = !1;
-    const T = (p) => {
-      const g = d.getBoundingClientRect(), x = "touches" in p ? p.touches[0].clientX : p.clientX, C = "touches" in p ? p.touches[0].clientY : p.clientY;
-      let v = Math.max(0, Math.min(1, (x - g.left) / g.width)), R = Math.max(0, Math.min(1, (C - g.top) / g.height));
-      const F = s[0] + v * (r[0] - s[0]), S = s[1] + (1 - R) * (r[1] - s[1]), B = [F, S];
-      this.values[e] = B, E.style.left = `${v * 100}%`, E.style.top = `${R * 100}%`, u.textContent = this.formatVec2(B), this.onChange(e, B);
-    }, w = (p) => {
-      b = !0, T(p), p.preventDefault();
-    }, _ = (p) => {
-      b && T(p);
-    }, m = () => {
-      b = !1;
+    _(n);
+    let y = !1;
+    const b = (f) => {
+      const E = h.getBoundingClientRect(), x = "touches" in f ? f.touches[0].clientX : f.clientX, S = "touches" in f ? f.touches[0].clientY : f.clientY;
+      let v = Math.max(0, Math.min(1, (x - E.left) / E.width)), C = Math.max(0, Math.min(1, (S - E.top) / E.height));
+      const A = s[0] + v * (r[0] - s[0]), F = s[1] + (1 - C) * (r[1] - s[1]), B = [A, F];
+      this.values[e] = B, T.style.left = `${v * 100}%`, T.style.top = `${C * 100}%`, d.textContent = this.formatVec2(B), this.onChange(e, B);
+    }, w = (f) => {
+      y = !0, b(f), f.preventDefault();
+    }, R = (f) => {
+      y && b(f);
+    }, p = () => {
+      y = !1;
     };
-    d.addEventListener("mousedown", w), document.addEventListener("mousemove", _), document.addEventListener("mouseup", m), this.documentListeners.push({ type: "mousemove", handler: _ }), this.documentListeners.push({ type: "mouseup", handler: m });
-    const h = (p) => {
-      b = !0, T(p), p.preventDefault();
-    }, f = (p) => {
-      b && T(p);
+    h.addEventListener("mousedown", w), document.addEventListener("mousemove", R), document.addEventListener("mouseup", p), this.documentListeners.push({ type: "mousemove", handler: R }), this.documentListeners.push({ type: "mouseup", handler: p });
+    const m = (f) => {
+      y = !0, b(f), f.preventDefault();
+    }, g = (f) => {
+      y && b(f);
     };
-    return d.addEventListener("touchstart", h), document.addEventListener("touchmove", f), document.addEventListener("touchend", m), this.documentListeners.push({ type: "touchmove", handler: f }), this.documentListeners.push({ type: "touchend", handler: m }), a.appendChild(c), a.appendChild(d), {
-      element: a,
-      update: (p) => {
-        const g = p;
-        y(g), u.textContent = this.formatVec2(g);
+    return h.addEventListener("touchstart", m), document.addEventListener("touchmove", g), document.addEventListener("touchend", p), this.documentListeners.push({ type: "touchmove", handler: g }), this.documentListeners.push({ type: "touchend", handler: p }), o.appendChild(c), o.appendChild(h), {
+      element: o,
+      update: (f) => {
+        const E = f;
+        _(E), d.textContent = this.formatVec2(E);
       }
     };
   }
@@ -2170,25 +2338,25 @@ class Ae {
   createColorPicker(e, t) {
     const n = this.values[e], s = t.label ?? e, r = document.createElement("div");
     r.className = "uniform-control uniform-control-color";
-    const o = document.createElement("div");
-    o.className = "uniform-control-label-row";
-    const a = document.createElement("label");
-    a.className = "uniform-control-label", a.textContent = s;
+    const a = document.createElement("div");
+    a.className = "uniform-control-label-row";
+    const o = document.createElement("label");
+    o.className = "uniform-control-label", o.textContent = s;
     const c = document.createElement("span");
-    c.className = "uniform-control-value", c.textContent = this.rgbToHex(n), o.appendChild(a), o.appendChild(c);
-    const l = document.createElement("div");
-    l.className = "uniform-control-color-wrapper";
-    const u = document.createElement("input");
-    u.type = "color", u.className = "uniform-control-color-input", u.value = this.rgbToHex(n);
-    const d = document.createElement("div");
-    return d.className = "uniform-control-color-swatch", d.style.backgroundColor = this.rgbToHex(n), u.addEventListener("input", () => {
-      const E = this.hexToRgb(u.value);
-      this.values[e] = E, c.textContent = u.value, d.style.backgroundColor = u.value, this.onChange(e, E);
-    }), d.addEventListener("click", () => u.click()), l.appendChild(d), l.appendChild(u), r.appendChild(o), r.appendChild(l), {
+    c.className = "uniform-control-value", c.textContent = this.rgbToHex(n), a.appendChild(o), a.appendChild(c);
+    const u = document.createElement("div");
+    u.className = "uniform-control-color-wrapper";
+    const d = document.createElement("input");
+    d.type = "color", d.className = "uniform-control-color-input", d.value = this.rgbToHex(n);
+    const h = document.createElement("div");
+    return h.className = "uniform-control-color-swatch", h.style.backgroundColor = this.rgbToHex(n), d.addEventListener("input", () => {
+      const T = this.hexToRgb(d.value);
+      this.values[e] = T, c.textContent = d.value, h.style.backgroundColor = d.value, this.onChange(e, T);
+    }), h.addEventListener("click", () => d.click()), u.appendChild(h), u.appendChild(d), r.appendChild(a), r.appendChild(u), {
       element: r,
-      update: (E) => {
-        const y = this.rgbToHex(E);
-        u.value = y, d.style.backgroundColor = y, c.textContent = y;
+      update: (T) => {
+        const _ = this.rgbToHex(T);
+        d.value = _, h.style.backgroundColor = _, c.textContent = _;
       }
     };
   }
@@ -2196,41 +2364,41 @@ class Ae {
   // Vec4 Color Picker (with alpha)
   // ===========================================================================
   createColorPicker4(e, t) {
-    var T, w, _;
+    var b, w, R;
     const n = this.values[e], s = t.label ?? e, r = document.createElement("div");
     r.className = "uniform-control uniform-control-color";
-    const o = document.createElement("div");
-    o.className = "uniform-control-label-row";
-    const a = document.createElement("label");
-    a.className = "uniform-control-label", a.textContent = s;
+    const a = document.createElement("div");
+    a.className = "uniform-control-label-row";
+    const o = document.createElement("label");
+    o.className = "uniform-control-label", o.textContent = s;
     const c = document.createElement("span");
-    c.className = "uniform-control-value", c.textContent = this.rgbToHex(n), o.appendChild(a), o.appendChild(c);
-    const l = document.createElement("div");
-    l.className = "uniform-control-color-wrapper";
-    const u = document.createElement("input");
-    u.type = "color", u.className = "uniform-control-color-input", u.value = this.rgbToHex(n);
-    const d = document.createElement("div");
-    d.className = "uniform-control-color-swatch", d.style.backgroundColor = this.rgbToHex(n), u.addEventListener("input", () => {
-      const m = this.hexToRgb(u.value), h = this.values[e];
-      h[0] = m[0], h[1] = m[1], h[2] = m[2], c.textContent = u.value, d.style.backgroundColor = u.value, this.onChange(e, [...h]);
-    }), d.addEventListener("click", () => u.click()), l.appendChild(d), l.appendChild(u);
-    const E = ((T = t.step) == null ? void 0 : T[3]) ?? 0.01, { element: y, update: b } = this.createSliderRow({
+    c.className = "uniform-control-value", c.textContent = this.rgbToHex(n), a.appendChild(o), a.appendChild(c);
+    const u = document.createElement("div");
+    u.className = "uniform-control-color-wrapper";
+    const d = document.createElement("input");
+    d.type = "color", d.className = "uniform-control-color-input", d.value = this.rgbToHex(n);
+    const h = document.createElement("div");
+    h.className = "uniform-control-color-swatch", h.style.backgroundColor = this.rgbToHex(n), d.addEventListener("input", () => {
+      const p = this.hexToRgb(d.value), m = this.values[e];
+      m[0] = p[0], m[1] = p[1], m[2] = p[2], c.textContent = d.value, h.style.backgroundColor = d.value, this.onChange(e, [...m]);
+    }), h.addEventListener("click", () => d.click()), u.appendChild(h), u.appendChild(d);
+    const T = ((b = t.step) == null ? void 0 : b[3]) ?? 0.01, { element: _, update: y } = this.createSliderRow({
       label: "Alpha",
       min: ((w = t.min) == null ? void 0 : w[3]) ?? 0,
-      max: ((_ = t.max) == null ? void 0 : _[3]) ?? 1,
-      step: E,
+      max: ((R = t.max) == null ? void 0 : R[3]) ?? 1,
+      step: T,
       value: n[3],
-      format: (m) => this.formatNumber(m, E),
-      onInput: (m) => {
-        const h = this.values[e];
-        h[3] = m, this.onChange(e, [...h]);
+      format: (p) => this.formatNumber(p, T),
+      onInput: (p) => {
+        const m = this.values[e];
+        m[3] = p, this.onChange(e, [...m]);
       }
     });
-    return r.appendChild(o), r.appendChild(l), r.appendChild(y), {
+    return r.appendChild(a), r.appendChild(u), r.appendChild(_), {
       element: r,
-      update: (m) => {
-        const h = m, f = this.rgbToHex(h);
-        u.value = f, d.style.backgroundColor = f, c.textContent = f, b(h[3]);
+      update: (p) => {
+        const m = p, g = this.rgbToHex(m);
+        d.value = g, h.style.backgroundColor = g, c.textContent = g, y(m[3]);
       }
     };
   }
@@ -2238,39 +2406,39 @@ class Ae {
   // Vec3/Vec4 Component Sliders
   // ===========================================================================
   createVecSliders(e, t, n) {
-    const s = this.values[e], r = t.label ?? e, o = n === 3 ? ["X", "Y", "Z"] : ["X", "Y", "Z", "W"], a = document.createElement("div");
-    a.className = `uniform-control uniform-control-vec${n}`;
+    const s = this.values[e], r = t.label ?? e, a = n === 3 ? ["X", "Y", "Z"] : ["X", "Y", "Z", "W"], o = document.createElement("div");
+    o.className = `uniform-control uniform-control-vec${n}`;
     const c = document.createElement("div");
-    c.className = "uniform-control-label", c.textContent = r, a.appendChild(c);
-    const l = [];
-    return o.forEach((u, d) => {
-      var _, m, h;
-      const E = ((_ = t.step) == null ? void 0 : _[d]) ?? 0.01, { element: y, update: b } = this.createSliderRow({
-        label: u,
-        min: ((m = t.min) == null ? void 0 : m[d]) ?? 0,
-        max: ((h = t.max) == null ? void 0 : h[d]) ?? 1,
-        step: E,
-        value: s[d],
-        format: (f) => this.formatNumber(f, E),
-        onInput: (f) => {
-          const p = this.values[e];
-          p[d] = f, this.onChange(e, [...p]);
+    c.className = "uniform-control-label", c.textContent = r, o.appendChild(c);
+    const u = [];
+    return a.forEach((d, h) => {
+      var R, p, m;
+      const T = ((R = t.step) == null ? void 0 : R[h]) ?? 0.01, { element: _, update: y } = this.createSliderRow({
+        label: d,
+        min: ((p = t.min) == null ? void 0 : p[h]) ?? 0,
+        max: ((m = t.max) == null ? void 0 : m[h]) ?? 1,
+        step: T,
+        value: s[h],
+        format: (g) => this.formatNumber(g, T),
+        onInput: (g) => {
+          const f = this.values[e];
+          f[h] = g, this.onChange(e, [...f]);
         }
-      }), T = y.querySelector(".uniform-control-label-row");
-      if (T) {
-        T.classList.add("uniform-control-vec-slider-row");
-        const f = T.querySelector(".uniform-control-label");
-        f && f.classList.add("uniform-control-vec-component");
-        const p = T.querySelector(".uniform-control-value");
-        p && p.classList.add("uniform-control-vec-value");
+      }), b = _.querySelector(".uniform-control-label-row");
+      if (b) {
+        b.classList.add("uniform-control-vec-slider-row");
+        const g = b.querySelector(".uniform-control-label");
+        g && g.classList.add("uniform-control-vec-component");
+        const f = b.querySelector(".uniform-control-value");
+        f && f.classList.add("uniform-control-vec-value");
       }
-      const w = y.querySelector(".uniform-control-slider");
-      w && w.classList.add("uniform-control-vec-slider"), l.push(b), a.appendChild(y);
+      const w = _.querySelector(".uniform-control-slider");
+      w && w.classList.add("uniform-control-vec-slider"), u.push(y), o.appendChild(_);
     }), {
-      element: a,
-      update: (u) => {
-        const d = u;
-        l.forEach((E, y) => E(d[y]));
+      element: o,
+      update: (d) => {
+        const h = d;
+        u.forEach((T, _) => T(h[_]));
       }
     };
   }
@@ -2311,7 +2479,7 @@ class Ae {
    */
   resetToDefaults() {
     for (const [e, t] of Object.entries(this.uniforms))
-      A(t) || t.hidden || (this.setValue(e, t.value), this.onChange(e, t.value));
+      L(t) || t.hidden || (this.setValue(e, t.value), this.onChange(e, t.value));
   }
   /**
    * Destroy the controls and clean up.
@@ -2322,9 +2490,14 @@ class Ae {
     this.documentListeners = [], this.container.innerHTML = "", this.updaters.clear();
   }
 }
-class gt {
+class mt {
   constructor(e) {
-    if (this.controls = null, this.isOpen = e.startOpen ?? !1, this.wrapper = document.createElement("div"), this.wrapper.className = "uniforms-panel-wrapper", this.toggleButton = document.createElement("button"), this.toggleButton.className = "uniforms-toggle-button", this.toggleButton.title = "Toggle Uniforms Panel", this.toggleButton.innerHTML = `
+    l(this, "wrapper");
+    l(this, "panel");
+    l(this, "toggleButton");
+    l(this, "controls", null);
+    l(this, "isOpen");
+    if (this.isOpen = e.startOpen ?? !1, this.wrapper = document.createElement("div"), this.wrapper.className = "uniforms-panel-wrapper", this.toggleButton = document.createElement("button"), this.toggleButton.className = "uniforms-toggle-button", this.toggleButton.title = "Toggle Uniforms Panel", this.toggleButton.innerHTML = `
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <line x1="4" y1="21" x2="4" y2="14"></line>
         <line x1="4" y1="10" x2="4" y2="3"></line>
@@ -2336,7 +2509,7 @@ class gt {
         <line x1="9" y1="8" x2="15" y2="8"></line>
         <line x1="17" y1="16" x2="23" y2="16"></line>
       </svg>
-    `, this.toggleButton.addEventListener("click", () => this.toggle()), this.wrapper.appendChild(this.toggleButton), this.panel = document.createElement("div"), this.panel.className = "uniforms-panel", !Object.values(e.uniforms).some((a) => se(a))) {
+    `, this.toggleButton.addEventListener("click", () => this.toggle()), this.wrapper.appendChild(this.toggleButton), this.panel = document.createElement("div"), this.panel.className = "uniforms-panel", !Object.values(e.uniforms).some((o) => se(o))) {
       this.wrapper.style.display = "none", e.container.appendChild(this.wrapper);
       return;
     }
@@ -2346,9 +2519,9 @@ class gt {
     s.textContent = "Uniforms", n.appendChild(s);
     const r = document.createElement("button");
     r.className = "uniforms-panel-close", r.innerHTML = "&times;", r.title = "Close", r.addEventListener("click", () => this.hide()), n.appendChild(r), this.panel.appendChild(n);
-    const o = document.createElement("div");
-    o.className = "uniforms-panel-content", this.panel.appendChild(o), this.controls = new Ae({
-      container: o,
+    const a = document.createElement("div");
+    a.className = "uniforms-panel-content", this.panel.appendChild(a), this.controls = new Fe({
+      container: a,
       uniforms: e.uniforms,
       initialValues: e.initialValues,
       onChange: e.onChange
@@ -2394,61 +2567,61 @@ class gt {
   }
 }
 const te = (i) => i.replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$/g, "\\$");
-function Et(i, e) {
-  const t = vt(i, e), n = new Blob([t], { type: "text/html" }), r = `${i.root.split("/").pop() || "shader"}.html`, o = URL.createObjectURL(n), a = document.createElement("a");
-  a.href = o, a.download = r, a.click(), URL.revokeObjectURL(o), console.log(`Exported: ${r}`);
+function pt(i, e) {
+  const t = ft(i, e), n = new Blob([t], { type: "text/html" }), r = `${i.root.split("/").pop() || "shader"}.html`, a = URL.createObjectURL(n), o = document.createElement("a");
+  o.href = a, o.download = r, o.click(), URL.revokeObjectURL(a), console.log(`Exported: ${r}`);
 }
-function vt(i, e) {
-  var p, g, x, C;
-  const t = i.meta.title, n = i.commonSource ?? "", s = e.getUniformValues(), r = e.getUBOExportData(), o = ["BufferA", "BufferB", "BufferC", "BufferD", "Image"], a = [];
-  let c = !1, l = !1;
-  for (const v of o) {
-    const R = i.passes[v];
-    if (!R)
-      continue;
-    const F = R.channels.map((S) => S.kind === "buffer" ? `buffer:${S.buffer}` : S.kind === "texture" ? "procedural" : S.kind === "keyboard" ? (c = !0, "keyboard") : S.kind === "script" ? (l = !0, `script:${S.name}`) : S.kind === "audio" || S.kind === "webcam" || S.kind === "video" ? "black" : "none");
-    a.push({
+function ft(i, e) {
+  var f, E, x, S;
+  const t = i.meta.title, n = i.commonSource ?? "", s = e.getUniformValues(), r = e.getUBOExportData(), a = ["BufferA", "BufferB", "BufferC", "BufferD", "Image"], o = [];
+  let c = !1, u = !1;
+  for (const v of a) {
+    const C = i.passes[v];
+    if (!C) continue;
+    const A = C.channels.map((F) => F.kind === "buffer" ? `buffer:${F.buffer}` : F.kind === "texture" ? "procedural" : F.kind === "keyboard" ? (c = !0, "keyboard") : F.kind === "script" ? (u = !0, `script:${F.name}`) : F.kind === "audio" || F.kind === "webcam" || F.kind === "video" ? "black" : "none");
+    o.push({
       name: v,
-      source: R.glslSource,
-      channels: R.channels,
-      channelTypes: F
+      source: C.glslSource,
+      channels: C.channels,
+      channelTypes: A
     });
   }
-  const u = !!((p = i.script) != null && p.setup || (g = i.script) != null && g.onFrame), d = Object.entries(i.uniforms).filter(([, v]) => !A(v)), E = [];
-  for (const [v, R] of d) {
-    if (A(R))
-      continue;
-    const F = s[v] ?? R.value;
-    if (R.type === "float" || R.type === "int")
-      E.push(`  '${v}': ${F}`);
-    else if (R.type === "bool")
-      E.push(`  '${v}': ${F ? 1 : 0}`);
-    else if (R.type === "vec2") {
-      const S = F;
-      E.push(`  '${v}': [${S[0]}, ${S[1]}]`);
-    } else if (R.type === "vec3") {
-      const S = F;
-      E.push(`  '${v}': [${S[0]}, ${S[1]}, ${S[2]}]`);
-    } else if (R.type === "vec4") {
-      const S = F;
-      E.push(`  '${v}': [${S[0]}, ${S[1]}, ${S[2]}, ${S[3]}]`);
+  const d = !!((f = i.script) != null && f.setup || (E = i.script) != null && E.onFrame), h = Object.entries(i.uniforms).filter(([, v]) => !L(v)), T = [];
+  for (const [v, C] of h) {
+    if (L(C)) continue;
+    const A = s[v] ?? C.value;
+    if (C.type === "float" || C.type === "int")
+      T.push(`  '${v}': ${A}`);
+    else if (C.type === "bool")
+      T.push(`  '${v}': ${A ? 1 : 0}`);
+    else if (C.type === "vec2") {
+      const F = A;
+      T.push(`  '${v}': [${F[0]}, ${F[1]}]`);
+    } else if (C.type === "vec3") {
+      const F = A;
+      T.push(`  '${v}': [${F[0]}, ${F[1]}, ${F[2]}]`);
+    } else if (C.type === "vec4") {
+      const F = A;
+      T.push(`  '${v}': [${F[0]}, ${F[1]}, ${F[2]}, ${F[3]}]`);
     }
   }
-  const y = d.map(([v, R]) => `uniform ${R.type === "bool" ? "bool" : R.type} ${v};`).join(`
-`), b = r.map((v) => `// Array uniform: ${v.name} (max ${v.count})
+  const _ = h.map(([v, C]) => `uniform ${C.type === "bool" ? "bool" : C.type} ${v};`).join(`
+`), y = r.map(
+    (v) => `// Array uniform: ${v.name} (max ${v.count})
 layout(std140) uniform _ub_${v.name} {
   ${v.type} ${v.name}[${v.count}];
 };
-uniform int ${v.name}_count;`).join(`
+uniform int ${v.name}_count;`
+  ).join(`
 
-`), T = r.map((v) => {
-    const R = Array.from(v.paddedData).map((F) => F.toFixed(6)).join(", ");
-    return `  { name: '${v.name}', type: '${v.type}', count: ${v.count}, binding: ${v.bindingPoint}, data: new Float32Array([${R}]) }`;
+`), b = r.map((v) => {
+    const C = Array.from(v.paddedData).map((A) => A.toFixed(6)).join(", ");
+    return `  { name: '${v.name}', type: '${v.type}', count: ${v.count}, binding: ${v.bindingPoint}, data: new Float32Array([${C}]) }`;
   }).join(`,
 `);
-  let w = "", _ = "";
-  u && ((x = i.script) != null && x.setup && (w = i.script.setup.toString()), (C = i.script) != null && C.onFrame && (_ = i.script.onFrame.toString()));
-  const m = c ? `
+  let w = "", R = "";
+  d && ((x = i.script) != null && x.setup && (w = i.script.setup.toString()), (S = i.script) != null && S.onFrame && (R = i.script.onFrame.toString()));
+  const p = c ? `
 // --- Keyboard helpers ---
 const int KEY_A = 65; const int KEY_B = 66; const int KEY_C = 67; const int KEY_D = 68;
 const int KEY_E = 69; const int KEY_F = 70; const int KEY_G = 71; const int KEY_H = 72;
@@ -2471,8 +2644,8 @@ float keyDown(int key) { return textureLod(iChannel0, vec2((float(key) + 0.5) / 
 float keyToggle(int key) { return textureLod(iChannel0, vec2((float(key) + 0.5) / 256.0, 0.75), 0.0).x; }
 bool isKeyDown(int key) { return keyDown(key) > 0.5; }
 bool isKeyToggled(int key) { return keyToggle(key) > 0.5; }
-` : "", h = a.map((v) => `  { name: '${v.name}', source: \`${te(v.source)}\`, channels: ${JSON.stringify(v.channelTypes)} }`).join(`,
-`), f = `#version 300 es
+` : "", m = o.map((v) => `  { name: '${v.name}', source: \`${te(v.source)}\`, channels: ${JSON.stringify(v.channelTypes)} }`).join(`,
+`), g = `#version 300 es
 precision highp float;
 
 const float ST_PI = 3.14159265359;
@@ -2497,9 +2670,9 @@ uniform sampler2D iChannel1;
 uniform sampler2D iChannel2;
 uniform sampler2D iChannel3;
 
-${b}
 ${y}
-${m}`;
+${_}
+${p}`;
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2538,7 +2711,7 @@ layout(location = 0) in vec2 position;
 void main() { gl_Position = vec4(position, 0.0, 1.0); }
 \`;
 
-const FRAGMENT_PREAMBLE = \`${te(f)}\`;
+const FRAGMENT_PREAMBLE = \`${te(g)}\`;
 
 const FRAGMENT_SUFFIX = \`
 out vec4 fragColor;
@@ -2548,16 +2721,16 @@ void main() { mainImage(fragColor, gl_FragCoord.xy); }
 const COMMON_SOURCE = \`${te(n)}\`;
 
 const PASSES = [
-${h}
+${m}
 ];
 
 const UNIFORM_VALUES = {
-${E.join(`,
+${T.join(`,
 `)}
 };
 
 const UBO_DATA = [
-${T}
+${b}
 ];
 
 // ── WebGL Setup ──
@@ -2651,7 +2824,7 @@ function updateKeyboardTexture() {
   keyDown_ev.fill(0);
 }
 ` : ""}
-${l || u ? `
+${u || d ? `
 // ── Script Textures ──
 const scriptTextures = new Map();
 
@@ -2779,11 +2952,11 @@ const uboBuffers = UBO_DATA.map(ubo => {
 });
 
 const findPass = name => runtimePasses.find(p => p.name === name);
-${u ? `
+${d ? `
 // ── Script Setup ──
 
 const scriptSetup = ${w || "null"};
-const scriptOnFrame = ${_ || "null"};
+const scriptOnFrame = ${R || "null"};
 
 const scriptEngine = {
   setUniformValue(name, value) {
@@ -2895,7 +3068,7 @@ function render(now) {
     date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds() + date.getMilliseconds() / 1000];
 ${c ? `
   updateKeyboardTexture();` : ""}
-${u ? `
+${d ? `
   // Run script onFrame
   try {
     if (scriptOnFrame) scriptOnFrame(scriptEngine, time, deltaTime, frame);
@@ -2998,9 +3171,16 @@ requestAnimationFrame(render);
 </body>
 </html>`;
 }
-class Tt {
+class gt {
   constructor(e, t, n) {
-    this.isRecording = !1, this.mediaRecorder = null, this.recordedChunks = [], this.recordingIndicator = null, this.canvas = e, this.container = t, this.projectRoot = n;
+    l(this, "isRecording", !1);
+    l(this, "canvas");
+    l(this, "container");
+    l(this, "projectRoot");
+    l(this, "mediaRecorder", null);
+    l(this, "recordedChunks", []);
+    l(this, "recordingIndicator", null);
+    this.canvas = e, this.container = t, this.projectRoot = n;
   }
   /**
    * Toggle recording on/off.
@@ -3026,8 +3206,8 @@ class Tt {
     }), this.recordedChunks = [], this.mediaRecorder.ondataavailable = (s) => {
       s.data.size > 0 && this.recordedChunks.push(s.data);
     }, this.mediaRecorder.onstop = () => {
-      const s = new Blob(this.recordedChunks, { type: "video/webm" }), r = this.projectRoot.split("/").pop() || "shader", o = /* @__PURE__ */ new Date(), a = o.getFullYear().toString() + (o.getMonth() + 1).toString().padStart(2, "0") + o.getDate().toString().padStart(2, "0") + "-" + o.getHours().toString().padStart(2, "0") + o.getMinutes().toString().padStart(2, "0") + o.getSeconds().toString().padStart(2, "0"), c = `shadertoy-${r}-${a}.webm`, l = URL.createObjectURL(s), u = document.createElement("a");
-      u.href = l, u.download = c, u.click(), URL.revokeObjectURL(l), console.log(`Recording saved: ${c}`);
+      const s = new Blob(this.recordedChunks, { type: "video/webm" }), r = this.projectRoot.split("/").pop() || "shader", a = /* @__PURE__ */ new Date(), o = a.getFullYear().toString() + (a.getMonth() + 1).toString().padStart(2, "0") + a.getDate().toString().padStart(2, "0") + "-" + a.getHours().toString().padStart(2, "0") + a.getMinutes().toString().padStart(2, "0") + a.getSeconds().toString().padStart(2, "0"), c = `shadertoy-${r}-${o}.webm`, u = URL.createObjectURL(s), d = document.createElement("a");
+      d.href = u, d.download = c, d.click(), URL.revokeObjectURL(u), console.log(`Recording saved: ${c}`);
     }, this.mediaRecorder.start(), this.isRecording = !0, this.showRecordingIndicator(), console.log("Recording started");
   }
   /**
@@ -3058,9 +3238,21 @@ class Tt {
     this.recordingIndicator && (this.recordingIndicator.remove(), this.recordingIndicator = null);
   }
 }
-class bt {
+class Et {
   constructor(e) {
-    this.frameCount = 0, this.totalFrameCount = 0, this.lastFpsUpdate = 0, this.currentFps = 0, this.isStatsOpen = !1, this.container = e, this.statsContainer = document.createElement("div"), this.statsContainer.className = "stats-container", this.fpsDisplay = document.createElement("button"), this.fpsDisplay.className = "fps-counter", this.fpsDisplay.textContent = "0 FPS", this.fpsDisplay.title = "Click to show stats", this.fpsDisplay.addEventListener("click", () => this.toggle()), this.statsGrid = document.createElement("div"), this.statsGrid.className = "stats-grid", this.timeDisplay = document.createElement("div"), this.timeDisplay.className = "stat-item", this.timeDisplay.innerHTML = '<span class="stat-value">0:00</span><span class="stat-label">time</span>', this.statsGrid.appendChild(this.timeDisplay), this.frameDisplay = document.createElement("div"), this.frameDisplay.className = "stat-item", this.frameDisplay.innerHTML = '<span class="stat-value">0</span><span class="stat-label">frame</span>', this.statsGrid.appendChild(this.frameDisplay), this.resolutionDisplay = document.createElement("div"), this.resolutionDisplay.className = "stat-item", this.resolutionDisplay.innerHTML = '<span class="stat-value">0×0</span><span class="stat-label">res</span>', this.statsGrid.appendChild(this.resolutionDisplay), this.statsContainer.appendChild(this.statsGrid), this.statsContainer.appendChild(this.fpsDisplay), this.container.appendChild(this.statsContainer);
+    l(this, "container");
+    l(this, "statsContainer");
+    l(this, "statsGrid");
+    l(this, "fpsDisplay");
+    l(this, "timeDisplay");
+    l(this, "frameDisplay");
+    l(this, "resolutionDisplay");
+    l(this, "frameCount", 0);
+    l(this, "totalFrameCount", 0);
+    l(this, "lastFpsUpdate", 0);
+    l(this, "currentFps", 0);
+    l(this, "isStatsOpen", !1);
+    this.container = e, this.statsContainer = document.createElement("div"), this.statsContainer.className = "stats-container", this.fpsDisplay = document.createElement("button"), this.fpsDisplay.className = "fps-counter", this.fpsDisplay.textContent = "0 FPS", this.fpsDisplay.title = "Click to show stats", this.fpsDisplay.addEventListener("click", () => this.toggle()), this.statsGrid = document.createElement("div"), this.statsGrid.className = "stats-grid", this.timeDisplay = document.createElement("div"), this.timeDisplay.className = "stat-item", this.timeDisplay.innerHTML = '<span class="stat-value">0:00</span><span class="stat-label">time</span>', this.statsGrid.appendChild(this.timeDisplay), this.frameDisplay = document.createElement("div"), this.frameDisplay.className = "stat-item", this.frameDisplay.innerHTML = '<span class="stat-value">0</span><span class="stat-label">frame</span>', this.statsGrid.appendChild(this.frameDisplay), this.resolutionDisplay = document.createElement("div"), this.resolutionDisplay.className = "stat-item", this.resolutionDisplay.innerHTML = '<span class="stat-value">0×0</span><span class="stat-label">res</span>', this.statsGrid.appendChild(this.resolutionDisplay), this.statsContainer.appendChild(this.statsGrid), this.statsContainer.appendChild(this.fpsDisplay), this.container.appendChild(this.statsContainer);
   }
   /**
    * Update FPS counter and stats. Call once per frame.
@@ -3095,16 +3287,22 @@ class bt {
   }
   updateTimeDisplay(e) {
     const t = Math.floor(e), n = Math.floor(t / 3600), s = Math.floor(t % 3600 / 60), r = t % 60;
-    let o;
-    n > 0 ? o = `${n}:${s.toString().padStart(2, "0")}:${r.toString().padStart(2, "0")}` : o = `${s}:${r.toString().padStart(2, "0")}`, this.timeDisplay.querySelector(".stat-value").textContent = o;
+    let a;
+    n > 0 ? a = `${n}:${s.toString().padStart(2, "0")}:${r.toString().padStart(2, "0")}` : a = `${s}:${r.toString().padStart(2, "0")}`, this.timeDisplay.querySelector(".stat-value").textContent = a;
   }
   updateResolutionDisplay() {
     this.resolutionDisplay.querySelector(".stat-value").textContent || (this.resolutionDisplay.querySelector(".stat-value").textContent = "0×0");
   }
 }
-class yt {
+class vt {
   constructor(e, t) {
-    this.isMenuOpen = !1, this.container = e, this.controlsContainer = document.createElement("div"), this.controlsContainer.className = "playback-controls", this.menuButton = document.createElement("button"), this.menuButton.className = "controls-menu-button", this.menuButton.title = "Controls", this.menuButton.textContent = "+", this.menuButton.addEventListener("click", () => this.toggleMenu()), this.controlsGrid = document.createElement("div"), this.controlsGrid.className = "controls-grid", this.playPauseButton = document.createElement("button"), this.playPauseButton.className = "control-button", this.playPauseButton.title = "Play/Pause (Space)", this.playPauseButton.innerHTML = `
+    l(this, "container");
+    l(this, "controlsContainer");
+    l(this, "controlsGrid");
+    l(this, "menuButton");
+    l(this, "playPauseButton");
+    l(this, "isMenuOpen", !1);
+    this.container = e, this.controlsContainer = document.createElement("div"), this.controlsContainer.className = "playback-controls", this.menuButton = document.createElement("button"), this.menuButton.className = "controls-menu-button", this.menuButton.title = "Controls", this.menuButton.textContent = "+", this.menuButton.addEventListener("click", () => this.toggleMenu()), this.controlsGrid = document.createElement("div"), this.controlsGrid.className = "controls-grid", this.playPauseButton = document.createElement("button"), this.playPauseButton.className = "control-button", this.playPauseButton.title = "Play/Pause (Space)", this.playPauseButton.innerHTML = `
       <svg viewBox="0 0 16 16">
         <path d="M5 3h2v10H5V3zm4 0h2v10H9V3z"/>
       </svg>
@@ -3129,23 +3327,23 @@ class yt {
         <circle cx="8" cy="8" r="5"/>
       </svg>
     `, r.addEventListener("click", () => t.onToggleRecording());
-    const o = document.createElement("button");
-    o.className = "control-button", o.title = "Export HTML", o.innerHTML = `
+    const a = document.createElement("button");
+    a.className = "control-button", a.title = "Export HTML", a.innerHTML = `
       <svg viewBox="0 0 16 16">
         <path d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1z"/>
         <path d="M2 14.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
       </svg>
-    `, o.addEventListener("click", () => t.onExportHTML());
-    const a = document.createElement("button");
-    a.className = "control-button", a.title = "Render", a.innerHTML = `
+    `, a.addEventListener("click", () => t.onExportHTML());
+    const o = document.createElement("button");
+    o.className = "control-button", o.title = "Render", o.innerHTML = `
       <svg viewBox="0 0 16 16">
         <path d="M2 3h12v2H2V3zm0 4h12v2H2V7zm0 4h12v2H2v-2z"/>
       </svg>
-    `, a.addEventListener("click", () => t.onRender());
+    `, o.addEventListener("click", () => t.onRender());
     const c = document.createElement("button");
-    c.className = "control-button", c.title = "Close", c.textContent = "−", c.style.fontSize = "20px", c.style.fontWeight = "300", c.addEventListener("click", () => this.toggleMenu()), this.controlsGrid.appendChild(this.playPauseButton), this.controlsGrid.appendChild(n), this.controlsGrid.appendChild(o), this.controlsGrid.appendChild(a), this.controlsGrid.appendChild(s), this.controlsGrid.appendChild(r);
-    const l = document.createElement("div");
-    this.controlsGrid.appendChild(l), this.controlsGrid.appendChild(c), this.controlsContainer.appendChild(this.controlsGrid), this.controlsContainer.appendChild(this.menuButton), this.container.appendChild(this.controlsContainer);
+    c.className = "control-button", c.title = "Close", c.textContent = "−", c.style.fontSize = "20px", c.style.fontWeight = "300", c.addEventListener("click", () => this.toggleMenu()), this.controlsGrid.appendChild(this.playPauseButton), this.controlsGrid.appendChild(n), this.controlsGrid.appendChild(a), this.controlsGrid.appendChild(o), this.controlsGrid.appendChild(s), this.controlsGrid.appendChild(r);
+    const u = document.createElement("div");
+    this.controlsGrid.appendChild(u), this.controlsGrid.appendChild(c), this.controlsContainer.appendChild(this.controlsGrid), this.controlsContainer.appendChild(this.menuButton), this.container.appendChild(this.controlsContainer);
   }
   /**
    * Update the play/pause button icon.
@@ -3171,15 +3369,31 @@ class yt {
     this.isMenuOpen = !this.isMenuOpen, this.menuButton.textContent = this.isMenuOpen ? "−" : "+", this.controlsGrid.classList.toggle("open", this.isMenuOpen), this.controlsContainer.classList.toggle("open", this.isMenuOpen);
   }
 }
-class wt {
+class Tt {
   constructor(e, t, n, s) {
-    this.parentContainer = e, this.canvasWidth = t, this.canvasHeight = n, this.onStartRender = s, this.cancelRenderFn = null, this.backdrop = document.createElement("div"), this.backdrop.className = "render-dialog-backdrop", this.backdrop.addEventListener("click", (x) => {
+    l(this, "backdrop");
+    l(this, "cancelRenderFn", null);
+    // Form elements
+    l(this, "widthInput");
+    l(this, "heightInput");
+    l(this, "fpsInput");
+    l(this, "durationInput");
+    l(this, "formatFrames");
+    l(this, "formatVideo");
+    l(this, "estimateEl");
+    // Progress elements
+    l(this, "bodyEl");
+    l(this, "actionsEl");
+    l(this, "progressEl");
+    l(this, "progressBar");
+    l(this, "progressText");
+    this.parentContainer = e, this.canvasWidth = t, this.canvasHeight = n, this.onStartRender = s, this.backdrop = document.createElement("div"), this.backdrop.className = "render-dialog-backdrop", this.backdrop.addEventListener("click", (x) => {
       x.target === this.backdrop && this.close();
     });
     const r = document.createElement("div");
     r.className = "render-dialog";
-    const o = document.createElement("div");
-    o.className = "render-dialog-header", o.innerHTML = `
+    const a = document.createElement("div");
+    a.className = "render-dialog-header", a.innerHTML = `
       <div class="render-dialog-title">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
           <path d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1z"/>
@@ -3188,37 +3402,37 @@ class wt {
         Render
       </div>
     `;
-    const a = document.createElement("button");
-    a.className = "render-dialog-close", a.textContent = "×", a.addEventListener("click", () => this.close()), o.appendChild(a), this.bodyEl = document.createElement("div"), this.bodyEl.className = "render-dialog-body";
-    const c = this.createField("Resolution"), l = document.createElement("div");
-    l.className = "render-field-row", this.widthInput = this.createNumberInput(t, 1, 7680), this.heightInput = this.createNumberInput(n, 1, 4320);
-    const u = document.createElement("span");
-    u.textContent = "×", l.appendChild(this.widthInput), l.appendChild(u), l.appendChild(this.heightInput), c.appendChild(l);
-    const d = this.createField("FPS");
-    this.fpsInput = this.createNumberInput(60, 1, 120), d.appendChild(this.fpsInput);
-    const E = this.createField("Duration (seconds)");
-    this.durationInput = this.createNumberInput(10, 1, 3600), E.appendChild(this.durationInput);
-    const y = this.createField("Format"), b = document.createElement("div");
-    b.className = "render-format-group", this.formatFrames = document.createElement("input"), this.formatFrames.type = "radio", this.formatFrames.name = "render-format", this.formatFrames.id = "render-fmt-frames", this.formatFrames.value = "frames", this.formatVideo = document.createElement("input"), this.formatVideo.type = "radio", this.formatVideo.name = "render-format", this.formatVideo.id = "render-fmt-video", this.formatVideo.value = "video", this.formatVideo.checked = !0;
-    const T = document.createElement("div");
-    T.className = "render-format-option";
+    const o = document.createElement("button");
+    o.className = "render-dialog-close", o.textContent = "×", o.addEventListener("click", () => this.close()), a.appendChild(o), this.bodyEl = document.createElement("div"), this.bodyEl.className = "render-dialog-body";
+    const c = this.createField("Resolution"), u = document.createElement("div");
+    u.className = "render-field-row", this.widthInput = this.createNumberInput(t, 1, 7680), this.heightInput = this.createNumberInput(n, 1, 4320);
+    const d = document.createElement("span");
+    d.textContent = "×", u.appendChild(this.widthInput), u.appendChild(d), u.appendChild(this.heightInput), c.appendChild(u);
+    const h = this.createField("FPS");
+    this.fpsInput = this.createNumberInput(60, 1, 120), h.appendChild(this.fpsInput);
+    const T = this.createField("Duration (seconds)");
+    this.durationInput = this.createNumberInput(10, 1, 3600), T.appendChild(this.durationInput);
+    const _ = this.createField("Format"), y = document.createElement("div");
+    y.className = "render-format-group", this.formatFrames = document.createElement("input"), this.formatFrames.type = "radio", this.formatFrames.name = "render-format", this.formatFrames.id = "render-fmt-frames", this.formatFrames.value = "frames", this.formatVideo = document.createElement("input"), this.formatVideo.type = "radio", this.formatVideo.name = "render-format", this.formatVideo.id = "render-fmt-video", this.formatVideo.value = "video", this.formatVideo.checked = !0;
+    const b = document.createElement("div");
+    b.className = "render-format-option";
     const w = document.createElement("label");
-    w.htmlFor = "render-fmt-frames", w.textContent = "PNG Frames", T.appendChild(this.formatFrames), T.appendChild(w);
-    const _ = document.createElement("div");
-    _.className = "render-format-option";
-    const m = document.createElement("label");
-    m.htmlFor = "render-fmt-video", m.textContent = "Video (WebM)", _.appendChild(this.formatVideo), _.appendChild(m), b.appendChild(_), b.appendChild(T), y.appendChild(b), this.estimateEl = document.createElement("div"), this.estimateEl.className = "render-estimate", this.bodyEl.appendChild(c), this.bodyEl.appendChild(d), this.bodyEl.appendChild(E), this.bodyEl.appendChild(y), this.bodyEl.appendChild(this.estimateEl), this.actionsEl = document.createElement("div"), this.actionsEl.className = "render-dialog-actions";
-    const h = document.createElement("button");
-    h.className = "render-btn render-btn-cancel", h.textContent = "Cancel", h.addEventListener("click", () => this.close());
-    const f = document.createElement("button");
-    f.className = "render-btn render-btn-primary", f.textContent = "Start Render", f.addEventListener("click", () => this.startRender()), this.actionsEl.appendChild(h), this.actionsEl.appendChild(f), this.progressEl = document.createElement("div"), this.progressEl.className = "render-progress", this.progressEl.innerHTML = `
+    w.htmlFor = "render-fmt-frames", w.textContent = "PNG Frames", b.appendChild(this.formatFrames), b.appendChild(w);
+    const R = document.createElement("div");
+    R.className = "render-format-option";
+    const p = document.createElement("label");
+    p.htmlFor = "render-fmt-video", p.textContent = "Video (WebM)", R.appendChild(this.formatVideo), R.appendChild(p), y.appendChild(R), y.appendChild(b), _.appendChild(y), this.estimateEl = document.createElement("div"), this.estimateEl.className = "render-estimate", this.bodyEl.appendChild(c), this.bodyEl.appendChild(h), this.bodyEl.appendChild(T), this.bodyEl.appendChild(_), this.bodyEl.appendChild(this.estimateEl), this.actionsEl = document.createElement("div"), this.actionsEl.className = "render-dialog-actions";
+    const m = document.createElement("button");
+    m.className = "render-btn render-btn-cancel", m.textContent = "Cancel", m.addEventListener("click", () => this.close());
+    const g = document.createElement("button");
+    g.className = "render-btn render-btn-primary", g.textContent = "Start Render", g.addEventListener("click", () => this.startRender()), this.actionsEl.appendChild(m), this.actionsEl.appendChild(g), this.progressEl = document.createElement("div"), this.progressEl.className = "render-progress", this.progressEl.innerHTML = `
       <div class="render-progress-bar-bg"><div class="render-progress-bar"></div></div>
       <div class="render-progress-text">Preparing...</div>
     `, this.progressBar = this.progressEl.querySelector(".render-progress-bar"), this.progressText = this.progressEl.querySelector(".render-progress-text");
-    const p = document.createElement("button");
-    p.className = "render-btn render-btn-cancel", p.textContent = "Cancel Render", p.style.marginTop = "4px", p.addEventListener("click", () => this.cancelRender()), this.progressEl.appendChild(p), r.appendChild(o), r.appendChild(this.bodyEl), r.appendChild(this.actionsEl), r.appendChild(this.progressEl), this.backdrop.appendChild(r);
-    const g = () => this.updateEstimate();
-    this.widthInput.addEventListener("input", g), this.heightInput.addEventListener("input", g), this.fpsInput.addEventListener("input", g), this.durationInput.addEventListener("input", g), this.formatFrames.addEventListener("change", g), this.formatVideo.addEventListener("change", g), this.updateEstimate();
+    const f = document.createElement("button");
+    f.className = "render-btn render-btn-cancel", f.textContent = "Cancel Render", f.style.marginTop = "4px", f.addEventListener("click", () => this.cancelRender()), this.progressEl.appendChild(f), r.appendChild(a), r.appendChild(this.bodyEl), r.appendChild(this.actionsEl), r.appendChild(this.progressEl), this.backdrop.appendChild(r);
+    const E = () => this.updateEstimate();
+    this.widthInput.addEventListener("input", E), this.heightInput.addEventListener("input", E), this.fpsInput.addEventListener("input", E), this.durationInput.addEventListener("input", E), this.formatFrames.addEventListener("change", E), this.formatVideo.addEventListener("change", E), this.updateEstimate();
   }
   open() {
     this.parentContainer.appendChild(this.backdrop);
@@ -3240,8 +3454,8 @@ class wt {
   updateEstimate() {
     const e = parseInt(this.widthInput.value) || 0, t = parseInt(this.heightInput.value) || 0, n = parseInt(this.fpsInput.value) || 0, s = parseFloat(this.durationInput.value) || 0, r = Math.ceil(n * s);
     if (this.formatFrames.checked) {
-      const a = e * t * 4 / 1048576 * r;
-      this.estimateEl.textContent = `${r} frames, ~${a < 1024 ? Math.round(a) + " MB" : (a / 1024).toFixed(1) + " GB"} raw`;
+      const o = e * t * 4 / 1048576 * r;
+      this.estimateEl.textContent = `${r} frames, ~${o < 1024 ? Math.round(o) + " MB" : (o / 1024).toFixed(1) + " GB"} raw`;
     } else
       this.estimateEl.textContent = `${r} frames, ${s}s at ${n} fps`;
   }
@@ -3253,15 +3467,15 @@ class wt {
       fps: n,
       duration: s,
       format: r,
-      onProgress: (o, a) => {
-        const c = o / a * 100;
-        this.progressBar.style.width = `${c}%`, this.progressText.textContent = `Frame ${o} / ${a} (${Math.round(c)}%)`;
+      onProgress: (a, o) => {
+        const c = a / o * 100;
+        this.progressBar.style.width = `${c}%`, this.progressText.textContent = `Frame ${a} / ${o} (${Math.round(c)}%)`;
       },
       onComplete: () => {
         this.progressText.textContent = "Done!", this.progressBar.style.width = "100%", setTimeout(() => this.close(), 1500);
       },
-      onError: (o) => {
-        this.progressText.textContent = `Error: ${o.message}`, this.progressBar.style.background = "#c62828";
+      onError: (a) => {
+        this.progressText.textContent = `Error: ${a.message}`, this.progressBar.style.background = "#c62828";
       }
     });
   }
@@ -3270,56 +3484,89 @@ class wt {
     (e = this.cancelRenderFn) == null || e.call(this), this.cancelRenderFn = null, this.bodyEl.style.display = "", this.actionsEl.style.display = "", this.progressEl.classList.remove("active");
   }
 }
-class M {
+const M = class M {
   constructor(e) {
-    var n;
-    this.views = /* @__PURE__ */ new Map(), this.animationId = null, this.startTime = 0, this.pausedElapsedTime = 0, this.disposed = !1, this.playbackControls = null, this.isPaused = !1, this.isVisible = !0, this.uniformsPanel = null, this.scriptAPI = null, this.scriptErrorCount = 0, this._lastOnFrameTime = null, this.globalKeyHandler = null, this.controlsKeyHandler = null, this.animate = (s) => {
+    l(this, "container");
+    l(this, "views", /* @__PURE__ */ new Map());
+    l(this, "primaryView");
+    l(this, "project");
+    l(this, "isMultiView");
+    l(this, "animationId", null);
+    l(this, "startTime", 0);
+    l(this, "pausedElapsedTime", 0);
+    l(this, "disposed", !1);
+    // Stats panel
+    l(this, "statsPanel");
+    // Playback controls
+    l(this, "playbackControls", null);
+    l(this, "isPaused", !1);
+    // Visibility observer (auto-pause when off-screen)
+    l(this, "intersectionObserver");
+    l(this, "isVisible", !0);
+    // Floating uniforms panel
+    l(this, "uniformsPanel", null);
+    // Script hooks API
+    l(this, "scriptAPI", null);
+    l(this, "scriptErrorCount", 0);
+    l(this, "_lastOnFrameTime", null);
+    // Recording
+    l(this, "recorder");
+    // Keyboard shortcut handlers (stored for cleanup in dispose)
+    l(this, "globalKeyHandler", null);
+    l(this, "controlsKeyHandler", null);
+    // ===========================================================================
+    // Animation Loop
+    // ===========================================================================
+    l(this, "animate", (e) => {
       if (this.disposed || (this.animationId = requestAnimationFrame(this.animate), this.isPaused || !this.isVisible))
         return;
-      for (const a of this.views.values())
-        if (a.isContextLost)
-          return;
-      const r = s / 1e3, o = r - this.startTime;
-      if (this.statsPanel.update(r, o), this.runScriptOnFrame(o, this.statsPanel.totalFrameCount), this.isMultiView) {
-        const a = /* @__PURE__ */ new Map();
-        for (const [c, l] of this.views)
-          a.set(c, {
-            mouse: l.getMouseState(),
-            resolution: l.getResolution(),
-            mousePressed: l.getMousePressed()
+      for (const s of this.views.values())
+        if (s.isContextLost) return;
+      const t = e / 1e3, n = t - this.startTime;
+      if (this.statsPanel.update(t, n), this.runScriptOnFrame(n, this.statsPanel.totalFrameCount), this.isMultiView) {
+        const s = /* @__PURE__ */ new Map();
+        for (const [r, a] of this.views)
+          s.set(r, {
+            mouse: a.getMouseState(),
+            resolution: a.getResolution(),
+            mousePressed: a.getMousePressed()
           });
-        for (const c of this.views.values())
-          c.step(o, a);
+        for (const r of this.views.values())
+          r.step(n, s);
       } else
-        this.primaryView.step(o);
-    }, this.container = e.container, this.project = e.project, this.isMultiView = Ce(e.project);
+        this.primaryView.step(n);
+    });
+    var n;
+    this.container = e.container, this.project = e.project, this.isMultiView = Re(e.project), this.container.hasAttribute("tabindex") || this.container.setAttribute("tabindex", "-1"), this.container.style.outline = "none", this.container.addEventListener("mousedown", () => this.container.focus());
     const t = e.pixelRatio ?? e.project.pixelRatio ?? window.devicePixelRatio;
     if (this.isMultiView) {
-      const s = e.project, r = s.views.map((o) => o.name);
+      const s = e.project, r = s.views.map((a) => a.name);
       if (!e.viewContainers)
         throw new Error("viewContainers required for multi-view projects");
-      for (const o of s.views) {
-        const a = e.viewContainers.get(o.name);
-        if (!a)
-          throw new Error(`No container provided for view "${o.name}"`);
-        const c = this.createViewProject(s, o), l = new ve({
-          container: a,
+      for (const a of s.views) {
+        const o = e.viewContainers.get(a.name);
+        if (!o)
+          throw new Error(`No container provided for view "${a.name}"`);
+        const c = this.createViewProject(s, a), u = new Ee({
+          container: o,
           project: c,
+          keyboardTarget: this.container,
           pixelRatio: t,
           viewNames: r
         });
-        this.views.set(o.name, l);
+        this.views.set(a.name, u);
       }
       this.primaryView = this.views.values().next().value;
     } else {
-      const s = new ve({
+      const s = new Ee({
         container: e.container,
         project: e.project,
+        keyboardTarget: this.container,
         pixelRatio: t
       });
       this.views.set("default", s), this.primaryView = s;
     }
-    if (this.recorder = new Tt(this.primaryView.canvas, this.container, this.project.root), this.statsPanel = new bt(this.container), this.statsPanel.updateResolution(this.primaryView.canvas.width, this.primaryView.canvas.height), this.isMultiView) {
+    if (this.recorder = new gt(this.primaryView.canvas, this.container, this.project.root), this.statsPanel = new Et(this.container), this.statsPanel.updateResolution(this.primaryView.canvas.width, this.primaryView.canvas.height), this.isMultiView) {
       this.primaryView.onResize = (s, r) => {
         this.statsPanel.updateResolution(s, r);
       };
@@ -3329,8 +3576,8 @@ class M {
           if (this.scriptAPI && ((r = this.project.script) != null && r.setup))
             try {
               this.project.script.setup(this.scriptAPI);
-            } catch (o) {
-              console.error("script.js setup() threw during context restore:", o), this.primaryView.runtimeErrorOverlay.showError("setup", o);
+            } catch (a) {
+              console.error("script.js setup() threw during context restore:", a), this.primaryView.runtimeErrorOverlay.showError("setup", a);
             }
         };
     } else
@@ -3346,22 +3593,25 @@ class M {
           }
         this.reset(), this.start();
       };
-    if (this.project.controls && !e.skipPlaybackControls && (this.playbackControls = new yt(this.container, {
+    if (this.project.controls && !e.skipPlaybackControls && (this.playbackControls = new vt(this.container, {
       onTogglePlayPause: () => this.togglePlayPause(),
       onReset: () => this.reset(),
       onScreenshot: () => this.screenshot(),
       onToggleRecording: () => this.toggleRecording(),
       onExportHTML: () => this.exportHTML(),
       onRender: () => this.openRenderDialog()
-    })), this.project.startPaused && (this.isPaused = !0, (n = this.playbackControls) == null || n.setPaused(!0)), this.intersectionObserver = new IntersectionObserver((s) => {
-      this.isVisible = s[0].isIntersecting;
-    }, { threshold: 0.1 }), this.intersectionObserver.observe(this.container), this.project.script && (this.initScriptAPI(), this.project.script.setup && this.scriptAPI))
+    })), this.project.startPaused && (this.isPaused = !0, (n = this.playbackControls) == null || n.setPaused(!0)), this.intersectionObserver = new IntersectionObserver(
+      (s) => {
+        this.isVisible = s[0].isIntersecting;
+      },
+      { threshold: 0.1 }
+    ), this.intersectionObserver.observe(this.container), this.project.script && (this.initScriptAPI(), this.project.script.setup && this.scriptAPI))
       try {
         this.project.script.setup(this.scriptAPI);
       } catch (s) {
         console.error("script.js setup() threw:", s), this.primaryView.runtimeErrorOverlay.showError("setup", s);
       }
-    !e.skipUniformsPanel && this.project.uniforms && Object.values(this.project.uniforms).some((s) => se(s)) && (this.uniformsPanel = new gt({
+    !e.skipUniformsPanel && this.project.uniforms && Object.values(this.project.uniforms).some((s) => se(s)) && (this.uniformsPanel = new mt({
       container: this.container,
       uniforms: this.project.uniforms,
       onChange: (s, r) => {
@@ -3406,7 +3656,7 @@ class M {
       setUniformValue: (t, n) => e.setUniformValue(t, n),
       getUniformValue: (t) => e.primaryView.engine.getUniformValue(t),
       updateTexture: (t, n, s, r) => e.primaryView.engine.updateTexture(t, n, s, r),
-      readPixels: (t, n, s, r, o) => e.primaryView.engine.readPixels(t, n, s, r, o),
+      readPixels: (t, n, s, r, a) => e.primaryView.engine.readPixels(t, n, s, r, a),
       get width() {
         return e.primaryView.engine.width;
       },
@@ -3428,8 +3678,7 @@ class M {
    */
   runScriptOnFrame(e, t) {
     var s;
-    if (!this.scriptAPI || !((s = this.project.script) != null && s.onFrame) || this.scriptErrorCount >= M.MAX_SCRIPT_ERRORS)
-      return;
+    if (!this.scriptAPI || !((s = this.project.script) != null && s.onFrame) || this.scriptErrorCount >= M.MAX_SCRIPT_ERRORS) return;
     const n = this._lastOnFrameTime !== null ? e - this._lastOnFrameTime : 0;
     try {
       this.project.script.onFrame(this.scriptAPI, e, n, t), this.scriptErrorCount = 0;
@@ -3443,8 +3692,7 @@ class M {
   // ===========================================================================
   hasErrors() {
     for (const e of this.views.values())
-      if (e.hasErrors())
-        return !0;
+      if (e.hasErrors()) return !0;
     return !1;
   }
   getEngine() {
@@ -3524,8 +3772,8 @@ class M {
         console.error("Failed to create screenshot blob");
         return;
       }
-      const o = URL.createObjectURL(r), a = document.createElement("a");
-      a.href = o, a.download = s, a.click(), URL.revokeObjectURL(o), console.log(`Screenshot saved: ${s}`);
+      const a = URL.createObjectURL(r), o = document.createElement("a");
+      o.href = a, o.download = s, o.click(), URL.revokeObjectURL(a), console.log(`Screenshot saved: ${s}`);
     }, "image/png");
   }
   toggleRecording() {
@@ -3539,10 +3787,15 @@ class M {
       console.warn("HTML export is not supported for multi-view projects");
       return;
     }
-    Et(this.project, this.primaryView.engine);
+    pt(this.project, this.primaryView.engine);
   }
   openRenderDialog() {
-    new wt(this.container, this.primaryView.canvas.width, this.primaryView.canvas.height, (t) => this.renderOffline(t)).open();
+    new Tt(
+      this.container,
+      this.primaryView.canvas.width,
+      this.primaryView.canvas.height,
+      (t) => this.renderOffline(t)
+    ).open();
   }
   renderOffline(e) {
     let t = !1;
@@ -3550,21 +3803,21 @@ class M {
       t = !0;
     };
     return (async () => {
-      var u, d;
-      const r = this.primaryView.canvas, o = this.primaryView.engine, a = r.width, c = r.height, l = this.isPaused;
+      var d, h;
+      const r = this.primaryView.canvas, a = this.primaryView.engine, o = r.width, c = r.height, u = this.isPaused;
       try {
-        this.isPaused = !0, r.width = e.width, r.height = e.height, o.resize(e.width, e.height), o.reset(), this.scriptAPI && ((u = this.project.script) != null && u.setup) && this.project.script.setup(this.scriptAPI);
-        const E = Math.ceil(e.fps * e.duration);
-        e.format === "video" ? await this.renderVideoFrames(E, e.fps, () => t, e.onProgress) : await this.renderPngFrames(E, e.fps, () => t, e.onProgress), t || e.onComplete();
-      } catch (E) {
-        t || e.onError(E instanceof Error ? E : new Error(String(E)));
+        this.isPaused = !0, r.width = e.width, r.height = e.height, a.resize(e.width, e.height), a.reset(), this.scriptAPI && ((d = this.project.script) != null && d.setup) && this.project.script.setup(this.scriptAPI);
+        const T = Math.ceil(e.fps * e.duration);
+        e.format === "video" ? await this.renderVideoFrames(T, e.fps, () => t, e.onProgress) : await this.renderPngFrames(T, e.fps, () => t, e.onProgress), t || e.onComplete();
+      } catch (T) {
+        t || e.onError(T instanceof Error ? T : new Error(String(T)));
       } finally {
-        if (r.width = a, r.height = c, o.resize(a, c), o.reset(), this.scriptAPI && ((d = this.project.script) != null && d.setup))
+        if (r.width = o, r.height = c, a.resize(o, c), a.reset(), this.scriptAPI && ((h = this.project.script) != null && h.setup))
           try {
             this.project.script.setup(this.scriptAPI);
           } catch {
           }
-        this.isPaused = l;
+        this.isPaused = u;
       }
     })(), n;
   }
@@ -3575,49 +3828,48 @@ class M {
         r = await window.showDirectoryPicker({ mode: "readwrite" });
       } catch {
       }
-    for (let o = 0; o < e; o++) {
-      if (n())
-        return;
-      this.stepForRender(o, t), this.primaryView.presentToScreen();
-      const a = await new Promise((l, u) => {
-        this.primaryView.canvas.toBlob((d) => d ? l(d) : u(new Error("Failed to capture frame")), "image/png");
-      }), c = `frame_${String(o).padStart(5, "0")}.png`;
+    for (let a = 0; a < e; a++) {
+      if (n()) return;
+      this.stepForRender(a, t), this.primaryView.presentToScreen();
+      const o = await new Promise((u, d) => {
+        this.primaryView.canvas.toBlob((h) => h ? u(h) : d(new Error("Failed to capture frame")), "image/png");
+      }), c = `frame_${String(a).padStart(5, "0")}.png`;
       if (r) {
-        const u = await (await r.getFileHandle(c, { create: !0 })).createWritable();
-        await u.write(a), await u.close();
+        const d = await (await r.getFileHandle(c, { create: !0 })).createWritable();
+        await d.write(o), await d.close();
       } else {
-        const l = URL.createObjectURL(a), u = document.createElement("a");
-        u.href = l, u.download = c, u.click(), URL.revokeObjectURL(l);
+        const u = URL.createObjectURL(o), d = document.createElement("a");
+        d.href = u, d.download = c, d.click(), URL.revokeObjectURL(u);
       }
-      s(o + 1, e), o % 10 === 0 && await new Promise((l) => setTimeout(l, 0));
+      s(a + 1, e), a % 10 === 0 && await new Promise((u) => setTimeout(u, 0));
     }
   }
   async renderVideoFrames(e, t, n, s) {
-    const r = this.primaryView.canvas, o = document.createElement("canvas");
-    o.width = r.width, o.height = r.height;
-    const a = o.getContext("2d"), c = o.captureStream(0), l = new MediaRecorder(c, {
+    const r = this.primaryView.canvas, a = document.createElement("canvas");
+    a.width = r.width, a.height = r.height;
+    const o = a.getContext("2d"), c = a.captureStream(0), u = new MediaRecorder(c, {
       mimeType: "video/webm;codecs=vp9",
       videoBitsPerSecond: 8e6
-    }), u = [];
-    l.ondataavailable = (T) => {
-      T.data.size > 0 && u.push(T.data);
+    }), d = [];
+    u.ondataavailable = (b) => {
+      b.data.size > 0 && d.push(b.data);
     };
-    const d = new Promise((T) => {
-      l.onstop = () => T();
+    const h = new Promise((b) => {
+      u.onstop = () => b();
     });
-    l.start();
-    for (let T = 0; T < e; T++) {
+    u.start();
+    for (let b = 0; b < e; b++) {
       if (n()) {
-        l.stop(), await d;
+        u.stop(), await h;
         return;
       }
-      this.stepForRender(T, t), this.primaryView.presentToScreen(), a.drawImage(r, 0, 0);
+      this.stepForRender(b, t), this.primaryView.presentToScreen(), o.drawImage(r, 0, 0);
       const w = c.getVideoTracks()[0];
-      w != null && w.requestFrame && w.requestFrame(), s(T + 1, e), T % 10 === 0 && await new Promise((_) => setTimeout(_, 0));
+      w != null && w.requestFrame && w.requestFrame(), s(b + 1, e), b % 10 === 0 && await new Promise((R) => setTimeout(R, 0));
     }
-    l.stop(), await d;
-    const E = new Blob(u, { type: "video/webm" }), y = URL.createObjectURL(E), b = document.createElement("a");
-    b.href = y, b.download = `render_${r.width}x${r.height}_${t}fps.webm`, b.click(), URL.revokeObjectURL(y);
+    u.stop(), await h;
+    const T = new Blob(d, { type: "video/webm" }), _ = URL.createObjectURL(T), y = document.createElement("a");
+    y.href = _, y.download = `render_${r.width}x${r.height}_${t}fps.webm`, y.click(), URL.revokeObjectURL(_);
   }
   stepForRender(e, t) {
     var r;
@@ -3634,20 +3886,19 @@ class M {
   // ===========================================================================
   static isTextInput(e) {
     const t = e.target;
-    if (!t)
-      return !1;
+    if (!t) return !1;
     const n = t.tagName;
     return n === "INPUT" || n === "TEXTAREA" || t.isContentEditable;
   }
   setupGlobalShortcuts() {
     this.globalKeyHandler = (e) => {
       M.isTextInput(e) || e.code === "KeyS" && !e.repeat && (e.preventDefault(), this.screenshot());
-    }, document.addEventListener("keydown", this.globalKeyHandler);
+    }, this.container.addEventListener("keydown", this.globalKeyHandler);
   }
   setupKeyboardShortcuts() {
     this.controlsKeyHandler = (e) => {
       M.isTextInput(e) || (e.code === "Space" && !e.repeat && (e.preventDefault(), this.togglePlayPause()), e.code === "KeyR" && !e.repeat && (e.preventDefault(), this.reset()));
-    }, document.addEventListener("keydown", this.controlsKeyHandler);
+    }, this.container.addEventListener("keydown", this.controlsKeyHandler);
   }
   // ===========================================================================
   // Lifecycle
@@ -3657,13 +3908,22 @@ class M {
     this.disposed = !0, this.stop();
     for (const n of this.views.values())
       n.dispose();
-    this.recorder.dispose(), (e = this.playbackControls) == null || e.dispose(), this.intersectionObserver.disconnect(), this.globalKeyHandler && document.removeEventListener("keydown", this.globalKeyHandler), this.controlsKeyHandler && document.removeEventListener("keydown", this.controlsKeyHandler), (t = this.uniformsPanel) == null || t.destroy(), this.statsPanel.dispose();
+    this.recorder.dispose(), (e = this.playbackControls) == null || e.dispose(), this.intersectionObserver.disconnect(), this.globalKeyHandler && this.container.removeEventListener("keydown", this.globalKeyHandler), this.controlsKeyHandler && this.container.removeEventListener("keydown", this.controlsKeyHandler), (t = this.uniformsPanel) == null || t.destroy(), this.statsPanel.dispose();
   }
-}
-M.MAX_SCRIPT_ERRORS = 10;
-class xt {
+};
+l(M, "MAX_SCRIPT_ERRORS", 10);
+let q = M;
+class bt {
   constructor(e) {
-    this.panel = null, this.controls = null, this.isOpen = !1, this.isPaused = !1, this.wrapper = e.wrapper, this.opts = e, this.isPaused = e.getPaused(), this.controlsWrapper = document.createElement("div"), this.controlsWrapper.className = "multi-view-controls-wrapper", this.toggleButton = document.createElement("button"), this.toggleButton.className = "multi-view-controls-toggle", this.toggleButton.title = "Toggle Controls", this.toggleButton.innerHTML = `
+    l(this, "wrapper");
+    l(this, "opts");
+    l(this, "controlsWrapper");
+    l(this, "toggleButton");
+    l(this, "panel", null);
+    l(this, "controls", null);
+    l(this, "isOpen", !1);
+    l(this, "isPaused", !1);
+    this.wrapper = e.wrapper, this.opts = e, this.isPaused = e.getPaused(), this.controlsWrapper = document.createElement("div"), this.controlsWrapper.className = "multi-view-controls-wrapper", this.toggleButton = document.createElement("button"), this.toggleButton.className = "multi-view-controls-toggle", this.toggleButton.title = "Toggle Controls", this.toggleButton.innerHTML = `
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <line x1="4" y1="21" x2="4" y2="14"></line>
         <line x1="4" y1="10" x2="4" y2="3"></line>
@@ -3687,32 +3947,32 @@ class xt {
     s.className = "multi-view-controls-close", s.innerHTML = "&times;", s.title = "Close", s.addEventListener("click", () => this.toggle()), t.appendChild(s), this.panel.appendChild(t);
     const r = document.createElement("div");
     r.className = "controls-section playback-controls";
-    const o = document.createElement("button");
-    o.className = "control-btn play-pause-btn", o.title = "Play/Pause", this.updatePlayPauseIcon(o), o.addEventListener("click", () => {
-      this.opts.onTogglePlayPause(), this.isPaused = this.opts.getPaused(), this.updatePlayPauseIcon(o);
-    }), r.appendChild(o);
     const a = document.createElement("button");
-    if (a.className = "control-btn reset-btn", a.title = "Reset", a.innerHTML = `
+    a.className = "control-btn play-pause-btn", a.title = "Play/Pause", this.updatePlayPauseIcon(a), a.addEventListener("click", () => {
+      this.opts.onTogglePlayPause(), this.isPaused = this.opts.getPaused(), this.updatePlayPauseIcon(a);
+    }), r.appendChild(a);
+    const o = document.createElement("button");
+    if (o.className = "control-btn reset-btn", o.title = "Reset", o.innerHTML = `
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
         <path d="M3 3v5h5"></path>
       </svg>
-    `, a.addEventListener("click", () => {
+    `, o.addEventListener("click", () => {
       this.opts.onReset();
-    }), r.appendChild(a), this.panel.appendChild(r), e && Object.values(e).some((c) => se(c))) {
+    }), r.appendChild(o), this.panel.appendChild(r), e && Object.values(e).some((c) => se(c))) {
       const c = document.createElement("div");
       c.className = "controls-section uniforms-section";
-      const l = document.createElement("div");
-      l.className = "section-label", l.textContent = "Uniforms", c.appendChild(l);
       const u = document.createElement("div");
-      u.className = "uniforms-container", this.controls = new Ae({
-        container: u,
+      u.className = "section-label", u.textContent = "Uniforms", c.appendChild(u);
+      const d = document.createElement("div");
+      d.className = "uniforms-container", this.controls = new Fe({
+        container: d,
         uniforms: e,
-        onChange: (d, E) => {
-          var y, b;
-          (b = (y = this.opts).onSetUniformValue) == null || b.call(y, d, E);
+        onChange: (h, T) => {
+          var _, y;
+          (y = (_ = this.opts).onSetUniformValue) == null || y.call(_, h, T);
         }
-      }), c.appendChild(u), this.panel.appendChild(c);
+      }), c.appendChild(d), this.panel.appendChild(c);
     }
     this.panel.classList.add("closed"), this.controlsWrapper.appendChild(this.panel);
   }
@@ -3737,8 +3997,11 @@ class xt {
     (e = this.controls) == null || e.destroy(), this.wrapper.removeChild(this.controlsWrapper);
   }
 }
-class _t {
+class yt {
   constructor(e) {
+    l(this, "container");
+    l(this, "root");
+    l(this, "canvasContainer");
     this.container = e.container, this.root = document.createElement("div"), this.root.className = "layout-fullscreen", this.canvasContainer = document.createElement("div"), this.canvasContainer.className = "canvas-container", this.root.appendChild(this.canvasContainer), this.container.appendChild(this.root);
   }
   getCanvasContainer() {
@@ -3748,8 +4011,11 @@ class _t {
     this.container.innerHTML = "";
   }
 }
-class Rt {
+class wt {
   constructor(e) {
+    l(this, "container");
+    l(this, "root");
+    l(this, "canvasContainer");
     this.container = e.container, this.root = document.createElement("div"), this.root.className = "layout-default", this.canvasContainer = document.createElement("div"), this.canvasContainer.className = "canvas-container", this.root.appendChild(this.canvasContainer), this.container.appendChild(this.root);
   }
   getCanvasContainer() {
@@ -3759,9 +4025,17 @@ class Rt {
     this.container.innerHTML = "";
   }
 }
-class Ct {
+class xt {
   constructor(e) {
-    this.editorPanel = null, this.recompileHandler = null, this._disposed = !1, this.container = e.container, this.project = e.project, this.root = document.createElement("div"), this.root.className = "layout-split", this.canvasContainer = document.createElement("div"), this.canvasContainer.className = "canvas-container", this.codePanel = document.createElement("div"), this.codePanel.className = "code-panel", this.buildEditorPanel(), this.root.appendChild(this.canvasContainer), this.root.appendChild(this.codePanel), this.container.appendChild(this.root);
+    l(this, "container");
+    l(this, "project");
+    l(this, "root");
+    l(this, "canvasContainer");
+    l(this, "codePanel");
+    l(this, "editorPanel", null);
+    l(this, "recompileHandler", null);
+    l(this, "_disposed", !1);
+    this.container = e.container, this.project = e.project, this.root = document.createElement("div"), this.root.className = "layout-split", this.canvasContainer = document.createElement("div"), this.canvasContainer.className = "canvas-container", this.codePanel = document.createElement("div"), this.codePanel.className = "code-panel", this.buildEditorPanel(), this.root.appendChild(this.canvasContainer), this.root.appendChild(this.codePanel), this.container.appendChild(this.root);
   }
   getCanvasContainer() {
     return this.canvasContainer;
@@ -3779,18 +4053,34 @@ class Ct {
    */
   async buildEditorPanel() {
     try {
-      const { EditorPanel: e } = await Promise.resolve().then(() => cn);
-      if (this._disposed)
-        return;
+      const { EditorPanel: e } = await Promise.resolve().then(() => rn);
+      if (this._disposed) return;
       this.editorPanel = new e(this.codePanel, this.project), this.recompileHandler && this.editorPanel.setRecompileHandler(this.recompileHandler);
     } catch (e) {
       console.error("Failed to load editor panel:", e);
     }
   }
 }
-class St {
+class _t {
   constructor(e) {
-    this.editorInstance = null, this.recompileHandler = null, this.modifiedSources = /* @__PURE__ */ new Map(), this.tabs = [], this.activeTabIndex = 0, this.keydownHandler = null, this.container = e.container, this.project = e.project, this.root = document.createElement("div"), this.root.className = "layout-tabbed";
+    l(this, "container");
+    l(this, "project");
+    l(this, "root");
+    l(this, "canvasContainer");
+    l(this, "contentArea");
+    l(this, "imageViewer");
+    l(this, "editorContainer");
+    l(this, "editorInstance", null);
+    l(this, "buttonContainer");
+    l(this, "copyButton");
+    l(this, "recompileButton");
+    l(this, "errorDisplay");
+    l(this, "recompileHandler", null);
+    l(this, "modifiedSources", /* @__PURE__ */ new Map());
+    l(this, "tabs", []);
+    l(this, "activeTabIndex", 0);
+    l(this, "keydownHandler", null);
+    this.container = e.container, this.project = e.project, this.root = document.createElement("div"), this.root.className = "layout-tabbed";
     const t = document.createElement("div");
     t.className = "tabbed-wrapper", this.contentArea = document.createElement("div"), this.contentArea.className = "tabbed-content", this.canvasContainer = document.createElement("div"), this.canvasContainer.className = "tabbed-canvas-container", this.imageViewer = document.createElement("div"), this.imageViewer.className = "tabbed-image-viewer", this.imageViewer.style.visibility = "hidden", this.contentArea.appendChild(this.canvasContainer), this.contentArea.appendChild(this.imageViewer), this.editorContainer = document.createElement("div"), this.editorContainer.className = "tabbed-editor-container", this.editorContainer.style.visibility = "hidden", this.contentArea.appendChild(this.editorContainer), this.buttonContainer = document.createElement("div"), this.buttonContainer.className = "tabbed-button-container", this.buttonContainer.style.display = "none", this.copyButton = document.createElement("button"), this.copyButton.className = "tabbed-copy-button", this.copyButton.innerHTML = `
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
@@ -3813,12 +4103,12 @@ class St {
     this.recompileHandler = e;
   }
   dispose() {
-    this.keydownHandler && (document.removeEventListener("keydown", this.keydownHandler), this.keydownHandler = null), this.editorInstance && (this.editorInstance.destroy(), this.editorInstance = null), this.container.innerHTML = "";
+    this.keydownHandler && (this.container.removeEventListener("keydown", this.keydownHandler), this.keydownHandler = null), this.editorInstance && (this.editorInstance.destroy(), this.editorInstance = null), this.container.innerHTML = "";
   }
   setupKeyboardShortcut() {
     this.keydownHandler = (e) => {
       (e.ctrlKey || e.metaKey) && e.key === "Enter" && this.tabs[this.activeTabIndex].kind === "code" && (e.preventDefault(), this.recompile());
-    }, document.addEventListener("keydown", this.keydownHandler);
+    }, this.container.addEventListener("keydown", this.keydownHandler);
   }
   saveCurrentEditorContent() {
     if (this.editorInstance) {
@@ -3836,8 +4126,7 @@ class St {
     }
     this.saveCurrentEditorContent();
     const e = this.tabs[this.activeTabIndex];
-    if (e.kind !== "code")
-      return;
+    if (e.kind !== "code") return;
     const t = this.modifiedSources.get(e.passName) ?? e.source, n = this.recompileHandler(e.passName, t);
     n.success ? (this.hideError(), e.source = t) : this.showError(n.error || "Compilation failed");
   }
@@ -3849,8 +4138,7 @@ class St {
   }
   async copyToClipboard() {
     const e = this.tabs[this.activeTabIndex];
-    if (e.kind !== "code")
-      return;
+    if (e.kind !== "code") return;
     const t = this.editorInstance ? this.editorInstance.getSource() : this.modifiedSources.get(e.passName) ?? e.source;
     try {
       await navigator.clipboard.writeText(t);
@@ -3882,13 +4170,13 @@ class St {
       "BufferC",
       "BufferD"
     ];
-    for (const o of n) {
-      const a = this.project.passes[o];
-      a && this.tabs.push({
+    for (const a of n) {
+      const o = this.project.passes[a];
+      o && this.tabs.push({
         kind: "code",
-        name: `${o.toLowerCase()}.glsl`,
-        passName: o,
-        source: a.glslSource
+        name: `${a.toLowerCase()}.glsl`,
+        passName: a,
+        source: o.glslSource
       });
     }
     const s = this.project.passes.Image;
@@ -3898,62 +4186,66 @@ class St {
       passName: "Image",
       source: s.glslSource
     });
-    for (const o of this.project.textures)
+    for (const a of this.project.textures)
       this.tabs.push({
         kind: "image",
-        name: o.filename || o.name,
-        url: o.source
+        name: a.filename || a.name,
+        url: a.source
       });
-    const r = async (o) => {
+    const r = async (a) => {
       this.saveCurrentEditorContent();
-      const a = this.tabs[o];
-      if (this.activeTabIndex = o, t.querySelectorAll(".tabbed-tab-button").forEach((c, l) => {
-        c.classList.toggle("active", l === o);
-      }), this.canvasContainer.style.visibility = "hidden", this.imageViewer.style.visibility = "hidden", this.editorContainer.style.visibility = "hidden", this.buttonContainer.style.display = "none", this.editorInstance && (this.editorInstance.destroy(), this.editorInstance = null), a.kind === "shader")
+      const o = this.tabs[a];
+      if (this.activeTabIndex = a, t.querySelectorAll(".tabbed-tab-button").forEach((c, u) => {
+        c.classList.toggle("active", u === a);
+      }), this.canvasContainer.style.visibility = "hidden", this.imageViewer.style.visibility = "hidden", this.editorContainer.style.visibility = "hidden", this.buttonContainer.style.display = "none", this.editorInstance && (this.editorInstance.destroy(), this.editorInstance = null), o.kind === "shader")
         this.canvasContainer.style.visibility = "visible";
-      else if (a.kind === "code") {
+      else if (o.kind === "code") {
         this.editorContainer.style.visibility = "visible", this.buttonContainer.style.display = "flex";
-        const c = this.modifiedSources.get(a.passName) ?? a.source;
+        const c = this.modifiedSources.get(o.passName) ?? o.source;
         this.editorContainer.innerHTML = "";
         try {
-          const { createEditor: l } = await Promise.resolve().then(() => Oe);
-          this.editorInstance = l(this.editorContainer, c, (u) => {
-            this.modifiedSources.set(a.passName, u);
+          const { createEditor: u } = await Promise.resolve().then(() => Be);
+          this.editorInstance = u(this.editorContainer, c, (d) => {
+            this.modifiedSources.set(o.passName, d);
           });
-        } catch (l) {
-          console.error("Failed to load editor:", l);
-          const u = document.createElement("textarea");
-          u.className = "tabbed-fallback-textarea", u.value = c, u.addEventListener("input", () => {
-            this.modifiedSources.set(a.passName, u.value);
-          }), this.editorContainer.appendChild(u);
+        } catch (u) {
+          console.error("Failed to load editor:", u);
+          const d = document.createElement("textarea");
+          d.className = "tabbed-fallback-textarea", d.value = c, d.addEventListener("input", () => {
+            this.modifiedSources.set(o.passName, d.value);
+          }), this.editorContainer.appendChild(d);
         }
       } else {
         this.imageViewer.style.visibility = "visible";
         const c = document.createElement("img");
-        c.src = a.url, c.alt = a.name, this.imageViewer.innerHTML = "", this.imageViewer.appendChild(c);
+        c.src = o.url, c.alt = o.name, this.imageViewer.innerHTML = "", this.imageViewer.appendChild(c);
       }
     };
-    return this.tabs.forEach((o, a) => {
+    return this.tabs.forEach((a, o) => {
       const c = document.createElement("button");
-      c.className = "tabbed-tab-button", o.kind === "shader" ? c.classList.add("shader-tab") : o.kind === "image" && c.classList.add("image-tab"), c.textContent = o.name, a === 0 && c.classList.add("active"), c.addEventListener("click", () => r(a)), t.appendChild(c);
+      c.className = "tabbed-tab-button", a.kind === "shader" ? c.classList.add("shader-tab") : a.kind === "image" && c.classList.add("image-tab"), c.textContent = a.name, o === 0 && c.classList.add("active"), c.addEventListener("click", () => r(o)), t.appendChild(c);
     }), e.appendChild(t), e.appendChild(this.buttonContainer), e;
   }
 }
-class Te {
+class ve {
   constructor(e) {
-    this.canvasContainers = /* @__PURE__ */ new Map(), this.container = e.container;
+    l(this, "container");
+    l(this, "wrapper");
+    l(this, "canvasContainers", /* @__PURE__ */ new Map());
+    l(this, "resizeObserver");
+    this.container = e.container;
     const t = e.viewNames.length;
     this.wrapper = document.createElement("div"), this.wrapper.className = "layout-multi-view layout-grid-view", this.wrapper.dataset.viewCount = String(t);
     for (const s of e.viewNames) {
       const r = document.createElement("div");
       r.className = "multi-view-canvas", r.setAttribute("data-view-name", s);
-      const o = document.createElement("div");
-      o.className = "multi-view-label", o.textContent = s, r.appendChild(o), this.canvasContainers.set(s, r), this.wrapper.appendChild(r);
+      const a = document.createElement("div");
+      a.className = "multi-view-label", a.textContent = s, r.appendChild(a), this.canvasContainers.set(s, r), this.wrapper.appendChild(r);
     }
     this.container.appendChild(this.wrapper), this.resizeObserver = new ResizeObserver((s) => {
       for (const r of s) {
-        const { width: o, height: a } = r.contentRect;
-        this.updateOrientation(o, a);
+        const { width: a, height: o } = r.contentRect;
+        this.updateOrientation(a, o);
       }
     }), this.resizeObserver.observe(this.wrapper);
     const n = this.wrapper.getBoundingClientRect();
@@ -3973,11 +4265,18 @@ class Te {
     this.resizeObserver.disconnect(), this.container.innerHTML = "";
   }
 }
-class Ft {
+class Rt {
   constructor(e) {
-    if (this.canvasContainers = /* @__PURE__ */ new Map(), this.insetContainer = null, this.minimizeBtn = null, this.isMinimized = !1, this.toggleMinimize = () => {
+    l(this, "container");
+    l(this, "wrapper");
+    l(this, "canvasContainers", /* @__PURE__ */ new Map());
+    l(this, "insetContainer", null);
+    l(this, "minimizeBtn", null);
+    l(this, "isMinimized", !1);
+    l(this, "toggleMinimize", () => {
       this.isMinimized = !this.isMinimized, this.insetContainer && this.insetContainer.classList.toggle("minimized", this.isMinimized), this.minimizeBtn && (this.isMinimized ? (this.minimizeBtn.innerHTML = "&#x25A1;", this.minimizeBtn.title = "Restore", this.minimizeBtn.style.display = "none") : (this.minimizeBtn.innerHTML = "&#x2212;", this.minimizeBtn.title = "Minimize", this.minimizeBtn.style.display = ""));
-    }, this.container = e.container, e.viewNames.length < 2)
+    });
+    if (this.container = e.container, e.viewNames.length < 2)
       throw new Error("InsetViewLayout requires at least 2 views");
     this.wrapper = document.createElement("div"), this.wrapper.className = "layout-multi-view layout-inset-view";
     const t = e.viewNames[0], n = document.createElement("div");
@@ -3997,104 +4296,112 @@ class Ft {
     this.minimizeBtn && this.minimizeBtn.removeEventListener("click", this.toggleMinimize), this.container.innerHTML = "";
   }
 }
-function oe(i) {
-  document.documentElement.setAttribute("data-theme", i);
-}
-function At(i, e) {
-  switch (oe(e.project.theme), i) {
+function Ct(i, e) {
+  switch (i) {
     case "fullscreen":
-      return new _t(e);
+      return new yt(e);
     case "default":
-      return new Rt(e);
+      return new wt(e);
     case "split":
-      return new Ct(e);
+      return new xt(e);
     case "tabbed":
-      return new St(e);
+      return new _t(e);
   }
 }
-function Lt(i, e) {
-  switch (oe(e.project.theme), i) {
+function St(i, e) {
+  switch (i) {
     case "split":
     case "quad":
     case "grid":
-      return new Te(e);
+      return new ve(e);
     case "inset":
-      return new Ft(e);
+      return new Rt(e);
     default:
-      return new Te(e);
+      return new ve(e);
   }
 }
-async function Dt(i, e) {
-  const { project: t, styled: n = !0, pixelRatio: s = window.devicePixelRatio } = e;
-  return n || i.classList.add("unstyled"), oe(t.theme), Ce(t) ? Mt(i, t, s) : Pt(i, t, s);
+function Ft(i, e) {
+  const { styled: t = !0, pixelRatio: n = window.devicePixelRatio } = e, s = { ...e.project };
+  return e.layout !== void 0 && (s.layout = e.layout), e.controls !== void 0 && (s.controls = e.controls), e.theme !== void 0 && (s.theme = e.theme), e.startPaused !== void 0 && (s.startPaused = e.startPaused), e.pixelRatio !== void 0 && (s.pixelRatio = e.pixelRatio), t || i.classList.add("unstyled"), i.setAttribute("data-theme", s.theme), Re(s) ? Lt(i, s, n) : At(i, s, n);
 }
-function Pt(i, e, t) {
-  const n = At(e.layout, {
+function Ae(i, e) {
+  return {
+    pause: () => {
+      i.getPaused() || i.togglePlayPause();
+    },
+    resume: () => {
+      i.getPaused() && i.togglePlayPause();
+    },
+    reset: () => i.reset(),
+    get isPaused() {
+      return i.getPaused();
+    },
+    setUniform: (t, n) => i.setUniformValue(t, n),
+    getUniform: (t) => i.getUniformValue(t),
+    destroy: e
+  };
+}
+function At(i, e, t) {
+  const n = Ct(e.layout, {
     container: i,
     project: e
-  }), s = new M({
+  }), s = new q({
     container: n.getCanvasContainer(),
     project: e,
     pixelRatio: t,
     skipUniformsPanel: !1,
     skipPlaybackControls: !1
   });
-  return n.setRecompileHandler && n.setRecompileHandler((r, o) => {
-    const a = s.getEngine();
-    if (!a)
+  return n.setRecompileHandler && n.setRecompileHandler((r, a) => {
+    const o = s.getEngine();
+    if (!o)
       return { success: !1, error: "Engine not initialized" };
     if (r === "common") {
-      const c = a.recompileCommon(o);
+      const c = o.recompileCommon(a);
       if (c.success)
         return { success: !0 };
-      const l = c.errors[0];
+      const u = c.errors[0];
       return {
         success: !1,
-        error: l ? `${l.passName}: ${l.error}` : "Unknown error"
+        error: u ? `${u.passName}: ${u.error}` : "Unknown error"
       };
     }
-    return a.recompilePass(r, o);
-  }), n.setUniformHandler && n.setUniformHandler((r, o) => {
-    const a = s.getEngine();
-    a && a.setUniformValue(r, o);
-  }), s.hasErrors() || s.start(), {
-    app: s,
-    destroy: () => {
-      s.dispose(), n.dispose();
-    }
-  };
+    return o.recompilePass(r, a);
+  }), n.setUniformHandler && n.setUniformHandler((r, a) => {
+    const o = s.getEngine();
+    o && o.setUniformValue(r, a);
+  }), s.hasErrors() || s.start(), Ae(s, () => {
+    s.dispose(), n.dispose();
+  });
 }
-function Mt(i, e, t) {
-  const n = e.views.map((a) => a.name), s = Lt(e.viewLayout, {
+function Lt(i, e, t) {
+  const n = e.views.map((o) => o.name), s = St(e.viewLayout, {
     container: i,
     project: e,
     viewNames: n
-  }), r = new M({
+  }), r = new q({
     container: s.getWrapperElement(),
     project: e,
     pixelRatio: t,
     viewContainers: s.getCanvasContainers(),
     skipPlaybackControls: !0,
     skipUniformsPanel: !0
-  }), o = new xt({
+  }), a = new bt({
     wrapper: s.getWrapperElement(),
     onTogglePlayPause: () => r.togglePlayPause(),
     onReset: () => r.reset(),
     getPaused: () => r.getPaused(),
-    onSetUniformValue: (a, c) => r.setUniformValue(a, c),
+    onSetUniformValue: (o, c) => r.setUniformValue(o, c),
     uniforms: e.uniforms
   });
-  return r.hasErrors() || r.start(), {
-    app: r,
-    destroy: () => {
-      o.dispose(), r.dispose(), s.dispose();
-    }
-  };
+  return r.hasErrors() || r.start(), Ae(r, () => {
+    a.dispose(), r.dispose(), s.dispose();
+  });
 }
 function ae(i) {
   return i === "Image" || i === "BufferA" || i === "BufferB" || i === "BufferC" || i === "BufferD";
 }
-function kt(i) {
+function Pt(i) {
   switch (i) {
     case "Image":
       return "image.glsl";
@@ -4111,7 +4418,7 @@ function kt(i) {
 function Le(i) {
   return typeof i == "string" ? ae(i) ? { buffer: i } : i === "keyboard" ? { keyboard: !0 } : i === "audio" ? { audio: !0 } : i === "webcam" ? { webcam: !0 } : { texture: i } : i;
 }
-const ie = ["Image", "BufferA", "BufferB", "BufferC", "BufferD"], Ut = ["BufferA", "BufferB", "BufferC", "BufferD"], De = ["iChannel0", "iChannel1", "iChannel2", "iChannel3"], Bt = "default", Pe = !0, It = "light", Me = /* @__PURE__ */ new Set([
+const ie = ["Image", "BufferA", "BufferB", "BufferC", "BufferD"], kt = ["BufferA", "BufferB", "BufferC", "BufferD"], Pe = ["iChannel0", "iChannel1", "iChannel2", "iChannel3"], Dt = "default", Ut = !0, Mt = "light", Bt = /* @__PURE__ */ new Set([
   "iResolution",
   "iTime",
   "iTimeDelta",
@@ -4131,7 +4438,7 @@ const ie = ["Image", "BufferA", "BufferB", "BufferC", "BufferD"], Ut = ["BufferA
   "iPinch",
   "iPinchDelta",
   "iPinchCenter"
-]), Nt = /^[a-zA-Z_][a-zA-Z0-9_]*$/, $t = /* @__PURE__ */ new Set([
+]), Nt = /^[a-zA-Z_][a-zA-Z0-9_]*$/, It = /* @__PURE__ */ new Set([
   "attribute",
   "const",
   "uniform",
@@ -4182,10 +4489,10 @@ const ie = ["Image", "BufferA", "BufferB", "BufferC", "BufferD"], Ut = ["BufferA
   "case",
   "default"
 ]);
-function $(i) {
-  return Nt.test(i) && !$t.has(i);
+function G(i) {
+  return Nt.test(i) && !It.has(i);
 }
-const be = /* @__PURE__ */ new Set(["fullscreen", "default", "split", "tabbed"]), q = /* @__PURE__ */ new Set(["light", "dark", "system"]), Ot = /* @__PURE__ */ new Set([
+const Te = /* @__PURE__ */ new Set(["fullscreen", "default", "split", "tabbed"]), be = /* @__PURE__ */ new Set(["light", "dark", "system"]), Ot = /* @__PURE__ */ new Set([
   "mode",
   "title",
   "author",
@@ -4206,63 +4513,46 @@ const be = /* @__PURE__ */ new Set(["fullscreen", "default", "split", "tabbed"])
   "BufferD",
   "views"
   // multi-view projects
-]), Ht = /* @__PURE__ */ new Set(["source", "iChannel0", "iChannel1", "iChannel2", "iChannel3"]), ye = /* @__PURE__ */ new Set(["keyboard", "audio", "webcam"]);
-function Vt(i, e) {
+]), $t = /* @__PURE__ */ new Set(["source", "iChannel0", "iChannel1", "iChannel2", "iChannel3"]), ye = /* @__PURE__ */ new Set(["keyboard", "audio", "webcam"]);
+function Ht(i, e) {
   const t = [], n = [];
   for (const r of Object.keys(i))
     Ot.has(r) || t.push(`Unknown config key '${r}'`);
-  if (i.layout !== void 0 && !be.has(i.layout) && n.push(`Invalid layout '${i.layout}'. Expected one of: ${[...be].join(", ")}`), i.theme !== void 0 && !q.has(i.theme) && n.push(`Invalid theme '${i.theme}'. Expected one of: ${[...q].join(", ")}`), i.uniforms && typeof i.uniforms == "object")
+  if (i.layout !== void 0 && !Te.has(i.layout) && n.push(`Invalid layout '${i.layout}'. Expected one of: ${[...Te].join(", ")}`), i.theme !== void 0 && !be.has(i.theme) && n.push(`Invalid theme '${i.theme}'. Expected one of: ${[...be].join(", ")}`), i.uniforms && typeof i.uniforms == "object")
     for (const r of Object.keys(i.uniforms))
-      Me.has(r) && n.push(`Uniform name '${r}' is reserved (built-in uniform)`), $(r) || n.push(`Uniform name '${r}' is not a valid GLSL identifier`);
+      Bt.has(r) && n.push(`Uniform name '${r}' is reserved (built-in uniform)`), G(r) || n.push(`Uniform name '${r}' is not a valid GLSL identifier`);
   const s = /* @__PURE__ */ new Set();
   if (i.buffers) {
     const r = Object.keys(i.buffers);
-    for (const o of r) {
-      if (typeof o != "string") {
-        n.push(`Buffer name must be a string, got ${typeof o}`);
+    for (const a of r) {
+      if (typeof a != "string") {
+        n.push(`Buffer name must be a string, got ${typeof a}`);
         continue;
       }
-      $(o) || n.push(`Buffer name '${o}' is not a valid GLSL identifier`), s.add(o);
+      G(a) || n.push(`Buffer name '${a}' is not a valid GLSL identifier`), s.add(a);
     }
   }
   if (i.textures && typeof i.textures == "object")
-    for (const [r, o] of Object.entries(i.textures))
-      $(r) || n.push(`Texture name '${r}' is not a valid GLSL identifier`), s.has(r) && n.push(`Texture name '${r}' collides with a buffer name`), typeof o != "string" ? n.push(`Texture source for '${r}' must be a string`) : !ye.has(o) && !/\.\w+$/.test(o) && !$(o) && n.push(`Invalid texture source '${o}' for '${r}'. Expected a file path with extension, a script texture name, or one of: ${[...ye].join(", ")}`);
+    for (const [r, a] of Object.entries(i.textures))
+      G(r) || n.push(`Texture name '${r}' is not a valid GLSL identifier`), s.has(r) && n.push(`Texture name '${r}' collides with a buffer name`), typeof a != "string" ? n.push(`Texture source for '${r}' must be a string`) : !ye.has(a) && !/\.\w+$/.test(a) && !G(a) && n.push(`Invalid texture source '${a}' for '${r}'. Expected a file path with extension, a script texture name, or one of: ${[...ye].join(", ")}`);
   for (const r of ie) {
-    const o = i[r];
-    if (!(!o || typeof o != "object")) {
-      for (const a of Object.keys(o))
-        Ht.has(a) || t.push(`Unknown key '${a}' in pass '${r}'`);
-      for (const a of De) {
-        const c = o[a];
-        c && typeof c == "string" && ae(c) && c !== "Image" && !i[c] && t.push(`${r}.${a} references '${c}' but no ${c} pass is configured`);
+    const a = i[r];
+    if (!(!a || typeof a != "object")) {
+      for (const o of Object.keys(a))
+        $t.has(o) || t.push(`Unknown key '${o}' in pass '${r}'`);
+      for (const o of Pe) {
+        const c = a[o];
+        c && typeof c == "string" && ae(c) && c !== "Image" && !i[c] && t.push(`${r}.${o} references '${c}' but no ${c} pass is configured`);
       }
     }
   }
-  for (const r of t)
-    console.warn(`[config] ${e}: ${r}`);
+  for (const r of t) console.warn(`[config] ${e}: ${r}`);
   if (n.length > 0)
-    throw new Error(`Config validation failed for '${e}':
+    throw new Error(
+      `Config validation failed for '${e}':
 ${n.map((r) => `  - ${r}`).join(`
-`)}`);
-}
-const we = /* @__PURE__ */ new Set(["split", "quad", "grid", "inset"]);
-function Xt(i, e) {
-  const t = [];
-  if (!Array.isArray(i.views) || i.views.length < 2)
-    t.push("'views' must be an array with at least 2 entries");
-  else {
-    for (const s of i.views)
-      (typeof s != "string" || !s) && t.push(`Each view name must be a non-empty string, got '${s}'`);
-    new Set(i.views).size !== i.views.length && t.push("Duplicate view names found");
-  }
-  if (i.layout !== void 0 && !we.has(i.layout) && t.push(`Invalid multi-view layout '${i.layout}'. Expected one of: ${[...we].join(", ")}`), i.theme !== void 0 && !q.has(i.theme) && t.push(`Invalid theme '${i.theme}'. Expected one of: ${[...q].join(", ")}`), i.uniforms && typeof i.uniforms == "object")
-    for (const n of Object.keys(i.uniforms))
-      Me.has(n) && t.push(`Uniform name '${n}' is reserved (built-in uniform)`), $(n) || t.push(`Uniform name '${n}' is not a valid GLSL identifier`);
-  if (t.length > 0)
-    throw new Error(`Multi-view config validation failed for '${e}':
-${t.map((n) => `  - ${n}`).join(`
-`)}`);
+`)}`
+    );
 }
 function Z(i) {
   return {
@@ -4273,9 +4563,9 @@ function Z(i) {
       author: i.author ?? null,
       description: i.description ?? null
     },
-    layout: i.layout ?? Bt,
-    theme: i.theme ?? It,
-    controls: i.controls ?? Pe,
+    layout: i.layout ?? Dt,
+    theme: i.theme ?? Mt,
+    controls: i.controls ?? Ut,
     startPaused: i.startPaused ?? !1,
     pixelRatio: i.pixelRatio ?? null,
     commonSource: i.commonSource,
@@ -4285,26 +4575,26 @@ function Z(i) {
     script: i.script ?? null
   };
 }
-const xe = /* @__PURE__ */ new Set(["float", "int", "bool", "vec2", "vec3", "vec4"]), _e = /* @__PURE__ */ new Set(["float", "vec2", "vec3", "vec4", "mat3", "mat4"]), jt = {
+const we = /* @__PURE__ */ new Set(["float", "int", "bool", "vec2", "vec3", "vec4"]), xe = /* @__PURE__ */ new Set(["float", "vec2", "vec3", "vec4", "mat3", "mat4"]), Vt = {
   vec2: 2,
   vec3: 3,
   vec4: 4
 };
-function Yt(i, e) {
+function Xt(i, e) {
   for (const [t, n] of Object.entries(i)) {
     const s = `Uniform '${t}' in '${e}'`;
     if (!n.type)
       throw new Error(`${s}: missing 'type' field`);
-    if (A(n)) {
-      if (!_e.has(n.type))
-        throw new Error(`${s}: invalid array type '${n.type}'. Expected one of: ${[..._e].join(", ")}`);
+    if (L(n)) {
+      if (!xe.has(n.type))
+        throw new Error(`${s}: invalid array type '${n.type}'. Expected one of: ${[...xe].join(", ")}`);
       if (typeof n.count != "number" || n.count < 1 || !Number.isInteger(n.count))
         throw new Error(`${s}: 'count' must be a positive integer, got ${n.count}`);
       continue;
     }
     const r = n;
-    if (!xe.has(r.type))
-      throw new Error(`${s}: invalid type '${r.type}'. Expected one of: ${[...xe].join(", ")}`);
+    if (!we.has(r.type))
+      throw new Error(`${s}: invalid type '${r.type}'. Expected one of: ${[...we].join(", ")}`);
     switch (r.type) {
       case "float":
       case "int":
@@ -4324,16 +4614,16 @@ function Yt(i, e) {
       case "vec2":
       case "vec3":
       case "vec4": {
-        const o = jt[r.type];
-        if (!Array.isArray(r.value) || r.value.length !== o)
-          throw new Error(`${s}: 'value' must be an array of ${o} numbers for type '${r.type}'`);
+        const a = Vt[r.type];
+        if (!Array.isArray(r.value) || r.value.length !== a)
+          throw new Error(`${s}: 'value' must be an array of ${a} numbers for type '${r.type}'`);
         if (r.value.some((c) => typeof c != "number"))
           throw new Error(`${s}: all components of 'value' must be numbers`);
-        const a = r;
+        const o = r;
         for (const c of ["min", "max", "step"]) {
-          const l = a[c];
-          if (l !== void 0 && (!Array.isArray(l) || l.length !== o))
-            throw new Error(`${s}: '${c}' must be an array of ${o} numbers for type '${r.type}'`);
+          const u = o[c];
+          if (u !== void 0 && (!Array.isArray(u) || u.length !== a))
+            throw new Error(`${s}: '${c}' must be an array of ${a} numbers for type '${r.type}'`);
         }
         break;
       }
@@ -4350,49 +4640,42 @@ async function ke(i, e, t) {
   const n = i.joinPath(e, "common.glsl");
   return await i.exists(n) ? await i.readText(n) : null;
 }
-class Ue {
+class De {
   constructor() {
-    this.map = /* @__PURE__ */ new Map();
+    l(this, "map", /* @__PURE__ */ new Map());
   }
   register(e, t = "linear", n = "repeat", s) {
-    const r = `${e}|${t}|${n}`, o = this.map.get(r);
-    if (o)
-      return o.name;
-    const a = `tex${this.map.size}`;
-    return this.map.set(r, { name: a, filename: s, source: e, filter: t, wrap: n }), a;
+    const r = `${e}|${t}|${n}`, a = this.map.get(r);
+    if (a) return a.name;
+    const o = `tex${this.map.size}`;
+    return this.map.set(r, { name: o, filename: s, source: e, filter: t, wrap: n }), o;
   }
   toArray() {
     return Array.from(this.map.values());
   }
 }
-function Kt(i, e, t, n, s, r) {
+function jt(i, e, t, n, s, r) {
   if ("buffer" in i) {
-    const o = i.buffer;
-    if (!ae(o))
-      throw new Error(`Invalid buffer name '${o}' for ${t} in pass '${e}' at '${n}'.`);
-    return { kind: "buffer", buffer: o, current: !!i.current };
+    const a = i.buffer;
+    if (!ae(a))
+      throw new Error(`Invalid buffer name '${a}' for ${t} in pass '${e}' at '${n}'.`);
+    return { kind: "buffer", buffer: a, current: !!i.current };
   }
   if ("texture" in i)
     return { kind: "texture", name: (r == null ? void 0 : r.get(i.texture)) ?? s.register(i.texture, i.filter, i.wrap), cubemap: i.type === "cubemap" };
-  if ("keyboard" in i)
-    return { kind: "keyboard" };
-  if ("audio" in i)
-    return { kind: "audio" };
-  if ("webcam" in i)
-    return { kind: "webcam" };
-  if ("video" in i)
-    return { kind: "video", src: i.video };
-  if ("script" in i)
-    return { kind: "script", name: i.script };
+  if ("keyboard" in i) return { kind: "keyboard" };
+  if ("audio" in i) return { kind: "audio" };
+  if ("webcam" in i) return { kind: "webcam" };
+  if ("video" in i) return { kind: "video", src: i.video };
+  if ("script" in i) return { kind: "script", name: i.script };
   throw new Error(`Invalid channel object for ${t} in pass '${e}' at '${n}'.`);
 }
 function W(i, e, t, n, s, r) {
-  if (!i)
-    return { kind: "none" };
-  const o = Le(i);
-  return o ? Kt(o, e, t, n, s, r) : { kind: "none" };
+  if (!i) return { kind: "none" };
+  const a = Le(i);
+  return a ? jt(a, e, t, n, s, r) : { kind: "none" };
 }
-async function zt(i, e, t) {
+async function Kt(i, e, t) {
   let n = t == null ? void 0 : t.config;
   if (n === void 0) {
     const s = i.joinPath(e, "config.json");
@@ -4400,34 +4683,38 @@ async function zt(i, e, t) {
       const r = await i.readText(s);
       try {
         n = JSON.parse(r);
-      } catch (o) {
-        throw new Error(`Invalid JSON in config.json at '${e}': ${(o == null ? void 0 : o.message) ?? String(o)}`);
+      } catch (a) {
+        throw new Error(`Invalid JSON in config.json at '${e}': ${(a == null ? void 0 : a.message) ?? String(a)}`);
       }
     }
   }
-  return n ? (Vt(n, e), n.mode === "shadertoy" ? Wt(i, e, n, t) : qt(i, e, n, t)) : Gt(i, e, t);
+  return n ? (Ht(n, e), n.mode === "shadertoy" ? zt(i, e, n, t) : Gt(i, e, n, t)) : Yt(i, e, t);
 }
-async function Gt(i, e, t) {
+async function Yt(i, e, t) {
   const n = i.joinPath(e, "image.glsl");
   if (!await i.exists(n))
     throw new Error(`Single-pass project at '${e}' requires 'image.glsl'.`);
   const s = await i.listGlslFiles(e);
-  if (s.length > 0 && s.filter((l) => l !== "image.glsl").length > 0)
-    throw new Error(`Project at '${e}' contains multiple GLSL files (${s.join(", ")}) but no 'config.json'. Add a config file to use multiple passes.`);
+  if (s.length > 0 && s.filter((u) => u !== "image.glsl").length > 0)
+    throw new Error(
+      `Project at '${e}' contains multiple GLSL files (${s.join(", ")}) but no 'config.json'. Add a config file to use multiple passes.`
+    );
   if (await i.hasFiles(i.joinPath(e, "textures")))
-    throw new Error(`Project at '${e}' uses textures (in 'textures/' folder) but has no 'config.json'. Add a config file to define texture bindings.`);
-  const o = await i.readText(n);
+    throw new Error(
+      `Project at '${e}' uses textures (in 'textures/' folder) but has no 'config.json'. Add a config file to define texture bindings.`
+    );
+  const a = await i.readText(n);
   return Z({
     mode: "standard",
     root: e,
     commonSource: null,
     passes: {
-      Image: { name: "Image", glslSource: o, channels: [{ kind: "none" }, { kind: "none" }, { kind: "none" }, { kind: "none" }] }
+      Image: { name: "Image", glslSource: a, channels: [{ kind: "none" }, { kind: "none" }, { kind: "none" }, { kind: "none" }] }
     },
     script: t == null ? void 0 : t.script
   });
 }
-async function Wt(i, e, t, n) {
+async function zt(i, e, t, n) {
   const s = {
     Image: t.Image,
     BufferA: t.BufferA,
@@ -4436,39 +4723,37 @@ async function Wt(i, e, t, n) {
     BufferD: t.BufferD
   };
   s.Image || s.BufferA || s.BufferB || s.BufferC || s.BufferD || (s.Image = {});
-  const o = await ke(i, e, t.common), a = new Ue(), c = /* @__PURE__ */ new Map();
+  const a = await ke(i, e, t.common), o = new De(), c = /* @__PURE__ */ new Map();
   if (n != null && n.textureUrlResolver)
-    for (const u of ie) {
-      const d = s[u];
-      if (d)
-        for (const E of De) {
-          const y = d[E];
-          if (!y)
-            continue;
-          const b = Le(y);
-          if (b && "texture" in b && !c.has(b.texture)) {
-            const T = await n.textureUrlResolver(b.texture), w = b.texture.split("/").pop(), _ = a.register(T, b.filter, b.wrap, w);
-            c.set(b.texture, _);
+    for (const d of ie) {
+      const h = s[d];
+      if (h)
+        for (const T of Pe) {
+          const _ = h[T];
+          if (!_) continue;
+          const y = Le(_);
+          if (y && "texture" in y && !c.has(y.texture)) {
+            const b = await n.textureUrlResolver(y.texture), w = y.texture.split("/").pop(), R = o.register(b, y.filter, y.wrap, w);
+            c.set(y.texture, R);
           }
         }
     }
-  const l = {};
-  for (const u of ie) {
-    const d = s[u];
-    if (!d)
-      continue;
-    const E = d.source ?? kt(u), y = i.joinPath(e, E);
-    if (!await i.exists(y))
-      throw new Error(`Source GLSL file for pass '${u}' not found at '${E}' in '${e}'.`);
-    const b = await i.readText(y), T = [
-      W(d.iChannel0, u, "iChannel0", e, a, c),
-      W(d.iChannel1, u, "iChannel1", e, a, c),
-      W(d.iChannel2, u, "iChannel2", e, a, c),
-      W(d.iChannel3, u, "iChannel3", e, a, c)
+  const u = {};
+  for (const d of ie) {
+    const h = s[d];
+    if (!h) continue;
+    const T = h.source ?? Pt(d), _ = i.joinPath(e, T);
+    if (!await i.exists(_))
+      throw new Error(`Source GLSL file for pass '${d}' not found at '${T}' in '${e}'.`);
+    const y = await i.readText(_), b = [
+      W(h.iChannel0, d, "iChannel0", e, o, c),
+      W(h.iChannel1, d, "iChannel1", e, o, c),
+      W(h.iChannel2, d, "iChannel2", e, o, c),
+      W(h.iChannel3, d, "iChannel3", e, o, c)
     ];
-    l[u] = { name: u, glslSource: b, channels: T };
+    u[d] = { name: d, glslSource: y, channels: b };
   }
-  if (!l.Image)
+  if (!u.Image)
     throw new Error(`config.json at '${e}' must define an Image pass.`);
   return Z({
     mode: "shadertoy",
@@ -4481,21 +4766,21 @@ async function Wt(i, e, t, n) {
     controls: t.controls,
     startPaused: t.startPaused,
     pixelRatio: t.pixelRatio,
-    commonSource: o,
-    passes: l,
-    textures: a.toArray(),
+    commonSource: a,
+    passes: u,
+    textures: o.toArray(),
     script: n == null ? void 0 : n.script
   });
 }
-async function qt(i, e, t, n) {
-  t.uniforms && Yt(t.uniforms, e);
+async function Gt(i, e, t, n) {
+  t.uniforms && Xt(t.uniforms, e);
   const s = await ke(i, e, t.common), r = t.buffers ?? {};
   if (Object.keys(r).length > 0 || t.textures && Object.keys(t.textures).length > 0)
-    return Jt(i, e, t, s, n);
-  const o = i.joinPath(e, "image.glsl");
-  if (!await i.exists(o))
+    return qt(i, e, t, s, n);
+  const a = i.joinPath(e, "image.glsl");
+  if (!await i.exists(a))
     throw new Error(`Standard mode project at '${e}' requires 'image.glsl'.`);
-  const a = await i.readText(o), c = [{ kind: "none" }, { kind: "none" }, { kind: "none" }, { kind: "none" }];
+  const o = await i.readText(a), c = [{ kind: "none" }, { kind: "none" }, { kind: "none" }, { kind: "none" }];
   return Z({
     mode: "standard",
     root: e,
@@ -4509,57 +4794,59 @@ async function qt(i, e, t, n) {
     pixelRatio: t.pixelRatio,
     commonSource: s,
     passes: {
-      Image: { name: "Image", glslSource: a, channels: c }
+      Image: { name: "Image", glslSource: o, channels: c }
     },
     uniforms: t.uniforms,
     script: n == null ? void 0 : n.script
   });
 }
-const Zt = /* @__PURE__ */ new Set(["keyboard", "audio", "webcam"]);
-async function Jt(i, e, t, n, s) {
-  const r = t.buffers ?? {}, o = Object.keys(r);
-  if (o.length > 4)
-    throw new Error(`Standard mode at '${e}' supports max 4 buffers, got ${o.length}: ${o.join(", ")}`);
-  const a = /* @__PURE__ */ new Map();
-  for (let b = 0; b < o.length; b++)
-    a.set(o[b], Ut[b]);
-  const c = new Ue(), l = /* @__PURE__ */ new Map();
-  for (const [b, T] of a)
-    l.set(b, { kind: "buffer", buffer: T, current: !1 });
-  for (const [b, T] of Object.entries(t.textures ?? {}))
-    if (T === "keyboard")
-      l.set(b, { kind: "keyboard" });
-    else if (T === "audio")
-      l.set(b, { kind: "audio" });
-    else if (T === "webcam")
-      l.set(b, { kind: "webcam" });
-    else if (/\.\w+$/.test(T)) {
+const Wt = /* @__PURE__ */ new Set(["keyboard", "audio", "webcam"]);
+async function qt(i, e, t, n, s) {
+  const r = t.buffers ?? {}, a = Object.keys(r);
+  if (a.length > 4)
+    throw new Error(
+      `Standard mode at '${e}' supports max 4 buffers, got ${a.length}: ${a.join(", ")}`
+    );
+  const o = /* @__PURE__ */ new Map();
+  for (let y = 0; y < a.length; y++)
+    o.set(a[y], kt[y]);
+  const c = new De(), u = /* @__PURE__ */ new Map();
+  for (const [y, b] of o)
+    u.set(y, { kind: "buffer", buffer: b, current: !1 });
+  for (const [y, b] of Object.entries(t.textures ?? {}))
+    if (b === "keyboard")
+      u.set(y, { kind: "keyboard" });
+    else if (b === "audio")
+      u.set(y, { kind: "audio" });
+    else if (b === "webcam")
+      u.set(y, { kind: "webcam" });
+    else if (/\.\w+$/.test(b)) {
       let w;
-      s != null && s.textureUrlResolver ? w = await s.textureUrlResolver(T) : w = T;
-      const _ = c.register(w);
-      l.set(b, { kind: "texture", name: _, cubemap: !1 });
-    } else Zt.has(T) || l.set(b, { kind: "script", name: T });
-  const u = [{ kind: "none" }, { kind: "none" }, { kind: "none" }, { kind: "none" }], d = i.joinPath(e, "image.glsl");
-  if (!await i.exists(d))
+      s != null && s.textureUrlResolver ? w = await s.textureUrlResolver(b) : w = b;
+      const R = c.register(w);
+      u.set(y, { kind: "texture", name: R, cubemap: !1 });
+    } else Wt.has(b) || u.set(y, { kind: "script", name: b });
+  const d = [{ kind: "none" }, { kind: "none" }, { kind: "none" }, { kind: "none" }], h = i.joinPath(e, "image.glsl");
+  if (!await i.exists(h))
     throw new Error(`Standard mode project at '${e}' requires 'image.glsl'.`);
-  const y = {
+  const _ = {
     Image: {
       name: "Image",
-      glslSource: await i.readText(d),
-      channels: u,
-      namedSamplers: new Map(l)
+      glslSource: await i.readText(h),
+      channels: d,
+      namedSamplers: new Map(u)
     }
   };
-  for (const [b, T] of a) {
-    const w = i.joinPath(e, `${b}.glsl`);
+  for (const [y, b] of o) {
+    const w = i.joinPath(e, `${y}.glsl`);
     if (!await i.exists(w))
-      throw new Error(`Buffer '${b}' requires '${b}.glsl' in '${e}'.`);
-    const _ = await i.readText(w);
-    y[T] = {
-      name: T,
-      glslSource: _,
-      channels: u,
-      namedSamplers: new Map(l)
+      throw new Error(`Buffer '${y}' requires '${y}.glsl' in '${e}'.`);
+    const R = await i.readText(w);
+    _[b] = {
+      name: b,
+      glslSource: R,
+      channels: d,
+      namedSamplers: new Map(u)
     };
   }
   return Z({
@@ -4574,46 +4861,38 @@ async function Jt(i, e, t, n, s) {
     startPaused: t.startPaused,
     pixelRatio: t.pixelRatio,
     commonSource: n,
-    passes: y,
+    passes: _,
     textures: c.toArray(),
     uniforms: t.uniforms,
     script: s == null ? void 0 : s.script
   });
 }
-function U(i, e) {
-  if (e in i)
-    return e;
-  const t = e.toLowerCase();
-  for (const n of Object.keys(i))
-    if (n.toLowerCase() === t)
-      return n;
-  return null;
-}
-async function Be(i, e) {
-  if (!e)
-    return null;
-  const t = `${i}/script.js`, n = U(e, t);
-  if (!n)
-    return null;
-  const s = await e[n](), r = {};
-  return typeof s.setup == "function" && (r.setup = s.setup), typeof s.onFrame == "function" && (r.onFrame = s.onFrame), r.setup || r.onFrame ? r : null;
-}
-function Ie(i, e) {
+function Zt(i) {
+  const e = /* @__PURE__ */ new Map();
+  function t(s) {
+    const r = s.replace(/^\.\//, "");
+    return new URL(r, i).href;
+  }
+  function n(s) {
+    const r = t(s);
+    let a = e.get(r);
+    return a || (a = fetch(r).then(
+      (o) => o.ok ? o.text() : null,
+      () => null
+    ), e.set(r, a)), a;
+  }
   return {
-    async exists(t) {
-      return U(i, t) !== null || U(e, t) !== null;
+    async exists(s) {
+      return await n(s) !== null;
     },
-    async readText(t) {
-      const n = U(i, t);
-      if (!n)
-        throw new Error(`File not found: ${t}`);
-      return i[n]();
+    async readText(s) {
+      const r = await n(s);
+      if (r === null)
+        throw new Error(`File not found: ${t(s)}`);
+      return r;
     },
-    async resolveImageUrl(t) {
-      const n = U(e, t);
-      if (!n)
-        throw new Error(`Image not found: ${t}`);
-      return e[n]();
+    async resolveImageUrl(s) {
+      return t(s);
     },
     async listGlslFiles() {
       return [];
@@ -4621,95 +4900,129 @@ function Ie(i, e) {
     async hasFiles() {
       return !1;
     },
-    joinPath(...t) {
-      return t.map((n, s) => s === 0 ? n : n.replace(/^\/+/, "")).join("/").replace(/\/+/g, "/");
+    joinPath(...s) {
+      return s.map((r, a) => a === 0 ? r : r.replace(/^\/+/, "")).join("/").replace(/\/+/g, "/");
     },
-    baseName(t) {
-      return t.split("/").pop() || t;
+    baseName(s) {
+      return s.split("/").pop() || s;
     }
   };
 }
-function Ne(i) {
-  return (i.split("/").pop() || i).split("-").map((t) => t.charAt(0).toUpperCase() + t.slice(1)).join(" ");
-}
-async function Qt(i, e, t, n, s) {
-  const r = i.startsWith("./") ? i : `./${i}`, o = `${r}/config.json`;
-  let a;
-  if (o in t && (a = await t[o]()), a && Ye(a))
-    return Xt(a, r), en(r, a, e, n, s);
-  const c = await Be(r, s), l = Ie(e, n), d = await zt(l, r, {
-    config: a,
-    script: c,
-    textureUrlResolver: async (E) => {
-      const y = `${r}/${E.replace(/^\.\//, "")}`;
-      return l.resolveImageUrl(y);
-    }
-  });
-  return a != null && a.title || (d.meta.title = Ne(r)), d;
-}
-async function en(i, e, t, n, s) {
-  const r = Ie(t, n), o = await Be(i, s);
-  let a = null;
-  const c = `${i}/common.glsl`;
-  U(t, c) && (a = await r.readText(c));
-  const l = [], u = [
-    { kind: "none" },
-    { kind: "none" },
-    { kind: "none" },
-    { kind: "none" }
-  ];
-  for (const d of e.views) {
-    const E = `${i}/${d}.glsl`, y = `${i}/${d}/image.glsl`;
-    let b;
-    if (U(t, E))
-      b = await r.readText(E);
-    else if (U(t, y))
-      b = await r.readText(y);
-    else
-      throw new Error(`Multi-view: No shader found for view "${d}". Expected ${d}.glsl or ${d}/image.glsl`);
-    const T = {
-      name: "Image",
-      glslSource: b,
-      channels: u,
-      namedSamplers: /* @__PURE__ */ new Map()
-    };
-    l.push({
-      name: d,
-      passes: { Image: T }
-    });
+async function Jt(i) {
+  try {
+    const t = await import(new URL("script.js", i).href), n = {};
+    return typeof t.setup == "function" && (n.setup = t.setup), typeof t.onFrame == "function" && (n.onFrame = t.onFrame), n.setup || n.onFrame ? n : null;
+  } catch {
+    return null;
   }
-  return {
-    mode: "standard",
-    root: i,
-    meta: {
-      title: e.title ?? Ne(i),
-      author: e.author ?? null,
-      description: e.description ?? null
-    },
-    theme: e.theme ?? "light",
-    controls: e.controls ?? Pe,
-    startPaused: e.startPaused ?? !1,
-    pixelRatio: e.pixelRatio ?? null,
-    commonSource: a,
-    uniforms: e.uniforms ?? {},
-    textures: [],
-    script: o,
-    views: l,
-    viewLayout: e.layout ?? "split"
-  };
 }
-const tn = /* @__PURE__ */ Object.assign({ "./notes/3d/05-lighting/shaders/hard-shadows/image.glsl": () => Promise.resolve().then(() => hn).then((i) => i.default) }), nn = /* @__PURE__ */ Object.assign({}), sn = /* @__PURE__ */ Object.assign({}), rn = /* @__PURE__ */ Object.assign({});
-let ne = null;
-async function on() {
-  return ne || (ne = await Qt("notes/3d/05-lighting/shaders/hard-shadows", tn, nn, sn, rn)), ne;
+async function Ue(i, e, t) {
+  const n = e.endsWith("/") ? e : e + "/", s = Zt(n), r = await Jt(n), o = await Kt(s, ".", {
+    script: r,
+    textureUrlResolver: async (c) => new URL(c, n).href
+  });
+  return Ft(i, {
+    project: o,
+    styled: (t == null ? void 0 : t.styled) ?? !0,
+    pixelRatio: t == null ? void 0 : t.pixelRatio,
+    layout: t == null ? void 0 : t.layout,
+    controls: t == null ? void 0 : t.controls,
+    theme: t == null ? void 0 : t.theme,
+    startPaused: t == null ? void 0 : t.startPaused
+  });
 }
-async function mn(i, e = {}) {
-  const t = await on();
-  return Dt(i, { project: t, ...e });
+async function ln(i, e) {
+  const t = e == null ? void 0 : e.shaderSrc;
+  if (!t)
+    throw new Error(
+      'shader-sandbox runtime: "shaderSrc" option is required. Use <shader-sandbox src="..."> or pass shaderSrc in options.'
+    );
+  return Ue(i, t, e);
 }
-class an {
+const Qt = /* @__PURE__ */ new Set(["src", "fullpage", "lazy", "style", "class", "id", "slot", "is"]);
+function en(i) {
+  return i.replace(/-([a-z])/g, (e, t) => t.toUpperCase());
+}
+function tn(i) {
+  if (i === "true") return !0;
+  if (i === "false") return !1;
+  const e = Number(i);
+  return i !== "" && !isNaN(e) ? e : i;
+}
+class nn extends HTMLElement {
+  constructor() {
+    super(...arguments);
+    l(this, "_handle", null);
+    l(this, "_observer", null);
+    l(this, "_unmountTimer", null);
+    l(this, "_mounted", !1);
+  }
+  connectedCallback() {
+    if (!this.getAttribute("src")) {
+      console.error('<shader-sandbox>: missing "src" attribute');
+      return;
+    }
+    this.hasAttribute("fullpage") ? Object.assign(this.style, {
+      display: "block",
+      width: "100vw",
+      height: "100vh",
+      position: "fixed",
+      top: "0",
+      left: "0"
+    }) : (!this.style.display || this.style.display === "inline") && (this.style.display = "block"), this.getAttribute("lazy") !== "false" ? (this._observer = new IntersectionObserver(
+      (s) => {
+        s[0].isIntersecting ? (this._unmountTimer !== null && (clearTimeout(this._unmountTimer), this._unmountTimer = null), this._mounted || this._mountShader()) : this._mounted && (this._unmountTimer = setTimeout(() => {
+          this._unmountTimer = null, this._unmountShader();
+        }, 1e3));
+      },
+      { rootMargin: "200px" }
+    ), this._observer.observe(this)) : this._mountShader();
+  }
+  disconnectedCallback() {
+    var t;
+    this._unmountTimer !== null && (clearTimeout(this._unmountTimer), this._unmountTimer = null), (t = this._observer) == null || t.disconnect(), this._observer = null, this._unmountShader();
+  }
+  _buildOptions() {
+    const t = {};
+    for (const n of this.attributes)
+      Qt.has(n.name) || (t[en(n.name)] = tn(n.value));
+    return t;
+  }
+  async _mountShader() {
+    if (this._mounted) return;
+    this._mounted = !0;
+    const t = this.getAttribute("src");
+    try {
+      this._handle = await Ue(this, t, this._buildOptions());
+    } catch (n) {
+      console.error("<shader-sandbox>: failed to load shader", n), this._mounted = !1;
+    }
+  }
+  _unmountShader() {
+    var t;
+    this._mounted && ((t = this._handle) == null || t.destroy(), this._handle = null, this._mounted = !1);
+  }
+}
+customElements.define("shader-sandbox", nn);
+class sn {
   constructor(e, t) {
-    this.recompileHandler = null, this.tabs = [], this.activeTabIndex = 0, this.editorInstance = null, this.modifiedSources = /* @__PURE__ */ new Map(), this.keydownHandler = null, this.container = e, this.project = t, this.buildTabs(), this.tabBar = document.createElement("div"), this.tabBar.className = "editor-tab-bar", this.buildTabBar(), this.contentArea = document.createElement("div"), this.contentArea.className = "editor-content-area", this.copyButton = document.createElement("button"), this.copyButton.className = "editor-copy-button", this.copyButton.innerHTML = `
+    l(this, "container");
+    l(this, "project");
+    l(this, "recompileHandler", null);
+    l(this, "tabBar");
+    l(this, "contentArea");
+    l(this, "copyButton");
+    l(this, "recompileButton");
+    l(this, "errorDisplay");
+    l(this, "tabs", []);
+    l(this, "activeTabIndex", 0);
+    // Editor instance (null if not in editor mode or viewing image)
+    l(this, "editorInstance", null);
+    // Track modified sources (passName -> modified source)
+    l(this, "modifiedSources", /* @__PURE__ */ new Map());
+    // Stored for cleanup in dispose()
+    l(this, "keydownHandler", null);
+    this.container = e, this.project = t, this.buildTabs(), this.tabBar = document.createElement("div"), this.tabBar.className = "editor-tab-bar", this.buildTabBar(), this.contentArea = document.createElement("div"), this.contentArea.className = "editor-content-area", this.copyButton = document.createElement("button"), this.copyButton.className = "editor-copy-button", this.copyButton.innerHTML = `
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
         <path d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V2z" opacity="0.4"/>
         <path d="M2 5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H2zm0 1h7a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1z"/>
@@ -4781,16 +5094,16 @@ class an {
       const n = this.modifiedSources.get(t.passName) ?? t.source, s = document.createElement("div");
       s.className = "editor-prism-container", this.contentArea.appendChild(s);
       try {
-        const { createEditor: r } = await Promise.resolve().then(() => Oe);
-        this.editorInstance = r(s, n, (o) => {
-          this.modifiedSources.set(t.passName, o);
+        const { createEditor: r } = await Promise.resolve().then(() => Be);
+        this.editorInstance = r(s, n, (a) => {
+          this.modifiedSources.set(t.passName, a);
         });
       } catch (r) {
         console.error("Failed to load editor:", r);
-        const o = document.createElement("textarea");
-        o.className = "editor-fallback-textarea", o.value = n, o.addEventListener("input", () => {
-          this.modifiedSources.set(t.passName, o.value);
-        }), s.appendChild(o);
+        const a = document.createElement("textarea");
+        a.className = "editor-fallback-textarea", a.value = n, a.addEventListener("input", () => {
+          this.modifiedSources.set(t.passName, a.value);
+        }), s.appendChild(a);
       }
     } else {
       this.copyButton.style.display = "none", this.recompileButton.style.display = "none";
@@ -4829,8 +5142,7 @@ class an {
   }
   async copyToClipboard() {
     const e = this.tabs[this.activeTabIndex];
-    if (e.kind !== "code")
-      return;
+    if (e.kind !== "code") return;
     const t = this.editorInstance ? this.editorInstance.getSource() : this.modifiedSources.get(e.passName) ?? e.source;
     try {
       await navigator.clipboard.writeText(t);
@@ -4852,11 +5164,11 @@ class an {
     }, this.container.addEventListener("keydown", this.keydownHandler);
   }
 }
-const cn = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const rn = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  EditorPanel: an
+  EditorPanel: sn
 }, Symbol.toStringTag, { value: "Module" }));
-var Re = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : typeof global < "u" ? global : typeof self < "u" ? self : {}, $e = { exports: {} };
+var _e = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : typeof global < "u" ? global : typeof self < "u" ? self : {}, Me = { exports: {} };
 (function(i) {
   var e = typeof window < "u" ? window : typeof WorkerGlobalScope < "u" && self instanceof WorkerGlobalScope ? self : {};
   /**
@@ -4868,7 +5180,7 @@ var Re = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
    * @public
    */
   var t = function(n) {
-    var s = /(?:^|\s)lang(?:uage)?-([\w-]+)(?=\s|$)/i, r = 0, o = {}, a = {
+    var s = /(?:^|\s)lang(?:uage)?-([\w-]+)(?=\s|$)/i, r = 0, a = {}, o = {
       /**
        * By default, Prism will attempt to highlight all code elements (by calling {@link Prism.highlightAll}) on the
        * current page after the page finished loading. This might be a problem if e.g. you wanted to asynchronously load
@@ -4923,8 +5235,8 @@ var Re = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
        * @memberof Prism
        */
       util: {
-        encode: function m(h) {
-          return h instanceof c ? new c(h.type, m(h.content), h.alias) : Array.isArray(h) ? h.map(m) : h.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/\u00a0/g, " ");
+        encode: function p(m) {
+          return m instanceof c ? new c(m.type, p(m.content), m.alias) : Array.isArray(m) ? m.map(p) : m.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/\u00a0/g, " ");
         },
         /**
          * Returns the name of the type of the given value.
@@ -4942,8 +5254,8 @@ var Re = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
          * type(String)    === 'Function'
          * type(/abc+/)    === 'RegExp'
          */
-        type: function(m) {
-          return Object.prototype.toString.call(m).slice(8, -1);
+        type: function(p) {
+          return Object.prototype.toString.call(p).slice(8, -1);
         },
         /**
          * Returns a unique number for the given object. Later calls will still return the same number.
@@ -4951,8 +5263,8 @@ var Re = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
          * @param {Object} obj
          * @returns {number}
          */
-        objId: function(m) {
-          return m.__id || Object.defineProperty(m, "__id", { value: ++r }), m.__id;
+        objId: function(p) {
+          return p.__id || Object.defineProperty(p, "__id", { value: ++r }), p.__id;
         },
         /**
          * Creates a deep clone of the given object.
@@ -4964,30 +5276,30 @@ var Re = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
          * @returns {T}
          * @template T
          */
-        clone: function m(h, f) {
-          f = f || {};
-          var p, g;
-          switch (a.util.type(h)) {
+        clone: function p(m, g) {
+          g = g || {};
+          var f, E;
+          switch (o.util.type(m)) {
             case "Object":
-              if (g = a.util.objId(h), f[g])
-                return f[g];
-              p = /** @type {Record<string, any>} */
-              {}, f[g] = p;
-              for (var x in h)
-                h.hasOwnProperty(x) && (p[x] = m(h[x], f));
+              if (E = o.util.objId(m), g[E])
+                return g[E];
+              f = /** @type {Record<string, any>} */
+              {}, g[E] = f;
+              for (var x in m)
+                m.hasOwnProperty(x) && (f[x] = p(m[x], g));
               return (
                 /** @type {any} */
-                p
+                f
               );
             case "Array":
-              return g = a.util.objId(h), f[g] ? f[g] : (p = [], f[g] = p, /** @type {Array} */
+              return E = o.util.objId(m), g[E] ? g[E] : (f = [], g[E] = f, /** @type {Array} */
               /** @type {any} */
-              h.forEach(function(C, v) {
-                p[v] = m(C, f);
+              m.forEach(function(S, v) {
+                f[v] = p(S, g);
               }), /** @type {any} */
-              p);
+              f);
             default:
-              return h;
+              return m;
           }
         },
         /**
@@ -4998,12 +5310,12 @@ var Re = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
          * @param {Element} element
          * @returns {string}
          */
-        getLanguage: function(m) {
-          for (; m; ) {
-            var h = s.exec(m.className);
-            if (h)
-              return h[1].toLowerCase();
-            m = m.parentElement;
+        getLanguage: function(p) {
+          for (; p; ) {
+            var m = s.exec(p.className);
+            if (m)
+              return m[1].toLowerCase();
+            p = p.parentElement;
           }
           return "none";
         },
@@ -5014,8 +5326,8 @@ var Re = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
          * @param {string} language
          * @returns {void}
          */
-        setLanguage: function(m, h) {
-          m.className = m.className.replace(RegExp(s, "gi"), ""), m.classList.add("language-" + h);
+        setLanguage: function(p, m) {
+          p.className = p.className.replace(RegExp(s, "gi"), ""), p.classList.add("language-" + m);
         },
         /**
          * Returns the script element that is currently executing.
@@ -5034,13 +5346,13 @@ var Re = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
             );
           try {
             throw new Error();
-          } catch (p) {
-            var m = (/at [^(\r\n]*\((.*):[^:]+:[^:]+\)$/i.exec(p.stack) || [])[1];
-            if (m) {
-              var h = document.getElementsByTagName("script");
-              for (var f in h)
-                if (h[f].src == m)
-                  return h[f];
+          } catch (f) {
+            var p = (/at [^(\r\n]*\((.*):[^:]+:[^:]+\)$/i.exec(f.stack) || [])[1];
+            if (p) {
+              var m = document.getElementsByTagName("script");
+              for (var g in m)
+                if (m[g].src == p)
+                  return m[g];
             }
             return null;
           }
@@ -5064,16 +5376,16 @@ var Re = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
          * @param {boolean} [defaultActivation=false]
          * @returns {boolean}
          */
-        isActive: function(m, h, f) {
-          for (var p = "no-" + h; m; ) {
-            var g = m.classList;
-            if (g.contains(h))
+        isActive: function(p, m, g) {
+          for (var f = "no-" + m; p; ) {
+            var E = p.classList;
+            if (E.contains(m))
               return !0;
-            if (g.contains(p))
+            if (E.contains(f))
               return !1;
-            m = m.parentElement;
+            p = p.parentElement;
           }
-          return !!f;
+          return !!g;
         }
       },
       /**
@@ -5087,10 +5399,10 @@ var Re = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
         /**
          * The grammar for plain, unformatted text.
          */
-        plain: o,
-        plaintext: o,
-        text: o,
-        txt: o,
+        plain: a,
+        plaintext: a,
+        text: a,
+        txt: a,
         /**
          * Creates a deep copy of the language with the given id and appends the given tokens.
          *
@@ -5119,11 +5431,11 @@ var Re = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
          *     'color': /\b(?:red|green|blue)\b/
          * });
          */
-        extend: function(m, h) {
-          var f = a.util.clone(a.languages[m]);
-          for (var p in h)
-            f[p] = h[p];
-          return f;
+        extend: function(p, m) {
+          var g = o.util.clone(o.languages[p]);
+          for (var f in m)
+            g[f] = m[f];
+          return g;
         },
         /**
          * Inserts tokens _before_ another token in a language definition or any other grammar.
@@ -5200,31 +5512,31 @@ var Re = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
          * @returns {Grammar} The new grammar object.
          * @public
          */
-        insertBefore: function(m, h, f, p) {
-          p = p || /** @type {any} */
-          a.languages;
-          var g = p[m], x = {};
-          for (var C in g)
-            if (g.hasOwnProperty(C)) {
-              if (C == h)
-                for (var v in f)
-                  f.hasOwnProperty(v) && (x[v] = f[v]);
-              f.hasOwnProperty(C) || (x[C] = g[C]);
+        insertBefore: function(p, m, g, f) {
+          f = f || /** @type {any} */
+          o.languages;
+          var E = f[p], x = {};
+          for (var S in E)
+            if (E.hasOwnProperty(S)) {
+              if (S == m)
+                for (var v in g)
+                  g.hasOwnProperty(v) && (x[v] = g[v]);
+              g.hasOwnProperty(S) || (x[S] = E[S]);
             }
-          var R = p[m];
-          return p[m] = x, a.languages.DFS(a.languages, function(F, S) {
-            S === R && F != m && (this[F] = x);
+          var C = f[p];
+          return f[p] = x, o.languages.DFS(o.languages, function(A, F) {
+            F === C && A != p && (this[A] = x);
           }), x;
         },
         // Traverse a language definition with Depth First Search
-        DFS: function m(h, f, p, g) {
-          g = g || {};
-          var x = a.util.objId;
-          for (var C in h)
-            if (h.hasOwnProperty(C)) {
-              f.call(h, C, h[C], p || C);
-              var v = h[C], R = a.util.type(v);
-              R === "Object" && !g[x(v)] ? (g[x(v)] = !0, m(v, f, null, g)) : R === "Array" && !g[x(v)] && (g[x(v)] = !0, m(v, f, C, g));
+        DFS: function p(m, g, f, E) {
+          E = E || {};
+          var x = o.util.objId;
+          for (var S in m)
+            if (m.hasOwnProperty(S)) {
+              g.call(m, S, m[S], f || S);
+              var v = m[S], C = o.util.type(v);
+              C === "Object" && !E[x(v)] ? (E[x(v)] = !0, p(v, g, null, E)) : C === "Array" && !E[x(v)] && (E[x(v)] = !0, p(v, g, S, E));
             }
         }
       },
@@ -5241,8 +5553,8 @@ var Re = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
        * @memberof Prism
        * @public
        */
-      highlightAll: function(m, h) {
-        a.highlightAllUnder(document, m, h);
+      highlightAll: function(p, m) {
+        o.highlightAllUnder(document, p, m);
       },
       /**
        * Fetches all the descendants of `container` that have a `.language-xxxx` class and then calls
@@ -5259,15 +5571,15 @@ var Re = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
        * @memberof Prism
        * @public
        */
-      highlightAllUnder: function(m, h, f) {
-        var p = {
-          callback: f,
-          container: m,
+      highlightAllUnder: function(p, m, g) {
+        var f = {
+          callback: g,
+          container: p,
           selector: 'code[class*="language-"], [class*="language-"] code, code[class*="lang-"], [class*="lang-"] code'
         };
-        a.hooks.run("before-highlightall", p), p.elements = Array.prototype.slice.apply(p.container.querySelectorAll(p.selector)), a.hooks.run("before-all-elements-highlight", p);
-        for (var g = 0, x; x = p.elements[g++]; )
-          a.highlightElement(x, h === !0, p.callback);
+        o.hooks.run("before-highlightall", f), f.elements = Array.prototype.slice.apply(f.container.querySelectorAll(f.selector)), o.hooks.run("before-all-elements-highlight", f);
+        for (var E = 0, x; x = f.elements[E++]; )
+          o.highlightElement(x, m === !0, f.callback);
       },
       /**
        * Highlights the code inside a single element.
@@ -5297,39 +5609,39 @@ var Re = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
        * @memberof Prism
        * @public
        */
-      highlightElement: function(m, h, f) {
-        var p = a.util.getLanguage(m), g = a.languages[p];
-        a.util.setLanguage(m, p);
-        var x = m.parentElement;
-        x && x.nodeName.toLowerCase() === "pre" && a.util.setLanguage(x, p);
-        var C = m.textContent, v = {
-          element: m,
-          language: p,
-          grammar: g,
-          code: C
+      highlightElement: function(p, m, g) {
+        var f = o.util.getLanguage(p), E = o.languages[f];
+        o.util.setLanguage(p, f);
+        var x = p.parentElement;
+        x && x.nodeName.toLowerCase() === "pre" && o.util.setLanguage(x, f);
+        var S = p.textContent, v = {
+          element: p,
+          language: f,
+          grammar: E,
+          code: S
         };
-        function R(S) {
-          v.highlightedCode = S, a.hooks.run("before-insert", v), v.element.innerHTML = v.highlightedCode, a.hooks.run("after-highlight", v), a.hooks.run("complete", v), f && f.call(v.element);
+        function C(F) {
+          v.highlightedCode = F, o.hooks.run("before-insert", v), v.element.innerHTML = v.highlightedCode, o.hooks.run("after-highlight", v), o.hooks.run("complete", v), g && g.call(v.element);
         }
-        if (a.hooks.run("before-sanity-check", v), x = v.element.parentElement, x && x.nodeName.toLowerCase() === "pre" && !x.hasAttribute("tabindex") && x.setAttribute("tabindex", "0"), !v.code) {
-          a.hooks.run("complete", v), f && f.call(v.element);
+        if (o.hooks.run("before-sanity-check", v), x = v.element.parentElement, x && x.nodeName.toLowerCase() === "pre" && !x.hasAttribute("tabindex") && x.setAttribute("tabindex", "0"), !v.code) {
+          o.hooks.run("complete", v), g && g.call(v.element);
           return;
         }
-        if (a.hooks.run("before-highlight", v), !v.grammar) {
-          R(a.util.encode(v.code));
+        if (o.hooks.run("before-highlight", v), !v.grammar) {
+          C(o.util.encode(v.code));
           return;
         }
-        if (h && n.Worker) {
-          var F = new Worker(a.filename);
-          F.onmessage = function(S) {
-            R(S.data);
-          }, F.postMessage(JSON.stringify({
+        if (m && n.Worker) {
+          var A = new Worker(o.filename);
+          A.onmessage = function(F) {
+            C(F.data);
+          }, A.postMessage(JSON.stringify({
             language: v.language,
             code: v.code,
             immediateClose: !0
           }));
         } else
-          R(a.highlight(v.code, v.grammar, v.language));
+          C(o.highlight(v.code, v.grammar, v.language));
       },
       /**
        * Low-level function, only use if you know what you’re doing. It accepts a string of text as input
@@ -5351,15 +5663,15 @@ var Re = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
        * @example
        * Prism.highlight('var foo = true;', Prism.languages.javascript, 'javascript');
        */
-      highlight: function(m, h, f) {
-        var p = {
-          code: m,
-          grammar: h,
-          language: f
+      highlight: function(p, m, g) {
+        var f = {
+          code: p,
+          grammar: m,
+          language: g
         };
-        if (a.hooks.run("before-tokenize", p), !p.grammar)
-          throw new Error('The language "' + p.language + '" has no grammar.');
-        return p.tokens = a.tokenize(p.code, p.grammar), a.hooks.run("after-tokenize", p), c.stringify(a.util.encode(p.tokens), p.language);
+        if (o.hooks.run("before-tokenize", f), !f.grammar)
+          throw new Error('The language "' + f.language + '" has no grammar.');
+        return f.tokens = o.tokenize(f.code, f.grammar), o.hooks.run("after-tokenize", f), c.stringify(o.util.encode(f.tokens), f.language);
       },
       /**
        * This is the heart of Prism, and the most low-level function you can use. It accepts a string of text as input
@@ -5385,15 +5697,15 @@ var Re = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
        *     }
        * });
        */
-      tokenize: function(m, h) {
-        var f = h.rest;
-        if (f) {
-          for (var p in f)
-            h[p] = f[p];
-          delete h.rest;
+      tokenize: function(p, m) {
+        var g = m.rest;
+        if (g) {
+          for (var f in g)
+            m[f] = g[f];
+          delete m.rest;
         }
-        var g = new d();
-        return E(g, g.head, m), u(m, g, h, g.head, 0), b(g);
+        var E = new h();
+        return T(E, E.head, p), d(p, E, m, E.head, 0), y(E);
       },
       /**
        * @namespace
@@ -5414,9 +5726,9 @@ var Re = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
          * @param {HookCallback} callback The callback function which is given environment variables.
          * @public
          */
-        add: function(m, h) {
-          var f = a.hooks.all;
-          f[m] = f[m] || [], f[m].push(h);
+        add: function(p, m) {
+          var g = o.hooks.all;
+          g[p] = g[p] || [], g[p].push(m);
         },
         /**
          * Runs a hook invoking all registered callbacks with the given environment variables.
@@ -5427,135 +5739,135 @@ var Re = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
          * @param {Object<string, any>} env The environment variables of the hook passed to all callbacks registered.
          * @public
          */
-        run: function(m, h) {
-          var f = a.hooks.all[m];
-          if (!(!f || !f.length))
-            for (var p = 0, g; g = f[p++]; )
-              g(h);
+        run: function(p, m) {
+          var g = o.hooks.all[p];
+          if (!(!g || !g.length))
+            for (var f = 0, E; E = g[f++]; )
+              E(m);
         }
       },
       Token: c
     };
-    n.Prism = a;
-    function c(m, h, f, p) {
-      this.type = m, this.content = h, this.alias = f, this.length = (p || "").length | 0;
+    n.Prism = o;
+    function c(p, m, g, f) {
+      this.type = p, this.content = m, this.alias = g, this.length = (f || "").length | 0;
     }
-    c.stringify = function m(h, f) {
-      if (typeof h == "string")
-        return h;
-      if (Array.isArray(h)) {
-        var p = "";
-        return h.forEach(function(R) {
-          p += m(R, f);
-        }), p;
+    c.stringify = function p(m, g) {
+      if (typeof m == "string")
+        return m;
+      if (Array.isArray(m)) {
+        var f = "";
+        return m.forEach(function(C) {
+          f += p(C, g);
+        }), f;
       }
-      var g = {
-        type: h.type,
-        content: m(h.content, f),
+      var E = {
+        type: m.type,
+        content: p(m.content, g),
         tag: "span",
-        classes: ["token", h.type],
+        classes: ["token", m.type],
         attributes: {},
-        language: f
-      }, x = h.alias;
-      x && (Array.isArray(x) ? Array.prototype.push.apply(g.classes, x) : g.classes.push(x)), a.hooks.run("wrap", g);
-      var C = "";
-      for (var v in g.attributes)
-        C += " " + v + '="' + (g.attributes[v] || "").replace(/"/g, "&quot;") + '"';
-      return "<" + g.tag + ' class="' + g.classes.join(" ") + '"' + C + ">" + g.content + "</" + g.tag + ">";
+        language: g
+      }, x = m.alias;
+      x && (Array.isArray(x) ? Array.prototype.push.apply(E.classes, x) : E.classes.push(x)), o.hooks.run("wrap", E);
+      var S = "";
+      for (var v in E.attributes)
+        S += " " + v + '="' + (E.attributes[v] || "").replace(/"/g, "&quot;") + '"';
+      return "<" + E.tag + ' class="' + E.classes.join(" ") + '"' + S + ">" + E.content + "</" + E.tag + ">";
     };
-    function l(m, h, f, p) {
-      m.lastIndex = h;
-      var g = m.exec(f);
-      if (g && p && g[1]) {
-        var x = g[1].length;
-        g.index += x, g[0] = g[0].slice(x);
+    function u(p, m, g, f) {
+      p.lastIndex = m;
+      var E = p.exec(g);
+      if (E && f && E[1]) {
+        var x = E[1].length;
+        E.index += x, E[0] = E[0].slice(x);
       }
-      return g;
+      return E;
     }
-    function u(m, h, f, p, g, x) {
-      for (var C in f)
-        if (!(!f.hasOwnProperty(C) || !f[C])) {
-          var v = f[C];
+    function d(p, m, g, f, E, x) {
+      for (var S in g)
+        if (!(!g.hasOwnProperty(S) || !g[S])) {
+          var v = g[S];
           v = Array.isArray(v) ? v : [v];
-          for (var R = 0; R < v.length; ++R) {
-            if (x && x.cause == C + "," + R)
+          for (var C = 0; C < v.length; ++C) {
+            if (x && x.cause == S + "," + C)
               return;
-            var F = v[R], S = F.inside, B = !!F.lookbehind, ce = !!F.greedy, He = F.alias;
-            if (ce && !F.pattern.global) {
-              var Ve = F.pattern.toString().match(/[imsuy]*$/)[0];
-              F.pattern = RegExp(F.pattern.source, Ve + "g");
+            var A = v[C], F = A.inside, B = !!A.lookbehind, oe = !!A.greedy, Ne = A.alias;
+            if (oe && !A.pattern.global) {
+              var Ie = A.pattern.toString().match(/[imsuy]*$/)[0];
+              A.pattern = RegExp(A.pattern.source, Ie + "g");
             }
-            for (var le = F.pattern || F, L = p.next, P = g; L !== h.tail && !(x && P >= x.reach); P += L.value.length, L = L.next) {
-              var I = L.value;
-              if (h.length > m.length)
+            for (var ce = A.pattern || A, P = f.next, D = E; P !== m.tail && !(x && D >= x.reach); D += P.value.length, P = P.next) {
+              var N = P.value;
+              if (m.length > p.length)
                 return;
-              if (!(I instanceof c)) {
-                var X = 1, D;
-                if (ce) {
-                  if (D = l(le, P, m, B), !D || D.index >= m.length)
+              if (!(N instanceof c)) {
+                var V = 1, k;
+                if (oe) {
+                  if (k = u(ce, D, p, B), !k || k.index >= p.length)
                     break;
-                  var j = D.index, Xe = D.index + D[0].length, k = P;
-                  for (k += L.value.length; j >= k; )
-                    L = L.next, k += L.value.length;
-                  if (k -= L.value.length, P = k, L.value instanceof c)
+                  var X = k.index, Oe = k.index + k[0].length, U = D;
+                  for (U += P.value.length; X >= U; )
+                    P = P.next, U += P.value.length;
+                  if (U -= P.value.length, D = U, P.value instanceof c)
                     continue;
-                  for (var N = L; N !== h.tail && (k < Xe || typeof N.value == "string"); N = N.next)
-                    X++, k += N.value.length;
-                  X--, I = m.slice(P, k), D.index -= P;
-                } else if (D = l(le, 0, I, B), !D)
+                  for (var I = P; I !== m.tail && (U < Oe || typeof I.value == "string"); I = I.next)
+                    V++, U += I.value.length;
+                  V--, N = p.slice(D, U), k.index -= D;
+                } else if (k = u(ce, 0, N, B), !k)
                   continue;
-                var j = D.index, Y = D[0], J = I.slice(0, j), ue = I.slice(j + Y.length), Q = P + I.length;
+                var X = k.index, j = k[0], J = N.slice(0, X), le = N.slice(X + j.length), Q = D + N.length;
                 x && Q > x.reach && (x.reach = Q);
-                var K = L.prev;
-                J && (K = E(h, K, J), P += J.length), y(h, K, X);
-                var je = new c(C, S ? a.tokenize(Y, S) : Y, He, Y);
-                if (L = E(h, K, je), ue && E(h, L, ue), X > 1) {
+                var K = P.prev;
+                J && (K = T(m, K, J), D += J.length), _(m, K, V);
+                var $e = new c(S, F ? o.tokenize(j, F) : j, Ne, j);
+                if (P = T(m, K, $e), le && T(m, P, le), V > 1) {
                   var ee = {
-                    cause: C + "," + R,
+                    cause: S + "," + C,
                     reach: Q
                   };
-                  u(m, h, f, L.prev, P, ee), x && ee.reach > x.reach && (x.reach = ee.reach);
+                  d(p, m, g, P.prev, D, ee), x && ee.reach > x.reach && (x.reach = ee.reach);
                 }
               }
             }
           }
         }
     }
-    function d() {
-      var m = { value: null, prev: null, next: null }, h = { value: null, prev: m, next: null };
-      m.next = h, this.head = m, this.tail = h, this.length = 0;
+    function h() {
+      var p = { value: null, prev: null, next: null }, m = { value: null, prev: p, next: null };
+      p.next = m, this.head = p, this.tail = m, this.length = 0;
     }
-    function E(m, h, f) {
-      var p = h.next, g = { value: f, prev: h, next: p };
-      return h.next = g, p.prev = g, m.length++, g;
+    function T(p, m, g) {
+      var f = m.next, E = { value: g, prev: m, next: f };
+      return m.next = E, f.prev = E, p.length++, E;
     }
-    function y(m, h, f) {
-      for (var p = h.next, g = 0; g < f && p !== m.tail; g++)
-        p = p.next;
-      h.next = p, p.prev = h, m.length -= g;
+    function _(p, m, g) {
+      for (var f = m.next, E = 0; E < g && f !== p.tail; E++)
+        f = f.next;
+      m.next = f, f.prev = m, p.length -= E;
     }
-    function b(m) {
-      for (var h = [], f = m.head.next; f !== m.tail; )
-        h.push(f.value), f = f.next;
-      return h;
+    function y(p) {
+      for (var m = [], g = p.head.next; g !== p.tail; )
+        m.push(g.value), g = g.next;
+      return m;
     }
     if (!n.document)
-      return n.addEventListener && (a.disableWorkerMessageHandler || n.addEventListener("message", function(m) {
-        var h = JSON.parse(m.data), f = h.language, p = h.code, g = h.immediateClose;
-        n.postMessage(a.highlight(p, a.languages[f], f)), g && n.close();
-      }, !1)), a;
-    var T = a.util.currentScript();
-    T && (a.filename = T.src, T.hasAttribute("data-manual") && (a.manual = !0));
+      return n.addEventListener && (o.disableWorkerMessageHandler || n.addEventListener("message", function(p) {
+        var m = JSON.parse(p.data), g = m.language, f = m.code, E = m.immediateClose;
+        n.postMessage(o.highlight(f, o.languages[g], g)), E && n.close();
+      }, !1)), o;
+    var b = o.util.currentScript();
+    b && (o.filename = b.src, b.hasAttribute("data-manual") && (o.manual = !0));
     function w() {
-      a.manual || a.highlightAll();
+      o.manual || o.highlightAll();
     }
-    if (!a.manual) {
-      var _ = document.readyState;
-      _ === "loading" || _ === "interactive" && T && T.defer ? document.addEventListener("DOMContentLoaded", w) : window.requestAnimationFrame ? window.requestAnimationFrame(w) : window.setTimeout(w, 16);
+    if (!o.manual) {
+      var R = document.readyState;
+      R === "loading" || R === "interactive" && b && b.defer ? document.addEventListener("DOMContentLoaded", w) : window.requestAnimationFrame ? window.requestAnimationFrame(w) : window.setTimeout(w, 16);
     }
-    return a;
+    return o;
   }(e);
-  i.exports && (i.exports = t), typeof Re < "u" && (Re.Prism = t), t.languages.markup = {
+  i.exports && (i.exports = t), typeof _e < "u" && (_e.Prism = t), t.languages.markup = {
     comment: {
       pattern: /<!--(?:(?!<!--)[\s\S])*?-->/,
       greedy: !0
@@ -5647,19 +5959,19 @@ var Re = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
      * addInlined('style', 'css');
      */
     value: function(s, r) {
-      var o = {};
-      o["language-" + r] = {
+      var a = {};
+      a["language-" + r] = {
         pattern: /(^<!\[CDATA\[)[\s\S]+?(?=\]\]>$)/i,
         lookbehind: !0,
         inside: t.languages[r]
-      }, o.cdata = /^<!\[CDATA\[|\]\]>$/i;
-      var a = {
+      }, a.cdata = /^<!\[CDATA\[|\]\]>$/i;
+      var o = {
         "included-cdata": {
           pattern: /<!\[CDATA\[[\s\S]*?\]\]>/i,
-          inside: o
+          inside: a
         }
       };
-      a["language-" + r] = {
+      o["language-" + r] = {
         pattern: /[\s\S]+/,
         inside: t.languages[r]
       };
@@ -5670,7 +5982,7 @@ var Re = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
         }), "i"),
         lookbehind: !0,
         greedy: !0,
-        inside: a
+        inside: o
       }, t.languages.insertBefore("markup", "cdata", c);
     }
   }), Object.defineProperty(t.languages.markup.tag, "addAttribute", {
@@ -5933,9 +6245,9 @@ var Re = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
     if (typeof t > "u" || typeof document > "u")
       return;
     Element.prototype.matches || (Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector);
-    var n = "Loading…", s = function(T, w) {
-      return "✖ Error " + T + " while fetching file: " + w;
-    }, r = "✖ Error: File does not exist or is empty", o = {
+    var n = "Loading…", s = function(b, w) {
+      return "✖ Error " + b + " while fetching file: " + w;
+    }, r = "✖ Error: File does not exist or is empty", a = {
       js: "javascript",
       py: "python",
       rb: "ruby",
@@ -5945,52 +6257,52 @@ var Re = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
       bat: "batch",
       h: "c",
       tex: "latex"
-    }, a = "data-src-status", c = "loading", l = "loaded", u = "failed", d = "pre[data-src]:not([" + a + '="' + l + '"]):not([' + a + '="' + c + '"])';
-    function E(T, w, _) {
-      var m = new XMLHttpRequest();
-      m.open("GET", T, !0), m.onreadystatechange = function() {
-        m.readyState == 4 && (m.status < 400 && m.responseText ? w(m.responseText) : m.status >= 400 ? _(s(m.status, m.statusText)) : _(r));
-      }, m.send(null);
+    }, o = "data-src-status", c = "loading", u = "loaded", d = "failed", h = "pre[data-src]:not([" + o + '="' + u + '"]):not([' + o + '="' + c + '"])';
+    function T(b, w, R) {
+      var p = new XMLHttpRequest();
+      p.open("GET", b, !0), p.onreadystatechange = function() {
+        p.readyState == 4 && (p.status < 400 && p.responseText ? w(p.responseText) : p.status >= 400 ? R(s(p.status, p.statusText)) : R(r));
+      }, p.send(null);
     }
-    function y(T) {
-      var w = /^\s*(\d+)\s*(?:(,)\s*(?:(\d+)\s*)?)?$/.exec(T || "");
+    function _(b) {
+      var w = /^\s*(\d+)\s*(?:(,)\s*(?:(\d+)\s*)?)?$/.exec(b || "");
       if (w) {
-        var _ = Number(w[1]), m = w[2], h = w[3];
-        return m ? h ? [_, Number(h)] : [_, void 0] : [_, _];
+        var R = Number(w[1]), p = w[2], m = w[3];
+        return p ? m ? [R, Number(m)] : [R, void 0] : [R, R];
       }
     }
-    t.hooks.add("before-highlightall", function(T) {
-      T.selector += ", " + d;
-    }), t.hooks.add("before-sanity-check", function(T) {
+    t.hooks.add("before-highlightall", function(b) {
+      b.selector += ", " + h;
+    }), t.hooks.add("before-sanity-check", function(b) {
       var w = (
         /** @type {HTMLPreElement} */
-        T.element
+        b.element
       );
-      if (w.matches(d)) {
-        T.code = "", w.setAttribute(a, c);
-        var _ = w.appendChild(document.createElement("CODE"));
-        _.textContent = n;
-        var m = w.getAttribute("data-src"), h = T.language;
-        if (h === "none") {
-          var f = (/\.(\w+)$/.exec(m) || [, "none"])[1];
-          h = o[f] || f;
+      if (w.matches(h)) {
+        b.code = "", w.setAttribute(o, c);
+        var R = w.appendChild(document.createElement("CODE"));
+        R.textContent = n;
+        var p = w.getAttribute("data-src"), m = b.language;
+        if (m === "none") {
+          var g = (/\.(\w+)$/.exec(p) || [, "none"])[1];
+          m = a[g] || g;
         }
-        t.util.setLanguage(_, h), t.util.setLanguage(w, h);
-        var p = t.plugins.autoloader;
-        p && p.loadLanguages(h), E(
-          m,
-          function(g) {
-            w.setAttribute(a, l);
-            var x = y(w.getAttribute("data-range"));
+        t.util.setLanguage(R, m), t.util.setLanguage(w, m);
+        var f = t.plugins.autoloader;
+        f && f.loadLanguages(m), T(
+          p,
+          function(E) {
+            w.setAttribute(o, u);
+            var x = _(w.getAttribute("data-range"));
             if (x) {
-              var C = g.split(/\r\n?|\n/g), v = x[0], R = x[1] == null ? C.length : x[1];
-              v < 0 && (v += C.length), v = Math.max(0, Math.min(v - 1, C.length)), R < 0 && (R += C.length), R = Math.max(0, Math.min(R, C.length)), g = C.slice(v, R).join(`
+              var S = E.split(/\r\n?|\n/g), v = x[0], C = x[1] == null ? S.length : x[1];
+              v < 0 && (v += S.length), v = Math.max(0, Math.min(v - 1, S.length)), C < 0 && (C += S.length), C = Math.max(0, Math.min(C, S.length)), E = S.slice(v, C).join(`
 `), w.hasAttribute("data-start") || w.setAttribute("data-start", String(v + 1));
             }
-            _.textContent = g, t.highlightElement(_);
+            R.textContent = E, t.highlightElement(R);
           },
-          function(g) {
-            w.setAttribute(a, u), _.textContent = g;
+          function(E) {
+            w.setAttribute(o, d), R.textContent = E;
           }
         );
       }
@@ -6003,17 +6315,17 @@ var Re = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
        * @param {ParentNode} [container=document]
        */
       highlight: function(w) {
-        for (var _ = (w || document).querySelectorAll(d), m = 0, h; h = _[m++]; )
-          t.highlightElement(h);
+        for (var R = (w || document).querySelectorAll(h), p = 0, m; m = R[p++]; )
+          t.highlightElement(m);
       }
     };
-    var b = !1;
+    var y = !1;
     t.fileHighlight = function() {
-      b || (console.warn("Prism.fileHighlight is deprecated. Use `Prism.plugins.fileHighlight.highlight` instead."), b = !0), t.plugins.fileHighlight.highlight.apply(this, arguments);
+      y || (console.warn("Prism.fileHighlight is deprecated. Use `Prism.plugins.fileHighlight.highlight` instead."), y = !0), t.plugins.fileHighlight.highlight.apply(this, arguments);
     };
   }();
-})($e);
-var ln = $e.exports;
+})(Me);
+var an = Me.exports;
 Prism.languages.c = Prism.languages.extend("clike", {
   comment: {
     pattern: /\/\/(?:[^\r\n\\]|\\(?:\r\n?|\n|(?![\r\n])))*|\/\*[\s\S]*?(?:\*\/|$)/,
@@ -6175,170 +6487,52 @@ delete Prism.languages.c.boolean;
     "class-name": /\b[a-z_]\w*\b(?!\s*::)/i
   }, i.languages.cpp["base-clause"]);
 })(Prism);
-function un(i, e, t) {
+function on(i, e, t) {
   const n = document.createElement("div");
   n.className = "prism-editor-wrapper";
   const s = document.createElement("div");
   s.className = "prism-editor-line-numbers";
   const r = document.createElement("div");
   r.className = "prism-editor-area";
-  const o = document.createElement("textarea");
-  o.className = "prism-editor-textarea", o.value = e, o.spellcheck = !1, o.autocapitalize = "off", o.autocomplete = "off";
-  const a = document.createElement("pre");
-  a.className = "prism-editor-highlight";
+  const a = document.createElement("textarea");
+  a.className = "prism-editor-textarea", a.value = e, a.spellcheck = !1, a.autocapitalize = "off", a.autocomplete = "off";
+  const o = document.createElement("pre");
+  o.className = "prism-editor-highlight";
   const c = document.createElement("code");
-  c.className = "language-cpp", a.appendChild(c), r.appendChild(o), r.appendChild(a), n.appendChild(s), n.appendChild(r), i.appendChild(n);
-  function l() {
-    const E = o.value;
-    c.textContent = E + `
-`, ln.highlightElement(c);
-    const y = E.split(`
-`);
-    s.innerHTML = y.map((b, T) => `<span>${T + 1}</span>`).join(""), t && t(E);
-  }
+  c.className = "language-cpp", o.appendChild(c), r.appendChild(a), r.appendChild(o), n.appendChild(s), n.appendChild(r), i.appendChild(n);
   function u() {
-    a.scrollTop = o.scrollTop, a.scrollLeft = o.scrollLeft, s.scrollTop = o.scrollTop;
+    const T = a.value;
+    c.textContent = T + `
+`, an.highlightElement(c);
+    const _ = T.split(`
+`);
+    s.innerHTML = _.map((y, b) => `<span>${b + 1}</span>`).join(""), t && t(T);
   }
-  function d(E) {
-    if (E.key === "Tab") {
-      E.preventDefault();
-      const y = o.selectionStart, b = o.selectionEnd, T = o.value;
-      o.value = T.substring(0, y) + "  " + T.substring(b), o.selectionStart = o.selectionEnd = y + 2, l();
+  function d() {
+    o.scrollTop = a.scrollTop, o.scrollLeft = a.scrollLeft, s.scrollTop = a.scrollTop;
+  }
+  function h(T) {
+    if (T.key === "Tab") {
+      T.preventDefault();
+      const _ = a.selectionStart, y = a.selectionEnd, b = a.value;
+      a.value = b.substring(0, _) + "  " + b.substring(y), a.selectionStart = a.selectionEnd = _ + 2, u();
     }
   }
-  return o.addEventListener("input", l), o.addEventListener("scroll", u), o.addEventListener("keydown", d), l(), {
-    getSource: () => o.value,
-    setSource: (E) => {
-      o.value = E, l();
+  return a.addEventListener("input", u), a.addEventListener("scroll", d), a.addEventListener("keydown", h), u(), {
+    getSource: () => a.value,
+    setSource: (T) => {
+      a.value = T, u();
     },
     destroy: () => {
-      o.removeEventListener("input", l), o.removeEventListener("scroll", u), o.removeEventListener("keydown", d), n.parentNode && n.parentNode.removeChild(n);
+      a.removeEventListener("input", u), a.removeEventListener("scroll", d), a.removeEventListener("keydown", h), n.parentNode && n.parentNode.removeChild(n);
     }
   };
 }
-const Oe = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const Be = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  createEditor: un
-}, Symbol.toStringTag, { value: "Module" })), dn = `const int MAX_STEPS = 100;
-const float MAX_DIST = 50.0;
-const float HIT_THRESHOLD = 0.001;
-
-struct Ray { vec3 origin; vec3 dir; };
-
-Ray makeRay(vec2 fragCoord) {
-    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
-    uv.x *= iResolution.x / iResolution.y;
-    float f = 1.0 / tan(radians(90.0) / 2.0);
-
-    Ray ray;
-    ray.origin = vec3(0.0);
-    ray.dir = normalize(vec3(uv, -f));
-    return ray;
-}
-
-mat3 rotateX(float a) { float c = cos(a), s = sin(a); return mat3(1,0,0, 0,c,-s, 0,s,c); }
-mat3 rotateY(float a) { float c = cos(a), s = sin(a); return mat3(c,0,s, 0,1,0, -s,0,c); }
-
-Ray orbitRay(Ray ray, float distance) {
-    vec2 mouse = iMouse.xy / iResolution.xy;
-    if (length(iMouse.xy) < 1.0) mouse = vec2(0.55, 0.6);
-    float angleY = (mouse.x - 0.5) * 6.28;
-    float angleX = (0.5 - mouse.y) * 3.14;
-    mat3 rot = rotateX(angleX) * rotateY(angleY);
-    ray.origin = rot * vec3(0.0, 0.0, distance);
-    ray.dir = rot * ray.dir;
-    return ray;
-}
-
-float sdScene(vec3 p) {
-    float d = p.y;
-    d = min(d, length(p - vec3(-1.2, 0.5, 0.0)) - 0.5);
-    d = min(d, length(p - vec3( 0.0, 0.35, 0.5)) - 0.35);
-    d = min(d, length(p - vec3( 1.1, 0.8, -0.3)) - 0.8);
-    return d;
-}
-
-vec3 getMaterial(vec3 p) {
-    float eps = 0.01;
-    if (length(p - vec3(-1.2, 0.5, 0.0)) - 0.5 < eps)   return vec3(0.8, 0.35, 0.25);
-    if (length(p - vec3( 0.0, 0.35, 0.5)) - 0.35 < eps)  return vec3(0.4, 0.5, 0.65);
-    if (length(p - vec3( 1.1, 0.8, -0.3)) - 0.8 < eps)   return vec3(0.9, 0.85, 0.78);
-    return vec3(0.5, 0.45, 0.4);
-}
-
-vec3 calcNormal(vec3 p) {
-    float eps = 0.001;
-    return normalize(vec3(
-        sdScene(p + vec3(eps, 0, 0)) - sdScene(p - vec3(eps, 0, 0)),
-        sdScene(p + vec3(0, eps, 0)) - sdScene(p - vec3(0, eps, 0)),
-        sdScene(p + vec3(0, 0, eps)) - sdScene(p - vec3(0, 0, eps))
-    ));
-}
-
-float raymarch(Ray ray) {
-    float t = 0.0;
-    for (int i = 0; i < MAX_STEPS; i++) {
-        vec3 p = ray.origin + t * ray.dir;
-        float d = sdScene(p);
-        if (d < HIT_THRESHOLD) return t;
-        t += d;
-        if (t > MAX_DIST) return -1.0;
-    }
-    return -1.0;
-}
-
-
-struct DirLight { vec3 dir; vec3 color; };
-
-float shadow(vec3 p, vec3 lightDir) {
-    float t = 0.02;
-    for (int i = 0; i < 50; i++) {
-        float d = sdScene(p + lightDir * t);
-        if (d < 0.001) return 0.0;
-        t += d;
-        if (t > 20.0) break;
-    }
-    return 1.0;
-}
-
-// Shade v3: diffuse + specular + hard shadow
-vec3 shade(vec3 p, vec3 n, vec3 mat, vec3 v, DirLight light) {
-    float diff = max(0.0, dot(n, light.dir));
-
-    vec3 h = normalize(light.dir + v);
-    float spec = pow(max(0.0, dot(n, h)), 32.0);
-
-    float sh = shadow(p + n * 0.01, light.dir);
-
-    return (mat * diff + vec3(0.3) * spec) * light.color * sh;
-}
-
-
-void mainImage(out vec4 fragColor, in vec2 fragCoord) {
-    Ray ray = makeRay(fragCoord);
-    ray = orbitRay(ray, 6.0);
-
-    float t = raymarch(ray);
-
-    vec3 color = vec3(0.1, 0.1, 0.12);
-    if (t > 0.0) {
-        vec3 p = ray.origin + t * ray.dir;
-        vec3 n = calcNormal(p);
-        vec3 mat = getMaterial(p);
-        vec3 viewDir = -ray.dir;
-
-        DirLight key = DirLight(normalize(vec3(1.0, 1.0, 1.0)), vec3(1.0));
-
-        vec3 ambient = mat * 0.15;
-        color = ambient + shade(p, n, mat, viewDir, key);
-    }
-
-    fragColor = vec4(color, 1.0);
-}
-`, hn = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
-  __proto__: null,
-  default: dn
+  createEditor: on
 }, Symbol.toStringTag, { value: "Module" }));
 export {
-  mn as mount
+  Ue as loadFromFolder,
+  ln as mount
 };

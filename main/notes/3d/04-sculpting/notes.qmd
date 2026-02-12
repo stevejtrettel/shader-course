@@ -8,7 +8,7 @@ The key insight is that the familiar set operations — union, intersection, com
 
 By the end of this chapter we build a breakfast scene — coffee mug, plate, donut on a table — entirely from the primitives in the last chapter.
 
-{{< shader breakfast-scene >}}
+{{< shader layout="tabbed" breakfast-scene >}}
 
 ---
 
@@ -120,7 +120,7 @@ float sdPunchedSphere(vec3 p, float radius, float holeRadius) {
 
 The swizzles `p.yzx`, `p.zxy` rotate the cylinder to align with each coordinate axis. Each cylinder is made slightly taller than the sphere's radius so it punches cleanly through.
 
-{{< shader punched-sphere >}}
+{{< shader layout="tabbed" punched-sphere >}}
 
 `shadeNormal` is especially revealing here — it shows the crease along each CSG seam where the gradient jumps between the sphere and the cylinder.
 
@@ -140,7 +140,7 @@ float sdSteinmetz(vec3 p, float radius) {
 }
 ```
 
-{{< shader steinmetz >}}
+{{< shader layout="tabbed" steinmetz >}}
 
 
 ### Example: Scooped Cube
@@ -155,7 +155,7 @@ float sdScoopedCube(vec3 p, float halfSize, float scoopRadius) {
 }
 ```
 
-{{< shader scooped-cube >}}
+{{< shader layout="tabbed" scooped-cube >}}
 
 
 ---
@@ -168,7 +168,7 @@ For mechanical objects — bolt holes, flat cuts, machined edges — the crease 
 
 We need a smooth version of `min`.
 
-{{< shader crease-problem-2d >}}
+{{< shader layout="tabbed" crease-problem-2d >}}
 
 ### The classical smooth min
 
@@ -211,7 +211,7 @@ float smin(float a, float b, float k) {
 
 That's a smooth minimum in four operations beyond the plain `min`.
 
-{{< shader smin-1d >}}
+{{< shader layout="tabbed" smin-1d >}}
 
 ### Smooth max and smooth subtraction
 
@@ -251,7 +251,7 @@ float blobPair(vec3 p, float separation, float radius, float blend) {
 
 Try varying the blend radius: $k = 0$ gives the hard union, $k = 0.5$ a gentle fillet, $k = 1.0$ a blobby merge.
 
-{{< shader smooth-union-spheres >}}
+{{< shader layout="tabbed" smooth-union-spheres >}}
 
 ### Example: Smooth subtraction
 
@@ -265,7 +265,7 @@ float bittenSphere(vec3 p, float radius, float biteRadius, float blend) {
 }
 ```
 
-{{< shader smooth-subtraction >}}
+{{< shader layout="tabbed" smooth-subtraction >}}
 
 ### The distance caveat (again)
 
@@ -303,7 +303,7 @@ float mugBody(vec3 p) {
 
 Hard subtraction is the right choice here — a real mug has a sharp lip.
 
-{{< shader mug-body >}}
+{{< shader layout="tabbed" mug-body >}}
 
 
 ### The handle
@@ -338,7 +338,7 @@ float sdMug(vec3 p) {
 
 A blend radius of 0.08 gives a subtle fillet where the handle joins — visible but not blobby. Increase to 0.15 for a more ceramic feel; decrease to 0.03 for a sharper junction.
 
-{{< shader mug >}}
+{{< shader layout="tabbed" mug >}}
 
 
 ### Wrapping it in a struct
@@ -382,7 +382,7 @@ vec3 getMaterial(vec3 p) {
 }
 ```
 
-{{< shader mug-in-scene >}}
+{{< shader layout="tabbed" mug-in-scene >}}
 
 One new struct, one new `sdf` overload, and the scene works. The `sdScene` / `getMaterial` / render loop pattern is unchanged. This is the payoff of CSG: you can define arbitrarily complex objects that slot into the same infrastructure as a sphere.
 
@@ -446,7 +446,7 @@ p.xz = abs(p.xz);   // mirror across two planes: 4 copies
 p = abs(p);           // mirror across all three: 8 copies (octant symmetry)
 ```
 
-{{< shader symmetry >}}
+{{< shader layout="tabbed" symmetry >}}
 
 ```glsl
 float sdScene(vec3 p) {
@@ -480,7 +480,7 @@ The `mod` maps $\mathbf{p}$ into the box $[-\frac{T}{2}, \frac{T}{2}]^3$. The sp
 
 This is the quotient of $\mathbb{R}^3$ by the translation lattice $T\mathbb{Z}^3$. The fundamental domain is a cube; the SDF is periodic.
 
-{{< shader repetition >}}
+{{< shader layout="tabbed" repetition >}}
 
 An infinite crystal of spheres, from four lines of code. The raymarcher doesn't know or care that the space is periodic — it just evaluates the SDF, which happens to repeat.
 
@@ -546,7 +546,7 @@ float sdScene(vec3 p) {
 }
 ```
 
-{{< shader corridor >}}
+{{< shader layout="tabbed" corridor >}}
 
 An infinite corridor with two rows of columns. The `mod` on $z$ repeats a single pair of columns along the corridor's length. The walls, floor, and ceiling are half-planes — they don't need repetition since they're already infinite. The camera flies forward through `iTime` and the corridor stretches on forever.
 
@@ -572,7 +572,7 @@ float sdScene(vec3 p) {
 }
 ```
 
-{{< shader twist >}}
+{{< shader layout="tabbed" twist >}}
 
 Two cylinders, twisting around one another into a double helix. The map $\varphi$ applies a $y$-dependent rotation $R(ky)$ to the $(x, z)$ coordinates. At $y = 0$ the cylinders sit at $(\pm 0.8, 0)$ in the $xz$-plane; at height $y$ they've rotated by $ky$ radians around the central axis. The two infinite cylinders have the SDF `length(p.xz - offset) - r`, which is just the 2D circle distance in the $xz$-plane — the same trick as our infinite cylinder from the Deriving SDFs chapter, but evaluated in the twisted coordinates. One of the best cost-to-drama ratios in SDF work.
 
@@ -594,7 +594,7 @@ float sdScene(vec3 p) {
 }
 ```
 
-{{< shader kaleidoscope >}}
+{{< shader layout="tabbed" kaleidoscope >}}
 
 The `mod` on the angle maps every sector to the same wedge — a fundamental domain of the dihedral group $D_N$, acting by rotations of $2\pi/N$ around the $y$-axis. The SDF sees a single copy; the scene displays $N$ copies arrayed in a ring. Change $N$ to get triangular, square, hexagonal, or any regular arrangement.
 
@@ -617,7 +617,7 @@ float displacedSphere(vec3 p) {
 }
 ```
 
-{{< shader displacement >}}
+{{< shader layout="tabbed" displacement >}}
 
 A bumpy sphere — the sinusoidal displacement creates a regular surface texture, like a golf ball or a sea urchin depending on frequency and amplitude. Replace the product of sines with noise and you get organic, rocky surfaces. We'll use this for donut icing in the breakfast scene.
 
@@ -706,7 +706,7 @@ float sdDonutWithIcing(vec3 p) {
 
 The displacement amplitude (0.008) is small — just enough to catch the shading and break up the silhouette. The frequency (40.0) creates fine-grained texture. Replace the product-of-sines with a proper noise function for a more organic look; this is a quick stand-in that makes the point.
 
-{{< shader donut >}}
+{{< shader layout="tabbed" donut >}}
 
 
 ### Table
@@ -726,7 +726,7 @@ float sdTable(vec3 p) {
 }
 ```
 
-{{< shader table >}}
+{{< shader layout="tabbed" table >}}
 
 One leg definition, four legs rendered. The `abs` on $xz$ folds the four quadrants onto one, and the leg positioned at $(2.3, -0.56, 1.3)$ appears at all four corners. The small smooth union at the joint softens the corner — like a table with slightly rounded joinery.
 
@@ -791,7 +791,7 @@ if (t > 0.0) {
 }
 ```
 
-{{< shader breakfast-scene >}}
+{{< shader layout="tabbed" breakfast-scene >}}
 
 Every shape is a primitive from the Deriving SDFs chapter. Every combination is `min`, `max`, or `smin`. The table legs use `abs` symmetry. The icing uses displacement. And the render loop hasn't changed since Raymarching.
 

@@ -1,6 +1,6 @@
 # Lighting & Shadows — Shader Code
 
-Each section title matches the `{{< shader-demo >}}` callout name in `lighting-shadows.md`.
+Each section title matches the shader shortcode callout name in `lighting-shadows.md`.
 
 ---
 

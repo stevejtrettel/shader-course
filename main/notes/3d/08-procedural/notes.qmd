@@ -25,7 +25,7 @@ Perlin noise uses random *gradients* at integer points instead of random values.
 // TODO: Perlin noise implementation
 ```
 
-{{< shader-demo procedural/perlin >}}
+{{< shader layout="tabbed" procedural/perlin >}}
 
 
 ## Fractal Brownian Motion
@@ -49,7 +49,7 @@ float fbm(vec3 p) {
 
 Each octave doubles the frequency and halves the amplitude. The result has detail at multiple scales — like clouds, terrain, or marble.
 
-{{< shader-demo procedural/fbm >}}
+{{< shader layout="tabbed" procedural/fbm >}}
 
 
 ## Domain Warping
@@ -65,7 +65,7 @@ float pattern(vec3 p) {
 
 This creates organic, flowing patterns — useful for fire, smoke, alien surfaces.
 
-{{< shader-demo procedural/warp >}}
+{{< shader layout="tabbed" procedural/warp >}}
 
 
 ## Applying Noise to Surfaces
@@ -95,7 +95,7 @@ float sdDisplacedSphere(vec3 p, float r) {
 // TODO: bump mapping with noise
 ```
 
-{{< shader-demo procedural/displaced >}}
+{{< shader layout="tabbed" procedural/displaced >}}
 
 
 ## Classic Patterns
@@ -121,7 +121,7 @@ Distance to nearest random point — creates cell-like patterns.
 // TODO: Voronoi implementation
 ```
 
-{{< shader-demo procedural/voronoi >}}
+{{< shader layout="tabbed" procedural/voronoi >}}
 
 
 ## Combining Techniques
@@ -134,7 +134,7 @@ A realistic material combines multiple procedural elements:
 // TODO: rust/weathering example
 ```
 
-{{< shader-demo procedural/materials >}}
+{{< shader layout="tabbed" procedural/materials >}}
 
 
 ## What's Next
