@@ -67,7 +67,7 @@ Shadertoy provides built-in uniforms like `iTime` (elapsed time), `iResolution` 
 
 ### Option 2: Local Development with Shader Sandbox {.unnumbered}
 
-For more control and offline work, you can use the [`@stevejtrettel/shader-sandbox`](https://www.npmjs.com/package/@stevejtrettel/shader-sandbox) npm package. This provides a Shadertoy-compatible development environment that runs locally on your machine.
+For more control and offline work, you can use the [`shader-sandbox`](https://www.npmjs.com/package/shader-sandbox) npm package. This provides a Shadertoy-compatible development environment that runs locally on your machine.
 
 **Prerequisites:** [Node.js](https://nodejs.org) (version 18 or later)
 
@@ -75,10 +75,20 @@ For more control and offline work, you can use the [`@stevejtrettel/shader-sandb
 
 ```bash
 # Create a new shader project
-npx @stevejtrettel/shader-sandbox create my-shaders
+npx shader-sandbox@latest create my-shaders
 cd my-shaders
 
 # Create and run a new shader
+npx shader new my-shader
+npx shader dev my-shader
+```
+
+Or install globally to skip the `npx` prefix:
+
+```bash
+npm install -g shader-sandbox
+shader create my-shaders
+cd my-shaders
 shader new my-shader
 shader dev my-shader
 ```
