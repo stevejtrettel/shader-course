@@ -20,7 +20,7 @@ mat3 rotateY(float a) { float c = cos(a), s = sin(a); return mat3(c,0,s, 0,1,0, 
 
 Ray orbitRay(Ray ray, float distance) {
     vec2 mouse = iMouse.xy / iResolution.xy;
-    if (length(iMouse.xy) < 1.0) mouse = vec2(0.55, 0.6);
+    if (length(iMouse.xy) < 1.0) mouse = vec2(0.55, 0.4);
     float angleY = (mouse.x - 0.5) * 6.28;
     float angleX = (0.5 - mouse.y) * 3.14;
     mat3 rot = rotateX(angleX) * rotateY(angleY);
@@ -82,16 +82,10 @@ float softShadow(vec3 p, vec3 lightDir, float k) {
     return res;
 }
 
-// Shade v4: diffuse + specular + soft shadow
-vec3 shade(vec3 p, vec3 n, vec3 mat, vec3 v, DirLight light) {
+vec3 shade(vec3 p, vec3 n, vec3 mat, DirLight light) {
     float diff = max(0.0, dot(n, light.dir));
-
-    vec3 h = normalize(light.dir + v);
-    float spec = pow(max(0.0, dot(n, h)), 32.0);
-
     float sh = softShadow(p + n * 0.01, light.dir, 16.0);
-
-    return (mat * diff + vec3(0.3) * spec) * light.color * sh;
+    return mat * diff * light.color * sh;
 }
 
 
@@ -106,12 +100,11 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
         vec3 p = ray.origin + t * ray.dir;
         vec3 n = calcNormal(p);
         vec3 mat = getMaterial(p);
-        vec3 viewDir = -ray.dir;
 
         DirLight key = DirLight(normalize(vec3(1.0, 1.0, 1.0)), vec3(1.0));
 
         vec3 ambient = mat * 0.15;
-        color = ambient + shade(p, n, mat, viewDir, key);
+        color = ambient + shade(p, n, mat, key);
     }
 
     fragColor = vec4(color, 1.0);

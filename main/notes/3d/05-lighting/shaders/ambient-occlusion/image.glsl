@@ -1,3 +1,7 @@
+// Ambient Occlusion Demo
+// White scene, ambient light only — AO is the only depth cue.
+// Left half: no AO.  Right half: with AO.
+
 const int MAX_STEPS = 100;
 const float MAX_DIST = 50.0;
 const float HIT_THRESHOLD = 0.001;
@@ -20,7 +24,7 @@ mat3 rotateY(float a) { float c = cos(a), s = sin(a); return mat3(c,0,s, 0,1,0, 
 
 Ray orbitRay(Ray ray, float distance) {
     vec2 mouse = iMouse.xy / iResolution.xy;
-    if (length(iMouse.xy) < 1.0) mouse = vec2(0.55, 0.6);
+    if (length(iMouse.xy) < 1.0) mouse = vec2(0.55, 0.4);
     float angleY = (mouse.x - 0.5) * 6.28;
     float angleX = (0.5 - mouse.y) * 3.14;
     mat3 rot = rotateX(angleX) * rotateY(angleY);
@@ -29,20 +33,25 @@ Ray orbitRay(Ray ray, float distance) {
     return ray;
 }
 
-float sdScene(vec3 p) {
-    float d = p.y;
-    d = min(d, length(p - vec3(-1.2, 0.5, 0.0)) - 0.5);
-    d = min(d, length(p - vec3( 0.0, 0.35, 0.5)) - 0.35);
-    d = min(d, length(p - vec3( 1.1, 0.8, -0.3)) - 0.8);
-    return d;
-}
 
-vec3 getMaterial(vec3 p) {
-    float eps = 0.01;
-    if (length(p - vec3(-1.2, 0.5, 0.0)) - 0.5 < eps)   return vec3(0.8, 0.35, 0.25);
-    if (length(p - vec3( 0.0, 0.35, 0.5)) - 0.35 < eps)  return vec3(0.4, 0.5, 0.65);
-    if (length(p - vec3( 1.1, 0.8, -0.3)) - 0.8 < eps)   return vec3(0.9, 0.85, 0.78);
-    return vec3(0.5, 0.45, 0.4);
+// =============================================
+//  Scene: white spheres on a white ground plane
+//  with a back wall for corner occlusion
+// =============================================
+
+float sdScene(vec3 p) {
+    float d = p.y;                                            // ground plane
+    d = min(d, p.z + 1.2);                                   // back wall at z = -1.2
+
+    // Cluster of spheres — different sizes, some touching
+    d = min(d, length(p - vec3( 0.0,  0.5,  0.0)) - 0.5);   // center
+    d = min(d, length(p - vec3(-0.9,  0.3,  0.3)) - 0.3);   // left small
+    d = min(d, length(p - vec3( 0.8,  0.4, -0.2)) - 0.4);   // right medium
+    d = min(d, length(p - vec3(-0.35, 0.15, 0.7)) - 0.15);  // front tiny
+    d = min(d, length(p - vec3( 0.3,  0.2,  0.6)) - 0.2);   // front small
+    d = min(d, length(p - vec3(-0.5,  0.7, -0.4)) - 0.35);  // back left, touching center sphere
+
+    return d;
 }
 
 vec3 calcNormal(vec3 p) {
@@ -67,66 +76,55 @@ float raymarch(Ray ray) {
 }
 
 
-struct DirLight { vec3 dir; vec3 color; };
-
-float softShadow(vec3 p, vec3 lightDir, float k) {
-    float res = 1.0;
-    float t = 0.02;
-    float prev = 1e20;
-    for (int i = 0; i < 50; i++) {
-        float d = sdScene(p + lightDir * t);
-        if (d < 0.001) return 0.0;
-        float y = d * d / (2.0 * prev);
-        float x = sqrt(d * d - y * y);
-        res = min(res, k * x / max(0.0, t - y));
-        prev = d;
-        t += d;
-        if (t > 20.0) break;
-    }
-    return res;
-}
+// =============================================
+//  Ambient Occlusion
+// =============================================
 
 float ambientOcclusion(vec3 p, vec3 n) {
     float ao = 0.0;
     float scale = 1.0;
     for (int i = 1; i <= 5; i++) {
-        float dist = 0.02 * float(i);
+        float dist = 0.06 * float(i);
         float d = sdScene(p + n * dist);
         ao += (dist - d) * scale;
         scale *= 0.5;
     }
-    return 1.0 - clamp(ao, 0.0, 1.0);
-}
-
-vec3 shade(vec3 p, vec3 n, vec3 mat, vec3 v, DirLight light) {
-    float diff = max(0.0, dot(n, light.dir));
-    vec3 h = normalize(light.dir + v);
-    float spec = pow(max(0.0, dot(n, h)), 32.0);
-    float sh = softShadow(p + n * 0.01, light.dir, 16.0);
-    return (mat * diff + vec3(0.3) * spec) * light.color * sh;
+    return 1.0 - clamp(2.0 * ao, 0.0, 1.0);
 }
 
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     Ray ray = makeRay(fragCoord);
-    ray = orbitRay(ray, 6.0);
+    ray = orbitRay(ray, 4.0);
 
     float t = raymarch(ray);
 
-    vec3 color = vec3(0.1, 0.1, 0.12);
+    vec3 color = vec3(0.85);  // light gray sky
     if (t > 0.0) {
         vec3 p = ray.origin + t * ray.dir;
         vec3 n = calcNormal(p);
-        vec3 mat = getMaterial(p);
-        vec3 viewDir = -ray.dir;
+
+        // Hemisphere ambient: cool sky above, warm ground below
+        vec3 sky    = vec3(0.95, 0.95, 1.0);
+        vec3 ground = vec3(0.8, 0.75, 0.7);
+        vec3 ambient = mix(ground, sky, 0.5 + 0.5 * n.y);
+
+        // White material
+        vec3 mat = vec3(0.9);
 
         float ao = ambientOcclusion(p, n);
 
-        DirLight key = DirLight(normalize(vec3(1.0, 1.0, 1.0)), vec3(1.0));
+        // Split screen: left = no AO, right = with AO
+        float split = fragCoord.x / iResolution.x;
+        float aoFactor = mix(1.0, ao, smoothstep(0.49, 0.51, split));
 
-        vec3 ambient = mat * 0.15 * ao;
-        color = ambient + shade(p, n, mat, viewDir, key);
+        color = mat * ambient * aoFactor;
     }
 
+    // Divider line
+    float splitX = 0.5 * iResolution.x;
+    if (abs(fragCoord.x - splitX) < 1.0) color = vec3(0.3);
+
+    color = pow(color, vec3(1.0 / 2.2));
     fragColor = vec4(color, 1.0);
 }

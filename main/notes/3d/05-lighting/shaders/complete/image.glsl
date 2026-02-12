@@ -20,7 +20,7 @@ mat3 rotateY(float a) { float c = cos(a), s = sin(a); return mat3(c,0,s, 0,1,0, 
 
 Ray orbitRay(Ray ray, float distance) {
     vec2 mouse = iMouse.xy / iResolution.xy;
-    if (length(iMouse.xy) < 1.0) mouse = vec2(0.55, 0.6);
+    if (length(iMouse.xy) < 1.0) mouse = vec2(0.55, 0.4);
     float angleY = (mouse.x - 0.5) * 6.28;
     float angleX = (0.5 - mouse.y) * 3.14;
     mat3 rot = rotateX(angleX) * rotateY(angleY);
@@ -118,20 +118,10 @@ float ambientOcclusion(vec3 p, vec3 n) {
     return 1.0 - clamp(ao, 0.0, 1.0);
 }
 
-vec3 shade(vec3 p, vec3 n, vec3 mat, vec3 v, DirLight light) {
+vec3 shade(vec3 p, vec3 n, vec3 mat, DirLight light) {
     float diff = max(0.0, dot(n, light.dir));
-
-    vec3 h = normalize(light.dir + v);
-    float spec = pow(max(0.0, dot(n, h)), 32.0);
-
     float sh = softShadow(p + n * 0.01, light.dir, 16.0);
-
-    return (mat * diff + vec3(0.3) * spec) * light.color * sh;
-}
-
-vec3 applyFog(vec3 color, float distance, vec3 fogColor) {
-    float fog = 1.0 - exp(-distance * 0.04);
-    return mix(color, fogColor, fog);
+    return mat * diff * light.color * sh;
 }
 
 
@@ -145,19 +135,14 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 
     float t = raymarch(ray);
 
-    vec3 fogColor = vec3(0.5, 0.6, 0.7);
-    vec3 color = fogColor;
+    vec3 color = vec3(0.5, 0.6, 0.7);
 
     if (t > 0.0) {
         vec3 p = ray.origin + t * ray.dir;
         vec3 n = calcNormal(p);
         vec3 mat = getMaterial(p);
-        vec3 viewDir = -ray.dir;
 
-        // Ambient occlusion
         float ao = ambientOcclusion(p, n);
-
-        // Ambient light
         vec3 ambient = mat * 0.15 * ao;
 
         // Key light: warm, from upper right
@@ -167,11 +152,8 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
         DirLight fill = DirLight(normalize(vec3(-1.0, 0.3, 0.0)), vec3(0.15, 0.2, 0.3));
 
         color = ambient;
-        color += shade(p, n, mat, viewDir, key);
-        color += shade(p, n, mat, viewDir, fill);
-
-        // Fog
-        color = applyFog(color, t, fogColor);
+        color += shade(p, n, mat, key);
+        color += shade(p, n, mat, fill);
     }
 
     // Gamma correction

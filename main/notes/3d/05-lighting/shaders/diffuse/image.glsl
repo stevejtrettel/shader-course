@@ -96,8 +96,7 @@ struct DirLight {
     vec3 color;
 };
 
-// Shade v1: diffuse only
-vec3 shade(vec3 p, vec3 n, vec3 mat, vec3 v, DirLight light) {
+vec3 shade(vec3 p, vec3 n, vec3 mat, DirLight light) {
     float diff = max(0.0, dot(n, light.dir));
     return mat * diff * light.color;
 }
@@ -114,12 +113,11 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
         vec3 p = ray.origin + t * ray.dir;
         vec3 n = calcNormal(p);
         vec3 mat = getMaterial(p);
-        vec3 viewDir = -ray.dir;
 
         DirLight key = DirLight(normalize(vec3(1.0, 1.0, 1.0)), vec3(1.0));
 
         vec3 ambient = mat * 0.15;
-        color = ambient + shade(p, n, mat, viewDir, key);
+        color = ambient + shade(p, n, mat, key);
     }
 
     fragColor = vec4(color, 1.0);
