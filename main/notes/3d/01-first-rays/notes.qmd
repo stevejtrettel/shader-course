@@ -6,7 +6,7 @@ We want to render 3D scenes. The approach: cast a ray from the camera through ea
 
 By the end of this chapter you'll have a lit, interactive 3D sphere that you can orbit with the mouse:
 
-{{< shader-demo first-rays/sphere-orbit >}}
+{{< shader sphere-orbit >}}
 
 We start with the simplest case: one sphere, one light, analytical intersection. This establishes the machinery — rays, hits, shading, camera control — that carries through the rest of the 3D rendering chapters.
 
@@ -70,7 +70,7 @@ The $z$-component is $-f$ because we look down the negative $z$-axis.
 
 We can verify the setup by coloring pixels according to their ray direction:
 
-{{< shader-demo first-rays/ray-visualization >}}
+{{< shader ray-visualization >}}
 
 ```glsl
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
@@ -142,7 +142,7 @@ We return $-1$ as a sentinel for "no hit" — any negative value works since val
 
 Let's test it:
 
-{{< shader-demo first-rays/sphere-flat >}}
+{{< shader sphere-flat >}}
 
 ```glsl
 Sphere sphere = Sphere(vec3(0.0, 0.0, -3.0), 1.0, vec3(1.0, 0.0, 0.0));
@@ -197,7 +197,7 @@ vec3 shadeNormal(vec3 normal) {
 }
 ```
 
-{{< shader-demo first-rays/sphere-normals >}}
+{{< shader sphere-normals >}}
 
 ```glsl
 if (t > 0.0) {
@@ -221,7 +221,7 @@ vec3 shadeDepth(float t) {
 }
 ```
 
-{{< shader-demo first-rays/sphere-depth >}}
+{{< shader sphere-depth >}}
 
 The divisor (10.0) sets the range — surfaces farther than 10 units fade to black. Adjust this to match your scene's scale. Like normal shading, this ignores the object's color. It's useful for verifying intersection distances and understanding the spatial layout of a scene.
 
@@ -246,7 +246,7 @@ vec3 shadeDiffuse(vec3 normal, vec3 albedo) {
 
 The `0.15` floor prevents surfaces facing away from going completely black — a crude stand-in for light arriving from directions we're ignoring. The `0.85` scales the lit contribution so the total doesn't exceed 1.0.
 
-{{< shader-demo first-rays/sphere-lit >}}
+{{< shader sphere-lit >}}
 
 ```glsl
 Sphere sphere = Sphere(vec3(0.0, 0.0, -3.0), 1.0, vec3(1.0, 0.0, 0.0));
@@ -329,7 +329,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 }
 ```
 
-{{< shader-demo first-rays/sphere-orbit >}}
+{{< shader sphere-orbit >}}
 
 Drag to orbit. The sphere stays at the origin; the camera circles it. This is our complete first raytracer: one sphere, diffuse shading, full mouse control.
 
@@ -352,7 +352,7 @@ Unlike quadratics, there's no formula you'd want to memorize. Solving a quartic 
 
 Inigo Quilez, the creator of Shadertoy, worked out an analytical solution. Here's what it looks like:
 
-{{< shader-demo first-rays/torus-analytical >}}
+{{< shader torus-analytical >}}
 
 The torus renders correctly — drag to orbit and admire the donut. But look at the code in the full shader: **80 lines** of intricate algebra to solve one quartic.
 

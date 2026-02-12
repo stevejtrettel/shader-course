@@ -1,10 +1,10 @@
 project:
   type: website
   output-dir: _site
-  pre-render:
-    - npm --prefix .. run shaders:build:main
+  # pre-render:
+  #   - node build-shaders.mjs
   resources:
-    - demos/**
+    - dist/**
 
 website:
   title: "Shader Programming"
@@ -23,15 +23,15 @@ website:
           - text: "Deriving SDFs"
             href: notes/3d/03-deriving-sdfs/notes.qmd
           - text: "Sculpting"
-            href: notes/3d/sculpting/notes.qmd
+            href: notes/3d/04-sculpting/notes.qmd
           - text: "Lighting & Shadows"
-            href: notes/3d/05-lighting-shadows/notes.qmd
-          - text: "Materials"
-            href: notes/3d/06-materials/notes.qmd
-          - text: "Refraction"
-            href: notes/3d/refraction/notes.qmd
-          - text: "Procedural Patterns"
-            href: notes/3d/08-procedural/notes.qmd
+            href: notes/3d/05-lighting/notes.qmd
+          # - text: "Materials"
+          #   href: notes/3d/06-materials/notes.qmd
+          # - text: "Refraction"
+          #   href: notes/3d/07-refraction/notes.qmd
+          # - text: "Procedural Patterns"
+          #   href: notes/3d/08-procedural/notes.qmd
 
       # - section: "Fundamentals"
       #   contents:

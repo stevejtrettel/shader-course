@@ -1,0 +1,6 @@
+title: Shader Sandbox
+author: Steve Trettel
+version: 1.0.0
+contributes:
+  shortcodes:
+    - shader.lua

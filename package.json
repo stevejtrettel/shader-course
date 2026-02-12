@@ -7,6 +7,6 @@
     "shaders:build:main": "node scripts/build-shaders.mjs main"
   },
   "dependencies": {
-    "@stevejtrettel/shader-sandbox": "latest"
+    "@stevejtrettel/shader-sandbox": "^0.1.10"
   }
 }
