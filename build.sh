@@ -15,7 +15,7 @@ if ! command -v quarto &> /dev/null; then
 fi
 
 echo "=== Building main site ==="
-cd main && quarto render && cd ..
+cd main && npm install && node build-shaders.mjs && quarto render && cd ..
 
 echo "=== Building CIRM course ==="
 cd cirm && quarto render && cd ..
