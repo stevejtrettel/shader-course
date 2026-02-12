@@ -520,25 +520,27 @@ This gives you a finite row — a line of soldiers, a set of fence posts, a row 
 
 ### Example: Infinite Corridor
 
-Repetition really shines when combined with CSG. An endless hallway of columns:
+Repetition really shines in architectural scenes. An endless hallway with rows of columns:
 
 ```glsl
 float sdScene(vec3 p) {
     float T = 4.0;
     vec3 q = p;
-    q.xz = mod(q.xz + 0.5 * T, T) - 0.5 * T;
+    q.z = mod(q.z + 0.5 * T, T) - 0.5 * T;
 
-    float col = sdCylinder(q, 0.3, 3.0);
+    float col1 = sdCylinder(q - vec3( 1.5, 0.0, 0.0), 0.3, 3.0);
+    float col2 = sdCylinder(q - vec3(-1.5, 0.0, 0.0), 0.3, 3.0);
 
     float floor = p.y + 3.0;
     float ceiling = -(p.y - 3.0);
+    float leftWall = -(p.x + 2.5);
+    float rightWall = p.x - 2.5;
 
-    float walls = sdBox(vec3(mod(p.x + 2.0, T) - 2.0, p.y, p.z),
-                        vec3(1.5, 3.0, 100.0));
-
-    float scene = min(col, floor);
+    float scene = min(col1, col2);
+    scene = min(scene, floor);
     scene = min(scene, ceiling);
-    scene = max(scene, -walls);
+    scene = min(scene, leftWall);
+    scene = min(scene, rightWall);
 
     return scene;
 }
@@ -546,7 +548,7 @@ float sdScene(vec3 p) {
 
 {{< shader corridor >}}
 
-An infinite vaulted corridor with periodic columns. The `mod` on $xz$ creates the repetition; the subtraction carves the walkable space. The camera flies forward through `iTime` and the corridor stretches on forever.
+An infinite corridor with two rows of columns. The `mod` on $z$ repeats a single pair of columns along the corridor's length. The walls, floor, and ceiling are half-planes — they don't need repetition since they're already infinite. The camera flies forward through `iTime` and the corridor stretches on forever.
 
 
 ### Twist
@@ -556,19 +558,23 @@ All the domain maps so far have been isometries (or piecewise isometries, in the
 Twist the $xz$-plane by an angle proportional to $y$:
 
 ```glsl
-float twistedBox(vec3 p) {
-    float k = 1.5;  // radians per unit height
+float sdScene(vec3 p) {
+    float k = 0.8;  // radians per unit height
     float angle = k * p.y;
     float c = cos(angle), s = sin(angle);
     vec2 twisted = vec2(c * p.x - s * p.z,
                         s * p.x + c * p.z);
-    return sdBox(vec3(twisted, p.y), vec3(0.5, 2.0, 0.5));
+
+    float cyl1 = length(twisted - vec2( 0.8, 0.0)) - 0.3;
+    float cyl2 = length(twisted - vec2(-0.8, 0.0)) - 0.3;
+
+    return min(cyl1, cyl2);
 }
 ```
 
 {{< shader twist >}}
 
-A box, twisted into a helix. The map $\varphi$ applies a $y$-dependent rotation $R(ky)$ to the $(x, z)$ coordinates. At $y = 0$ the box is unrotated; at $y = 1$ it's rotated by $k$ radians. One of the best cost-to-drama ratios in SDF work.
+Two cylinders, twisting around one another into a double helix. The map $\varphi$ applies a $y$-dependent rotation $R(ky)$ to the $(x, z)$ coordinates. At $y = 0$ the cylinders sit at $(\pm 0.8, 0)$ in the $xz$-plane; at height $y$ they've rotated by $ky$ radians around the central axis. The two infinite cylinders have the SDF `length(p.xz - offset) - r`, which is just the 2D circle distance in the $xz$-plane — the same trick as our infinite cylinder from the Deriving SDFs chapter, but evaluated in the twisted coordinates. One of the best cost-to-drama ratios in SDF work.
 
 
 ### Kaleidoscope

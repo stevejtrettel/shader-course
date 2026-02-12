@@ -12,7 +12,7 @@ Ray makeRay(vec2 fragCoord) {
     vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
     uv.x *= iResolution.x / iResolution.y;
 
-    float fov = 90.0;
+    float fov = 60.0;
     float f = 1.0 / tan(radians(fov) / 2.0);
 
     Ray ray;
@@ -207,7 +207,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 
     float t = raymarch(ray);
 
-    vec3 color = vec3(0.1, 0.1, 0.2);
+    vec3 color = vec3(0.7, 0.7, 0.75);
     if (t > 0.0) {
         vec3 p = ray.origin + t * ray.dir;
         vec3 normal = calcNormal(p);

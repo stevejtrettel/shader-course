@@ -1,4 +1,4 @@
-const int MAX_STEPS = 100;
+const int MAX_STEPS = 150;
 const float MAX_DIST = 100.0;
 const float HIT_THRESHOLD = 0.001;
 const float STEP_SCALE = 0.5;
@@ -12,7 +12,7 @@ Ray makeRay(vec2 fragCoord) {
     vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
     uv.x *= iResolution.x / iResolution.y;
 
-    float fov = 90.0;
+    float fov = 60.0;
     float f = 1.0 / tan(radians(fov) / 2.0);
 
     Ray ray;
@@ -44,22 +44,19 @@ Ray orbitRay(Ray ray, float distance) {
     return ray;
 }
 
-// --- Primitives ---
-
-float sdBox(vec3 p, vec3 halfSize) {
-    vec3 d = abs(p) - halfSize;
-    return length(max(d, 0.0)) + min(max(d.x, max(d.y, d.z)), 0.0);
-}
-
 // --- Scene ---
 
 float sdScene(vec3 p) {
-    float k = 1.5;
+    float k = 0.8;
     float angle = k * p.y;
     float c = cos(angle), s = sin(angle);
     vec2 twisted = vec2(c * p.x - s * p.z,
                         s * p.x + c * p.z);
-    return sdBox(vec3(twisted, p.y), vec3(0.5, 2.0, 0.5));
+
+    float cyl1 = length(twisted - vec2( 0.8, 0.0)) - 0.3;
+    float cyl2 = length(twisted - vec2(-0.8, 0.0)) - 0.3;
+
+    return min(cyl1, cyl2);
 }
 
 // --- Raymarching ---

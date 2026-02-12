@@ -33,7 +33,7 @@ ${a}`);
   }
   return i.detachShader(r, n), i.detachShader(r, s), i.deleteShader(n), i.deleteShader(s), r;
 }
-function ze(i) {
+function Ke(i) {
   const e = i.createVertexArray();
   if (!e)
     throw new Error("Failed to create VAO");
@@ -66,7 +66,7 @@ function ze(i) {
     // offset
   ), i.bindVertexArray(null), i.bindBuffer(i.ARRAY_BUFFER, null), e;
 }
-function K(i, e, t) {
+function z(i, e, t) {
   const n = i.createTexture();
   if (!n)
     throw new Error("Failed to create texture");
@@ -105,7 +105,7 @@ function me(i, e) {
     throw i.deleteFramebuffer(t), new Error(`Framebuffer incomplete: ${et(i, n)}`);
   return i.bindFramebuffer(i.FRAMEBUFFER, null), t;
 }
-function Ke(i) {
+function ze(i) {
   const e = i.createTexture();
   if (!e)
     throw new Error("Failed to create black texture");
@@ -821,7 +821,7 @@ class ut {
 }
 class ge {
   constructor(e) {
-    this._frame = 0, this._time = 0, this._lastStepTime = null, this._passes = [], this._textures = [], this._keyboardTexture = null, this._blackTexture = null, this._keyStates = /* @__PURE__ */ new Map(), this._toggleStates = /* @__PURE__ */ new Map(), this._compilationErrors = [], this._scriptTextures = /* @__PURE__ */ new Map(), this._sharedVAO = null, this._disposed = !1, this._viewNames = [], this.gl = e.gl, this.project = e.project, this._onAssetError = e.onAssetError, this._width = this.gl.drawingBufferWidth, this._height = this.gl.drawingBufferHeight, this.initExtensions(), this._blackTexture = Ke(this.gl);
+    this._frame = 0, this._time = 0, this._lastStepTime = null, this._passes = [], this._textures = [], this._keyboardTexture = null, this._blackTexture = null, this._keyStates = /* @__PURE__ */ new Map(), this._toggleStates = /* @__PURE__ */ new Map(), this._compilationErrors = [], this._scriptTextures = /* @__PURE__ */ new Map(), this._sharedVAO = null, this._disposed = !1, this._viewNames = [], this.gl = e.gl, this.project = e.project, this._onAssetError = e.onAssetError, this._width = this.gl.drawingBufferWidth, this._height = this.gl.drawingBufferHeight, this.initExtensions(), this._blackTexture = ze(this.gl);
     const t = Ge(this.gl);
     this._keyboardTexture = {
       texture: t,
@@ -1022,7 +1022,7 @@ class ge {
     this._width = e, this._height = t;
     const n = this.gl;
     for (const s of this._passes)
-      n.deleteTexture(s.currentTexture), n.deleteTexture(s.previousTexture), n.deleteFramebuffer(s.framebuffer), s.currentTexture = K(n, e, t), s.previousTexture = K(n, e, t), s.framebuffer = me(n, s.currentTexture);
+      n.deleteTexture(s.currentTexture), n.deleteTexture(s.previousTexture), n.deleteFramebuffer(s.framebuffer), s.currentTexture = z(n, e, t), s.previousTexture = z(n, e, t), s.framebuffer = me(n, s.currentTexture);
   }
   /**
    * Reset frame counter and clear all render targets.
@@ -1254,7 +1254,7 @@ class ge {
    * Compile shaders, create VAOs/FBOs/textures, and build RuntimePass array.
    */
   initRuntimePasses() {
-    const e = this.gl, t = this.project, n = ze(e);
+    const e = this.gl, t = this.project, n = Ke(e);
     this._sharedVAO = n;
     const s = ["BufferA", "BufferB", "BufferC", "BufferD", "Image"];
     for (const r of s) {
@@ -1263,7 +1263,7 @@ class ge {
         continue;
       const { source: a, lineMapping: c } = this.buildFragmentShader(o.glslSource, o.channels, o.namedSamplers);
       try {
-        const l = he(e, fe, a), u = this.cacheUniformLocations(l, o.namedSamplers), d = K(e, this._width, this._height), E = K(e, this._width, this._height), y = me(e, d), b = {
+        const l = he(e, fe, a), u = this.cacheUniformLocations(l, o.namedSamplers), d = z(e, this._width, this._height), E = z(e, this._width, this._height), y = me(e, d), b = {
           name: r,
           projectChannels: o.channels,
           vao: n,
@@ -4365,7 +4365,7 @@ class Ue {
     return Array.from(this.map.values());
   }
 }
-function zt(i, e, t, n, s, r) {
+function Kt(i, e, t, n, s, r) {
   if ("buffer" in i) {
     const o = i.buffer;
     if (!ae(o))
@@ -4390,9 +4390,9 @@ function W(i, e, t, n, s, r) {
   if (!i)
     return { kind: "none" };
   const o = Le(i);
-  return o ? zt(o, e, t, n, s, r) : { kind: "none" };
+  return o ? Kt(o, e, t, n, s, r) : { kind: "none" };
 }
-async function Kt(i, e, t) {
+async function zt(i, e, t) {
   let n = t == null ? void 0 : t.config;
   if (n === void 0) {
     const s = i.joinPath(e, "config.json");
@@ -4637,7 +4637,7 @@ async function Qt(i, e, t, n, s) {
   let a;
   if (o in t && (a = await t[o]()), a && Ye(a))
     return Xt(a, r), en(r, a, e, n, s);
-  const c = await Be(r, s), l = Ne(e, n), d = await Kt(l, r, {
+  const c = await Be(r, s), l = Ne(e, n), d = await zt(l, r, {
     config: a,
     script: c,
     textureUrlResolver: async (E) => {
@@ -5506,10 +5506,10 @@ var Re = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
                   continue;
                 var j = P.index, Y = P[0], J = N.slice(0, j), ue = N.slice(j + Y.length), Q = D + N.length;
                 x && Q > x.reach && (x.reach = Q);
-                var z = L.prev;
-                J && (z = E(h, z, J), D += J.length), y(h, z, X);
+                var K = L.prev;
+                J && (K = E(h, K, J), D += J.length), y(h, K, X);
                 var je = new c(C, S ? a.tokenize(Y, S) : Y, He, Y);
-                if (L = E(h, z, je), ue && E(h, L, ue), X > 1) {
+                if (L = E(h, K, je), ue && E(h, L, ue), X > 1) {
                   var ee = {
                     cause: C + "," + R,
                     reach: Q
@@ -6219,7 +6219,7 @@ function un(i, e, t) {
 const Oe = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   createEditor: un
-}, Symbol.toStringTag, { value: "Module" })), dn = `const int MAX_STEPS = 100;
+}, Symbol.toStringTag, { value: "Module" })), dn = `const int MAX_STEPS = 150;
 const float MAX_DIST = 100.0;
 const float HIT_THRESHOLD = 0.001;
 const float STEP_SCALE = 0.5;
@@ -6233,7 +6233,7 @@ Ray makeRay(vec2 fragCoord) {
     vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
     uv.x *= iResolution.x / iResolution.y;
 
-    float fov = 90.0;
+    float fov = 60.0;
     float f = 1.0 / tan(radians(fov) / 2.0);
 
     Ray ray;
@@ -6265,22 +6265,19 @@ Ray orbitRay(Ray ray, float distance) {
     return ray;
 }
 
-// --- Primitives ---
-
-float sdBox(vec3 p, vec3 halfSize) {
-    vec3 d = abs(p) - halfSize;
-    return length(max(d, 0.0)) + min(max(d.x, max(d.y, d.z)), 0.0);
-}
-
 // --- Scene ---
 
 float sdScene(vec3 p) {
-    float k = 1.5;
+    float k = 0.8;
     float angle = k * p.y;
     float c = cos(angle), s = sin(angle);
     vec2 twisted = vec2(c * p.x - s * p.z,
                         s * p.x + c * p.z);
-    return sdBox(vec3(twisted, p.y), vec3(0.5, 2.0, 0.5));
+
+    float cyl1 = length(twisted - vec2( 0.8, 0.0)) - 0.3;
+    float cyl2 = length(twisted - vec2(-0.8, 0.0)) - 0.3;
+
+    return min(cyl1, cyl2);
 }
 
 // --- Raymarching ---

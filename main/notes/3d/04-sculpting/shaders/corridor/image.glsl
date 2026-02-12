@@ -1,6 +1,7 @@
-const int MAX_STEPS = 100;
+const int MAX_STEPS = 150;
 const float MAX_DIST = 100.0;
 const float HIT_THRESHOLD = 0.001;
+const float STEP_SCALE = 0.5;
 
 struct Ray {
     vec3 origin;
@@ -27,29 +28,29 @@ float sdCylinder(vec3 p, float r, float h) {
     return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
 }
 
-float sdBox(vec3 p, vec3 halfSize) {
-    vec3 d = abs(p) - halfSize;
-    return length(max(d, 0.0)) + min(max(d.x, max(d.y, d.z)), 0.0);
-}
-
 // --- Scene ---
 
 float sdScene(vec3 p) {
     float T = 4.0;
-    vec3 q = p;
-    q.xz = mod(q.xz + 0.5 * T, T) - 0.5 * T;
 
-    float col = sdCylinder(q, 0.3, 3.0);
+    // Repeat in z for column rows
+    vec3 q = p;
+    q.z = mod(q.z + 0.5 * T, T) - 0.5 * T;
+
+    // Two rows of columns along the corridor
+    float col1 = sdCylinder(q - vec3( 1.5, 0.0, 0.0), 0.3, 3.0);
+    float col2 = sdCylinder(q - vec3(-1.5, 0.0, 0.0), 0.3, 3.0);
 
     float floor = p.y + 3.0;
     float ceiling = -(p.y - 3.0);
+    float leftWall = -(p.x + 2.5);
+    float rightWall = p.x - 2.5;
 
-    float walls = sdBox(vec3(mod(p.x + 2.0, T) - 2.0, p.y, p.z),
-                        vec3(1.5, 3.0, 100.0));
-
-    float scene = min(col, floor);
+    float scene = min(col1, col2);
+    scene = min(scene, floor);
     scene = min(scene, ceiling);
-    scene = max(scene, -walls);
+    scene = min(scene, leftWall);
+    scene = min(scene, rightWall);
 
     return scene;
 }
@@ -57,11 +58,12 @@ float sdScene(vec3 p) {
 vec3 getMaterial(vec3 p) {
     float T = 4.0;
     vec3 q = p;
-    q.xz = mod(q.xz + 0.5 * T, T) - 0.5 * T;
+    q.z = mod(q.z + 0.5 * T, T) - 0.5 * T;
 
-    float col = sdCylinder(q, 0.3, 3.0);
-    if (col < 0.01) return vec3(0.8, 0.75, 0.65);
+    float col1 = sdCylinder(q - vec3( 1.5, 0.0, 0.0), 0.3, 3.0);
+    float col2 = sdCylinder(q - vec3(-1.5, 0.0, 0.0), 0.3, 3.0);
 
+    if (min(col1, col2) < 0.01) return vec3(0.8, 0.75, 0.65);
     if (p.y + 3.0 < 0.01) return vec3(0.4, 0.35, 0.3);
     if (-(p.y - 3.0) < 0.01) return vec3(0.5, 0.45, 0.4);
 
@@ -88,7 +90,7 @@ float raymarch(Ray ray) {
 
         if (d < HIT_THRESHOLD) return t;
 
-        t += d;
+        t += d * STEP_SCALE;
 
         if (t > MAX_DIST) return -1.0;
     }
@@ -108,7 +110,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     Ray ray = makeRay(fragCoord);
 
     // Fly forward through the corridor
-    ray.origin = vec3(0.0, 0.0, iTime * 2.0);
+    ray.origin = vec3(0.0, 0.0, -iTime * 2.0);
 
     float t = raymarch(ray);
 

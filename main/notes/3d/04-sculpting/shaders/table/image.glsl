@@ -11,7 +11,7 @@ Ray makeRay(vec2 fragCoord) {
     vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
     uv.x *= iResolution.x / iResolution.y;
 
-    float fov = 90.0;
+    float fov = 70.0;
     float f = 1.0 / tan(radians(fov) / 2.0);
 
     Ray ray;

@@ -66,7 +66,7 @@ function Ke(i) {
     // offset
   ), i.bindVertexArray(null), i.bindBuffer(i.ARRAY_BUFFER, null), e;
 }
-function z(i, e, t) {
+function G(i, e, t) {
   const n = i.createTexture();
   if (!n)
     throw new Error("Failed to create texture");
@@ -105,7 +105,7 @@ function me(i, e) {
     throw i.deleteFramebuffer(t), new Error(`Framebuffer incomplete: ${et(i, n)}`);
   return i.bindFramebuffer(i.FRAMEBUFFER, null), t;
 }
-function ze(i) {
+function Ge(i) {
   const e = i.createTexture();
   if (!e)
     throw new Error("Failed to create black texture");
@@ -113,7 +113,7 @@ function ze(i) {
   const t = new Float32Array([0, 0, 0, 1]);
   return i.texImage2D(i.TEXTURE_2D, 0, i.RGBA32F, 1, 1, 0, i.RGBA, i.FLOAT, t), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_MIN_FILTER, i.NEAREST), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_MAG_FILTER, i.NEAREST), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_WRAP_S, i.CLAMP_TO_EDGE), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_WRAP_T, i.CLAMP_TO_EDGE), i.bindTexture(i.TEXTURE_2D, null), e;
 }
-function Ge(i) {
+function ze(i) {
   const e = i.createTexture();
   if (!e)
     throw new Error("Failed to create keyboard texture");
@@ -821,8 +821,8 @@ class ut {
 }
 class ge {
   constructor(e) {
-    this._frame = 0, this._time = 0, this._lastStepTime = null, this._passes = [], this._textures = [], this._keyboardTexture = null, this._blackTexture = null, this._keyStates = /* @__PURE__ */ new Map(), this._toggleStates = /* @__PURE__ */ new Map(), this._compilationErrors = [], this._scriptTextures = /* @__PURE__ */ new Map(), this._sharedVAO = null, this._disposed = !1, this._viewNames = [], this.gl = e.gl, this.project = e.project, this._onAssetError = e.onAssetError, this._width = this.gl.drawingBufferWidth, this._height = this.gl.drawingBufferHeight, this.initExtensions(), this._blackTexture = ze(this.gl);
-    const t = Ge(this.gl);
+    this._frame = 0, this._time = 0, this._lastStepTime = null, this._passes = [], this._textures = [], this._keyboardTexture = null, this._blackTexture = null, this._keyStates = /* @__PURE__ */ new Map(), this._toggleStates = /* @__PURE__ */ new Map(), this._compilationErrors = [], this._scriptTextures = /* @__PURE__ */ new Map(), this._sharedVAO = null, this._disposed = !1, this._viewNames = [], this.gl = e.gl, this.project = e.project, this._onAssetError = e.onAssetError, this._width = this.gl.drawingBufferWidth, this._height = this.gl.drawingBufferHeight, this.initExtensions(), this._blackTexture = Ge(this.gl);
+    const t = ze(this.gl);
     this._keyboardTexture = {
       texture: t,
       width: 256,
@@ -1022,7 +1022,7 @@ class ge {
     this._width = e, this._height = t;
     const n = this.gl;
     for (const s of this._passes)
-      n.deleteTexture(s.currentTexture), n.deleteTexture(s.previousTexture), n.deleteFramebuffer(s.framebuffer), s.currentTexture = z(n, e, t), s.previousTexture = z(n, e, t), s.framebuffer = me(n, s.currentTexture);
+      n.deleteTexture(s.currentTexture), n.deleteTexture(s.previousTexture), n.deleteFramebuffer(s.framebuffer), s.currentTexture = G(n, e, t), s.previousTexture = G(n, e, t), s.framebuffer = me(n, s.currentTexture);
   }
   /**
    * Reset frame counter and clear all render targets.
@@ -1263,7 +1263,7 @@ class ge {
         continue;
       const { source: a, lineMapping: c } = this.buildFragmentShader(o.glslSource, o.channels, o.namedSamplers);
       try {
-        const l = he(e, fe, a), u = this.cacheUniformLocations(l, o.namedSamplers), d = z(e, this._width, this._height), E = z(e, this._width, this._height), y = me(e, d), b = {
+        const l = he(e, fe, a), u = this.cacheUniformLocations(l, o.namedSamplers), d = G(e, this._width, this._height), E = G(e, this._width, this._height), y = me(e, d), b = {
           name: r,
           projectChannels: o.channels,
           vao: n,
@@ -1567,8 +1567,8 @@ class H {
           </span>
           <button class="script-error-close" title="Dismiss">×</button>
         </div>
-        <pre class="script-error-message">${G(n)}</pre>
-        ${s ? `<pre class="script-error-stack">${G(s)}</pre>` : ""}
+        <pre class="script-error-message">${z(n)}</pre>
+        ${s ? `<pre class="script-error-stack">${z(s)}</pre>` : ""}
       </div>
     `, this.wireClose(), this.autoHideTimer = setTimeout(() => this.hide(), H.AUTO_HIDE_MS);
   }
@@ -1602,11 +1602,11 @@ class H {
             <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: text-bottom;">
               <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
             </svg>
-            ${G(e)}
+            ${z(e)}
           </span>
           <button class="script-error-close" title="Dismiss">×</button>
         </div>
-        <pre class="script-error-message">${G(t)}</pre>
+        <pre class="script-error-message">${z(t)}</pre>
       </div>
     `, this.wireClose(), this.autoHideTimer = setTimeout(() => this.hide(), H.AUTO_HIDE_MS);
   }
@@ -1635,7 +1635,7 @@ class H {
   }
 }
 H.AUTO_HIDE_MS = 5e3;
-function G(i) {
+function z(i) {
   const e = document.createElement("div");
   return e.textContent = i, e.innerHTML;
 }
@@ -4111,7 +4111,7 @@ function kt(i) {
 function Le(i) {
   return typeof i == "string" ? ae(i) ? { buffer: i } : i === "keyboard" ? { keyboard: !0 } : i === "audio" ? { audio: !0 } : i === "webcam" ? { webcam: !0 } : { texture: i } : i;
 }
-const ie = ["Image", "BufferA", "BufferB", "BufferC", "BufferD"], Ut = ["BufferA", "BufferB", "BufferC", "BufferD"], Pe = ["iChannel0", "iChannel1", "iChannel2", "iChannel3"], Bt = "default", De = !0, Nt = "light", Me = /* @__PURE__ */ new Set([
+const ie = ["Image", "BufferA", "BufferB", "BufferC", "BufferD"], Ut = ["BufferA", "BufferB", "BufferC", "BufferD"], Pe = ["iChannel0", "iChannel1", "iChannel2", "iChannel3"], Bt = "default", De = !0, It = "light", Me = /* @__PURE__ */ new Set([
   "iResolution",
   "iTime",
   "iTimeDelta",
@@ -4131,7 +4131,7 @@ const ie = ["Image", "BufferA", "BufferB", "BufferC", "BufferD"], Ut = ["BufferA
   "iPinch",
   "iPinchDelta",
   "iPinchCenter"
-]), It = /^[a-zA-Z_][a-zA-Z0-9_]*$/, $t = /* @__PURE__ */ new Set([
+]), Nt = /^[a-zA-Z_][a-zA-Z0-9_]*$/, $t = /* @__PURE__ */ new Set([
   "attribute",
   "const",
   "uniform",
@@ -4183,7 +4183,7 @@ const ie = ["Image", "BufferA", "BufferB", "BufferC", "BufferD"], Ut = ["BufferA
   "default"
 ]);
 function $(i) {
-  return It.test(i) && !$t.has(i);
+  return Nt.test(i) && !$t.has(i);
 }
 const be = /* @__PURE__ */ new Set(["fullscreen", "default", "split", "tabbed"]), q = /* @__PURE__ */ new Set(["light", "dark", "system"]), Ot = /* @__PURE__ */ new Set([
   "mode",
@@ -4274,7 +4274,7 @@ function Z(i) {
       description: i.description ?? null
     },
     layout: i.layout ?? Bt,
-    theme: i.theme ?? Nt,
+    theme: i.theme ?? It,
     controls: i.controls ?? De,
     startPaused: i.startPaused ?? !1,
     pixelRatio: i.pixelRatio ?? null,
@@ -4392,7 +4392,7 @@ function W(i, e, t, n, s, r) {
   const o = Le(i);
   return o ? Kt(o, e, t, n, s, r) : { kind: "none" };
 }
-async function zt(i, e, t) {
+async function Gt(i, e, t) {
   let n = t == null ? void 0 : t.config;
   if (n === void 0) {
     const s = i.joinPath(e, "config.json");
@@ -4405,9 +4405,9 @@ async function zt(i, e, t) {
       }
     }
   }
-  return n ? (Vt(n, e), n.mode === "shadertoy" ? Wt(i, e, n, t) : qt(i, e, n, t)) : Gt(i, e, t);
+  return n ? (Vt(n, e), n.mode === "shadertoy" ? Wt(i, e, n, t) : qt(i, e, n, t)) : zt(i, e, t);
 }
-async function Gt(i, e, t) {
+async function zt(i, e, t) {
   const n = i.joinPath(e, "image.glsl");
   if (!await i.exists(n))
     throw new Error(`Single-pass project at '${e}' requires 'image.glsl'.`);
@@ -4598,7 +4598,7 @@ async function Be(i, e) {
   const s = await e[n](), r = {};
   return typeof s.setup == "function" && (r.setup = s.setup), typeof s.onFrame == "function" && (r.onFrame = s.onFrame), r.setup || r.onFrame ? r : null;
 }
-function Ne(i, e) {
+function Ie(i, e) {
   return {
     async exists(t) {
       return U(i, t) !== null || U(e, t) !== null;
@@ -4629,7 +4629,7 @@ function Ne(i, e) {
     }
   };
 }
-function Ie(i) {
+function Ne(i) {
   return (i.split("/").pop() || i).split("-").map((t) => t.charAt(0).toUpperCase() + t.slice(1)).join(" ");
 }
 async function Qt(i, e, t, n, s) {
@@ -4637,7 +4637,7 @@ async function Qt(i, e, t, n, s) {
   let a;
   if (o in t && (a = await t[o]()), a && Ye(a))
     return Xt(a, r), en(r, a, e, n, s);
-  const c = await Be(r, s), l = Ne(e, n), d = await zt(l, r, {
+  const c = await Be(r, s), l = Ie(e, n), d = await Gt(l, r, {
     config: a,
     script: c,
     textureUrlResolver: async (E) => {
@@ -4645,10 +4645,10 @@ async function Qt(i, e, t, n, s) {
       return l.resolveImageUrl(y);
     }
   });
-  return a != null && a.title || (d.meta.title = Ie(r)), d;
+  return a != null && a.title || (d.meta.title = Ne(r)), d;
 }
 async function en(i, e, t, n, s) {
-  const r = Ne(t, n), o = await Be(i, s);
+  const r = Ie(t, n), o = await Be(i, s);
   let a = null;
   const c = `${i}/common.glsl`;
   U(t, c) && (a = await r.readText(c));
@@ -4682,7 +4682,7 @@ async function en(i, e, t, n, s) {
     mode: "standard",
     root: i,
     meta: {
-      title: e.title ?? Ie(i),
+      title: e.title ?? Ne(i),
       author: e.author ?? null,
       description: e.description ?? null
     },
@@ -4698,10 +4698,10 @@ async function en(i, e, t, n, s) {
     viewLayout: e.layout ?? "split"
   };
 }
-const tn = /* @__PURE__ */ Object.assign({ "./notes/3d/04-sculpting/shaders/mug/image.glsl": () => Promise.resolve().then(() => hn).then((i) => i.default) }), nn = /* @__PURE__ */ Object.assign({}), sn = /* @__PURE__ */ Object.assign({}), rn = /* @__PURE__ */ Object.assign({});
+const tn = /* @__PURE__ */ Object.assign({ "./notes/3d/05-lighting/shaders/point-light/image.glsl": () => Promise.resolve().then(() => hn).then((i) => i.default) }), nn = /* @__PURE__ */ Object.assign({}), sn = /* @__PURE__ */ Object.assign({}), rn = /* @__PURE__ */ Object.assign({});
 let ne = null;
 async function on() {
-  return ne || (ne = await Qt("notes/3d/04-sculpting/shaders/mug", tn, nn, sn, rn)), ne;
+  return ne || (ne = await Qt("notes/3d/05-lighting/shaders/point-light", tn, nn, sn, rn)), ne;
 }
 async function mn(i, e = {}) {
   const t = await on();
@@ -5486,10 +5486,10 @@ var Re = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
               F.pattern = RegExp(F.pattern.source, Ve + "g");
             }
             for (var le = F.pattern || F, L = p.next, D = g; L !== h.tail && !(x && D >= x.reach); D += L.value.length, L = L.next) {
-              var N = L.value;
+              var I = L.value;
               if (h.length > m.length)
                 return;
-              if (!(N instanceof c)) {
+              if (!(I instanceof c)) {
                 var X = 1, P;
                 if (ce) {
                   if (P = l(le, D, m, B), !P || P.index >= m.length)
@@ -5499,12 +5499,12 @@ var Re = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
                     L = L.next, k += L.value.length;
                   if (k -= L.value.length, D = k, L.value instanceof c)
                     continue;
-                  for (var I = L; I !== h.tail && (k < Xe || typeof I.value == "string"); I = I.next)
-                    X++, k += I.value.length;
-                  X--, N = m.slice(D, k), P.index -= D;
-                } else if (P = l(le, 0, N, B), !P)
+                  for (var N = L; N !== h.tail && (k < Xe || typeof N.value == "string"); N = N.next)
+                    X++, k += N.value.length;
+                  X--, I = m.slice(D, k), P.index -= D;
+                } else if (P = l(le, 0, I, B), !P)
                   continue;
-                var j = P.index, Y = P[0], J = N.slice(0, j), ue = N.slice(j + Y.length), Q = D + N.length;
+                var j = P.index, Y = P[0], J = I.slice(0, j), ue = I.slice(j + Y.length), Q = D + I.length;
                 x && Q > x.reach && (x.reach = Q);
                 var K = L.prev;
                 J && (K = E(h, K, J), D += J.length), y(h, K, X);
@@ -6219,7 +6219,10 @@ function un(i, e, t) {
 const Oe = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   createEditor: un
-}, Symbol.toStringTag, { value: "Module" })), dn = `const int MAX_STEPS = 100;
+}, Symbol.toStringTag, { value: "Module" })), dn = `// Lighting & Shadows — Point Light
+// Single point light, ambient v2 (+AO), gamma
+
+const int MAX_STEPS = 100;
 const float MAX_DIST = 100.0;
 const float HIT_THRESHOLD = 0.001;
 
@@ -6228,13 +6231,16 @@ struct Ray {
     vec3 dir;
 };
 
+struct PtLight {
+    vec3 pos;
+    vec3 color;
+    float intensity;
+};
+
 Ray makeRay(vec2 fragCoord) {
     vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
     uv.x *= iResolution.x / iResolution.y;
-
-    float fov = 60.0;
-    float f = 1.0 / tan(radians(fov) / 2.0);
-
+    float f = 1.0 / tan(radians(90.0) / 2.0);
     Ray ray;
     ray.origin = vec3(0.0);
     ray.dir = normalize(vec3(uv, -f));
@@ -6254,57 +6260,47 @@ mat3 rotateY(float a) {
 Ray orbitRay(Ray ray, float distance) {
     vec2 mouse = iMouse.xy / iResolution.xy;
     if (length(iMouse.xy) < 1.0) mouse = vec2(0.6, 0.55);
-
     float angleY = (mouse.x - 0.5) * 6.28;
     float angleX = (0.5 - mouse.y) * 3.14;
-
     mat3 rot = rotateX(angleX) * rotateY(angleY);
     ray.origin = rot * vec3(0.0, 0.0, distance);
     ray.dir = rot * ray.dir;
     return ray;
 }
 
-// --- Primitives ---
-
-float sdCylinder(vec3 p, float r, float h) {
-    vec2 d = vec2(length(p.xz) - r, abs(p.y) - h);
-    return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
-}
-
-float sdTorus(vec3 p, float R, float r) {
-    vec2 q = vec2(length(p.xz) - R, p.y);
-    return length(q) - r;
-}
-
-float smin(float a, float b, float k) {
-    float h = max(k - abs(a - b), 0.0) / k;
-    return min(a, b) - h * h * k * 0.25;
-}
 
 // --- Scene ---
 
-float mugBody(vec3 p) {
-    float outer = sdCylinder(p, 0.5, 0.5);
-    float inner = sdCylinder(p - vec3(0, 0.05, 0), 0.45, 0.5);
-    return max(outer, -inner);
-}
+const float R = 0.5;
+const vec3 S1 = vec3( 0.0,   0.5,  0.577);
+const vec3 S2 = vec3(-0.5,   0.5, -0.289);
+const vec3 S3 = vec3( 0.5,   0.5, -0.289);
+const vec3 S4 = vec3( 0.0,   1.317, 0.0);
 
-float mugHandle(vec3 p) {
-    vec3 hp = p - vec3(0.5, 0.0, 0.0);
-    hp = hp.xzy;
-    float torus = sdTorus(hp, 0.3, 0.07);
-    float d = max(torus, hp.y - 0.2);
-    d = max(d, -hp.x);
+const vec3 C1 = vec3(0.80, 0.45, 0.30);
+const vec3 C2 = vec3(0.50, 0.70, 0.50);
+const vec3 C3 = vec3(0.40, 0.55, 0.75);
+const vec3 C4 = vec3(0.90, 0.85, 0.75);
+const vec3 CG = vec3(0.60, 0.60, 0.55);
+
+float sdScene(vec3 p) {
+    float d = length(p - S1) - R;
+    d = min(d, length(p - S2) - R);
+    d = min(d, length(p - S3) - R);
+    d = min(d, length(p - S4) - R);
+    d = min(d, p.y);
     return d;
 }
 
-float sdMug(vec3 p) {
-    return smin(mugBody(p), mugHandle(p), 0.08);
+vec3 getMaterial(vec3 p) {
+    float eps = 0.01;
+    if (length(p - S1) - R < eps) return C1;
+    if (length(p - S2) - R < eps) return C2;
+    if (length(p - S3) - R < eps) return C3;
+    if (length(p - S4) - R < eps) return C4;
+    return CG;
 }
 
-float sdScene(vec3 p) {
-    return sdMug(p);
-}
 
 // --- Raymarching ---
 
@@ -6319,40 +6315,88 @@ vec3 calcNormal(vec3 p) {
 
 float raymarch(Ray ray) {
     float t = 0.0;
-
     for (int i = 0; i < MAX_STEPS; i++) {
         vec3 p = ray.origin + t * ray.dir;
         float d = sdScene(p);
-
         if (d < HIT_THRESHOLD) return t;
-
         t += d;
-
         if (t > MAX_DIST) return -1.0;
     }
-
     return -1.0;
 }
 
+
 // --- Shading ---
 
-vec3 shadeNormal(vec3 normal) {
-    return normal * 0.5 + 0.5;
+float softShadow(vec3 p, vec3 lightDir, float k, float maxDist) {
+    float res = 1.0;
+    float t = 0.02;
+    float prev = 1e20;
+    for (int i = 0; i < 50; i++) {
+        float d = sdScene(p + lightDir * t);
+        if (d < 0.001) return 0.0;
+        float y = d * d / (2.0 * prev);
+        float s = sqrt(d * d - y * y);
+        res = min(res, k * s / max(0.0, t - y));
+        prev = d;
+        t += d;
+        if (t > maxDist) break;
+    }
+    return res;
 }
+
+float ambientOcclusion(vec3 p, vec3 n) {
+    float ao = 0.0;
+    float scale = 1.0;
+    for (int i = 1; i <= 5; i++) {
+        float dist = 0.02 * float(i);
+        float d = sdScene(p + n * dist);
+        ao += (dist - d) * scale;
+        scale *= 0.5;
+    }
+    return 1.0 - clamp(ao, 0.0, 1.0);
+}
+
+vec3 ambient(vec3 p, vec3 n, vec3 mat) {
+    float ao = ambientOcclusion(p, n);
+    return mat * 0.15 * ao;
+}
+
+vec3 shade(vec3 p, vec3 n, vec3 mat, vec3 v, PtLight light) {
+    vec3 toLight = light.pos - p;
+    float dist = length(toLight);
+    vec3 lightDir = toLight / dist;
+    float atten = light.intensity / (1.0 + dist * dist);
+
+    float diff = max(0.0, dot(n, lightDir));
+    vec3 h = normalize(lightDir + v);
+    float spec = pow(max(0.0, dot(n, h)), 32.0);
+    float sh = softShadow(p + n * 0.01, lightDir, 16.0, dist);
+
+    return (mat * diff + vec3(0.3) * spec) * light.color * atten * sh;
+}
+
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     Ray ray = makeRay(fragCoord);
-    ray = orbitRay(ray, 3.0);
+    ray = orbitRay(ray, 5.0);
 
     float t = raymarch(ray);
 
-    vec3 color = vec3(0.1, 0.1, 0.2);
+    vec3 color = vec3(0.5, 0.6, 0.7);
     if (t > 0.0) {
         vec3 p = ray.origin + t * ray.dir;
         vec3 normal = calcNormal(p);
-        color = shadeNormal(normal);
+        vec3 material = getMaterial(p);
+        vec3 viewDir = -ray.dir;
+
+        PtLight warm = PtLight(vec3(1.5, 2.5, 1.0), vec3(1.0, 0.85, 0.7), 8.0);
+
+        color = ambient(p, normal, material);
+        color += shade(p, normal, material, viewDir, warm);
     }
 
+    color = pow(color, vec3(1.0 / 2.2));
     fragColor = vec4(color, 1.0);
 }
 `, hn = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
