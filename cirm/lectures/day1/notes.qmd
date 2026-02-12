@@ -4,7 +4,7 @@
 
 A shader is a function from coordinates to colors. You write code that takes a point $(x, y)$ and returns an RGB value; the GPU evaluates your function at every pixel, in parallel, and the result is an image. Here's what we'll make by the end of today:
 
-{{< shader-demo day1/elliptic-family >}}
+{{< shader layout="tabbed" elliptic-family >}}
 
 A family of elliptic curves $y^2 = x^3 + ax + b$. Drag the mouse to explore parameter space: $x$ controls $a$, $y$ controls the center of the family. Gold curves have one connected component; blue curves split into two pieces. Red marks the singular curves along the discriminant locus $4a^3 + 27b^2 = 0$—the boundary between topological types. The whole thing runs in real time, recomputed sixty times per second.
 
@@ -74,7 +74,7 @@ The `in` and `out` keywords are explicit about data flow: `fragCoord` is read-on
 
 The simplest shader: make every pixel red.
 
-{{< shader-demo day1/red >}}
+{{< shader layout="tabbed" red >}}
 
 The `vec4(1.0, 0.0, 0.0, 1.0)` constructs a 4-component vector: red=1, green=0, blue=0, alpha=1. Every pixel receives the same color, so the screen fills with red.
 
@@ -159,7 +159,7 @@ if (fragCoord.x < iResolution.x / 2.0) {
 fragColor = vec4(color, 1.0);
 ```
 
-{{< shader-demo day1/half-plane-pixels >}}
+{{< shader layout="tabbed" half-plane-pixels >}}
 
 This works, but the code is awkward—we're comparing against half the resolution in pixels. What if we want to divide along a diagonal? Or animate the dividing line? We'd be doing messy arithmetic with pixel counts everywhere.
 
@@ -198,7 +198,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 }
 ```
 
-{{< shader-demo day1/coordinates >}}
+{{< shader layout="tabbed" coordinates >}}
 
 Black at bottom-left (0,0), red at bottom-right (1,0), green at top-left (0,1), yellow at top-right (1,1).
 
@@ -276,7 +276,7 @@ if (f < 0.0) {
 fragColor = vec4(color, 1.0);
 ```
 
-{{< shader-demo day1/circle >}}
+{{< shader layout="tabbed" circle >}}
 
 Try commenting out the aspect ratio correction (`uv.x *= ...`) to see the distortion—the circle becomes an ellipse.
 
@@ -311,7 +311,7 @@ if (f < 0.0) {
 fragColor = vec4(color, 1.0);
 ```
 
-{{< shader-demo day1/circle-ring >}}
+{{< shader layout="tabbed" circle-ring >}}
 
 
 ## Animation and Interaction
@@ -337,7 +337,7 @@ if (f < 0.0) {
 fragColor = vec4(color, 1.0);
 ```
 
-{{< shader-demo day1/circle-pulsing >}}
+{{< shader layout="tabbed" circle-pulsing >}}
 
 This is our first animated shader. The same principle applies anywhere: any parameter can depend on `iTime`.
 
@@ -382,7 +382,7 @@ if (d < r) {
 fragColor = vec4(color, 1.0);
 ```
 
-{{< shader-demo day1/circle-mouse >}}
+{{< shader layout="tabbed" circle-mouse >}}
 
 Click and drag to move the circle.
 
@@ -446,7 +446,7 @@ if (d_earth < 0.15) {
 fragColor = vec4(color, 1.0);
 ```
 
-{{< shader-demo day1/sun-earth >}}
+{{< shader layout="tabbed" sun-earth >}}
 
 Drag to move the sun; the earth follows in orbit. (Exercise: add a moon orbiting the earth!)
 
@@ -475,7 +475,7 @@ if (abs(F) < eps) {
 fragColor = vec4(color, 1.0);
 ```
 
-{{< shader-demo day1/parabola >}}
+{{< shader layout="tabbed" parabola >}}
 
 ### More Examples
 
@@ -505,7 +505,7 @@ float F = r2 * r2 - a * a * (p.x * p.x - p.y * p.y);
 
 Look carefully at the parabola. The rendered thickness isn't uniform—it's thinner where the curve is steep, thicker where it's flat. The problem gets worse with more complicated curves, especially those with singularities. Here's the lemniscate:
 
-{{< shader-demo day1/lemniscate-naive >}}
+{{< shader layout="tabbed" lemniscate-naive >}}
 
 Notice how the thickness blows up near the origin, where the curve crosses itself.
 
@@ -550,7 +550,7 @@ if (dist < eps) {
 fragColor = vec4(color, 1.0);
 ```
 
-{{< shader-demo day1/lemniscate-gradient >}}
+{{< shader layout="tabbed" lemniscate-gradient >}}
 
 Compare with the naive version above to see the difference in thickness uniformity.
 
@@ -624,7 +624,7 @@ if (dist < 0.05) {
 fragColor = vec4(color, 1.0);
 ```
 
-{{< shader-demo day1/folium-mouse >}}
+{{< shader layout="tabbed" folium-mouse >}}
 
 Drag left and right to sweep through the level sets and watch the curve topology change.
 
@@ -712,6 +712,6 @@ if (dist < 0.05) {
 fragColor = vec4(color, 1.0);
 ```
 
-{{< shader-demo day1/elliptic-curve >}}
+{{< shader layout="tabbed" elliptic-curve >}}
 
 Drag to explore the parameter space. Gold curves have one component; blue curves split into two pieces (an "egg" and an infinite branch). Red marks the singular curves where $\Delta = 4a^3 + 27b^2 = 0$—the boundary between topological types.

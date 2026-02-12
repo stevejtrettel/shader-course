@@ -6,7 +6,7 @@ Today we render 3D scenes. Each pixel casts a ray into the world; we find where 
 
 It's a big day. We'll build cameras, implement lighting models, and develop two different approaches to the core problem of finding ray-surface intersections. By the exercises, you can make something like this:
 
-{{< shader-demo day5/barth-sextic-final >}}
+{{< shader layout="tabbed" barth-sextic-final >}}
 
 The Barth sextic—a degree-6 algebraic surface with icosahedral symmetry, rotating under two colored lights.
 
@@ -68,7 +68,7 @@ The $z$-component is $-f$ because we look down the negative $z$-axis.
 
 We can verify the setup by coloring pixels according to their ray direction:
 
-{{< shader-demo day5/ray-visualization >}}
+{{< shader layout="tabbed" ray-visualization >}}
 
 ```glsl
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
@@ -121,7 +121,7 @@ We return $-1$ as a sentinel for "no hit"—any negative value works since valid
 
 Testing it:
 
-{{< shader-demo day5/sphere-flat >}}
+{{< shader layout="tabbed" sphere-flat >}}
 
 ```glsl
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
@@ -146,7 +146,7 @@ $$\mathbf{n} = \frac{\mathbf{p} - \mathbf{c}}{r}$$
 
 We can visualize normals as colors by mapping components from $[-1,1]$ to $[0,1]$:
 
-{{< shader-demo day5/sphere-normals >}}
+{{< shader layout="tabbed" sphere-normals >}}
 
 ```glsl
 if (t > 0.0) {
@@ -243,7 +243,7 @@ GLSL's `reflect(-light.dir, hit.normal)` computes the reflection of incoming lig
 
 Putting it together:
 
-{{< shader-demo day5/sphere-lit >}}
+{{< shader layout="tabbed" sphere-lit >}}
 
 ```glsl
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
@@ -304,7 +304,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 }
 ```
 
-{{< shader-demo day5/sphere-orbit >}}
+{{< shader layout="tabbed" sphere-orbit >}}
 
 Drag to orbit. The sphere stays at the origin; the camera circles it.
 
@@ -454,7 +454,7 @@ Hit intersectTorus(Ray ray, vec2 tor, vec3 color) {
 }
 ```
 
-{{< shader-demo day5/torus-analytical >}}
+{{< shader layout="tabbed" torus-analytical >}}
 
 It works. Drag to orbit and admire the donut. But look at what it cost us: 80 lines of intricate algebra for a quartic. And most surfaces don't admit closed-form ray intersections at all—the torus is a special case where someone worked it out.
 
@@ -513,7 +513,7 @@ float sdCircle(vec2 p, float r) {
 }
 ```
 
-{{< shader-demo day5/sdf-circle-2d >}}
+{{< shader layout="tabbed" sdf-circle-2d >}}
 
 The contour lines are level sets—curves where $d = k$ for various $k$. On the boundary ($k = 0$), you're exactly on the circle. Inside is negative; outside is positive.
 
@@ -526,7 +526,7 @@ float sdBox(vec2 p, vec2 halfSize) {
 }
 ```
 
-{{< shader-demo day5/sdf-box-2d >}}
+{{< shader layout="tabbed" sdf-box-2d >}}
 
 Notice how the contours round out near corners—the SDF measures distance, and distance from a corner is distance from a point.
 
@@ -638,7 +638,7 @@ float sceneSDF(vec3 p) {
 
 That's the entire scene definition. Combined with our `raymarch` function, `calcNormal`, and the same `shade` function we've been using:
 
-{{< shader-demo day5/raymarch-sphere >}}
+{{< shader layout="tabbed" raymarch-sphere >}}
 
 ```glsl
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
@@ -683,7 +683,7 @@ float sceneSDF(vec3 p) {
 
 Four lines. The raymarching loop doesn't change. The normal calculation doesn't change. The lighting doesn't change.
 
-{{< shader-demo day5/raymarch-torus >}}
+{{< shader layout="tabbed" raymarch-torus >}}
 
 Compare: 80 lines of quartic algebra reduced to 4 lines of distance calculation. The raymarching framework absorbs all the complexity—we just answer "how far is the surface?"
 
@@ -717,7 +717,7 @@ float sceneSDF(vec3 p) {
 }
 ```
 
-{{< shader-demo day5/scene-multi >}}
+{{< shader layout="tabbed" scene-multi >}}
 
 Three objects, one `min` chain. Drag to orbit and see them from all angles.
 

@@ -4,7 +4,7 @@
 
 A fractal is a shape with structure at every scale—zoom in and you find more detail, forever. Today we make two of them:
 
-{{< shader-demo day2/mandelbrot-zoom >}}
+{{< shader layout="tabbed" mandelbrot-zoom >}}
 
 The first is the Mandelbrot set, born from iterating $z \mapsto z^2 + c$ in the complex plane. The second is the Apollonian gasket, born from iterating circle inversions. Different mathematics, same principle: take a simple operation and repeat it.
 
@@ -115,7 +115,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 }
 ```
 
-{{< shader-demo day2/mandelbrot-bw >}}
+{{< shader layout="tabbed" mandelbrot-bw >}}
 
 
 ## Coloring Escape-Time Fractals
@@ -143,7 +143,7 @@ if (i < 100) {
 }
 ```
 
-{{< shader-demo day2/mandelbrot-gray >}}
+{{< shader layout="tabbed" mandelbrot-gray >}}
 
 Structure appears: tendrils, spirals, bulbs around the boundary. Points far from the Mandelbrot set escape quickly (white); points near the boundary take many iterations to escape (gray); points in the set never escape (black).
 
@@ -167,7 +167,7 @@ if (i < 100) {
 }
 ```
 
-{{< shader-demo day2/mandelbrot-color >}}
+{{< shader layout="tabbed" mandelbrot-color >}}
 
 The color bands correspond to iteration counts. There's another fractal hiding in the same iteration.
 
@@ -194,7 +194,7 @@ vec2 c = vec2(-0.7, 0.27015);  // a fixed parameter
 vec2 z = normalize_coord(fragCoord);
 ```
 
-{{< shader-demo day2/julia-static >}}
+{{< shader layout="tabbed" julia-static >}}
 
 The escape condition $|z| > 2$ still works for most Julia sets; the precise escape radius depends on $|c|$ (see Exercise H3).
 
@@ -210,7 +210,7 @@ If $c$ lies inside the Mandelbrot set, the Julia set is a single connected piece
 
 Points on the *boundary* of $\mathcal{M}$ give the most intricate Julia sets—neither solid nor completely fractured, but balanced at the edge of connectivity.
 
-{{< shader-demo day2/julia-explorer >}}
+{{< shader layout="tabbed" julia-explorer >}}
 
 Drag from inside the Mandelbrot set to outside and watch the Julia set transform. Connected structures with complicated boundaries give way to scattered dust as you cross into the exterior.
 
@@ -252,7 +252,7 @@ if (fract(iTime * 0.5) < 0.5) {
 // Draw shapes using q
 ```
 
-{{< shader-demo day2/inversion-toggle >}}
+{{< shader layout="tabbed" inversion-toggle >}}
 
 Lines not through the origin become circles through the origin. Circles map to circles, or to lines if they pass through the center of inversion.
 
@@ -277,7 +277,7 @@ vec2 grid = mod(q, 0.5);
 if (grid.x < 0.02 || grid.y < 0.02) color = vec3(1.0, 1.0, 0.0);
 ```
 
-{{< shader-demo day2/inversion-grid >}}
+{{< shader layout="tabbed" inversion-grid >}}
 
 The rectilinear grid becomes a web of circles, all passing through the origin.
 
@@ -335,7 +335,7 @@ bool isInside(vec2 p, Circle c) {
 }
 ```
 
-{{< shader-demo day2/inversion-moving >}}
+{{< shader layout="tabbed" inversion-moving >}}
 
 
 ## The Apollonian Gasket
@@ -356,7 +356,7 @@ Circle c3 = Circle(vec2(circumradius * sqrt(3.0)/2.0, -circumradius * 0.5), r);
 Circle outer = Circle(vec2(0.0, 0.0), circumradius + r);
 ```
 
-{{< shader-demo day2/apollonian-setup >}}
+{{< shader layout="tabbed" apollonian-setup >}}
 
 The gaps between circles are curvilinear triangles.
 
@@ -455,7 +455,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 }
 ```
 
-{{< shader-demo day2/apollonian-iterated >}}
+{{< shader layout="tabbed" apollonian-iterated >}}
 
 ### The Limit Set
 
@@ -469,7 +469,7 @@ vec3 color = 30.0 * vec3(t2, t2, t2);
 
 The squaring suppresses low iteration counts while the factor of 30 boosts high ones:
 
-{{< shader-demo day2/apollonian-final >}}
+{{< shader layout="tabbed" apollonian-final >}}
 
 All of this from iterating four circle inversions.
 

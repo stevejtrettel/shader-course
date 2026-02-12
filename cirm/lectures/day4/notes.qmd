@@ -2,7 +2,7 @@
 
 Today we learn how shaders can read from images — and eventually, from themselves. This lets us simulate things that evolve over time: like the game of life, or these waves trapped in the Mandelbrot set.
 
-{{< shader-demo day4/mandelbrot-waves-hook >}}
+{{< shader layout="tabbed" mandelbrot-waves-hook >}}
 
 Click to add ripples.
 
@@ -31,7 +31,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 }
 ```
 
-{{< shader-demo day4/texture-basic >}}
+{{< shader layout="tabbed" texture-basic >}}
 
 The `texture` function takes a channel and **UV coordinates** — coordinates normalized to the range [0, 1]. We compute `uv` by dividing pixel position by resolution: bottom-left is (0, 0), top-right is (1, 1).
 
@@ -79,7 +79,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 }
 ```
 
-{{< shader-demo day4/texture-flip >}}
+{{< shader layout="tabbed" texture-flip >}}
 
 Each pixel asks: "What color should I be?" And we answer: "Whatever color is on the opposite side of the image."
 
@@ -99,7 +99,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 }
 ```
 
-{{< shader-demo day4/texture-wavy >}}
+{{< shader layout="tabbed" texture-wavy >}}
 
 The distortion ripples through the image. Notice how `texture` smoothly interpolates — we're sampling at positions between pixels, and it blends them together.
 
@@ -126,7 +126,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 }
 ```
 
-{{< shader-demo day4/texture-swirl >}}
+{{< shader layout="tabbed" texture-swirl >}}
 
 The center twists while the edges stay mostly fixed.
 
@@ -153,7 +153,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 }
 ```
 
-{{< shader-demo day4/texture-magnify >}}
+{{< shader layout="tabbed" texture-magnify >}}
 
 Click and drag to move the lens. Inside the circle, we sample from a compressed region — making things appear larger.
 
@@ -181,7 +181,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 }
 ```
 
-{{< shader-demo day4/paint-broken >}}
+{{< shader layout="tabbed" paint-broken >}}
 
 Try it. You get a white dot that follows the mouse — but it doesn't leave a trail. Each frame, we redraw from scratch: white near the mouse, black everywhere else. The shader has no memory.
 
@@ -230,7 +230,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 }
 ```
 
-{{< shader-demo day4/paint-basic >}}
+{{< shader layout="tabbed" paint-basic >}}
 
 Click and drag to draw. The marks stay.
 
@@ -245,7 +245,7 @@ vec4 prev = texelFetch(iChannel0, ivec2(fragCoord), 0);
 prev *= 0.99;  // Fade toward black
 ```
 
-{{< shader-demo day4/paint-fade >}}
+{{< shader layout="tabbed" paint-fade >}}
 
 Each frame, every pixel dims slightly. Draw fast enough and you get bright trails; stop and they fade away.
 
@@ -363,7 +363,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
 Buffer A does the simulation: read the previous generation, apply the rules, write the next generation. Image just displays whatever Buffer A computed.
 
-{{< shader-demo day4/game-of-life >}}
+{{< shader layout="tabbed" game-of-life >}}
 
 
 ## The Wave Equation
@@ -476,7 +476,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 }
 ```
 
-{{< shader-demo day4/wave-equation >}}
+{{< shader layout="tabbed" wave-equation >}}
 
 ::: {.callout-warning}
 ## Stability
@@ -504,7 +504,7 @@ if (iMouse.z > 0.0) {
 }
 ```
 
-{{< shader-demo day4/wave-interactive >}}
+{{< shader layout="tabbed" wave-interactive >}}
 
 
 ## Boundary Geometry
@@ -559,7 +559,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 }
 ```
 
-{{< shader-demo day4/wave-circle >}}
+{{< shader layout="tabbed" wave-circle >}}
 
 This works, but now we have the same function in two places. If we change the domain, we have to edit both — and if they get out of sync, strange things happen.
 
@@ -586,4 +586,4 @@ bool inDomain(vec2 fragCoord, vec2 resolution) {
 }
 ```
 
-{{< shader-demo day4/mandelbrot-waves >}}
+{{< shader layout="tabbed" mandelbrot-waves >}}

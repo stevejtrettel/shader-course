@@ -4,7 +4,7 @@ project:
   # pre-render:
   #   - npm --prefix .. run shaders:build:cirm
   resources:
-    - demos/**
+    - lectures/**/shaders/**
 
 base-path: /cirm-2026
 

@@ -2,7 +2,7 @@
 
 Today we tile the plane by reflecting shapes across boundaries. We'll start with Euclidean tilings—strips, squares, triangles—then apply the same technique to the hyperbolic plane. By the end, you'll be able to make this:
 
-{{< shader-demo day3/hook-animated-tiling >}}
+{{< shader layout="tabbed" hook-animated-tiling >}}
 
 The $(2,3,7)$ hyperbolic triangle tiling in the Poincaré disk, with edges and vertices highlighted. The animation applies hyperbolic isometries—Möbius transformations that preserve the geometry—making the pattern drift and rotate while maintaining its structure. The triangles look like they shrink near the boundary, but they're all the same hyperbolic size.
 
@@ -52,7 +52,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 }
 ```
 
-{{< shader-demo day3/strip-circle >}}
+{{< shader layout="tabbed" strip-circle >}}
 
 The circle tiles across the entire plane. But circles are symmetric—we can't tell whether tiles are being reflected or translated. Let's draw something asymmetric.
 
@@ -77,7 +77,7 @@ Replace the circle drawing with:
 vec3 color = drawF(p - vec2(0.5, 0.0), vec3(0.1, 0.1, 0.15), vec3(1.0, 0.8, 0.3));
 ```
 
-{{< shader-demo day3/strip-F >}}
+{{< shader layout="tabbed" strip-f >}}
 
 Now we see the structure: the F alternates between normal and mirrored. Each boundary crossing flips the image.
 
@@ -96,7 +96,7 @@ for (int i = 0; i < 20; i++) {
 }
 ```
 
-{{< shader-demo day3/square-F >}}
+{{< shader layout="tabbed" square-f >}}
 
 The F now appears in four orientations: original, flipped horizontally, flipped vertically, and flipped both ways. Every tile is a reflected copy of its neighbors.
 
@@ -119,7 +119,7 @@ for (int i = 0; i < 20; i++) {
 
 Coloring by fold count reveals the structure:
 
-{{< shader-demo day3/square-foldcount >}}
+{{< shader layout="tabbed" square-foldcount >}}
 
 For tilings, we usually just want to distinguish neighbors. The **parity**—odd or even—gives a checkerboard:
 
@@ -132,7 +132,7 @@ float parity = mod(float(foldCount), 2.0);
 vec3 color = (parity < 0.5) ? CREAM : SLATE;
 ```
 
-{{< shader-demo day3/square-parity >}}
+{{< shader layout="tabbed" square-parity >}}
 
 ::: {.callout-note}
 ## GLSL: The Ternary Operator
@@ -237,7 +237,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 }
 ```
 
-{{< shader-demo day3/halfspace-single >}}
+{{< shader layout="tabbed" halfspace-single >}}
 
 The blue region is "inside" the half-space.
 
@@ -266,7 +266,7 @@ float parity = mod(float(foldCount), 2.0);
 vec3 bg = (parity < 0.5) ? CREAM : SLATE;
 ```
 
-{{< shader-demo day3/square-halfspace >}}
+{{< shader layout="tabbed" square-halfspace >}}
 
 Same result as before, but now the code is structured around half-spaces rather than ad-hoc coordinate checks.
 
@@ -290,7 +290,7 @@ for (int i = 0; i < 30; i++) {
 }
 ```
 
-{{< shader-demo day3/triangle-tiling >}}
+{{< shader layout="tabbed" triangle-tiling >}}
 
 The folding loop is identical to the square case—only the half-space definitions changed.
 
@@ -338,7 +338,7 @@ struct HalfSpaceCirc {
 };
 ```
 
-{{< shader-demo day3/hyp-halfspaces >}}
+{{< shader layout="tabbed" hyp-halfspaces >}}
 
 The blue region is inside the vertical half-space ($x > 1$). The orange tint shows the circular half-space (outside the semicircle). The white curves are the geodesic boundaries.
 
@@ -380,7 +380,7 @@ vec2 reflectInto(vec2 z, HalfSpaceCirc h, inout int count) {
 
 If you did the Apollonian gasket in Day 2, this is exactly the same operation—circle inversion is hyperbolic reflection.
 
-{{< shader-demo day3/hyp-reflect-F >}}
+{{< shader layout="tabbed" hyp-reflect-f >}}
 
 The shader alternates between reflecting the F across the vertical geodesic (which flips it horizontally) and across the semicircle (which distorts it through inversion).
 
@@ -408,7 +408,7 @@ HalfSpaceVert right = HalfSpaceVert(0.5, 1.0);      // x < 0.5
 HalfSpaceCirc bottom = HalfSpaceCirc(0.0, 1.0, 1.0); // outside unit circle
 ```
 
-{{< shader-demo day3/hyp-triangle-halfspaces >}}
+{{< shader layout="tabbed" hyp-triangle-halfspaces >}}
 
 The blue region is our fundamental domain. The vertices are at $i$ (angle $\pi/2$), at $\frac{1}{2} + \frac{\sqrt{3}}{2}i$ (angle $\pi/3$), and at $\infty$ where the vertical lines meet (angle $0$).
 
@@ -428,7 +428,7 @@ float parity = mod(float(foldCount), 2.0);
 vec3 color = (parity < 0.5) ? CREAM : SLATE;
 ```
 
-{{< shader-demo day3/hyp-tiling-23inf >}}
+{{< shader layout="tabbed" hyp-tiling-23inf >}}
 
 The hyperbolic tiling. Triangles appear to shrink near the boundary, but they're all the same hyperbolic size.
 
@@ -485,7 +485,7 @@ vec3 color = (parity < 0.5) ? CREAM : SLATE;
 if (length(w) > 1.0) color = BLACK;
 ```
 
-{{< shader-demo day3/poincare-disk >}}
+{{< shader layout="tabbed" poincare-disk >}}
 
 The same $(2,3,\infty)$ tiling, now in the Poincaré disk. The boundary of the disk is infinity—triangles cluster there but never reach it.
 
@@ -524,6 +524,6 @@ for (int i = 0; i < 100; i++) {
 }
 ```
 
-{{< shader-demo day3/hyp-tiling-237 >}}
+{{< shader layout="tabbed" hyp-tiling-237 >}}
 
 The $(2,3,7)$ tiling—the same algorithm, different half-spaces.

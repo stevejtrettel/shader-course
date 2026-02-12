@@ -3,12 +3,12 @@
 --
 -- Usage:
 --   {{< shader breakfast-scene >}}
---   {{< shader breakfast-scene height=400px controls="false" >}}
+--   {{< shader breakfast-scene height=400px controls="true" >}}
 --   {{< shader /custom/path/to/shader >}}
 --
--- Bare names resolve relative to the current .qmd file's directory:
+-- Bare names resolve relative to the current page's directory:
 --   notes/3d/04-sculpting/notes.qmd + {{< shader breakfast-scene >}}
---   → src="/notes/3d/04-sculpting/shaders/breakfast-scene/"
+--   → src="shaders/breakfast-scene/" (resolved via new URL(src, location.href))
 --
 -- The script is included automatically only on pages that use the shortcode.
 
@@ -56,22 +56,12 @@ return {
       -- Explicit path: use as-is
       src = name
     else
-      -- Bare name: resolve relative to the current .qmd's directory
-      local doc_dir = ""
-      if quarto.doc.input_file and quarto.project and quarto.project.directory then
-        local input = quarto.doc.input_file
-        local proj  = quarto.project.directory
-        if proj:sub(-1) ~= "/" then proj = proj .. "/" end
-        local dir = input:match("(.*/)")
-        if dir and dir:sub(1, #proj) == proj then
-          doc_dir = dir:sub(#proj + 1)
-        end
-      end
-      src = "/" .. doc_dir .. "shaders/" .. name .. "/"
+      -- Bare name: resolve relative to current page
+      src = "shaders/" .. name .. "/"
     end
 
-    -- Ensure trailing slash
-    if not src:match("/$") then
+    -- Ensure trailing slash for directory paths
+    if not src:match("%.glsl$") and not src:match("/$") then
       src = src .. "/"
     end
 
@@ -95,6 +85,7 @@ return {
 <script type="module">
 const el = document.createElement('shader-sandbox');
 el.setAttribute('src', new URL('%s', location.href).href);
+el.setAttribute('controls', 'false');
 el.style.cssText = 'width:100%%;height:%s;display:block';
 %s
 document.getElementById('%s').appendChild(el);

@@ -30,7 +30,7 @@ mat3 rotateY(float a) {
 
 Ray orbitRay(Ray ray, float distance) {
     vec2 mouse = iMouse.xy / iResolution.xy;
-    if (length(iMouse.xy) < 1.0) mouse = vec2(0.55, 0.6);
+    if (length(iMouse.xy) < 1.0) mouse = vec2(0.55, 0.4);
     float angleY = (mouse.x - 0.5) * 6.28;
     float angleX = (0.5 - mouse.y) * 3.14;
     mat3 rot = rotateX(angleX) * rotateY(angleY);
