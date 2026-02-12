@@ -1,8 +1,8 @@
 project:
   type: website
   output-dir: _site
-  pre-render:
-    - npm --prefix .. run shaders:build:cirm
+  # pre-render:
+  #   - npm --prefix .. run shaders:build:cirm
   resources:
     - demos/**
 
