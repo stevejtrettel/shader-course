@@ -82,6 +82,29 @@ vec3 calcNormal(vec3 p) {
 }
 
 
+// ── Inset disk (curve in R²) ─────────────────────────────────
+
+#define INSET_PLANE_R 3.5
+
+vec3 insetDisk(vec2 uv_local) {
+    vec2 w = uv_local * INSET_PLANE_R;
+
+    float f = curve(w);
+    vec2 grad = vec2(
+        curve(w + vec2(0.0001, 0)) - f,
+        curve(w + vec2(0, 0.0001)) - f
+    ) / 0.0001;
+    float d = abs(f) / max(length(grad), 1e-5);
+
+    float px = INSET_PLANE_R * 2.0 / (iResolution.y * 0.15);
+    float curveAlpha = 1.0 - smoothstep(1.0 * px, 3.0 * px, d);
+
+    vec3 col = vec3(0.12, 0.11, 0.14);
+    col = mix(col, vec3(0.85, 0.25, 0.15), curveAlpha);
+    return col;
+}
+
+
 // ── Main ────────────────────────────────────────────────────
 
 void mainImage(out vec4 O, in vec2 F) {
@@ -144,6 +167,22 @@ void mainImage(out vec4 O, in vec2 F) {
     } else {
         result = mix(vec3(0.01, 0.01, 0.02),
                      vec3(0.04, 0.02, 0.06), uv.y + 0.5);
+    }
+
+    // Inset sphere (bottom-right): curve on S²
+    float aspect = iResolution.x / iResolution.y;
+    float insetR = 0.15;
+    float margin = 0.03;
+    vec2 insetCenter = vec2(0.5 * aspect - insetR - margin,
+                            -0.5 + insetR + margin);
+    vec2 insetUV = (uv - insetCenter) / insetR;
+    float insetDist = length(insetUV);
+
+    if (insetDist < 1.06) {
+        if (insetDist > 1.0)
+            result = vec3(0.25);
+        else
+            result = insetDisk(insetUV);
     }
 
     O = vec4(pow(clamp(result, 0.0, 1.0), vec3(1.0/2.2)), 1);

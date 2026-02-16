@@ -2,6 +2,7 @@ project:
   type: website
   output-dir: _site
   resources:
+    - shaders/**
     - glsl-intro/shaders/**
     - functions/shaders/**
     - geometry/shaders/**
@@ -20,8 +21,6 @@ website:
     style: docked
     contents:
       - index.qmd
-      - text: "Why Shaders?"
-        href: why-shaders.qmd
       - text: "Intro to GLSL"
         href: glsl-intro/index.qmd
       - text: "Functions"

@@ -51,6 +51,13 @@ return {
       if h ~= "" then height = h end
     end
 
+    -- Optional width (default 75%)
+    local width = "75%"
+    if kwargs["width"] then
+      local w = pandoc.utils.stringify(kwargs["width"])
+      if w ~= "" then width = w end
+    end
+
     local src
     if name:match("/") then
       -- Explicit path: use as-is
@@ -68,7 +75,7 @@ return {
     -- Collect extra attributes from kwargs (skip height, already handled)
     local extra = ""
     for k, v in pairs(kwargs) do
-      if k ~= "height" then
+      if k ~= "height" and k ~= "width" then
         extra = extra .. " " .. k .. '="' .. pandoc.utils.stringify(v) .. '"'
       end
     end
@@ -78,7 +85,7 @@ return {
     -- with protocol — a bare path like "/notes/..." won't work.
     counter = counter + 1
     local id = "shader-" .. name:gsub("/", "-") .. "-" .. counter
-    local style = string.format("width:75%%;height:%s;display:block;margin:0 auto", height)
+    local style = string.format("width:%s;height:%s;display:block;margin:0 auto", width, height)
 
     local html = string.format([[
 <div id="%s" style="%s"></div>

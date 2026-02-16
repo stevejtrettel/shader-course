@@ -119,3 +119,82 @@ Each encoding reveals some structure and hides other structure.
 The art is choosing the right encoding for the question you're trying to answer — or better, building a tool that lets you switch between them.
 
 
+### Billiards
+
+A billiard dynamical system is one of the simplest things you can write down: a point moves in a straight line inside a region and reflects off the boundary according to the law of reflection (angle of incidence = angle of reflection).
+Despite this simplicity, billiard dynamics is extraordinarily rich — the shape of the table determines everything, and even basic questions (is a given trajectory periodic? does it visit every part of the table?) can be deep.
+
+For a convex polygon with vertex angles that are rational multiples of $\pi$, every trajectory is either periodic or uniformly distributed — this is a theorem of Veech.
+For irrational angles, the situation is wide open: whether every trajectory in an obtuse triangle is periodic remains unknown.
+
+This shader is a good example of something that is *not* a natural fit for the pullback approach — and works anyway.
+A billiard trajectory is a single curve: one initial condition, one sequence of reflections.
+There's nothing per-pixel about it.
+But the shader computes the entire trajectory independently at every pixel, then measures the distance from that pixel to every segment, just to decide whether to light up.
+Every pixel does the same 200-bounce ray trace and throws away almost all of it.
+This is absurdly wasteful — a CPU drawing the same trajectory with line segments would be essentially free.
+
+But the GPU has pixels to burn.
+Two million redundant copies of a 200-step loop, running in parallel, still finishes in a couple of milliseconds.
+The result is a clean, anti-aliased, glowing trajectory with no line-drawing library, no graphics pipeline, no state management — just a distance function and `smoothstep`.
+Sometimes brute force is the right answer.
+
+Use the mouse to control the trajectory: horizontal position sets the launch angle, vertical position moves the starting point along the first edge.
+Try the different table shapes — the rectangle gives familiar periodic orbits, the pentagon fills out quasiperiodic patterns, and the L-shaped room (non-convex!) produces chaotic-looking trajectories.
+You can also turn on a central circular scatterer with `SHOW_SCATTERER` to get a Sinai-billiard-like system.
+
+{{< shader layout="tabbed" billiards >}}
+
+
+#### Phase portrait: the right way
+
+The trajectory shader draws one orbit.
+But inner billiards has a natural *per-pixel* question too: the **phase portrait**.
+
+The phase space of a convex billiard is the cylinder $(s, \theta)$, where $s$ is arc length position on the boundary and $\theta \in (0, \pi)$ is the outgoing angle from the tangent.
+Each point in this cylinder is a different initial condition — a different starting position and launch angle — and the billiard ball map $T\colon (s, \theta) \mapsto (s', \theta')$ sends one bounce to the next.
+
+This is a genuinely per-pixel computation: every pixel in the $(s, \theta)$ plane represents a different orbit, with a different rotation number.
+The **rotation number** $\rho$ is the average fraction of the perimeter traversed per bounce:
+$$\rho = \lim_{n \to \infty} \frac{1}{n} \sum_{k=0}^{n-1} \frac{s_{k+1} - s_k}{L}$$
+
+The shader iterates the billiard map at each pixel and colors by $\rho$.
+The default table is a square — completely integrable, so the entire phase space is foliated by smooth invariant curves, visible as clean color bands.
+
+Now try switching to the pentagon: the integrability breaks, and you see the structure of a **twist map** — smooth invariant curves (KAM tori) survive as bands of constant color, but periodic orbits show up as chains of islands, and chaotic layers fill the gaps between resonances.
+The 60-gon gives a near-circle, showing the nearly-integrable limit where KAM theory guarantees most invariant curves survive.
+
+{{< shader layout="tabbed" billiard-phase >}}
+
+
+### Outer Billiards
+
+Outer billiards is a dynamical system defined on the *exterior* of a convex polygon.
+Given a point $p$ outside the polygon, find the vertex $v$ such that $p$ lies in the "forward cone" of $v$ — the region between the extensions of the two edges meeting at $v$ — and map $p$ to its reflection $2v - p$ through that vertex.
+This is the **outer billiard map** $T$.
+
+Unlike ordinary (inner) billiards, where a ball bounces inside a table, outer billiards acts on the unbounded complement.
+The map is piecewise-isometric: in each cone it's a rotation by $\pi$ around the corresponding vertex.
+The discontinuities occur along the rays extending the polygon's edges outward — these are the **singularity lines** of $T$.
+
+The **singularity set** is the closure of all preimages of these rays under iterates of $T$:
+$$\Sigma = \overline{\bigcup_{n \ge 0} T^{-n}(\text{edge rays})}$$
+
+This set has rich fractal structure that depends on the polygon.
+For rational polygons (vertex angles that are rational multiples of $\pi$), the singularity set tiles the plane into regions where the orbit of $T$ is periodic.
+For regular polygons the pattern has the dihedral symmetry of the polygon, producing striking self-similar tilings.
+
+The shader computes $\Sigma$ directly: for each pixel, it iterates the outer billiard map forward and checks whether any iterate lands on an edge ray.
+This is the *correct* use of a shader for billiards — unlike the trajectory shader above, where every pixel redundantly computed the same curve, here each pixel genuinely has its own computation to do.
+The question "does the orbit of *this point* hit a singularity line?" has a different answer at every pixel, and the GPU evaluates all of them in parallel.
+
+Try switching between different polygons — the triangle gives a simple tiling, the pentagon produces an intricate quasicrystalline pattern, and the kite breaks all the symmetry.
+
+{{< shader layout="tabbed" outer-billiards >}}
+
+::: {.callout-tip}
+## Credit
+This shader was written by [Lael Costa](https://lael.dev) (Penn State), a graduate student at the IHP trimester program.
+:::
+
+

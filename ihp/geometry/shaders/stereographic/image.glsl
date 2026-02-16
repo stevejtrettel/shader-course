@@ -18,50 +18,20 @@
 
 
 // ── Your curve ──────────────────────────────────────────────
-//  Uncomment ONE block, or write your own.
+//  Uncomment ONE return line, or write your own.
 
-
-// Circle  |w|² = 1   →  equator of S²
 float curve(vec2 w) {
-    return dot(w, w) - 1.0;
-}
-
-/*
-// Line  u = 0   →  great circle through poles
-float curve(vec2 w) {
-    return w.x;
-}
-*/
-
-/*
-// Lemniscate of Bernoulli  (u²+v²)² = 2(u²−v²)
-float curve(vec2 w) {
+    float u = w.x, v = w.y;
     float r2 = dot(w, w);
-    return r2*r2 - 2.0*(w.x*w.x - w.y*w.y);
-}
-*/
 
-/*
-// Elliptic curve  v² = u³ − u
-float curve(vec2 w) {
-    return w.y*w.y - (w.x*w.x*w.x - w.x);
+    //return r2 - 1.0;                            // Circle → equator of S²
+    //return u;                                   // Line → great circle through poles
+    //return r2*r2 - 2.0*(u*u - v*v);            // Lemniscate of Bernoulli
+    return v*v - (u*u*u - u);                     // Elliptic curve
+    //return v - u*u;                             // Parabola → passes through north pole
+    //return (r2 - 1.0) * (r2 - 4.0);            // Two concentric circles
+    //return u*u*u - 3.0*u*v*v - 0.5;            // Trefoil  Re(z³) = ½
 }
-*/
-
-/*
-// Parabola  v = u²
-float curve(vec2 w) {
-    return w.y - w.x*w.x;
-}
-*/
-
-/*
-// Two concentric circles  (|w|²−1)(|w|²−4) = 0
-float curve(vec2 w) {
-    float r2 = dot(w, w);
-    return (r2 - 1.0) * (r2 - 4.0);
-}
-*/
 
 
 // ═══════════════════════════════════════════════════════════════

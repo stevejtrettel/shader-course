@@ -130,6 +130,11 @@ Some configurations to try:
 
 {{< shader layout="tabbed" apollonian >}}
 
+::: {.callout-tip}
+## Credit
+This shader was written by [Summer Haag](https://math.colorado.edu/~suha3163/) (University of Colorado Boulder), a graduate student at the IHP trimester program.
+:::
+
 
 ### Hyperbolic 3-Space
 
@@ -167,15 +172,30 @@ Try moving the points farther from the origin and watch how the geodesic lines c
 {{< shader layout="tabbed" hyp-basics >}}
 
 
+#### Ideal Tetrahedral Honeycomb {3,3,6}
+
+An ideal tetrahedron in $\mathbb{H}^3$ has all four vertices at infinity (on $\partial \mathbb{H}^3$).
+Despite having infinite edge lengths, such a tetrahedron has **finite volume** — a signature feature of hyperbolic geometry.
+The dihedral angle at each edge is $\pi/3$, so exactly six tetrahedra fit around each edge, giving the **{3,3,6} honeycomb**.
+
+The tiling algorithm is the same fold-into-fundamental-domain technique from the 2D tilings, now in one higher dimension.
+The fundamental tetrahedron has 4 face mirrors, each a totally geodesic hyperplane in $\mathbb{H}^3$.
+For any point $p$, the `bounce` function iterates: check which face half-space $p$ violates, reflect through that mirror, repeat until $p$ is inside all 4 half-spaces.
+Each face normal has the form $(\pm\psi, \pm\psi, \mp\psi, \chi)$ where $\psi = \frac{\sqrt{3}}{2\sqrt{2}}$ and $\chi = \frac{1}{2\sqrt{2}}$, and all four dot products are computed simultaneously via a single swizzled expression.
+
+After folding, the edge SDF computes distance to the 6 edges of the tetrahedron using $\cosh^2(d) = \frac{1}{2} + w^2 + \min_i(p_i^2 - |\sqrt{3}\, w\, p_i + p_j p_k|)$, handling all 6 edges at once via cyclic permutation.
+The face SDF renders thin shells around each totally geodesic face plane, bounded by a ball around the origin to prevent them from extending to infinity.
+
+{{< shader layout="tabbed" hyp-tetrahedron >}}
+
+
 #### Dodecahedral Honeycomb {5,3,4}
 
 A regular dodecahedron has pentagonal faces with interior angles of $108°$ and dihedral angles of about $116.6°$ in Euclidean space.
 In hyperbolic space, we can inflate the dodecahedron until its dihedral angles become exactly $90°$ — four cells then fit perfectly around each edge, tiling all of $\mathbb{H}^3$.
-This is the **{5,3,4} honeycomb**: faces are pentagons {5}, three meet at each edge {3}, four cells at each edge {4}.
+This is the **{5,3,4} honeycomb**: faces are pentagons {5}, three meet at each vertex {3}, four cells around each edge {4}.
 
-The tiling algorithm is the same fold-into-fundamental-domain technique from the 2D tilings, now in one higher dimension.
-The fundamental dodecahedron has 12 face mirrors, each a totally geodesic hyperplane in $\mathbb{H}^3$.
-For any point $p$, the `bounce` function iterates: check which face half-space $p$ violates, reflect through that mirror, repeat until $p$ is inside all 12 half-spaces.
+The same `bounce` algorithm applies, but now with 12 face mirrors instead of 4.
 Icosahedral symmetry compresses this: `abs(p.xyz)` handles sign flips, and a $\varphi$-weighted cyclic shift `q += \varphi \cdot q.\text{yzx}$ finds the winning mirror, so the loop body is just a few lines.
 
 After folding, the SDF tests distance to the 20 vertices and 30 edges of the fundamental dodecahedron.

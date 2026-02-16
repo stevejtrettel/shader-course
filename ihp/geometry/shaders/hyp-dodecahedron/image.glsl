@@ -15,6 +15,7 @@
 struct Style {
     vec3  vertexColor;
     vec3  edgeColor;
+    vec3  faceColor;
     vec3  bgColor;
     float vertexRadius;   // hyperbolic distance
     float edgeRadius;
@@ -22,17 +23,23 @@ struct Style {
 };
 
 Style style = Style(
-    vec3(0.90, 0.35, 0.25),     // vertices: warm red
-    vec3(0.85, 0.82, 0.72),     // edges: warm white
-    vec3(0.0),                   // background: black
+    vec3(1.0, 0.5, 0.25),       // vertices: bright orange
+    vec3(1.0, 0.85, 0.35),      // edges: vivid gold
+    vec3(0.35, 0.6, 1.0),       // faces: bright blue
+    vec3(0.02, 0.02, 0.04),     // background: near-black
     0.24,                        // vertex radius
     0.0875,                      // edge radius
-    vec3(1.41, 1.73, 2.72)      // depth hue shift
+    vec3(1.0, 1.3, 1.8)         // depth hue shift
 );
 
 // Toggle features
 #define DRAW_VERTICES true
 #define DRAW_EDGES    true
+#define DRAW_FACES    true
+
+// Face parameters
+#define FACE_HOLE   0.04     // gap width around edges (0 = solid faces)
+#define FACE_BOUND  1.0      // how far faces extend from cell center
 
 
 // === DODECAHEDRON CONSTANTS =======================
@@ -180,12 +187,37 @@ float edge_sdf(vec4 p) {
 }
 
 
+// === FACE SDF =====================================
+//
+// Distance to nearest face (totally geodesic plane).
+// The 12 face neighbor centers are at
+//   (±F_ALPHA, ±F_BETA, 0, F_GAMMA) and cyclic perms.
+// Reduced to 3 dot products by abs() and cyclic symmetry.
+
+float face_sdf(vec4 p) {
+    p = bounce(p);
+    vec3 a = abs(p.xyz);
+
+    float d0 = arccosh(p.w);
+
+    vec3 face_dp = F_GAMMA * p.w - (F_ALPHA * a + F_BETA * a.yzx);
+    float dp = max(face_dp.x, max(face_dp.y, face_dp.z));
+    float d1 = arccosh(dp);
+
+    float b_sdf = FACE_BOUND - d0;
+    float f_sdf = 0.5 * (d1 - d0 - FACE_HOLE);
+
+    return max(b_sdf, f_sdf);
+}
+
+
 // === COMBINED SDF =================================
 
 float sdf(vec4 p) {
     float d = 1e6;
     if (DRAW_VERTICES) d = min(d, vertex_sdf(p));
     if (DRAW_EDGES)    d = min(d, edge_sdf(p));
+    if (DRAW_FACES)    d = min(d, face_sdf(p));
     return d;
 }
 
@@ -233,11 +265,12 @@ vec4 raymarch(vec4 origin, vec4 ray, out float dist) {
 
 
 // === WHICH FEATURE WAS HIT ========================
-// 0 = vertex, 1 = edge
+// 0 = vertex, 1 = edge, 2 = face
 
 int hit_feature(vec4 p) {
     if (DRAW_VERTICES && vertex_sdf(p) < 0.01) return 0;
-    return 1;
+    if (DRAW_EDGES && edge_sdf(p) < 0.01) return 1;
+    return 2;
 }
 
 
@@ -261,7 +294,9 @@ vec3 shade(vec4 pos, vec4 normal, vec4 camera) {
 
     // Pick color by feature type
     int feat = hit_feature(pos);
-    vec3 base = (feat == 0) ? style.vertexColor : depth_rgb * style.edgeColor;
+    vec3 base = (feat == 0) ? style.vertexColor
+              : (feat == 1) ? depth_rgb * style.edgeColor
+              :               depth_rgb * style.faceColor;
 
     // View direction at hit point (lifted to tangent space)
     vec3 view_dir = camera.xyz - pos.xyz;
@@ -293,6 +328,10 @@ vec3 shade(vec4 pos, vec4 normal, vec4 camera) {
         color += atten * (diffuse + specular);
     }
 
+    // Fog: fade to dark with hyperbolic distance
+    float hyp_d = arccosh(w);
+    color *= exp(-0.35 * hyp_d);
+
     return color;
 }
 
@@ -303,7 +342,7 @@ void build_camera(vec4 mouse, vec2 res,
                   out vec4 cam_pos, out vec4 X, out vec4 Y, out vec4 Z) {
 
     // Mouse-only orbit; static default when idle
-    float theta = 0.6, phi = 0.4;
+    float theta = 0.35, phi = 0.25;
     if (mouse.z > 0.0) {
         theta = 6.2832 * (mouse.x / res.x - 0.5);
         phi   = 2.4 * (mouse.y / res.y - 0.5);
