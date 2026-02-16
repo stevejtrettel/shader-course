@@ -1,0 +1,2420 @@
+# Shader Code Reference
+
+Full shader listings for the workshop. Each shader is ready to paste into Shadertoy.
+
+
+## 2D Level Sets — Basic
+`level-sets-basic/image.glsl`
+
+```glsl
+// =============================================
+// 2D LEVEL SETS — BASIC
+// =============================================
+// Paste into Shadertoy (no channels needed)
+
+// =============================================
+// EDIT HERE: Define your function f(x, y)
+// =============================================
+
+float f(vec2 p) {
+    return sin(p.x) * sin(p.y) + 0.5 * sin(p.x + p.y);
+}
+
+// =============================================
+// PARAMETERS
+// =============================================
+
+#define VIEW_RADIUS  6.0      // half-width of visible region
+#define SPACING      0.25     // distance between level curves
+#define LINE_WIDTH   0.06     // thickness of level curves (as fraction of spacing)
+
+// Color ramp: blue for negative, white at zero, red for positive
+vec3 colormap(float val) {
+    float t = clamp(val * 0.3, -1.0, 1.0);
+    if (t < 0.0) return mix(vec3(1.0), vec3(0.2, 0.4, 0.9), -t);
+    else          return mix(vec3(1.0), vec3(0.9, 0.2, 0.2), t);
+}
+
+// =============================================
+// MAIN
+// =============================================
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (2.0 * fragCoord - iResolution.xy) / iResolution.y;
+    uv *= VIEW_RADIUS;
+
+    float val = f(uv);
+
+    // Color by value
+    vec3 col = colormap(val);
+
+    // Level curves: check if val is near a multiple of SPACING
+    float inCell = fract(val / SPACING);          // 0 to 1 within each band
+    float distToLine = min(inCell, 1.0 - inCell); // distance to nearest edge
+    float line = smoothstep(0.0, LINE_WIDTH, distToLine);
+
+    col *= 0.2 + 0.8 * line; // darken near level curves
+
+    fragColor = vec4(col, 1.0);
+}
+```
+
+
+## 2D Level Sets — Gradient Corrected
+`level-sets-gradient/image.glsl`
+
+```glsl
+// =============================================
+// 2D LEVEL SETS — GRADIENT CORRECTED
+// =============================================
+// Paste into Shadertoy (no channels needed)
+
+// =============================================
+// EDIT HERE: Define your function f(x, y)
+// =============================================
+
+float f(vec2 p) {
+    return sin(p.x) * sin(p.y) + 0.5 * sin(p.x + p.y);
+}
+
+// =============================================
+// PARAMETERS
+// =============================================
+
+#define VIEW_RADIUS  6.0      // half-width of visible region
+#define SPACING      0.25     // distance between level curves
+#define LINE_PX      1.5      // line width in pixels
+
+// Color ramp: blue for negative, white at zero, red for positive
+vec3 colormap(float val) {
+    float t = clamp(val * 0.3, -1.0, 1.0);
+    if (t < 0.0) return mix(vec3(1.0), vec3(0.2, 0.4, 0.9), -t);
+    else          return mix(vec3(1.0), vec3(0.9, 0.2, 0.2), t);
+}
+
+// =============================================
+// MAIN
+// =============================================
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (2.0 * fragCoord - iResolution.xy) / iResolution.y;
+    uv *= VIEW_RADIUS;
+
+    float val = f(uv);
+
+    // Numerical gradient via finite differences
+    float eps = VIEW_RADIUS * 2.0 / iResolution.y; // one pixel in world coords
+    float gradX = (f(uv + vec2(eps, 0.0)) - f(uv - vec2(eps, 0.0))) / (2.0 * eps);
+    float gradY = (f(uv + vec2(0.0, eps)) - f(uv - vec2(0.0, eps))) / (2.0 * eps);
+    float gradMag = length(vec2(gradX, gradY));
+
+    // Color by value
+    vec3 col = colormap(val);
+
+    // Level curves with gradient-corrected width
+    float valInCell = fract(val / SPACING);
+    float distToLine = min(valInCell, 1.0 - valInCell) * SPACING; // distance in value
+    float pixelDist = distToLine / (gradMag * eps);                // distance in pixels
+    float line = smoothstep(0.0, LINE_PX, pixelDist);
+
+    col *= 0.2 + 0.8 * line;
+
+    fragColor = vec4(col, 1.0);
+}
+```
+
+
+## 2D Level Sets — Colored Stripes
+`level-sets-stripes/image.glsl`
+
+```glsl
+// =============================================
+// 2D LEVEL SETS — COLORED STRIPES
+// =============================================
+// Paste into Shadertoy (no channels needed)
+//
+// Fills bands between level sets with distinct colors,
+// antialiased using the error function for correct
+// Gaussian-weighted pixel blending.
+
+// =============================================
+// EDIT HERE: Define your function f(x, y)
+// =============================================
+
+float f(vec2 p, float t) {
+    return sin(p.x + t) * cos(p.y) + sin(p.x * p.y + 0.5 * t);
+
+    // Other things to try:
+    // return length(p) + 0.3 * sin(6.0 * atan(p.y, p.x) + t);  // wobbly rings
+    // return p.x * p.x - p.y * p.y;                               // saddle
+    // return sin(p.x) * sin(p.y) + 0.5 * cos(length(p) - t);    // interference
+}
+
+// =============================================
+// EDIT HERE: Stripe colors
+// =============================================
+
+#define NUM_COLORS 4
+vec3 stripeColors[NUM_COLORS] = vec3[NUM_COLORS](
+    vec3(0.82, 0.77, 0.71),  // warm cream
+    vec3(0.18, 0.09, 0.00),  // dark brown
+    vec3(0.02, 0.36, 0.51),  // deep blue
+    vec3(0.24, 0.62, 0.67)   // teal
+);
+
+// =============================================
+// PARAMETERS
+// =============================================
+
+#define VIEW_RADIUS  5.0      // half-width of visible region
+#define STRIPE_WIDTH 0.5      // width of each stripe in value-space
+
+// =============================================
+// VISUALIZATION CODE (no need to edit below)
+// =============================================
+
+// Abramowitz and Stegun, equation 7.1.27
+float erfc_appx(float t) {
+    const float A1 = 0.278393;
+    const float A2 = 0.230389;
+    const float A3 = 0.000972;
+    const float A4 = 0.078108;
+    float p = 1.0 + A1*(t + A2*(t + A3*(t + A4*t)));
+    float p_sq = p*p;
+    return 1.0 / (p_sq*p_sq);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (2.0 * fragCoord - iResolution.xy) / iResolution.y;
+    uv *= VIEW_RADIUS;
+
+    float t = iTime;
+    float val = f(uv, t);
+
+    // Numerical gradient
+    float eps = VIEW_RADIUS * 2.0 / iResolution.y;
+    float gradX = (f(uv + vec2(eps, 0.0), t) - f(uv - vec2(eps, 0.0), t)) / (2.0 * eps);
+    float gradY = (f(uv + vec2(0.0, eps), t) - f(uv - vec2(0.0, eps), t)) / (2.0 * eps);
+    float gradMag = length(vec2(gradX, gradY));
+
+    // Pixel radius in world coords
+    float pixelRadius = VIEW_RADIUS * 2.0 / min(iResolution.x, iResolution.y);
+
+    // Find position within stripe cycle
+    float period = STRIPE_WIDTH * float(NUM_COLORS);
+    float inCycle = mod(val, period);
+    float inStripe = inCycle / STRIPE_WIDTH;
+    int n = int(floor(inStripe));
+    float disp = (inStripe - float(n) - 0.5) * STRIPE_WIDTH; // displacement from stripe center
+
+    // Screen-space distance to nearest stripe edge
+    float screenDist = abs(disp) / (gradMag * pixelRadius + 1e-6);
+
+    // Gaussian antialiasing via erfc
+    float overflow = 0.5 * erfc_appx(screenDist / pixelRadius);
+
+    // Blend with neighbor stripe
+    vec3 thisColor = stripeColors[n % NUM_COLORS];
+    int neighborIdx = disp < 0.0 ? (n - 1 + NUM_COLORS) % NUM_COLORS
+                                 : (n + 1) % NUM_COLORS;
+    vec3 neighborColor = stripeColors[neighborIdx];
+
+    vec3 col = mix(thisColor, neighborColor, overflow);
+
+    fragColor = vec4(col, 1.0);
+}
+```
+
+
+## 2D Level Sets — Logarithmic Contours
+`level-sets-log/image.glsl`
+
+Based on [Ricky Reusser's blended contour shader](https://www.shadertoy.com/view/tsycWV).
+
+```glsl
+// =============================================
+// 2D LEVEL SETS — LOGARITHMIC CONTOURS
+// =============================================
+// Paste into Shadertoy (no channels needed, single tab)
+//
+// Draws contours of log|f|, blended across multiple octaves.
+// Contours are evenly spaced multiplicatively, so they adapt
+// naturally to functions with zeros, poles, or large dynamic range.
+
+// =============================================
+// EDIT HERE: Define your function f(z)
+// Return value should be a vec2 (complex number) or
+// use vec2(realValue, 0.0) for real-valued functions.
+// =============================================
+
+vec2 myFunction(vec2 z) {
+    // A rational function with two zeros and a pole
+    // (z - 1)(z + 0.5 + 0.8i) / (z + 1)
+    float x = z.x, y = z.y;
+    // (z-1)
+    vec2 a = z - vec2(1, 0);
+    // (z+1)
+    vec2 b = z + vec2(1, 0);
+    // (z - (-0.5 + 0.8i))
+    vec2 c = z - vec2(-0.5, 0.8);
+    // a * c / b, done manually:
+    vec2 ac = vec2(a.x*c.x - a.y*c.y, a.y*c.x + a.x*c.y);
+    float denom = dot(b, b);
+    return vec2(ac.x*b.x + ac.y*b.y, ac.y*b.x - ac.x*b.y) / denom;
+
+    // Other things to try:
+    // return vec2(length(z) - 1.0, 0.0);          // distance to unit circle
+    // return vec2(z.x*z.x - z.y*z.y + 0.3, 2.0*z.x*z.y + 0.5); // z^2 + c
+    // return vec2(exp(z.x)*cos(z.y), exp(z.x)*sin(z.y));         // e^z
+}
+
+// =============================================
+// PARAMETERS
+// =============================================
+
+#define VIEW_RADIUS    4.0
+#define MIN_SPACING    2.0    // smallest contour spacing in pixels
+#define DIVISIONS      6.0    // subdivisions per octave
+#define LINE_WIDTH     1.0    // line width in pixels
+#define AA_WIDTH       1.5    // antialiasing width
+
+// =============================================
+// VISUALIZATION CODE (no need to edit below)
+// =============================================
+
+// Numerically stable magnitude
+float hypot(vec2 z) {
+    float x = abs(z.x);
+    float y = abs(z.y);
+    float t = min(x, y);
+    x = max(x, y);
+    t = t / x;
+    return x * sqrt(1.0 + t * t);
+}
+
+// Multi-octave logarithmic contours
+float blendedContours(float f, vec2 gradient, float minSpacing,
+                      float divisions, float lineWidth, float aa) {
+    float screenSpaceLogGrad = hypot(gradient) / f;
+    float localOctave = log2(screenSpaceLogGrad * minSpacing) / log2(divisions);
+    float contourSpacing = pow(divisions, ceil(localOctave));
+    float plotVar = log2(f) / contourSpacing;
+    float widthScale = 0.5 * contourSpacing / screenSpaceLogGrad;
+
+    float contourSum = 0.0;
+    const int octaves = 5;
+
+    for (int i = 0; i < octaves; i++) {
+        float t = float(i + 1) - fract(localOctave);
+        float weight = smoothstep(0.0, 1.0, t)
+                     * smoothstep(float(octaves), float(octaves) - 1.0, t);
+
+        contourSum += weight * smoothstep(
+            0.5 * (lineWidth + aa),
+            0.5 * (lineWidth - aa),
+            (0.5 - abs(fract(plotVar) - 0.5)) * widthScale
+        );
+
+        widthScale *= divisions;
+        plotVar /= divisions;
+    }
+
+    return contourSum / float(octaves);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = VIEW_RADIUS * vec2(1.0, iResolution.y / iResolution.x)
+            * (fragCoord / iResolution.xy - 0.5);
+
+    vec2 f = myFunction(uv);
+
+    float fMag = hypot(f);
+    vec2 fMagGradient = vec2(dFdx(fMag), dFdy(fMag));
+
+    float contour = blendedContours(fMag, fMagGradient,
+                                     MIN_SPACING, DIVISIONS, LINE_WIDTH, AA_WIDTH);
+
+    vec3 col = vec3(1.0 - contour);
+    fragColor = vec4(col, 1.0);
+}
+```
+
+
+## Domain Coloring — Pattern (Identity)
+`domain-coloring-pattern/image.glsl`
+
+The color pattern we pull back through complex functions. This shader applies the pattern to the identity $f(z) = z$ — it's just a visualization of the encoding itself.
+
+```glsl
+// =============================================
+// DOMAIN COLORING — THE PATTERN
+// =============================================
+// The color scheme applied to the identity f(z) = z.
+// Hue encodes argument, brightness from modulus.
+// No channels, no Common tab needed.
+
+// =============================================
+// PARAMETERS
+// =============================================
+
+#define PI 3.14159265359
+#define VIEW_RADIUS 4.0
+
+// =============================================
+// COLOR
+// =============================================
+
+vec3 cubehelix(float h, float s, float l) {
+    float a = s * l * (1.0 - l);
+    float hr = (h + 120.0) * PI / 180.0;
+    float co = cos(hr), si = sin(hr);
+    return clamp(vec3(
+        l + a * (-0.14861 * co + 1.78277 * si),
+        l + a * (-0.29227 * co - 0.90649 * si),
+        l + a * (1.97294 * co)
+    ), 0.0, 1.0);
+}
+
+vec3 rainbow(float t) {
+    if (t < 0.0 || t > 1.0) t -= floor(t);
+    float ts = abs(t - 0.5);
+    return cubehelix(360.0 * t - 100.0, 1.5 - 1.5 * ts, 0.8 - 0.9 * ts);
+}
+
+vec3 complexToColor(vec2 w) {
+    float arg = atan(w.y, w.x);
+    float mag = length(w);
+
+    float phase = arg / (2.0 * PI) + 0.5;
+    vec3 col = rainbow(phase);
+
+    float rings = 0.5 + 0.5 * sin(2.0 * PI * log2(mag + 0.001));
+    col *= 0.7 + 0.3 * rings;
+
+    return col;
+}
+
+// =============================================
+// MAIN
+// =============================================
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (2.0 * fragCoord - iResolution.xy) / iResolution.y;
+    uv *= VIEW_RADIUS;
+
+    vec3 col = complexToColor(uv);
+    fragColor = vec4(col, 1.0);
+}
+```
+
+
+## Domain Coloring — Standard
+`domain-coloring/common.glsl` and `domain-coloring/image.glsl`
+
+### Common
+
+```glsl
+// =============================================
+// COMPLEX ARITHMETIC LIBRARY
+// =============================================
+
+#define PI 3.14159265359
+
+vec2 cmul(vec2 a, vec2 b) {
+    return vec2(a.x*b.x - a.y*b.y, a.x*b.y + a.y*b.x);
+}
+
+vec2 cdiv(vec2 a, vec2 b) {
+    return vec2(a.x*b.x + a.y*b.y, a.y*b.x - a.x*b.y) / dot(b, b);
+}
+
+vec2 csqr(vec2 z) {
+    return vec2(z.x*z.x - z.y*z.y, 2.0*z.x*z.y);
+}
+
+vec2 cconj(vec2 z) {
+    return vec2(z.x, -z.y);
+}
+
+vec2 cexp(vec2 z) {
+    return exp(z.x) * vec2(cos(z.y), sin(z.y));
+}
+
+vec2 clog(vec2 z) {
+    return vec2(log(length(z)), atan(z.y, z.x));
+}
+
+vec2 cpow(vec2 z, float n) {
+    float r = length(z);
+    float theta = atan(z.y, z.x);
+    return pow(r, n) * vec2(cos(n*theta), sin(n*theta));
+}
+
+vec2 cpow(vec2 z, vec2 w) {
+    return cexp(cmul(w, clog(z)));
+}
+
+vec2 csin(vec2 z) {
+    return vec2(sin(z.x)*cosh(z.y), cos(z.x)*sinh(z.y));
+}
+
+vec2 ccos(vec2 z) {
+    return vec2(cos(z.x)*cosh(z.y), -sin(z.x)*sinh(z.y));
+}
+
+vec2 csqrt(vec2 z) {
+    float r = length(z);
+    float theta = atan(z.y, z.x);
+    return sqrt(r) * vec2(cos(theta/2.0), sin(theta/2.0));
+}
+
+vec2 cinv(vec2 z) {
+    return cconj(z) / dot(z, z);
+}
+
+// Mobius transformation (az+b)/(cz+d)
+vec2 mobius(vec2 a, vec2 b, vec2 c, vec2 d, vec2 z) {
+    return cdiv(cmul(a, z) + b, cmul(c, z) + d);
+}
+
+// =============================================
+// COLOR UTILITIES
+// =============================================
+
+// Cubehelix color space (from d3-color, Mike Bostock)
+vec3 cubehelix(float h, float s, float l) {
+    float a = s * l * (1.0 - l);
+    float hr = (h + 120.0) * PI / 180.0;
+    float co = cos(hr), si = sin(hr);
+    return clamp(vec3(
+        l + a * (-0.14861 * co + 1.78277 * si),
+        l + a * (-0.29227 * co - 0.90649 * si),
+        l + a * (1.97294 * co)
+    ), 0.0, 1.0);
+}
+
+// d3 rainbow colormap — perceptually uniform hue cycle
+vec3 rainbow(float t) {
+    if (t < 0.0 || t > 1.0) t -= floor(t);
+    float ts = abs(t - 0.5);
+    return cubehelix(360.0 * t - 100.0, 1.5 - 1.5 * ts, 0.8 - 0.9 * ts);
+}
+
+vec3 complexToColor(vec2 w) {
+    float arg = atan(w.y, w.x);
+    float mag = length(w);
+
+    // Phase coloring via rainbow
+    float phase = arg / (2.0 * PI) + 0.5;
+    vec3 col = rainbow(phase);
+
+    // Modulus rings
+    float rings = 0.5 + 0.5 * sin(2.0 * PI * log2(mag + 0.001));
+    col *= 0.7 + 0.3 * rings;
+
+    return col;
+}
+```
+
+### Image
+
+```glsl
+// =============================================
+// DOMAIN COLORING — STANDARD
+// =============================================
+// Common tab: complex arithmetic + complexToColor
+// No channels needed
+
+// =============================================
+// EDIT HERE: Define your complex function f(z)
+// =============================================
+
+vec2 f(vec2 z) {
+    // (z^2 - 1) / (z + i)
+    return cdiv(csqr(z) - vec2(1, 0), z + vec2(0, 1));
+
+    // Other things to try:
+    // return csin(z);                              // complex sine
+    // return cexp(cinv(z));                         // essential singularity at 0
+    // return cmul(z, clog(z));                      // z * log(z)
+    // return cpow(z, 3.0) - vec2(1, 0);            // z^3 - 1
+    // return cdiv(vec2(1,0), csqr(z) + vec2(1,0)); // 1/(z^2+1)
+}
+
+// =============================================
+// PARAMETERS
+// =============================================
+
+#define VIEW_RADIUS  4.0
+
+// =============================================
+// MAIN
+// =============================================
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (2.0 * fragCoord - iResolution.xy) / iResolution.y;
+    uv *= VIEW_RADIUS;
+
+    vec2 w = f(uv);
+    vec3 col = complexToColor(w);
+
+    fragColor = vec4(col, 1.0);
+}
+```
+
+
+## Domain Coloring — Checkerboard Grid
+`domain-coloring-checker/common.glsl` and `domain-coloring-checker/image.glsl`
+
+Uses the same Common tab as the standard domain coloring shader above (for complex arithmetic only).
+
+### Image
+
+```glsl
+// =============================================
+// DOMAIN COLORING — CHECKERBOARD GRID
+// =============================================
+// Common tab: complex arithmetic (same as domain-coloring)
+// No channels needed
+//
+// Pulls back a checkerboard with subdivision grid through f(z).
+// Pure geometry — no phase coloring.
+
+// =============================================
+// EDIT HERE: Define your complex function f(z)
+// =============================================
+
+vec2 f(vec2 z) {
+    return cdiv(csqr(z) - vec2(1, 0), z + vec2(0, 1));
+
+    // Other things to try:
+    // return csin(z);
+    // return cexp(cinv(z));
+    // return cpow(z, 3.0) - vec2(1, 0);
+    // return cmul(z, clog(z));
+}
+
+// =============================================
+// PARAMETERS
+// =============================================
+
+#define VIEW_RADIUS   4.0
+#define SUBDIVISIONS  4.0     // minor grid lines per unit square
+
+// =============================================
+// VISUALIZATION CODE (no need to edit below)
+// =============================================
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (2.0 * fragCoord - iResolution.xy) / iResolution.y;
+    uv *= VIEW_RADIUS;
+
+    vec2 w = f(uv);
+
+    // Major checkerboard on integer grid
+    float check = mod(floor(w.x) + floor(w.y), 2.0);
+    float base = mix(0.2, 0.8, check);
+
+    // Subdivision grid within each square
+    float subX = min(fract(w.x * SUBDIVISIONS), 1.0 - fract(w.x * SUBDIVISIONS));
+    float subY = min(fract(w.y * SUBDIVISIONS), 1.0 - fract(w.y * SUBDIVISIONS));
+    float subGrid = smoothstep(0.0, 0.04, min(subX, subY));
+    float sub = mix(base * 0.7, base, subGrid);
+
+    // Major grid lines at integers (darkest)
+    float reGrid = min(fract(w.x), 1.0 - fract(w.x));
+    float imGrid = min(fract(w.y), 1.0 - fract(w.y));
+    float grid = smoothstep(0.0, 0.03, min(reGrid, imGrid));
+    float col = mix(0.05, sub, grid);
+
+    fragColor = vec4(vec3(col), 1.0);
+}
+```
+
+
+## Domain Coloring — Adaptive Grid
+`domain-coloring-adaptive/common.glsl` and `domain-coloring-adaptive/image.glsl`
+
+Uses the same Common tab as the standard domain coloring shader (complex arithmetic only).
+
+Based on [Ricky Reusser's rectangular domain coloring](https://www.shadertoy.com/view/tlcGzf).
+
+### Image
+
+```glsl
+// =============================================
+// DOMAIN COLORING — ADAPTIVE GRID
+// =============================================
+// Common tab: complex arithmetic (same as domain-coloring)
+// No channels needed
+//
+// Combines phase coloring, checkerboard shading, and
+// multi-scale adaptive grid lines. Grid density adjusts
+// automatically to the local derivative magnitude.
+
+// =============================================
+// EDIT HERE: Define your complex function f(z)
+// =============================================
+
+vec2 f(vec2 z) {
+    return cdiv(csqr(z) - vec2(1, 0), z + vec2(0, 1));
+
+    // Other things to try:
+    // return csin(z);
+    // return cexp(cinv(z));
+    // return cpow(z, 3.0) - vec2(1, 0);
+    // return cmul(z, clog(z));
+    // return cdiv(cmul(z - vec2(1,0), z + vec2(0.5, 0.8)), z + vec2(1, 0));
+}
+
+// =============================================
+// PARAMETERS
+// =============================================
+
+#define VIEW_RADIUS    4.0
+#define GRID_STEPS     8.0    // subdivisions per octave
+#define GRID_OPACITY   0.7    // 0 = no grid, 1 = full grid
+#define SHADE_OPACITY  0.15   // 0 = no checkerboard, 1 = full checkerboard
+#define PHASE_AMOUNT   1.0    // 0 = grayscale, 1 = full phase coloring
+#define LINE_WIDTH     1.0
+#define LINE_FEATHER   1.0
+
+// =============================================
+// VISUALIZATION CODE (no need to edit below)
+// =============================================
+
+// Numerically careful hypot (avoids overflow near poles)
+float hypot(vec2 z) {
+    float x = abs(z.x);
+    float y = abs(z.y);
+    float t = min(x, y);
+    x = max(x, y);
+    if (x == 0.0) return 0.0;
+    t = t / x;
+    return x * sqrt(1.0 + t * t);
+}
+
+// Phase color via rainbow (cubehelix rainbow is defined in Common)
+vec3 phaseColor(float arg) {
+    float phase = arg / (2.0 * PI) + 0.5;
+    return rainbow(phase);
+}
+
+// Grid helpers
+vec2 gridFract(vec2 x) {
+    return 2.0 * abs(fract(x - 0.5) - 0.5);
+}
+
+float checkerboard(vec2 xy) {
+    vec2 fl = fract(xy * 0.5) * 2.0 - 1.0;
+    return fl.x * fl.y > 0.0 ? 1.0 : 0.0;
+}
+
+// Adaptive multi-scale domain coloring
+vec4 adaptiveDomainColoring(vec4 f_df) {
+    const int octaves = 4;
+    vec2 steps = vec2(GRID_STEPS);
+    vec2 baseScale = vec2(10.0);
+
+    float cmagRecip = 1.0 / hypot(f_df.xy);
+    vec2 znorm = f_df.xy * cmagRecip;
+    float cmagGradientMag = hypot(vec2(
+        dot(znorm, f_df.zw),
+        dot(vec2(znorm.y, -znorm.x), f_df.zw)
+    ));
+
+    float xContinuousScale = log2(cmagGradientMag) / log2(steps.x);
+    float xDiscreteScale = floor(xContinuousScale);
+    float yContinuousScale = log2(cmagGradientMag) / log2(steps.y);
+    float yDiscreteScale = floor(yContinuousScale);
+
+    vec2 scalePosition = 1.0 - vec2(xContinuousScale, yContinuousScale)
+                       + vec2(xDiscreteScale, yDiscreteScale);
+    vec2 scaleBase = vec2(
+        pow(steps.x, -xDiscreteScale),
+        pow(steps.y, -yDiscreteScale)
+    ) / baseScale;
+
+    float width1 = max(0.0, LINE_WIDTH - LINE_FEATHER);
+    float width2 = LINE_WIDTH + LINE_FEATHER;
+
+    float totalWeight = 0.0;
+    float shading = 0.0;
+    vec2 invSteps = 1.0 / steps;
+    vec2 octaveScale = vec2(1.0);
+    vec2 grid = vec2(0.0);
+    vec2 gridScaleBase = vec2(
+        pow(steps.x, scalePosition.x),
+        pow(steps.y, scalePosition.y)
+    );
+
+    for (int i = 0; i < octaves; i++) {
+        float w0 = i == 0 ? 1e-4 : 1.0 + float(i);
+        float w1 = i == octaves - 1 ? 1e-4 : 1.0 + float(i + 1);
+        float w = mix(w0, w1, scalePosition.x);
+        totalWeight += w;
+
+        vec2 value = f_df.xy * scaleBase * octaveScale;
+        vec2 gridSlope = baseScale * gridScaleBase / octaveScale / steps;
+        vec2 xygrid = gridFract(value) * gridSlope;
+
+        grid += w * vec2(
+            smoothstep(width2, width1, xygrid.x),
+            smoothstep(width2, width1, xygrid.y)
+        );
+        shading += w * checkerboard(value);
+        octaveScale *= invSteps;
+    }
+
+    shading /= totalWeight;
+    grid /= totalWeight;
+    grid *= GRID_OPACITY;
+
+    float carg = atan(f_df.y, f_df.x);
+    vec3 color = mix(vec3(1.0), phaseColor(carg), PHASE_AMOUNT);
+
+    // Gamma-aware compositing
+    const float gamma = 0.454;
+    color = pow(color, vec3(gamma));
+    color = mix(vec3(1), color, 0.97);
+
+    float mixedGrid = max(grid.x, grid.y);
+    float shade = mix(1.0, shading, SHADE_OPACITY);
+    vec3 result = clamp(mix(color * shade, vec3(0.0), mixedGrid), vec3(0), vec3(1));
+
+    result = pow(result, vec3(1.0 / gamma));
+    return vec4(result, 1.0);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy - 0.5)
+            * vec2(1.0, iResolution.y / iResolution.x) * VIEW_RADIUS * 2.0;
+
+    vec2 fz = f(uv);
+
+    // Derivative magnitudes via hardware derivatives
+    vec4 fdf = vec4(fz, vec2(hypot(dFdx(fz)), hypot(dFdy(fz))));
+
+    fragColor = adaptiveDomainColoring(fdf);
+}
+```
+
+
+## Domain Coloring — Riemann Sphere
+`domain-coloring-sphere/common.glsl` and `domain-coloring-sphere/image.glsl`
+
+Uses the same Common tab as the other domain coloring shaders (complex arithmetic + rainbow + complexToColor).
+
+Renders a lit sphere and applies domain coloring via stereographic projection: each visible point on the sphere maps to a point $z \in \mathbb{C}$, we evaluate $f(z)$, and color with the result. The south pole maps to $\infty$.
+
+### Image
+
+```glsl
+// =============================================
+// DOMAIN COLORING — RIEMANN SPHERE
+// =============================================
+// Common tab: complex arithmetic + rainbow + complexToColor
+// No channels needed
+//
+// Stereographic projection maps the sphere to the complex
+// plane. We evaluate f(z) and domain-color the result.
+
+// =============================================
+// EDIT HERE: Define your complex function f(z)
+// =============================================
+
+vec2 f(vec2 z) {
+    // Two steps of the Doyle-McMullen iteration for z^5 = 1
+    // (a generally convergent algorithm; see doi:10.1007/BF02392735)
+    for (int i = 0; i < 2; i++) {
+        vec2 z5 = cmul(cmul(cmul(cmul(z, z), z), z), z);
+        vec2 num = cmul(z5 + vec2(11, 0), z5) - vec2(1, 0);
+        vec2 den = cmul(11.0 * z5, z5 + vec2(6, 0)) - vec2(1, 0);
+        z = z - 12.0 * cmul(z, cdiv(num, den));
+    }
+    return z;
+
+    // Other things to try:
+    // return cmul(z, z);                                // z^2: two-to-one cover
+    // return cdiv(cmul(z, z) - vec2(1,0), cmul(z, z) + vec2(1,0)); // Möbius
+    // return csin(z);                                   // wild near poles
+    // return cinv(z);                                   // swap 0 and infinity
+}
+
+// =============================================
+// PARAMETERS
+// =============================================
+
+#define SPHERE_RADIUS 3.0     // radius in screen units
+#define SCALE         8.0     // controls how much of the screen the sphere fills
+#define AUTO_SPEED    0.15    // auto-rotation speed when not dragging
+const vec3 BG_COLOR = vec3(0.15); // background: try vec3(0.95) for light
+
+// =============================================
+// VISUALIZATION CODE (no need to edit below)
+// =============================================
+
+// Rotation matrices
+mat3 rotX(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(1, 0, 0, 0, c, -s, 0, s, c);
+}
+
+mat3 rotZ(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(c, -s, 0, s, c, 0, 0, 0, 1);
+}
+
+// Stereographic projection: sphere point (x, y, z) → complex number
+// Projects from the back pole (y = -1, hidden from viewer)
+// Center of visible disk (y = 1) maps to z = 0
+vec2 stereo(vec3 n) {
+    float denom = 1.0 + n.y;
+    if (denom < 1e-6) return vec2(1e6); // near back pole → infinity
+    return vec2(n.x, n.z) / denom;
+}
+
+// Sphere normal from screen-space point inside the disk
+vec3 sphereNormal(vec2 uv, float r) {
+    vec2 p = uv / r;
+    float z = sqrt(max(0.0, 1.0 - dot(p, p)));
+    return normalize(vec3(p.x, z, p.y)); // y is toward viewer
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 aspect = iResolution.xy / iResolution.y;
+    vec2 uv = (fragCoord.xy / iResolution.y) - 0.5 * aspect;
+    uv *= SCALE;
+
+    float r = SPHERE_RADIUS;
+
+    if (length(uv) < r) {
+        // Sphere geometry
+        vec3 normal = sphereNormal(uv, r);
+
+        // Rotation: drag to orbit, auto-rotate when idle
+        float azimuth, elevation;
+        if (iMouse.z > 0.0) {
+            // Mouse dragging: map mouse position to angles
+            azimuth   = -(iMouse.x / iResolution.x - 0.5) * 2.0 * PI;
+            elevation = (iMouse.y / iResolution.y - 0.5) * PI;
+        } else {
+            // Auto-rotate
+            azimuth   = AUTO_SPEED * iTime;
+            elevation = 0.3 * sin(0.2 * iTime);
+        }
+        normal = rotZ(azimuth) * rotX(elevation) * normal;
+
+        // Stereographic projection → complex plane
+        vec2 z = stereo(normal);
+
+        // Apply the function and color
+        vec2 w = f(z);
+        vec3 col = complexToColor(w);
+
+        // Diffuse lighting (light follows the camera)
+        vec3 lightDir = normalize(vec3(0.0, 1.0, 0.0));
+        float diffuse = 0.3 + 0.7 * max(dot(sphereNormal(uv, r), lightDir), 0.0);
+        col *= diffuse;
+
+        fragColor = vec4(col, 1.0);
+    } else {
+        // Background
+        fragColor = vec4(BG_COLOR, 1.0);
+    }
+}
+```
+
+
+
+## Implicit Surface — Single Level Set
+`implicit-surface/image.glsl`
+
+```glsl
+// =============================================
+// IMPLICIT SURFACE — SINGLE LEVEL SET
+// =============================================
+// Raymarches the surface f(x,y,z) = 0 inside a bounding box
+// sitting on a ground plane. Isolines of f on the box walls.
+// Drag to orbit.
+
+// =============================================
+// EDIT HERE: Define your implicit function f(x, y, z)
+// The surface is the level set f = 0.
+// =============================================
+
+float f(vec3 p) {
+    // Torus: major radius R, minor radius r
+    float R = 0.6, r = 0.25;
+    vec2 q = vec2(length(p.xz) - R, p.y);
+    return length(q) - r;
+
+    // return length(p) - 0.8;                                       // sphere
+    // return max(abs(p.x), max(abs(p.y), abs(p.z))) - 0.7;         // cube
+    // return dot(p,p) + 2.0*p.x*p.y*p.z - 0.5;                    // Cayley cubic
+    // return cos(p.x*3.14) + cos(p.y*3.14) + cos(p.z*3.14);       // Schwarz P
+    // return sin(p.x*3.14)*cos(p.y*3.14) + sin(p.y*3.14)*cos(p.z*3.14)
+    //      + sin(p.z*3.14)*cos(p.x*3.14);                          // gyroid
+}
+
+// =============================================
+// PARAMETERS
+// =============================================
+
+#define PI         3.14159265359
+#define BOX_SIZE   vec3(1.0)       // bounding box half-size
+#define STEP_SIZE  0.01
+#define ISO_LINE_WIDTH 0.2         // isoline width on box faces
+#define SPEC_EXP   128.0
+
+// Camera
+#define CAM_DIST   5.0
+#define CAM_HEIGHT 4.0
+#define CAM_SPEED  0.3
+#define FOV        2.0
+
+// Colors
+const vec3 SURFACE_COLOR = vec3(0.4, 0.6, 0.95);
+const vec3 ISO_COLOR     = vec3(0.05);
+
+// =============================================
+// VISUALIZATION CODE (no need to edit below)
+// =============================================
+
+#define LIGHT_DIR normalize(vec3(cos(-iTime*0.3+PI*0.5), 1.0, sin(-iTime*0.3+PI*0.5)))
+
+vec3 boxCenter = vec3(0.0, BOX_SIZE.y, 0.0);
+
+float fWorld(vec3 p) { return f(p - boxCenter); }
+
+vec3 fGrad(vec3 p) {
+    vec2 d = vec2(0.01, 0.0);
+    float v = fWorld(p);
+    return vec3(fWorld(p+d.xyy)-v, fWorld(p+d.yxy)-v, fWorld(p+d.yyx)-v);
+}
+
+vec2 boxIntersect(vec3 ro, vec3 rd, out vec3 nFront, out vec3 nBack) {
+    vec3 roo = ro - boxCenter;
+    vec3 m = 1.0/rd;
+    vec3 n = m*roo;
+    vec3 k = abs(m)*BOX_SIZE;
+    vec3 t1 = -n - k;
+    vec3 t2 = -n + k;
+    float tN = max(max(t1.x, t1.y), t1.z);
+    float tF = min(min(t2.x, t2.y), t2.z);
+    if (tN > tF || tF < 0.0) return vec2(-1.0);
+    nFront = -sign(rd)*step(t1.yzx,t1.xyz)*step(t1.zxy,t1.xyz);
+    vec3 d = abs(roo + rd*tF);
+    nBack = -sign(rd)*vec3(
+        d.x>d.y&&d.x>d.z ? 1.0 : 0.0,
+        d.y>d.x&&d.y>d.z ? 1.0 : 0.0,
+        d.z>d.y&&d.z>d.x ? 1.0 : 0.0);
+    return vec2(tN, tF);
+}
+
+float marchIso(vec3 ro, vec3 rd, float tMin, float tMax, float level) {
+    float val = fWorld(ro + rd*tMin);
+    float inv = val > level ? 1.0 : -1.0;
+    for (float t = tMin; t < tMax; t += STEP_SIZE) {
+        val = fWorld(ro + rd*t);
+        if ((val - level)*inv < 0.0) return t;
+    }
+    return tMax;
+}
+
+mat3 setCamera(vec3 ro, vec3 ta, float cr) {
+    vec3 cw = normalize(ta - ro);
+    vec3 cp = vec3(sin(cr), cos(cr), 0.0);
+    vec3 cu = normalize(cross(cw, cp));
+    vec3 cv = normalize(cross(cu, cw));
+    return mat3(cu, cv, cw);
+}
+
+vec3 render(vec3 ro, vec3 rd) {
+    // Ground plane
+    float t = -ro.y / rd.y;
+    if (t < 0.0 || rd.y > 0.0) t = 10000.0;
+    vec3 col = mix(vec3(0.9), vec3(0.5,0.6,0.9), 1.0 - exp(-0.05*t));
+
+    // Ground AO
+    if (t < 100.0) {
+        vec3 pGround = ro + rd*t;
+        float val = fWorld(pGround);
+        vec3 grad = fGrad(pGround);
+        grad.y = 0.0;
+        float w = abs(val) / length(grad);
+        w = max(w, max(max(abs(pGround.x), abs(pGround.z)) - BOX_SIZE.x, 0.0)*100.0);
+        w = clamp(w / 12.0, 0.0, 1.0);
+        col *= 0.6 + 0.4*smoothstep(0.0, 1.0, w);
+    }
+
+    // Box
+    vec3 n, n2;
+    vec2 tnf = boxIntersect(ro, rd, n, n2);
+    float t_min = max(0.0, tnf.x);
+    float t_max = min(t, tnf.y);
+    float depth = max(0.0, t_max - t_min);
+
+    if (depth > 0.0) {
+        float tt = marchIso(ro, rd, t_min, t_max, 0.0);
+        if (tt < t_max) {
+            vec3 p = ro + rd*tt;
+            vec3 nn = normalize(fGrad(p));
+            vec3 cur_col = SURFACE_COLOR;
+            if (dot(nn, rd) > 0.0) {
+                cur_col = 0.4 + 0.6*cur_col;
+                nn = -nn;
+            }
+            col = cur_col*(0.5 + 0.5*max(0.0, dot(nn, LIGHT_DIR)))
+                + vec3(pow(max(0.0, dot(LIGHT_DIR, reflect(rd, nn))), SPEC_EXP));
+            t_max = tt;
+        }
+    }
+
+    // Isolines on box faces (just f=0)
+    if (depth > 0.001) {
+        vec3 p = ro + rd*(tnf.x + 0.01);
+        float val = fWorld(p);
+        vec3 grad = fGrad(p);
+        grad -= n*dot(grad, n);
+        float w = abs(val) / length(grad);
+        col = mix(col, ISO_COLOR, mix(1.0, 0.0, clamp(w - ISO_LINE_WIDTH*tnf.x, 0.0, 1.0)));
+
+        if (tnf.y < t_max + 0.01) {
+            p = ro + rd*(tnf.y - 0.01);
+            val = fWorld(p);
+            grad = fGrad(p);
+            grad -= n2*dot(grad, n2);
+            w = abs(val) / length(grad);
+            col = mix(col, ISO_COLOR, mix(1.0, 0.0, clamp(w - ISO_LINE_WIDTH*tnf.y, 0.0, 1.0)));
+        }
+    }
+
+    if (ro.y < 0.0) col = mix(vec3(0.9), col, 0.5);
+    return col;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (2.0*fragCoord - iResolution.xy) / iResolution.y;
+    vec3 ta = vec3(0.0, BOX_SIZE.y*0.5, 0.0);
+    vec3 ro;
+    if (iMouse.z > 0.5) {
+        float phi = (iMouse.x / iResolution.x) * PI * 2.0;
+        float psi = -((iMouse.y / iResolution.y) - 0.5) * PI;
+        ro = CAM_DIST * vec3(cos(phi)*cos(psi), sin(psi), sin(phi)*cos(psi));
+    } else {
+        ro = vec3(CAM_DIST*cos(-iTime*CAM_SPEED), CAM_HEIGHT, CAM_DIST*sin(-iTime*CAM_SPEED));
+    }
+    mat3 cam = setCamera(ro, ta, 0.0);
+    vec3 rd = cam * normalize(vec3(uv, FOV));
+    vec3 col = render(ro, rd);
+    col = sqrt(col);
+    fragColor = vec4(col, 1.0);
+}
+```
+
+
+## Implicit Surface — Nested Level Sets
+`implicit-surface-nested/image.glsl`
+
+```glsl
+// =============================================
+// IMPLICIT SURFACE — NESTED LEVEL SETS
+// =============================================
+// Raymarches multiple level sets f(x,y,z) = c inside a
+// bounding box on a ground plane. Colored isolines on
+// box walls, ambient occlusion on the ground.
+// Drag to orbit.
+
+// =============================================
+// EDIT HERE: Define your implicit function f(x, y, z)
+// Should return values spanning your level set range.
+// =============================================
+
+float f(vec3 p) {
+    // Torus distance field
+    float R = 0.6; vec2 q = vec2(length(p.xz)-R, p.y); return length(q);
+
+    // return length(p);                                                // concentric spheres
+    // return length(p) + 0.3*sin(3.0*p.x)*sin(3.0*p.y)*sin(3.0*p.z); // deformed shells
+    // return cos(p.x*3.14) + cos(p.y*3.14) + cos(p.z*3.14);          // Schwarz P family
+}
+
+// =============================================
+// EDIT HERE: Level set values and colors
+// =============================================
+
+#define NUM_LEVELS 6
+float iso[NUM_LEVELS] = float[NUM_LEVELS](
+    0.2, 0.4, 0.6, 0.8, 1.0, 1.2
+);
+vec3 isoColor[NUM_LEVELS] = vec3[NUM_LEVELS](
+    vec3(1.0, 0.0, 0.0),           // red
+    vec3(0.707, 0.707, 0.0),       // yellow
+    vec3(0.0, 1.0, 0.0),           // green
+    vec3(0.0, 0.707, 0.707),       // cyan
+    vec3(0.0, 0.0, 1.0),           // blue
+    vec3(0.707, 0.0, 0.707)        // magenta
+);
+
+// =============================================
+// PARAMETERS
+// =============================================
+
+#define PI         3.14159265359
+#define BOX_SIZE   vec3(1.0)
+#define STEP_SIZE  0.01
+#define ISO_LINE_WIDTH 0.2
+#define SPEC_EXP   128.0
+
+// Camera
+#define CAM_DIST   5.0
+#define CAM_HEIGHT 4.0
+#define CAM_SPEED  0.3
+#define FOV        2.0
+
+// =============================================
+// VISUALIZATION CODE (no need to edit below)
+// =============================================
+
+#define LIGHT_DIR normalize(vec3(cos(-iTime*0.3+PI*0.5), 1.0, sin(-iTime*0.3+PI*0.5)))
+
+vec3 boxCenter = vec3(0.0, BOX_SIZE.y, 0.0);
+
+float fWorld(vec3 p) { return f(p - boxCenter); }
+
+vec3 fGrad(vec3 p) {
+    vec2 d = vec2(0.01, 0.0);
+    float v = fWorld(p);
+    return vec3(fWorld(p+d.xyy)-v, fWorld(p+d.yxy)-v, fWorld(p+d.yyx)-v);
+}
+
+vec2 boxIntersect(vec3 ro, vec3 rd, out vec3 nFront, out vec3 nBack) {
+    vec3 roo = ro - boxCenter;
+    vec3 m = 1.0/rd;
+    vec3 n = m*roo;
+    vec3 k = abs(m)*BOX_SIZE;
+    vec3 t1 = -n - k;
+    vec3 t2 = -n + k;
+    float tN = max(max(t1.x, t1.y), t1.z);
+    float tF = min(min(t2.x, t2.y), t2.z);
+    if (tN > tF || tF < 0.0) return vec2(-1.0);
+    nFront = -sign(rd)*step(t1.yzx,t1.xyz)*step(t1.zxy,t1.xyz);
+    vec3 d = abs(roo + rd*tF);
+    nBack = -sign(rd)*vec3(
+        d.x>d.y&&d.x>d.z ? 1.0 : 0.0,
+        d.y>d.x&&d.y>d.z ? 1.0 : 0.0,
+        d.z>d.y&&d.z>d.x ? 1.0 : 0.0);
+    return vec2(tN, tF);
+}
+
+float marchIso(vec3 ro, vec3 rd, float tMin, float tMax, float level) {
+    float val = fWorld(ro + rd*tMin);
+    float inv = val > level ? 1.0 : -1.0;
+    for (float t = tMin; t < tMax; t += STEP_SIZE) {
+        val = fWorld(ro + rd*t);
+        if ((val - level)*inv < 0.0) return t;
+    }
+    return tMax;
+}
+
+float marchMultiIso(vec3 ro, vec3 rd, float tMin, float tMax, out int hitLevel) {
+    hitLevel = -1;
+    float val = fWorld(ro + rd*tMin);
+    int lo = -1, hi = -1;
+    for (int k = 0; k < NUM_LEVELS; k++) {
+        if (val >= iso[k]) lo = k;
+        if (hi == -1 && val < iso[k]) hi = k;
+    }
+    float tBest = tMax;
+    for (int b = 0; b < 2; b++) {
+        int lvl = (b == 0) ? lo : hi;
+        if (lvl < 0) continue;
+        float t = marchIso(ro, rd, tMin, tMax, iso[lvl]);
+        if (t < tBest) { tBest = t; hitLevel = lvl; }
+    }
+    return min(tBest, tMax);
+}
+
+mat3 setCamera(vec3 ro, vec3 ta, float cr) {
+    vec3 cw = normalize(ta - ro);
+    vec3 cp = vec3(sin(cr), cos(cr), 0.0);
+    vec3 cu = normalize(cross(cw, cp));
+    vec3 cv = normalize(cross(cu, cw));
+    return mat3(cu, cv, cw);
+}
+
+vec3 render(vec3 ro, vec3 rd) {
+    float t = -ro.y / rd.y;
+    if (t < 0.0 || rd.y > 0.0) t = 10000.0;
+    vec3 col = mix(vec3(0.9), vec3(0.5,0.6,0.9), 1.0 - exp(-0.05*t));
+
+    // Ground AO
+    if (t < 100.0) {
+        vec3 pGround = ro + rd*t;
+        float val = fWorld(pGround);
+        vec3 grad = fGrad(pGround);
+        grad.y = 0.0;
+        float w = 100.0;
+        for (int k = 0; k < NUM_LEVELS; k++)
+            w = min(w, abs(val - iso[k]) / length(grad));
+        w = max(w, max(max(abs(pGround.x), abs(pGround.z)) - BOX_SIZE.x, 0.0)*100.0);
+        w = clamp(w / 12.0, 0.0, 1.0);
+        col *= 0.6 + 0.4*smoothstep(0.0, 1.0, w);
+    }
+
+    // Box
+    vec3 n, n2;
+    vec2 tnf = boxIntersect(ro, rd, n, n2);
+    float t_min = max(0.0, tnf.x);
+    float t_max = min(t, tnf.y);
+    float depth = max(0.0, t_max - t_min);
+
+    if (depth > 0.0) {
+        int kk;
+        float tt = marchMultiIso(ro, rd, t_min, t_max, kk);
+        if (tt < t_max) {
+            vec3 cur_col = isoColor[kk];
+            vec3 p = ro + rd*tt;
+            vec3 nn = normalize(fGrad(p));
+            if (dot(nn, rd) > 0.0) {
+                cur_col = 0.4 + 0.6*cur_col;
+                nn = -nn;
+            }
+            col = cur_col*(0.5 + 0.5*max(0.0, dot(nn, LIGHT_DIR)))
+                + vec3(pow(max(0.0, dot(LIGHT_DIR, reflect(rd, nn))), SPEC_EXP));
+            t_max = tt;
+        }
+    }
+
+    // Isolines on box faces
+    if (depth > 0.001) {
+        vec3 p = ro + rd*(tnf.x + 0.01);
+        float val = fWorld(p);
+        vec3 grad = fGrad(p);
+        grad -= n*dot(grad, n);
+        for (int k = 0; k < NUM_LEVELS; k++) {
+            float w = abs(val - iso[k]) / length(grad);
+            col = mix(col, isoColor[k]*0.1,
+                      mix(1.0, 0.0, clamp(w - ISO_LINE_WIDTH*tnf.x, 0.0, 1.0)));
+        }
+        if (tnf.y < t_max + 0.01) {
+            p = ro + rd*(tnf.y - 0.01);
+            val = fWorld(p);
+            grad = fGrad(p);
+            grad -= n2*dot(grad, n2);
+            for (int k = 0; k < NUM_LEVELS; k++) {
+                float w = abs(val - iso[k]) / length(grad);
+                col = mix(col, isoColor[k]*0.1,
+                          mix(1.0, 0.0, clamp(w - ISO_LINE_WIDTH*tnf.y, 0.0, 1.0)));
+            }
+        }
+    }
+
+    if (ro.y < 0.0) col = mix(vec3(0.9), col, 0.5);
+    return col;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (2.0*fragCoord - iResolution.xy) / iResolution.y;
+    vec3 ta = vec3(0.0, BOX_SIZE.y*0.5, 0.0);
+    vec3 ro;
+    if (iMouse.z > 0.5) {
+        float phi = (iMouse.x / iResolution.x) * PI * 2.0;
+        float psi = -((iMouse.y / iResolution.y) - 0.5) * PI;
+        ro = CAM_DIST * vec3(cos(phi)*cos(psi), sin(psi), sin(phi)*cos(psi));
+    } else {
+        ro = vec3(CAM_DIST*cos(-iTime*CAM_SPEED), CAM_HEIGHT, CAM_DIST*sin(-iTime*CAM_SPEED));
+    }
+    mat3 cam = setCamera(ro, ta, 0.0);
+    vec3 rd = cam * normalize(vec3(uv, FOV));
+    vec3 col = render(ro, rd);
+    col = sqrt(col);
+    fragColor = vec4(col, 1.0);
+}
+```
+
+
+## Implicit Surface — Cross-Section
+`implicit-surface-section/image.glsl`
+
+```glsl
+// =============================================
+// IMPLICIT SURFACE — CROSS-SECTION
+// =============================================
+// Raymarches multiple level sets inside a bounding box,
+// clipped by an animated plane. The cut face shows
+// colored contour lines. Box wall isolines and ground AO.
+// Drag to orbit.
+
+// =============================================
+// EDIT HERE: Define your implicit function f(x, y, z)
+// =============================================
+
+float f(vec3 p) {
+    float R = 0.6; vec2 q = vec2(length(p.xz)-R, p.y); return length(q);
+
+    // return length(p);
+    // return cos(p.x*3.14) + cos(p.y*3.14) + cos(p.z*3.14);
+}
+
+// =============================================
+// EDIT HERE: Level set values and colors
+// =============================================
+
+#define NUM_LEVELS 6
+float iso[NUM_LEVELS] = float[NUM_LEVELS](
+    0.2, 0.4, 0.6, 0.8, 1.0, 1.2
+);
+vec3 isoColor[NUM_LEVELS] = vec3[NUM_LEVELS](
+    vec3(1.0, 0.0, 0.0),
+    vec3(0.707, 0.707, 0.0),
+    vec3(0.0, 1.0, 0.0),
+    vec3(0.0, 0.707, 0.707),
+    vec3(0.0, 0.0, 1.0),
+    vec3(0.707, 0.0, 0.707)
+);
+
+// =============================================
+// PARAMETERS
+// =============================================
+
+#define PI         3.14159265359
+#define BOX_SIZE   vec3(1.0)
+#define STEP_SIZE  0.01
+#define ISO_LINE_WIDTH 0.2
+#define SPEC_EXP   128.0
+
+// Clipping plane
+#define CLIP_SPEED   0.3
+#define CLIP_RANGE   0.9         // sweep amplitude (fraction of BOX_SIZE)
+vec3 CLIP_NORMAL = normalize(vec3(0.0, 1.0, 0.0));
+
+// Cut face contour lines
+#define CUT_SPACING    0.1       // contour interval
+#define CUT_LINE_WIDTH 0.15
+
+// Camera
+#define CAM_DIST   5.0
+#define CAM_HEIGHT 4.0
+#define CAM_SPEED  0.3
+#define FOV        2.0
+
+// Colors
+const vec3 CUT_BG   = vec3(0.92, 0.88, 0.82);
+const vec3 CUT_LINE = vec3(0.35, 0.30, 0.25);
+
+// =============================================
+// VISUALIZATION CODE (no need to edit below)
+// =============================================
+
+#define LIGHT_DIR normalize(vec3(cos(-iTime*0.3+PI*0.5), 1.0, sin(-iTime*0.3+PI*0.5)))
+
+vec3 boxCenter = vec3(0.0, BOX_SIZE.y, 0.0);
+
+float fWorld(vec3 p) { return f(p - boxCenter); }
+
+vec3 fGrad(vec3 p) {
+    vec2 d = vec2(0.01, 0.0);
+    float v = fWorld(p);
+    return vec3(fWorld(p+d.xyy)-v, fWorld(p+d.yxy)-v, fWorld(p+d.yyx)-v);
+}
+
+vec2 boxIntersect(vec3 ro, vec3 rd, out vec3 nFront, out vec3 nBack) {
+    vec3 roo = ro - boxCenter;
+    vec3 m = 1.0/rd;
+    vec3 n = m*roo;
+    vec3 k = abs(m)*BOX_SIZE;
+    vec3 t1 = -n - k;
+    vec3 t2 = -n + k;
+    float tN = max(max(t1.x, t1.y), t1.z);
+    float tF = min(min(t2.x, t2.y), t2.z);
+    if (tN > tF || tF < 0.0) return vec2(-1.0);
+    nFront = -sign(rd)*step(t1.yzx,t1.xyz)*step(t1.zxy,t1.xyz);
+    vec3 d = abs(roo + rd*tF);
+    nBack = -sign(rd)*vec3(
+        d.x>d.y&&d.x>d.z ? 1.0 : 0.0,
+        d.y>d.x&&d.y>d.z ? 1.0 : 0.0,
+        d.z>d.y&&d.z>d.x ? 1.0 : 0.0);
+    return vec2(tN, tF);
+}
+
+float marchIso(vec3 ro, vec3 rd, float tMin, float tMax, float level) {
+    float val = fWorld(ro + rd*tMin);
+    float inv = val > level ? 1.0 : -1.0;
+    for (float t = tMin; t < tMax; t += STEP_SIZE) {
+        val = fWorld(ro + rd*t);
+        if ((val - level)*inv < 0.0) return t;
+    }
+    return tMax;
+}
+
+float marchMultiIso(vec3 ro, vec3 rd, float tMin, float tMax, out int hitLevel) {
+    hitLevel = -1;
+    float val = fWorld(ro + rd*tMin);
+    int lo = -1, hi = -1;
+    for (int k = 0; k < NUM_LEVELS; k++) {
+        if (val >= iso[k]) lo = k;
+        if (hi == -1 && val < iso[k]) hi = k;
+    }
+    float tBest = tMax;
+    for (int b = 0; b < 2; b++) {
+        int lvl = (b == 0) ? lo : hi;
+        if (lvl < 0) continue;
+        float t = marchIso(ro, rd, tMin, tMax, iso[lvl]);
+        if (t < tBest) { tBest = t; hitLevel = lvl; }
+    }
+    return min(tBest, tMax);
+}
+
+// Clip plane: clips dot(p - boxCenter, CLIP_NORMAL) > clipOff
+float clipDist(vec3 p, float clipOff) {
+    return clipOff - dot(p - boxCenter, CLIP_NORMAL);
+}
+
+// March for the nearest isosurface, but skip anything in the clipped region
+float marchMultiIsoClipped(vec3 ro, vec3 rd, float tMin, float tMax,
+                            float clipOff, out int hitLevel, out bool hitClip) {
+    hitLevel = -1;
+    hitClip = false;
+
+    float t = tMin;
+    float prevF = fWorld(ro + rd*t);
+    float prevClip = clipDist(ro + rd*t, clipOff);
+
+    // Find which two levels bracket us
+    int lo = -1, hi = -1;
+    for (int k = 0; k < NUM_LEVELS; k++) {
+        if (prevF >= iso[k]) lo = k;
+        if (hi == -1 && prevF < iso[k]) hi = k;
+    }
+
+    for (t = tMin; t < tMax; t += STEP_SIZE) {
+        vec3 p = ro + rd*t;
+        float curF = fWorld(p);
+        float curClip = clipDist(p, clipOff);
+
+        // Check isosurface crossings (only in kept region)
+        if (curClip > 0.0 && prevClip > 0.0) {
+            for (int b = 0; b < 2; b++) {
+                int lvl = (b == 0) ? lo : hi;
+                if (lvl < 0) continue;
+                float c = iso[lvl];
+                if ((prevF - c) * (curF - c) < 0.0) {
+                    hitLevel = lvl;
+                    return t;
+                }
+            }
+        }
+
+        // Check clip plane crossing while inside any isosurface region
+        if (prevClip * curClip < 0.0) {
+            // Are we between two iso levels?
+            bool inside = false;
+            for (int k = 0; k < NUM_LEVELS; k++) {
+                if ((prevF - iso[k]) * (curF - iso[k]) <= 0.0 ||
+                    min(prevF, curF) < iso[k]) {
+                    inside = true; break;
+                }
+            }
+            // Simpler: just check if we're inside the outermost level
+            if (prevF < iso[NUM_LEVELS-1] || curF < iso[NUM_LEVELS-1]) {
+                hitClip = true;
+                // Find clip plane t by linear interpolation
+                float tClip = t - STEP_SIZE + STEP_SIZE * prevClip / (prevClip - curClip);
+                return tClip;
+            }
+        }
+
+        prevF = curF;
+        prevClip = curClip;
+
+        // Update bracket
+        lo = -1; hi = -1;
+        for (int k = 0; k < NUM_LEVELS; k++) {
+            if (curF >= iso[k]) lo = k;
+            if (hi == -1 && curF < iso[k]) hi = k;
+        }
+    }
+    return tMax;
+}
+
+vec3 cutFaceColor(vec3 p, vec3 rd) {
+    float val = fWorld(p);
+    vec3 grad = fGrad(p);
+    grad -= CLIP_NORMAL * dot(grad, CLIP_NORMAL);
+    float gradLen = length(grad);
+
+    vec3 col = CUT_BG;
+
+    // Colored contour for each level
+    for (int k = 0; k < NUM_LEVELS; k++) {
+        float w = abs(val - iso[k]) / max(gradLen * CUT_LINE_WIDTH, 1e-6);
+        float line = 1.0 - smoothstep(0.0, 1.0, w);
+        col = mix(col, isoColor[k] * 0.3, line);
+    }
+
+    // Light the cut face
+    vec3 n = CLIP_NORMAL;
+    if (dot(n, rd) > 0.0) n = -n;
+    float diff = 0.5 + 0.5 * max(dot(n, LIGHT_DIR), 0.0);
+    return col * diff;
+}
+
+mat3 setCamera(vec3 ro, vec3 ta, float cr) {
+    vec3 cw = normalize(ta - ro);
+    vec3 cp = vec3(sin(cr), cos(cr), 0.0);
+    vec3 cu = normalize(cross(cw, cp));
+    vec3 cv = normalize(cross(cu, cw));
+    return mat3(cu, cv, cw);
+}
+
+vec3 render(vec3 ro, vec3 rd) {
+    float t = -ro.y / rd.y;
+    if (t < 0.0 || rd.y > 0.0) t = 10000.0;
+    vec3 col = mix(vec3(0.9), vec3(0.5,0.6,0.9), 1.0 - exp(-0.05*t));
+
+    float clipOff = CLIP_RANGE * sin(CLIP_SPEED * iTime);
+
+    // Ground AO
+    if (t < 100.0) {
+        vec3 pGround = ro + rd*t;
+        float val = fWorld(pGround);
+        vec3 grad = fGrad(pGround);
+        grad.y = 0.0;
+        float w = 100.0;
+        for (int k = 0; k < NUM_LEVELS; k++)
+            w = min(w, abs(val - iso[k]) / length(grad));
+        w = max(w, max(max(abs(pGround.x), abs(pGround.z)) - BOX_SIZE.x, 0.0)*100.0);
+        w = clamp(w / 12.0, 0.0, 1.0);
+        col *= 0.6 + 0.4*smoothstep(0.0, 1.0, w);
+    }
+
+    // Box
+    vec3 n, n2;
+    vec2 tnf = boxIntersect(ro, rd, n, n2);
+    float t_min = max(0.0, tnf.x);
+    float t_max = min(t, tnf.y);
+    float depth = max(0.0, t_max - t_min);
+
+    if (depth > 0.0) {
+        int kk;
+        bool hitClip;
+        float tt = marchMultiIsoClipped(ro, rd, t_min, t_max, clipOff, kk, hitClip);
+
+        if (tt < t_max) {
+            if (hitClip) {
+                col = cutFaceColor(ro + rd*tt, rd);
+            } else {
+                vec3 cur_col = isoColor[kk];
+                vec3 p = ro + rd*tt;
+                vec3 nn = normalize(fGrad(p));
+                if (dot(nn, rd) > 0.0) {
+                    cur_col = 0.4 + 0.6*cur_col;
+                    nn = -nn;
+                }
+                col = cur_col*(0.5 + 0.5*max(0.0, dot(nn, LIGHT_DIR)))
+                    + vec3(pow(max(0.0, dot(LIGHT_DIR, reflect(rd, nn))), SPEC_EXP));
+            }
+            t_max = tt;
+        }
+    }
+
+    // Isolines on box faces
+    if (depth > 0.001) {
+        vec3 p = ro + rd*(tnf.x + 0.01);
+        float val = fWorld(p);
+        vec3 grad = fGrad(p);
+        grad -= n*dot(grad, n);
+        for (int k = 0; k < NUM_LEVELS; k++) {
+            float w = abs(val - iso[k]) / length(grad);
+            col = mix(col, isoColor[k]*0.1,
+                      mix(1.0, 0.0, clamp(w - ISO_LINE_WIDTH*tnf.x, 0.0, 1.0)));
+        }
+        if (tnf.y < t_max + 0.01) {
+            p = ro + rd*(tnf.y - 0.01);
+            val = fWorld(p);
+            grad = fGrad(p);
+            grad -= n2*dot(grad, n2);
+            for (int k = 0; k < NUM_LEVELS; k++) {
+                float w = abs(val - iso[k]) / length(grad);
+                col = mix(col, isoColor[k]*0.1,
+                          mix(1.0, 0.0, clamp(w - ISO_LINE_WIDTH*tnf.y, 0.0, 1.0)));
+            }
+        }
+    }
+
+    if (ro.y < 0.0) col = mix(vec3(0.9), col, 0.5);
+    return col;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (2.0*fragCoord - iResolution.xy) / iResolution.y;
+    vec3 ta = vec3(0.0, BOX_SIZE.y*0.5, 0.0);
+    vec3 ro;
+    if (iMouse.z > 0.5) {
+        float phi = (iMouse.x / iResolution.x) * PI * 2.0;
+        float psi = -((iMouse.y / iResolution.y) - 0.5) * PI;
+        ro = CAM_DIST * vec3(cos(phi)*cos(psi), sin(psi), sin(phi)*cos(psi));
+    } else {
+        ro = vec3(CAM_DIST*cos(-iTime*CAM_SPEED), CAM_HEIGHT, CAM_DIST*sin(-iTime*CAM_SPEED));
+    }
+    mat3 cam = setCamera(ro, ta, 0.0);
+    vec3 rd = cam * normalize(vec3(uv, FOV));
+    vec3 col = render(ro, rd);
+    col = sqrt(col);
+    fragColor = vec4(col, 1.0);
+}
+```
+
+
+## Volumetric Density Plot
+`volume/image.glsl`
+
+```glsl
+// =============================================
+// 3D VOLUMETRIC DENSITY PLOT
+// =============================================
+// Renders a scalar field rho(x,y,z) as a luminous volume
+// using emission-absorption raymarching.
+//
+// Positive density glows warm (orange/white).
+// Negative density glows cool (blue/cyan).
+// Near-zero regions are transparent.
+// Drag to orbit.
+
+// =============================================
+// EDIT HERE: Define your density function rho(x, y, z)
+// =============================================
+
+float rho(vec3 p) {
+    // Two positive Gaussian blobs minus a negative one
+    float g1 = exp(-2.0 * dot(p - vec3(1,0,0), p - vec3(1,0,0)));
+    float g2 = exp(-2.0 * dot(p + vec3(1,0,0), p + vec3(1,0,0)));
+    float g3 = exp(-3.0 * dot(p, p));
+    return g1 + g2 - 0.8 * g3;
+
+    // return sin(p.x) * sin(p.y) * sin(p.z);                          // 3D checkerboard
+    // return exp(-dot(p,p)) * sin(5.0*length(p));                      // radial wave packet
+    // return cos(p.x) + cos(p.y) + cos(p.z);                          // Schwarz P density
+    // return sin(p.x*p.y) + sin(p.y*p.z) + sin(p.z*p.x);             // interference
+    // return 1.0 / (1.0 + dot(p,p)) - 0.3;                            // Coulomb-ish
+    // return exp(-dot(p,p)) * (p.x*p.x - p.y*p.y);                    // d-orbital shape
+    // return sin(length(p) * 6.0 - iTime * 2.0) * exp(-0.3*dot(p,p)); // pulsing wave
+}
+
+// =============================================
+// PARAMETERS
+// =============================================
+
+// Which sign to render: 0 = both, 1 = positive only, -1 = negative only
+const int VOLUME_SIGN = 0;
+
+#define PI 3.14159265359
+
+// Domain
+#define BOX_SIZE       vec3(3.0)
+
+// Camera
+#define CAM_DIST       7.0
+#define CAM_HEIGHT     3.5
+#define CAM_SPEED      0.2
+#define FOV            2.0
+
+// Volume rendering
+#define NUM_STEPS      128
+#define DENSITY_SCALE  8.0       // amplifies density for visibility
+#define ABSORPTION     6.0       // opacity per unit density
+#define LIGHT_STRENGTH 0.6       // gradient-based shading strength
+#define BRIGHTNESS     3.0       // emission multiplier
+#define GLOW_POWER     1.2       // contrast curve (1 = linear)
+#define OPACITY_CUTOFF 0.01      // density below this is transparent
+
+// Grid on box faces
+#define SHOW_GRID      true
+#define GRID_SPACING   1.0
+#define GRID_WIDTH     0.02
+
+// Colors
+const vec3 POS_COLOR_CORE = vec3(1.0, 0.95, 0.85);
+const vec3 POS_COLOR_EDGE = vec3(0.95, 0.4, 0.1);
+const vec3 NEG_COLOR_CORE = vec3(0.85, 0.95, 1.0);
+const vec3 NEG_COLOR_EDGE = vec3(0.1, 0.35, 0.9);
+const vec3 BG_COLOR       = vec3(0.02, 0.02, 0.04);
+
+// =============================================
+// VISUALIZATION CODE (no need to edit below)
+// =============================================
+
+#define LIGHT_DIR normalize(vec3(cos(-iTime*0.3+PI*0.5), 1.0, sin(-iTime*0.3+PI*0.5)))
+
+vec2 boxIntersect(vec3 ro, vec3 rd, vec3 halfSize) {
+    vec3 m = 1.0/rd;
+    vec3 n = m*ro;
+    vec3 k = abs(m)*halfSize;
+    vec3 t1 = -n - k;
+    vec3 t2 = -n + k;
+    float tN = max(max(t1.x, t1.y), t1.z);
+    float tF = min(min(t2.x, t2.y), t2.z);
+    if (tN > tF || tF < 0.0) return vec2(-1.0);
+    return vec2(tN, tF);
+}
+
+vec3 gradRho(vec3 p) {
+    float e = 0.02;
+    return vec3(
+        rho(p + vec3(e,0,0)) - rho(p - vec3(e,0,0)),
+        rho(p + vec3(0,e,0)) - rho(p - vec3(0,e,0)),
+        rho(p + vec3(0,0,e)) - rho(p - vec3(0,0,e))
+    ) / (2.0 * e);
+}
+
+vec4 transferFunction(float val, vec3 p, vec3 lightDir) {
+    float absVal = abs(val);
+    if (absVal < OPACITY_CUTOFF) return vec4(0.0);
+    if (VOLUME_SIGN > 0 && val < 0.0) return vec4(0.0);
+    if (VOLUME_SIGN < 0 && val > 0.0) return vec4(0.0);
+
+    float intensity = pow(absVal, GLOW_POWER);
+
+    vec3 col;
+    if (val > 0.0)
+        col = mix(POS_COLOR_EDGE, POS_COLOR_CORE, smoothstep(0.0, 0.8, intensity));
+    else
+        col = mix(NEG_COLOR_EDGE, NEG_COLOR_CORE, smoothstep(0.0, 0.8, intensity));
+
+    // Gradient-based directional shading
+    vec3 grad = gradRho(p);
+    float gradMag = length(grad);
+    if (gradMag > 0.001) {
+        float lightFactor = 0.5 + 0.5 * dot(grad / gradMag, lightDir);
+        col *= mix(1.0, lightFactor, LIGHT_STRENGTH * smoothstep(0.0, 0.5, absVal));
+    }
+
+    float opacity = 1.0 - exp(-ABSORPTION * intensity);
+    return vec4(col * BRIGHTNESS * intensity, opacity);
+}
+
+vec3 boxFaceGrid(vec3 p, vec3 normal) {
+    vec2 fc;
+    if (abs(normal.x) > 0.5)      fc = p.yz;
+    else if (abs(normal.y) > 0.5)  fc = p.xz;
+    else                            fc = p.xy;
+
+    vec2 grid = abs(fract(fc / GRID_SPACING + 0.5) - 0.5) * GRID_SPACING;
+    float d = min(grid.x, grid.y);
+    float line = 1.0 - smoothstep(0.0, GRID_WIDTH, d);
+
+    vec2 axisD = abs(fc);
+    float axisLine = 1.0 - smoothstep(0.0, GRID_WIDTH * 2.0, min(axisD.x, axisD.y));
+
+    vec3 col = BG_COLOR + vec3(0.03);
+    col = mix(col, vec3(0.08, 0.08, 0.12), line * 0.8);
+    col = mix(col, vec3(0.12, 0.1, 0.15), axisLine * 0.6);
+    return col;
+}
+
+vec3 boxNormalAt(vec3 ro, vec3 rd, float t, vec3 halfSize) {
+    vec3 p = ro + rd * t;
+    vec3 d = abs(abs(p) - halfSize);
+    float minD = min(d.x, min(d.y, d.z));
+    if (d.x == minD) return vec3(sign(p.x), 0, 0);
+    if (d.y == minD) return vec3(0, sign(p.y), 0);
+    return vec3(0, 0, sign(p.z));
+}
+
+mat3 setCamera(vec3 ro, vec3 ta) {
+    vec3 cw = normalize(ta - ro);
+    vec3 cp = vec3(0.0, 1.0, 0.0);
+    vec3 cu = normalize(cross(cw, cp));
+    vec3 cv = normalize(cross(cu, cw));
+    return mat3(cu, cv, cw);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (2.0*fragCoord - iResolution.xy) / iResolution.y;
+
+    vec3 ta = vec3(0.0);
+    vec3 ro;
+    if (iMouse.z > 0.5) {
+        float phi = (iMouse.x / iResolution.x) * PI * 2.0;
+        float psi = -((iMouse.y / iResolution.y) - 0.5) * PI;
+        ro = CAM_DIST * vec3(cos(phi)*cos(psi), sin(psi), sin(phi)*cos(psi));
+    } else {
+        ro = vec3(CAM_DIST*cos(-iTime*CAM_SPEED), CAM_HEIGHT, CAM_DIST*sin(-iTime*CAM_SPEED));
+    }
+    mat3 cam = setCamera(ro, ta);
+    vec3 rd = cam * normalize(vec3(uv, FOV));
+
+    vec3 col = BG_COLOR + 0.02 * max(rd.y, 0.0);
+
+    vec2 tBox = boxIntersect(ro, rd, BOX_SIZE);
+
+    if (tBox.y > 0.0) {
+        float tMin = max(tBox.x, 0.0);
+        float tMax = tBox.y;
+        float stepSize = (tMax - tMin) / float(NUM_STEPS);
+
+        // Back face grid
+        if (SHOW_GRID) {
+            vec3 pBack = ro + rd * (tMax - 0.001);
+            vec3 nBack = boxNormalAt(ro, rd, tMax, BOX_SIZE);
+            col = boxFaceGrid(pBack, nBack);
+        }
+
+        // Front-to-back compositing
+        vec3 accumColor = vec3(0.0);
+        float accumAlpha = 0.0;
+
+        for (int i = 0; i < NUM_STEPS; i++) {
+            if (accumAlpha > 0.99) break;
+            float t = tMin + (float(i) + 0.5) * stepSize;
+            vec3 p = ro + rd * t;
+
+            float val = rho(p) * DENSITY_SCALE;
+            vec4 s = transferFunction(val, p, LIGHT_DIR);
+
+            if (s.a > 0.0) {
+                float stepOpacity = s.a * stepSize;
+                accumColor += (1.0 - accumAlpha) * s.rgb * stepOpacity;
+                accumAlpha += (1.0 - accumAlpha) * stepOpacity;
+            }
+        }
+
+        col = accumColor + (1.0 - accumAlpha) * col;
+
+        // Front face grid (semi-transparent)
+        if (SHOW_GRID && tMin > 0.0) {
+            vec3 pFront = ro + rd * (tMin + 0.001);
+            vec3 nFront = boxNormalAt(ro, rd, tMin, BOX_SIZE);
+            col = mix(col, boxFaceGrid(pFront, nFront), 0.15);
+        }
+    }
+
+    col = col / (1.0 + col); // Reinhard
+    col = pow(col, vec3(1.0/2.2));
+    fragColor = vec4(col, 1.0);
+}
+```
+
+
+
+
+
+## Volumetric Density Plot — Cross-Section
+`volume-section/image.glsl`
+
+```glsl
+// =============================================
+// VOLUMETRIC DENSITY — CROSS-SECTION
+// =============================================
+// Identical to the basic volume shader, but an animated
+// plane clips the density — samples above the plane are
+// simply skipped. The box and grid stay fixed.
+// Drag to orbit.
+
+// =============================================
+// EDIT HERE: Define your density function rho(x, y, z)
+// =============================================
+
+float rho(vec3 p) {
+    float g1 = exp(-2.0 * dot(p - vec3(1,0,0), p - vec3(1,0,0)));
+    float g2 = exp(-2.0 * dot(p + vec3(1,0,0), p + vec3(1,0,0)));
+    float g3 = exp(-3.0 * dot(p, p));
+    return g1 + g2 - 0.8 * g3;
+
+    // return sin(p.x) * sin(p.y) * sin(p.z);
+    // return exp(-dot(p,p)) * sin(5.0*length(p));
+    // return exp(-dot(p,p)) * (p.x*p.x - p.y*p.y);
+    // return sin(length(p) * 6.0 - iTime * 2.0) * exp(-0.3*dot(p,p));
+}
+
+// =============================================
+// PARAMETERS
+// =============================================
+
+const int VOLUME_SIGN = 0;
+
+#define PI 3.14159265359
+
+// Domain
+#define BOX_SIZE       vec3(3.0)
+
+// Camera
+#define CAM_DIST       7.0
+#define CAM_HEIGHT     3.5
+#define CAM_SPEED      0.2
+#define FOV            2.0
+
+// Volume rendering
+#define NUM_STEPS      128
+#define DENSITY_SCALE  8.0
+#define ABSORPTION     6.0
+#define LIGHT_STRENGTH 0.6
+#define BRIGHTNESS     3.0
+#define GLOW_POWER     1.2
+#define OPACITY_CUTOFF 0.01
+
+// Clipping: skip samples where dot(p, CLIP_NORMAL) > clipOff
+#define CLIP_SPEED     0.25
+#define CLIP_RANGE     2.5
+vec3 CLIP_NORMAL = normalize(vec3(0.0, 1.0, 0.0));
+
+// Grid on box faces
+#define SHOW_GRID      true
+#define GRID_SPACING   1.0
+#define GRID_WIDTH     0.02
+
+// Colors
+const vec3 POS_COLOR_CORE = vec3(1.0, 0.95, 0.85);
+const vec3 POS_COLOR_EDGE = vec3(0.95, 0.4, 0.1);
+const vec3 NEG_COLOR_CORE = vec3(0.85, 0.95, 1.0);
+const vec3 NEG_COLOR_EDGE = vec3(0.1, 0.35, 0.9);
+const vec3 BG_COLOR       = vec3(0.02, 0.02, 0.04);
+
+// =============================================
+// VISUALIZATION CODE (no need to edit below)
+// =============================================
+
+#define LIGHT_DIR normalize(vec3(cos(-iTime*0.3+PI*0.5), 1.0, sin(-iTime*0.3+PI*0.5)))
+
+vec2 boxIntersect(vec3 ro, vec3 rd, vec3 halfSize) {
+    vec3 m = 1.0/rd;
+    vec3 n = m*ro;
+    vec3 k = abs(m)*halfSize;
+    vec3 t1 = -n - k;
+    vec3 t2 = -n + k;
+    float tN = max(max(t1.x, t1.y), t1.z);
+    float tF = min(min(t2.x, t2.y), t2.z);
+    if (tN > tF || tF < 0.0) return vec2(-1.0);
+    return vec2(tN, tF);
+}
+
+vec3 gradRho(vec3 p) {
+    float e = 0.02;
+    return vec3(
+        rho(p + vec3(e,0,0)) - rho(p - vec3(e,0,0)),
+        rho(p + vec3(0,e,0)) - rho(p - vec3(0,e,0)),
+        rho(p + vec3(0,0,e)) - rho(p - vec3(0,0,e))
+    ) / (2.0 * e);
+}
+
+vec4 transferFunction(float val, vec3 p, vec3 lightDir) {
+    float absVal = abs(val);
+    if (absVal < OPACITY_CUTOFF) return vec4(0.0);
+    if (VOLUME_SIGN > 0 && val < 0.0) return vec4(0.0);
+    if (VOLUME_SIGN < 0 && val > 0.0) return vec4(0.0);
+
+    float intensity = pow(absVal, GLOW_POWER);
+    vec3 col;
+    if (val > 0.0)
+        col = mix(POS_COLOR_EDGE, POS_COLOR_CORE, smoothstep(0.0, 0.8, intensity));
+    else
+        col = mix(NEG_COLOR_EDGE, NEG_COLOR_CORE, smoothstep(0.0, 0.8, intensity));
+
+    vec3 grad = gradRho(p);
+    float gradMag = length(grad);
+    if (gradMag > 0.001) {
+        float lightFactor = 0.5 + 0.5 * dot(grad / gradMag, lightDir);
+        col *= mix(1.0, lightFactor, LIGHT_STRENGTH * smoothstep(0.0, 0.5, absVal));
+    }
+
+    float opacity = 1.0 - exp(-ABSORPTION * intensity);
+    return vec4(col * BRIGHTNESS * intensity, opacity);
+}
+
+vec3 boxFaceGrid(vec3 p, vec3 normal) {
+    vec2 fc;
+    if (abs(normal.x) > 0.5)      fc = p.yz;
+    else if (abs(normal.y) > 0.5)  fc = p.xz;
+    else                            fc = p.xy;
+
+    vec2 grid = abs(fract(fc / GRID_SPACING + 0.5) - 0.5) * GRID_SPACING;
+    float d = min(grid.x, grid.y);
+    float line = 1.0 - smoothstep(0.0, GRID_WIDTH, d);
+
+    vec2 axisD = abs(fc);
+    float axisLine = 1.0 - smoothstep(0.0, GRID_WIDTH * 2.0, min(axisD.x, axisD.y));
+
+    vec3 col = BG_COLOR + vec3(0.03);
+    col = mix(col, vec3(0.08, 0.08, 0.12), line * 0.8);
+    col = mix(col, vec3(0.12, 0.1, 0.15), axisLine * 0.6);
+    return col;
+}
+
+vec3 boxNormalAt(vec3 ro, vec3 rd, float t, vec3 halfSize) {
+    vec3 p = ro + rd * t;
+    vec3 d = abs(abs(p) - halfSize);
+    float minD = min(d.x, min(d.y, d.z));
+    if (d.x == minD) return vec3(sign(p.x), 0, 0);
+    if (d.y == minD) return vec3(0, sign(p.y), 0);
+    return vec3(0, 0, sign(p.z));
+}
+
+mat3 setCamera(vec3 ro, vec3 ta) {
+    vec3 cw = normalize(ta - ro);
+    vec3 cp = vec3(0.0, 1.0, 0.0);
+    vec3 cu = normalize(cross(cw, cp));
+    vec3 cv = normalize(cross(cu, cw));
+    return mat3(cu, cv, cw);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (2.0*fragCoord - iResolution.xy) / iResolution.y;
+
+    vec3 ta = vec3(0.0);
+    vec3 ro;
+    if (iMouse.z > 0.5) {
+        float phi = (iMouse.x / iResolution.x) * PI * 2.0;
+        float psi = -((iMouse.y / iResolution.y) - 0.5) * PI;
+        ro = CAM_DIST * vec3(cos(phi)*cos(psi), sin(psi), sin(phi)*cos(psi));
+    } else {
+        ro = vec3(CAM_DIST*cos(-iTime*CAM_SPEED), CAM_HEIGHT, CAM_DIST*sin(-iTime*CAM_SPEED));
+    }
+    mat3 cam = setCamera(ro, ta);
+    vec3 rd = cam * normalize(vec3(uv, FOV));
+
+    float clipOff = CLIP_RANGE * sin(CLIP_SPEED * iTime);
+
+    vec3 col = BG_COLOR + 0.02 * max(rd.y, 0.0);
+
+    vec2 tBox = boxIntersect(ro, rd, BOX_SIZE);
+
+    if (tBox.y > 0.0) {
+        float tMin = max(tBox.x, 0.0);
+        float tMax = tBox.y;
+        float stepSize = (tMax - tMin) / float(NUM_STEPS);
+
+        // Back face grid (always)
+        if (SHOW_GRID) {
+            vec3 pBack = ro + rd * (tMax - 0.001);
+            vec3 nBack = boxNormalAt(ro, rd, tMax, BOX_SIZE);
+            col = boxFaceGrid(pBack, nBack);
+        }
+
+        // Front-to-back compositing — skip samples above clip plane
+        vec3 accumColor = vec3(0.0);
+        float accumAlpha = 0.0;
+
+        for (int i = 0; i < NUM_STEPS; i++) {
+            if (accumAlpha > 0.99) break;
+            float t = tMin + (float(i) + 0.5) * stepSize;
+            vec3 p = ro + rd * t;
+
+            // THE ONLY DIFFERENCE: skip if above clip plane
+            if (dot(p, CLIP_NORMAL) > clipOff) continue;
+
+            float val = rho(p) * DENSITY_SCALE;
+            vec4 s = transferFunction(val, p, LIGHT_DIR);
+
+            if (s.a > 0.0) {
+                float so = s.a * stepSize;
+                accumColor += (1.0 - accumAlpha) * s.rgb * so;
+                accumAlpha += (1.0 - accumAlpha) * so;
+            }
+        }
+
+        col = accumColor + (1.0 - accumAlpha) * col;
+
+        // Front face grid (always)
+        if (SHOW_GRID && tMin > 0.0) {
+            vec3 pFront = ro + rd * (tMin + 0.001);
+            vec3 nFront = boxNormalAt(ro, rd, tMin, BOX_SIZE);
+            col = mix(col, boxFaceGrid(pFront, nFront), 0.15);
+        }
+    }
+
+    col = col / (1.0 + col);
+    col = pow(col, vec3(1.0/2.2));
+    fragColor = vec4(col, 1.0);
+}
+```
+
+
+## 3D Slice Planes
+`slice-planes/image.glsl`
+
+```glsl
+// =============================================
+// 3D SLICE PLANES
+// =============================================
+// Visualizes a scalar field f(x,y,z) using cutting planes:
+//
+//   • Three semi-transparent REFERENCE planes at x=0, y=0, z=0
+//     show a muted colormap with contour lines for spatial context.
+//
+//   • One opaque ACTIVE slice sweeps back and forth along a
+//     chosen axis, showing a rich colormap with gradient-corrected
+//     contour lines — a 2D level-set plot embedded in 3D.
+//
+// The active slice axis (x, y, or z) is configurable.
+// Drag to orbit.
+
+// =============================================
+// EDIT HERE: Define your function f(x, y, z)
+// =============================================
+
+float f(vec3 p) {
+    // Gyroid
+    return sin(p.x) * cos(p.y) + sin(p.y) * cos(p.z) + sin(p.z) * cos(p.x);
+
+    // return cos(p.x) + cos(p.y) + cos(p.z);                          // Schwarz P
+    // return sin(p.x) * sin(p.y) * sin(p.z);                          // 3D checkerboard
+    // return dot(p,p) + 2.0*p.x*p.y*p.z - 1.0;                      // Cayley cubic
+    // return length(vec2(length(p.xz)-1.5, p.y)) - 0.5;              // torus field
+    // return p.x*p.x + p.y*p.y - p.z*p.z - 0.5;                     // hyperboloid
+    // return exp(-dot(p,p)) * (p.x*p.x - p.y*p.y);                   // d-orbital
+    // return sin(length(p)*6.0 - iTime*2.0) * exp(-0.3*dot(p,p));    // pulsing wave
+}
+
+// =============================================
+// PARAMETERS
+// =============================================
+
+#define PI 3.14159265359
+
+// Active slice axis: 0 = x, 1 = y, 2 = z
+#define SLICE_AXIS     1
+
+// Active slice motion
+#define SLICE_SPEED    0.4
+#define SLICE_RANGE    2.8
+
+// Domain
+#define DOMAIN_SIZE    vec3(3.5)
+
+// Camera
+#define CAM_DIST       9.0
+#define CAM_HEIGHT     4.5
+#define AUTO_SPEED     0.2
+#define FOV            2.0
+
+// Active slice: colormap + contour lines
+#define SPACING        0.25      // distance between contour lines
+#define LINE_PX        2.0       // contour line width in pixels
+#define COLOR_SCALE    0.45      // colormap saturation
+#define ZERO_LINE_PX   3.5       // f=0 contour width (thicker)
+
+// Reference planes
+#define REF_SPACING    0.5
+#define REF_LINE_PX    1.0
+#define REF_COLOR_SAT  0.12
+#define REF_LINE_DIM   0.35
+
+// Grid lines on bounding box
+#define GRID_SPACING   1.0
+#define GRID_LINE_PX   1.2
+
+// Lighting
+#define AMBIENT        0.55
+
+// Colors
+const vec3 BG_COLOR     = vec3(0.94, 0.93, 0.91);
+const vec3 BOX_COLOR    = vec3(0.88, 0.87, 0.85);
+const vec3 GRID_COLOR   = vec3(0.6, 0.58, 0.55);
+const vec3 AXIS_COLOR   = vec3(0.35, 0.33, 0.3);
+
+// =============================================
+// VISUALIZATION CODE (no need to edit below)
+// =============================================
+
+#define LIGHT_DIR normalize(vec3(cos(-iTime*0.3 + PI*0.5), 1.0, sin(-iTime*0.3 + PI*0.5)))
+
+// Diverging colormap: blue — white — red
+vec3 divergingMap(float val, float scale) {
+    float t = clamp(val * scale, -1.0, 1.0);
+    if (t < 0.0) return mix(vec3(1.0), vec3(0.15, 0.35, 0.85), -t);
+    else          return mix(vec3(1.0), vec3(0.85, 0.15, 0.15), t);
+}
+
+// Gradient-corrected contour lines on a slice plane
+float contourLines(vec3 p, vec3 faceNormal, float spacing, float linePx, float tHit) {
+    float val = f(p);
+    float e = 0.005;
+    vec3 grad = vec3(
+        f(p + vec3(e,0,0)) - f(p - vec3(e,0,0)),
+        f(p + vec3(0,e,0)) - f(p - vec3(0,e,0)),
+        f(p + vec3(0,0,e)) - f(p - vec3(0,0,e))
+    ) / (2.0 * e);
+    grad -= faceNormal * dot(grad, faceNormal);
+    float gradMag = length(grad);
+    float pixelSize = tHit * 2.0 / iResolution.y;
+    float valInCell = fract(val / spacing);
+    float distToLine = min(valInCell, 1.0 - valInCell) * spacing;
+    float pixelDist = distToLine / max(gradMag * pixelSize, 1e-6);
+    return 0.2 + 0.8 * smoothstep(0.0, linePx, pixelDist);
+}
+
+float zeroContour(vec3 p, vec3 faceNormal, float linePx, float tHit) {
+    float val = f(p);
+    float e = 0.005;
+    vec3 grad = vec3(
+        f(p + vec3(e,0,0)) - f(p - vec3(e,0,0)),
+        f(p + vec3(0,e,0)) - f(p - vec3(0,e,0)),
+        f(p + vec3(0,0,e)) - f(p - vec3(0,0,e))
+    ) / (2.0 * e);
+    grad -= faceNormal * dot(grad, faceNormal);
+    float gradMag = length(grad);
+    float pixelSize = tHit * 2.0 / iResolution.y;
+    float pixelDist = abs(val) / max(gradMag * pixelSize, 1e-6);
+    return 1.0 - smoothstep(0.0, linePx, pixelDist);
+}
+
+// Active slice: rich colormap + contours + f=0 highlight
+vec3 activeSliceColor(vec3 p, vec3 normal, float tHit) {
+    float val = f(p);
+    vec3 col = divergingMap(val, COLOR_SCALE);
+    float lines = contourLines(p, normal, SPACING, LINE_PX, tHit);
+    col *= 0.15 + 0.85 * lines;
+    float zc = zeroContour(p, normal, ZERO_LINE_PX, tHit);
+    col = mix(col, vec3(0.05), zc * 0.9);
+    float diff = AMBIENT + (1.0 - AMBIENT) * abs(dot(normal, LIGHT_DIR));
+    return col * diff;
+}
+
+// Reference plane: muted colormap + sparser contours
+vec3 refPlaneColor(vec3 p, vec3 normal, float tHit) {
+    float val = f(p);
+    vec3 col = divergingMap(val, REF_COLOR_SAT);
+    float lines = contourLines(p, normal, REF_SPACING, REF_LINE_PX, tHit);
+    col *= mix(1.0, lines, REF_LINE_DIM);
+    float zc = zeroContour(p, normal, REF_LINE_PX * 1.5, tHit);
+    col = mix(col, vec3(0.45), zc * REF_LINE_DIM);
+    float diff = AMBIENT + (1.0 - AMBIENT) * abs(dot(normal, LIGHT_DIR));
+    return col * diff;
+}
+
+// Box face with grid
+vec3 drawBoxFace(vec3 p, vec3 faceNormal, float tHit) {
+    vec2 faceCoord;
+    if (abs(faceNormal.x) > 0.5)      faceCoord = p.yz;
+    else if (abs(faceNormal.y) > 0.5)  faceCoord = p.xz;
+    else                                faceCoord = p.xy;
+    float pixelSize = tHit * 2.0 / iResolution.y;
+    vec2 majorGrid = abs(fract(faceCoord / GRID_SPACING + 0.5) - 0.5) * GRID_SPACING;
+    float majorDist = min(majorGrid.x, majorGrid.y);
+    float majorLine = 1.0 - smoothstep(0.0, pixelSize * GRID_LINE_PX, majorDist);
+    vec2 axisDist = abs(faceCoord);
+    float axisLine = 1.0 - smoothstep(0.0, pixelSize * GRID_LINE_PX * 2.0, min(axisDist.x, axisDist.y));
+    float diff = AMBIENT + (1.0 - AMBIENT) * abs(dot(faceNormal, LIGHT_DIR));
+    vec3 col = BOX_COLOR * diff;
+    col = mix(col, GRID_COLOR * diff, majorLine * 0.45);
+    col = mix(col, AXIS_COLOR * diff, axisLine * 0.6);
+    return col;
+}
+
+// Geometry
+vec2 boxIntersect(vec3 ro, vec3 rd, vec3 halfSize, out vec3 nFront, out vec3 nBack) {
+    vec3 m = 1.0 / rd;
+    vec3 n = m * ro;
+    vec3 k = abs(m) * halfSize;
+    vec3 t1 = -n - k;
+    vec3 t2 = -n + k;
+    float tN = max(max(t1.x, t1.y), t1.z);
+    float tF = min(min(t2.x, t2.y), t2.z);
+    if (tN > tF || tF < 0.0) return vec2(-1.0);
+    nFront = -sign(rd) * step(t1.yzx, t1.xyz) * step(t1.zxy, t1.xyz);
+    vec3 d = abs(ro + rd * tF);
+    nBack = -sign(rd) * vec3(
+        d.x > d.y && d.x > d.z ? 1.0 : 0.0,
+        d.y > d.x && d.y > d.z ? 1.0 : 0.0,
+        d.z > d.y && d.z > d.x ? 1.0 : 0.0
+    );
+    return vec2(tN, tF);
+}
+
+float planeIntersect(vec3 ro, vec3 rd, int axis, float planePos, vec3 halfSize) {
+    float o = axis == 0 ? ro.x : (axis == 1 ? ro.y : ro.z);
+    float d = axis == 0 ? rd.x : (axis == 1 ? rd.y : rd.z);
+    if (abs(d) < 1e-8) return -1.0;
+    float t = (planePos - o) / d;
+    if (t < 0.0) return -1.0;
+    vec3 p = ro + rd * t;
+    if (abs(p.x) > halfSize.x + 0.001 ||
+        abs(p.y) > halfSize.y + 0.001 ||
+        abs(p.z) > halfSize.z + 0.001) return -1.0;
+    return t;
+}
+
+vec3 planeNormal(int axis) {
+    if (axis == 0) return vec3(1, 0, 0);
+    if (axis == 1) return vec3(0, 1, 0);
+    return vec3(0, 0, 1);
+}
+
+mat3 setCamera(vec3 ro, vec3 ta) {
+    vec3 cw = normalize(ta - ro);
+    vec3 cp = vec3(0.0, 1.0, 0.0);
+    vec3 cu = normalize(cross(cw, cp));
+    vec3 cv = normalize(cross(cu, cw));
+    return mat3(cu, cv, cw);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (2.0 * fragCoord - iResolution.xy) / iResolution.y;
+
+    vec3 ro, ta;
+    ta = vec3(0.0);
+    if (iMouse.z > 0.5) {
+        float phi = (iMouse.x / iResolution.x) * 2.0 * PI;
+        float psi = -((iMouse.y / iResolution.y) - 0.5) * PI;
+        ro = CAM_DIST * vec3(cos(phi)*cos(psi), sin(psi), sin(phi)*cos(psi));
+    } else {
+        ro = vec3(
+            CAM_DIST * cos(-iTime * AUTO_SPEED),
+            CAM_HEIGHT,
+            CAM_DIST * sin(-iTime * AUTO_SPEED)
+        );
+    }
+    mat3 cam = setCamera(ro, ta);
+    vec3 rd = cam * normalize(vec3(uv, FOV));
+
+    vec3 col = BG_COLOR;
+
+    vec3 nFront, nBack;
+    vec2 tBox = boxIntersect(ro, rd, DOMAIN_SIZE, nFront, nBack);
+
+    if (tBox.y > 0.0) {
+        float tMin = max(tBox.x, 0.0);
+        float tMax = tBox.y;
+
+        // Back face: reference contour plot
+        vec3 pBack = ro + rd * (tMax - 0.001);
+        col = refPlaneColor(pBack, nBack, tMax);
+
+        // Active slice
+        float slicePos = SLICE_RANGE * sin(iTime * SLICE_SPEED);
+        float sliceT = planeIntersect(ro, rd, SLICE_AXIS, slicePos, DOMAIN_SIZE);
+
+        if (sliceT > tMin && sliceT < tMax - 0.001) {
+            vec3 p = ro + rd * sliceT;
+            vec3 n = planeNormal(SLICE_AXIS);
+            vec3 sliceCol = activeSliceColor(p, n, sliceT);
+
+            // Edge outline where slice meets box boundary
+            float d1, d2;
+            if (SLICE_AXIS == 0)      { d1 = DOMAIN_SIZE.y - abs(p.y); d2 = DOMAIN_SIZE.z - abs(p.z); }
+            else if (SLICE_AXIS == 1) { d1 = DOMAIN_SIZE.x - abs(p.x); d2 = DOMAIN_SIZE.z - abs(p.z); }
+            else                       { d1 = DOMAIN_SIZE.x - abs(p.x); d2 = DOMAIN_SIZE.y - abs(p.y); }
+            float edgeDist = min(d1, d2);
+            float pixelSize = sliceT * 2.0 / iResolution.y;
+            float edge = 1.0 - smoothstep(pixelSize * 0.5, pixelSize * 2.5, edgeDist);
+            sliceCol = mix(sliceCol, vec3(0.15), edge * 0.7);
+
+            col = sliceCol;
+        }
+
+        // Front face: thin grid overlay
+        if (tMin > 0.0) {
+            vec3 pFront = ro + rd * (tMin + 0.001);
+            vec3 gridCol = drawBoxFace(pFront, nFront, tMin);
+            col = mix(col, gridCol, 0.1);
+        }
+    }
+
+    col = pow(col, vec3(1.0 / 2.2));
+    fragColor = vec4(col, 1.0);
+}
+```
+
+

@@ -1,0 +1,2199 @@
+## Hyperbolic Geometry Explorer
+`hyperbolic-explorer/image.glsl`
+
+```glsl
+// =============================================
+// HYPERBOLIC GEOMETRY EXPLORER
+// =============================================
+// Draw points, geodesics, and horocycles in the
+// hyperbolic plane. All objects are specified in
+// upper half-plane coordinates. Choose your model.
+// Drag to orbit (Poincaré/Klein/Band).
+
+// =============================================
+// MODEL (uncomment one)
+// =============================================
+#define MODEL_POINCARE
+//#define MODEL_UHP
+//#define MODEL_KLEIN
+//#define MODEL_BAND
+
+// =============================================
+// THEME (uncomment one)
+// =============================================
+//#define THEME_DARK
+#define THEME_LIGHT
+
+// =============================================
+// EDIT HERE: Points in UHP (x + yi, y > 0)
+// =============================================
+
+#define NUM_POINTS 3
+vec2 pts[NUM_POINTS] = vec2[NUM_POINTS](
+    vec2(0.0, 1.0),        // i
+    vec2(1.5, 0.8),        // 1.5 + 0.8i
+    vec2(-1.0, 2.0)        // -1 + 2i
+);
+vec3 ptColor[NUM_POINTS] = vec3[NUM_POINTS](
+    vec3(0.95, 0.3, 0.25),
+    vec3(0.3, 0.85, 0.35),
+    vec3(0.3, 0.5, 0.95)
+);
+float ptRadius[NUM_POINTS] = float[NUM_POINTS](
+    0.08, 0.08, 0.08
+);
+
+// =============================================
+// EDIT HERE: Geodesics (through two UHP points)
+// Each vec4 = (z1.x, z1.y, z2.x, z2.y)
+// The full geodesic is drawn, not just the segment.
+// =============================================
+
+#define NUM_GEODESICS 3
+vec4 geos[NUM_GEODESICS] = vec4[NUM_GEODESICS](
+    vec4(0.0, 1.0,  1.5, 0.8),      // connecting point 0 and 1
+    vec4(1.5, 0.8, -1.0, 2.0),      // connecting point 1 and 2
+    vec4(-1.0, 2.0,  0.0, 1.0)      // connecting point 2 and 0
+);
+vec3 geoColor[NUM_GEODESICS] = vec3[NUM_GEODESICS](
+    vec3(0.9, 0.75, 0.3),
+    vec3(0.9, 0.75, 0.3),
+    vec3(0.9, 0.75, 0.3)
+);
+float geoThick[NUM_GEODESICS] = float[NUM_GEODESICS](
+    0.02, 0.02, 0.02
+);
+
+// =============================================
+// EDIT HERE: Horocycles
+// vec2(base, radius):
+//   base = point on the real axis where horocycle is tangent
+//   radius = Euclidean radius of the horocycle in UHP
+// For a horocycle at infinity: vec2(INF, height)
+//   where height = the y-coordinate of the horizontal line
+// =============================================
+
+#define INF 1e10
+#define NUM_HOROCYCLES 2
+vec2 horos[NUM_HOROCYCLES] = vec2[NUM_HOROCYCLES](
+    vec2(0.0, 0.3),        // tangent to real axis at 0, radius 0.3
+    vec2(INF, 3.0)          // horizontal line y = 3 (horocycle at infinity)
+);
+vec3 horoColor[NUM_HOROCYCLES] = vec3[NUM_HOROCYCLES](
+    vec3(0.3, 0.75, 0.9),
+    vec3(0.3, 0.75, 0.9)
+);
+float horoThick[NUM_HOROCYCLES] = float[NUM_HOROCYCLES](
+    0.02, 0.02
+);
+
+// =============================================
+// PARAMETERS
+// =============================================
+
+#define PI 3.14159265359
+
+#define AA_WIDTH       0.008    // antialiasing width
+
+// Camera / display
+#define ZOOM           2.4
+#define UHP_CENTER     vec2(0.0, 2.5)   // center of view in UHP mode
+#define UHP_SCALE      2.0              // zoom for UHP mode
+
+// Animation (Poincaré / Klein only)
+#define ANIMATE        true
+#define ROTATE_SPEED   0.15
+#define DRIFT_AMOUNT   0.1
+
+// Colors — theme-dependent
+#ifdef THEME_DARK
+    const vec3 COLOR_BG     = vec3(0.02, 0.02, 0.03);
+    const vec3 COLOR_DISK   = vec3(0.06, 0.06, 0.08);
+    const vec3 COLOR_BORDER = vec3(0.25, 0.25, 0.3);
+#else
+    const vec3 COLOR_BG     = vec3(0.88, 0.87, 0.85);
+    const vec3 COLOR_DISK   = vec3(0.96, 0.95, 0.93);
+    const vec3 COLOR_BORDER = vec3(0.4, 0.38, 0.35);
+#endif
+
+// =============================================
+// IMPLEMENTATION
+// =============================================
+
+// ---- Complex arithmetic ----
+
+vec2 cmul(vec2 a, vec2 b) {
+    return vec2(a.x*b.x - a.y*b.y, a.x*b.y + a.y*b.x);
+}
+vec2 cdiv(vec2 a, vec2 b) {
+    return vec2(a.x*b.x + a.y*b.y, a.y*b.x - a.x*b.y) / dot(b, b);
+}
+vec2 ctanh(vec2 z) {
+    float d = cosh(2.0*z.x) + cos(2.0*z.y);
+    return vec2(sinh(2.0*z.x), sin(2.0*z.y)) / d;
+}
+
+// ---- Model conversions ----
+
+vec2 diskToUHP(vec2 w) {
+    return cmul(vec2(0,1), cdiv(vec2(1,0)+w, vec2(1,0)-w));
+}
+vec2 uhpToDisk(vec2 z) {
+    return cdiv(z - vec2(0,1), z + vec2(0,1));
+}
+vec2 kleinToDisk(vec2 w) {
+    float s = length(w);
+    if (s < 1e-6) return vec2(0);
+    return w * ((s / (1.0 + sqrt(1.0 - s*s))) / s);
+}
+
+// ---- Möbius in the disk ----
+
+vec2 diskRotate(vec2 w, float a) {
+    return vec2(cos(a)*w.x - sin(a)*w.y, sin(a)*w.x + cos(a)*w.y);
+}
+vec2 diskTranslate(vec2 w, vec2 a) {
+    return cdiv(w - a, vec2(1,0) - cmul(vec2(a.x,-a.y), w));
+}
+
+// ---- Hyperbolic distances ----
+
+// Distance from z to vertical geodesic Re(z) = c
+float distToVert(vec2 z, float c) {
+    vec2 w = z - vec2(c, 0.0);
+    return acosh(max(1.0, length(w) / z.y));
+}
+
+// Distance from z to semicircular geodesic centered at (center, 0) with given radius
+float distToCirc(vec2 z, float center, float radius) {
+    vec2 num   = z - vec2(center + radius, 0.0);
+    vec2 denom = z - vec2(center - radius, 0.0);
+    vec2 w = cdiv(num, denom);
+    return acosh(max(1.0, length(w) / max(w.y, 1e-10)));
+}
+
+// Distance between two points
+float hypDist(vec2 z1, vec2 z2) {
+    vec2 d = z1 - z2;
+    return acosh(max(1.0, 1.0 + dot(d,d) / (2.0*z1.y*z2.y)));
+}
+
+// ---- Distance to geodesic through two UHP points ----
+
+float distToGeodesic(vec2 z, vec2 z1, vec2 z2) {
+    // Vertical case
+    if (abs(z1.x - z2.x) < 1e-4)
+        return distToVert(z, 0.5*(z1.x + z2.x));
+    // Semicircle: find center on real axis
+    float c = (dot(z1,z1) - dot(z2,z2)) / (2.0*(z1.x - z2.x));
+    float r = length(z1 - vec2(c, 0.0));
+    return distToCirc(z, c, r);
+}
+
+// ---- Distance to horocycle ----
+
+float distToHorocycle(vec2 z, vec2 horo) {
+    float base = horo.x;
+    float r = horo.y;
+    if (abs(base) > 1e6) {
+        // Horocycle at infinity: horizontal line y = r
+        return abs(log(z.y / r));
+    }
+    // Horocycle at finite point: circle tangent to real axis
+    // at (base, 0) with Euclidean radius r.
+    // Apply T(z) = -1/(z - base), sending base → ∞.
+    // Horocycle maps to y = 1/(2r).
+    // dist = |log(Im(T(z)) / (1/(2r)))| = |log(2r · z.y / |z-base|²)|
+    float dx = z.x - base;
+    float d2 = dx*dx + z.y*z.y;
+    return abs(log(max(1e-10, 2.0 * r * z.y / d2)));
+}
+
+// ---- Main ----
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = fragCoord / iResolution.xy - 0.5;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 w = uv * ZOOM;
+
+    // ---- Convert screen coords to UHP ----
+    vec3 col = COLOR_BG;
+    bool inDomain = false;
+    float borderDist = 1e6;
+    vec2 z;
+
+    #ifdef MODEL_POINCARE
+        float diskR = length(w);
+        inDomain = diskR < 0.998;
+        borderDist = 1.0 - diskR;
+        if (ANIMATE) {
+            float t = iTime * ROTATE_SPEED;
+            w = diskRotate(w, t);
+            w = diskTranslate(w, DRIFT_AMOUNT * vec2(sin(t*1.3), cos(t*0.9)));
+        }
+        z = diskToUHP(w);
+    #endif
+
+    #ifdef MODEL_KLEIN
+        float kleinR = length(w);
+        inDomain = kleinR < 0.998;
+        borderDist = 1.0 - kleinR;
+        vec2 diskPt = kleinToDisk(w);
+        if (ANIMATE) {
+            float t = iTime * ROTATE_SPEED;
+            diskPt = diskRotate(diskPt, t);
+            diskPt = diskTranslate(diskPt, DRIFT_AMOUNT * vec2(sin(t*1.3), cos(t*0.9)));
+        }
+        z = diskToUHP(diskPt);
+    #endif
+
+    #ifdef MODEL_BAND
+        float bandHalf = PI * 0.25 * ZOOM / 2.4;
+        inDomain = abs(w.y) < bandHalf * 0.998;
+        borderDist = bandHalf - abs(w.y);
+        vec2 diskPtB = ctanh(w);
+        if (ANIMATE) {
+            float t = iTime * ROTATE_SPEED;
+            diskPtB = diskRotate(diskPtB, t);
+            diskPtB = diskTranslate(diskPtB, DRIFT_AMOUNT * vec2(sin(t*1.3), cos(t*0.9)));
+        }
+        z = diskToUHP(diskPtB);
+    #endif
+
+    #ifdef MODEL_UHP
+        z = w * UHP_SCALE + UHP_CENTER;
+        inDomain = z.y > 0.001;
+        borderDist = z.y;
+    #endif
+
+    // Disk/Klein/Band border
+    #if defined(MODEL_POINCARE) || defined(MODEL_KLEIN) || defined(MODEL_BAND)
+        float pixSize = ZOOM / iResolution.y;
+        if (abs(borderDist) < pixSize * 2.0)
+            col = COLOR_BORDER;
+    #endif
+
+    if (!inDomain) {
+        fragColor = vec4(col, 1.0);
+        return;
+    }
+
+    // Start with interior background
+    col = COLOR_DISK;
+
+    // ---- Draw geodesics ----
+    for (int i = 0; i < NUM_GEODESICS; i++) {
+        vec2 z1 = vec2(geos[i].xy);
+        vec2 z2 = vec2(geos[i].zw);
+        float d = distToGeodesic(z, z1, z2);
+        float line = 1.0 - smoothstep(geoThick[i] - AA_WIDTH, geoThick[i] + AA_WIDTH, d);
+        col = mix(col, geoColor[i], line);
+    }
+
+    // ---- Draw horocycles ----
+    for (int i = 0; i < NUM_HOROCYCLES; i++) {
+        float d = distToHorocycle(z, horos[i]);
+        float line = 1.0 - smoothstep(horoThick[i] - AA_WIDTH, horoThick[i] + AA_WIDTH, d);
+        col = mix(col, horoColor[i], line);
+    }
+
+    // ---- Draw points ----
+    for (int i = 0; i < NUM_POINTS; i++) {
+        float d = hypDist(z, pts[i]);
+        float dot_ = 1.0 - smoothstep(ptRadius[i] - AA_WIDTH, ptRadius[i] + AA_WIDTH, d);
+        col = mix(col, ptColor[i], dot_);
+    }
+
+    fragColor = vec4(col, 1.0);
+}
+```
+
+
+
+## Hyperbolic Triangle Tilings
+`hyperbolic-triangles/image.glsl`
+
+```glsl
+/////////////////////////////////////////////////////
+//  HYPERBOLIC TRIANGLE TILINGS
+//  Workshop Shader — Illustrating Mathematics
+//
+//  Visualizes (P, Q, R) triangle groups in the
+//  hyperbolic plane via iterated reflection.
+//  Drag to orbit.
+/////////////////////////////////////////////////////
+
+//--------------------------------------------------
+// MODEL (uncomment one)
+//--------------------------------------------------
+#define MODEL_POINCARE
+//#define MODEL_UHP
+//#define MODEL_KLEIN
+//#define MODEL_BAND
+
+//--------------------------------------------------
+// THEME (uncomment one)
+//--------------------------------------------------
+//#define THEME_DARK
+#define THEME_LIGHT
+
+//--------------------------------------------------
+// TRIANGLE GROUP (P, Q, R)
+//   Angles pi/P, pi/Q, pi/R.
+//   Must satisfy 1/P + 1/Q + 1/R < 1.
+//--------------------------------------------------
+#define TRI_P  3
+#define TRI_Q  2
+#define TRI_R  10
+
+//--------------------------------------------------
+// WHAT TO DRAW
+//--------------------------------------------------
+#define DRAW_EDGES    true
+#define DRAW_VERTICES true
+#define DRAW_PARITY   true    // two-color by orientation?
+
+//--------------------------------------------------
+// SIZES (hyperbolic distance units)
+//--------------------------------------------------
+#define EDGE_THICKNESS   0.015
+#define VERTEX_RADIUS    0.06
+
+//--------------------------------------------------
+// ANIMATION
+//--------------------------------------------------
+#define ANIMATE       true
+#define ROTATE_SPEED  0.3
+#define DRIFT_AMOUNT  0.15
+
+//--------------------------------------------------
+// COLORS
+//--------------------------------------------------
+#ifdef THEME_DARK
+    const vec3 COLOR_A      = vec3(0.55, 0.70, 0.85);
+    const vec3 COLOR_B      = vec3(0.20, 0.30, 0.45);
+    const vec3 COLOR_EDGE   = vec3(0.92, 0.88, 0.82);
+    const vec3 COLOR_VERTEX = vec3(0.90, 0.35, 0.25);
+    const vec3 COLOR_BG     = vec3(0.02, 0.02, 0.03);
+    const vec3 COLOR_BORDER = vec3(0.25, 0.25, 0.3);
+#else
+    const vec3 COLOR_A      = vec3(0.72, 0.82, 0.92);
+    const vec3 COLOR_B      = vec3(0.45, 0.55, 0.70);
+    const vec3 COLOR_EDGE   = vec3(0.15, 0.12, 0.08);
+    const vec3 COLOR_VERTEX = vec3(0.85, 0.3, 0.2);
+    const vec3 COLOR_BG     = vec3(0.88, 0.87, 0.85);
+    const vec3 COLOR_BORDER = vec3(0.4, 0.38, 0.35);
+#endif
+
+//--------------------------------------------------
+// ZOOM
+//--------------------------------------------------
+#define ZOOM 2.4
+
+
+/////////////////////////////////////////////////////
+//  IMPLEMENTATION
+/////////////////////////////////////////////////////
+
+const float PI = 3.14159265;
+
+vec2 cmul(vec2 a, vec2 b) {
+    return vec2(a.x*b.x - a.y*b.y, a.x*b.y + a.y*b.x);
+}
+vec2 cdiv(vec2 a, vec2 b) {
+    return vec2(a.x*b.x + a.y*b.y, a.y*b.x - a.x*b.y) / dot(b, b);
+}
+vec2 ctanh(vec2 z) {
+    float d = cosh(2.0*z.x) + cos(2.0*z.y);
+    return vec2(sinh(2.0*z.x), sin(2.0*z.y)) / d;
+}
+
+vec2 diskToUHP(vec2 w) {
+    return cmul(vec2(0,1), cdiv(vec2(1,0)+w, vec2(1,0)-w));
+}
+vec2 kleinToDisk(vec2 w) {
+    float s = length(w);
+    if (s < 0.0001) return vec2(0);
+    return w / (1.0 + sqrt(max(1.0 - dot(w,w), 0.0)));
+}
+vec2 diskRotate(vec2 w, float angle) {
+    float c = cos(angle), s = sin(angle);
+    return vec2(c*w.x - s*w.y, s*w.x + c*w.y);
+}
+vec2 diskTranslate(vec2 w, vec2 a) {
+    return cdiv(w - a, vec2(1,0) - cmul(vec2(a.x,-a.y), w));
+}
+
+// Half-space types
+struct HSVert { float x; float side; };
+struct HSCirc { float center; float radius; float side; };
+
+vec2 reflectInto(vec2 z, HSVert h, inout int count) {
+    if ((z.x - h.x) * h.side >= 0.0) return z;
+    count++;
+    return vec2(2.0*h.x - z.x, z.y);
+}
+vec2 reflectInto(vec2 z, HSCirc h, inout int count) {
+    vec2 rel = z - vec2(h.center, 0.0);
+    float r2 = h.radius * h.radius;
+    if ((dot(rel, rel) - r2) * h.side >= 0.0) return z;
+    count++;
+    z.x -= h.center;
+    z = z * (r2 / dot(z, z));
+    z.x += h.center;
+    return z;
+}
+
+// Hyperbolic distances
+float distToVert(vec2 z, float c) {
+    vec2 w = z - vec2(c, 0.0);
+    return acosh(max(1.0, length(w) / z.y));
+}
+float distToCirc(vec2 z, float center, float radius) {
+    vec2 num   = z - vec2(center + radius, 0.0);
+    vec2 denom = z - vec2(center - radius, 0.0);
+    vec2 w = cdiv(num, denom);
+    return acosh(max(1.0, length(w) / max(w.y, 1e-10)));
+}
+float hypDist(vec2 z1, vec2 z2) {
+    vec2 d = z1 - z2;
+    return acosh(max(1.0, 1.0 + dot(d,d) / (2.0*z1.y*z2.y)));
+}
+
+// Triangle data
+struct TriData {
+    HSVert sideA;
+    HSCirc sideB;
+    HSCirc sideC;
+    vec2 vertP, vertQ, vertR;
+};
+
+TriData buildTriangle(int P, int Q, int R) {
+    float p = float(P), q = float(Q), r = float(R);
+    float cosP = cos(PI/p), sinP = sin(PI/p);
+    float cosQ = cos(PI/q), sinQ = sin(PI/q);
+    float cosR = cos(PI/r);
+    float xA = -cosP;
+    HSVert sideA = HSVert(xA, 1.0);
+    HSCirc sideB = HSCirc(0.0, 1.0, 1.0);
+    float coshSR = (cosR + cosP*cosQ) / (sinP*sinQ);
+    float eucH = sinP * exp(acosh(coshSR));
+    float x_off = eucH / tan(PI/q);
+    float cC = xA - x_off;
+    float rC = sqrt(x_off*x_off + eucH*eucH);
+    HSCirc sideC = HSCirc(cC, rC, -1.0);
+    vec2 vertP = vec2(xA, sinP);
+    float dy = sqrt(max(rC*rC - (xA-cC)*(xA-cC), 0.0));
+    vec2 vertR = vec2(xA, dy);
+    float xQ = (1.0 + cC*cC - rC*rC) / (2.0*cC);
+    float yQ = sqrt(max(1.0 - xQ*xQ, 0.0));
+    vec2 vertQ = vec2(xQ, yQ);
+    return TriData(sideA, sideB, sideC, vertP, vertQ, vertR);
+}
+
+vec2 foldIntoTriangle(vec2 z, TriData tri, out int foldCount) {
+    foldCount = 0;
+    for (int i = 0; i < 100; i++) {
+        vec2 z0 = z;
+        z = reflectInto(z, tri.sideA, foldCount);
+        z = reflectInto(z, tri.sideB, foldCount);
+        z = reflectInto(z, tri.sideC, foldCount);
+        if (dot(z - z0, z - z0) < 1e-8) break;
+    }
+    return z;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = fragCoord / iResolution.xy - 0.5;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 w = uv * float(ZOOM);
+
+    #ifdef MODEL_POINCARE
+        if (ANIMATE) {
+            float t = iTime * ROTATE_SPEED;
+            w = diskRotate(w, t);
+            w = diskTranslate(w, DRIFT_AMOUNT * vec2(sin(t*1.3), cos(t*0.9)));
+        }
+    #endif
+
+    bool inDomain = false;
+    float borderDist = 1e6;
+    vec2 z;
+
+    #ifdef MODEL_POINCARE
+        inDomain = length(w) < 0.998;
+        borderDist = 1.0 - length(w);
+        z = diskToUHP(w);
+    #endif
+    #ifdef MODEL_KLEIN
+        inDomain = length(w) < 0.998;
+        borderDist = 1.0 - length(w);
+        vec2 dkPt = kleinToDisk(w);
+        if (ANIMATE) {
+            float t = iTime * ROTATE_SPEED;
+            dkPt = diskRotate(dkPt, t);
+            dkPt = diskTranslate(dkPt, DRIFT_AMOUNT * vec2(sin(t*1.3), cos(t*0.9)));
+        }
+        z = diskToUHP(dkPt);
+    #endif
+    #ifdef MODEL_BAND
+        float bandHalf = PI * 0.25 * float(ZOOM) / 2.4;
+        inDomain = abs(w.y) < bandHalf * 0.998;
+        borderDist = bandHalf - abs(w.y);
+        vec2 bdPt = ctanh(w);
+        if (ANIMATE) {
+            float t = iTime * ROTATE_SPEED;
+            bdPt = diskRotate(bdPt, t);
+            bdPt = diskTranslate(bdPt, DRIFT_AMOUNT * vec2(sin(t*1.3), cos(t*0.9)));
+        }
+        z = diskToUHP(bdPt);
+    #endif
+    #ifdef MODEL_UHP
+        z = w * 2.0 + vec2(0, 2.5);
+        inDomain = z.y > 0.0;
+        borderDist = z.y;
+    #endif
+
+    vec3 color = COLOR_BG;
+    #if defined(MODEL_POINCARE) || defined(MODEL_KLEIN) || defined(MODEL_BAND)
+        float pixSize = float(ZOOM) / iResolution.y;
+        if (abs(borderDist) < pixSize * 2.0)
+            color = COLOR_BORDER;
+    #endif
+
+    if (!inDomain) {
+        fragColor = vec4(color, 1.0);
+        return;
+    }
+
+    TriData tri = buildTriangle(TRI_P, TRI_Q, TRI_R);
+    int foldCount;
+    vec2 zf = foldIntoTriangle(z, tri, foldCount);
+
+    if (DRAW_PARITY)
+        color = (mod(float(foldCount), 2.0) < 0.5) ? COLOR_A : COLOR_B;
+    else
+        color = COLOR_A;
+
+    if (DRAW_EDGES) {
+        float d1 = distToVert(zf, tri.sideA.x);
+        float d2 = distToCirc(zf, tri.sideB.center, tri.sideB.radius);
+        float d3 = distToCirc(zf, tri.sideC.center, tri.sideC.radius);
+        if (min(d1, min(d2, d3)) < EDGE_THICKNESS)
+            color = COLOR_EDGE;
+    }
+
+    if (DRAW_VERTICES) {
+        float dP = hypDist(zf, tri.vertP);
+        float dQ = hypDist(zf, tri.vertQ);
+        float dR = hypDist(zf, tri.vertR);
+        if (min(dP, min(dQ, dR)) < VERTEX_RADIUS)
+            color = COLOR_VERTEX;
+    }
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+## Wythoff Tilings
+`wythoff-tilings/image.glsl`
+
+```glsl
+/////////////////////////////////////////////////////
+//  WYTHOFF TILINGS OF HYPERBOLIC TRIANGLE GROUPS
+//  Workshop Shader — Illustrating Mathematics
+//
+//  Given a (P, Q, R) triangle group, choose a
+//  generating point and watch the Wythoff construction
+//  tile the hyperbolic plane with polygons.
+//  Drag to orbit.
+/////////////////////////////////////////////////////
+
+//--------------------------------------------------
+// MODEL (uncomment one)
+//--------------------------------------------------
+#define MODEL_POINCARE
+//#define MODEL_UHP
+//#define MODEL_KLEIN
+//#define MODEL_BAND
+
+//--------------------------------------------------
+// THEME (uncomment one)
+//--------------------------------------------------
+//#define THEME_DARK
+#define THEME_LIGHT
+
+//--------------------------------------------------
+// TRIANGLE GROUP (P, Q, R)
+//   Angles pi/P, pi/Q, pi/R.
+//   Must satisfy 1/P + 1/Q + 1/R < 1.
+//--------------------------------------------------
+#define TRI_P  2
+#define TRI_Q  3
+#define TRI_R  7
+
+//--------------------------------------------------
+// GENERATING POINT
+//   Controls which Wythoff tiling you get.
+//
+//   Mirrors:  a = vertical line (has vertices P, R)
+//             b = unit circle   (has vertices P, Q)
+//             c = computed arc  (has vertices Q, R)
+//
+//   0 = vertex P (pi/P)    on a,b
+//   1 = vertex Q (pi/Q)    on b,c
+//   2 = vertex R (pi/R)    on a,c
+//   3 = uniform pt on QR   on c     (equidistant from a,b)
+//   4 = uniform pt on PR   on a     (equidistant from b,c)
+//   5 = uniform pt on PQ   on b     (equidistant from a,c)
+//   6 = incenter            off all  (equidistant from a,b,c)
+//   7 = MANUAL (see below)
+//--------------------------------------------------
+#define GEN_POINT 5
+
+//--------------------------------------------------
+// MANUAL GENERATING POINT (only when GEN_POINT == 7)
+//   GEN_MIRROR: 0 = sideA, 1 = sideB, 2 = sideC
+//   GEN_T: position along mirror (0 to 1, hyperbolic interp)
+//--------------------------------------------------
+#define GEN_MIRROR 0
+#define GEN_T      0.5
+
+//--------------------------------------------------
+// DRAWING OPTIONS
+//--------------------------------------------------
+#define DRAW_WYTHOFF_EDGES    true
+#define DRAW_WYTHOFF_VERTICES true
+#define DRAW_TRIANGLE_EDGES   false
+#define DRAW_TRIANGLE_PARITY  false
+
+#define WYTHOFF_EDGE_THICKNESS  0.012
+#define WYTHOFF_VERTEX_RADIUS   0.04
+#define TRIANGLE_EDGE_THICKNESS 0.004
+
+//--------------------------------------------------
+// ANIMATION
+//--------------------------------------------------
+#define ANIMATE       true
+#define ROTATE_SPEED  0.3
+#define DRIFT_AMOUNT  0.15
+
+//--------------------------------------------------
+// COLORS
+//--------------------------------------------------
+#ifdef THEME_DARK
+    const vec3 COLOR_A             = vec3(0.55, 0.70, 0.85);
+    const vec3 COLOR_B             = vec3(0.35, 0.50, 0.68);
+    const vec3 COLOR_WYTHOFF_EDGE  = vec3(0.92, 0.88, 0.82);
+    const vec3 COLOR_WYTHOFF_VERT  = vec3(0.90, 0.35, 0.25);
+    const vec3 COLOR_TRI_EDGE      = vec3(0.75, 0.75, 0.75);
+    const vec3 COLOR_BG            = vec3(0.02, 0.02, 0.03);
+    const vec3 COLOR_BORDER        = vec3(0.25, 0.25, 0.3);
+#else
+    const vec3 COLOR_A             = vec3(0.72, 0.82, 0.92);
+    const vec3 COLOR_B             = vec3(0.50, 0.60, 0.75);
+    const vec3 COLOR_WYTHOFF_EDGE  = vec3(0.1, 0.1, 0.4);
+    const vec3 COLOR_WYTHOFF_VERT  = vec3(0.85, 0.3, 0.2);
+    const vec3 COLOR_TRI_EDGE      = vec3(0.5, 0.48, 0.45);
+    const vec3 COLOR_BG            = vec3(0.88, 0.87, 0.85);
+    const vec3 COLOR_BORDER        = vec3(0.4, 0.38, 0.35);
+#endif
+
+//--------------------------------------------------
+// ZOOM
+//--------------------------------------------------
+#define ZOOM 2.4
+
+
+/////////////////////////////////////////////////////
+//  IMPLEMENTATION
+/////////////////////////////////////////////////////
+
+const float PI = 3.14159265;
+
+vec2 cmul(vec2 a, vec2 b) {
+    return vec2(a.x*b.x - a.y*b.y, a.x*b.y + a.y*b.x);
+}
+vec2 cdiv(vec2 a, vec2 b) {
+    return vec2(a.x*b.x + a.y*b.y, a.y*b.x - a.x*b.y) / dot(b, b);
+}
+vec2 ctanh(vec2 z) {
+    float d = cosh(2.0*z.x) + cos(2.0*z.y);
+    return vec2(sinh(2.0*z.x), sin(2.0*z.y)) / d;
+}
+
+vec2 diskToUHP(vec2 w) {
+    return cmul(vec2(0,1), cdiv(vec2(1,0)+w, vec2(1,0)-w));
+}
+vec2 uhpToDisk(vec2 z) {
+    return cdiv(z - vec2(0,1), z + vec2(0,1));
+}
+vec2 kleinToDisk(vec2 w) {
+    float s = length(w);
+    if (s < 0.0001) return vec2(0);
+    return w / (1.0 + sqrt(max(1.0 - dot(w,w), 0.0)));
+}
+vec2 diskRotate(vec2 w, float angle) {
+    float c = cos(angle), s = sin(angle);
+    return vec2(c*w.x - s*w.y, s*w.x + c*w.y);
+}
+vec2 diskTranslate(vec2 w, vec2 a) {
+    return cdiv(w - a, vec2(1,0) - cmul(vec2(a.x,-a.y), w));
+}
+
+struct HSVert { float x; float side; };
+struct HSCirc { float center; float radius; float side; };
+
+vec2 reflectInto(vec2 z, HSVert h, inout int count) {
+    if ((z.x - h.x) * h.side >= 0.0) return z;
+    count++;
+    return vec2(2.0*h.x - z.x, z.y);
+}
+vec2 reflectInto(vec2 z, HSCirc h, inout int count) {
+    vec2 rel = z - vec2(h.center, 0.0);
+    float r2 = h.radius * h.radius;
+    if ((dot(rel, rel) - r2) * h.side >= 0.0) return z;
+    count++;
+    z.x -= h.center;
+    z = z * (r2 / dot(z, z));
+    z.x += h.center;
+    return z;
+}
+
+vec2 reflectInVert(vec2 z, float x) {
+    return vec2(2.0*x - z.x, z.y);
+}
+vec2 reflectInCirc(vec2 z, float center, float radius) {
+    z.x -= center;
+    float r2 = radius * radius;
+    z = z * (r2 / dot(z, z));
+    z.x += center;
+    return z;
+}
+
+float distToVert(vec2 z, float c) {
+    vec2 w = z - vec2(c, 0.0);
+    return acosh(max(1.0, length(w) / z.y));
+}
+float distToCirc(vec2 z, float center, float radius) {
+    vec2 num   = z - vec2(center + radius, 0.0);
+    vec2 denom = z - vec2(center - radius, 0.0);
+    vec2 w = cdiv(num, denom);
+    return acosh(max(1.0, length(w) / max(w.y, 1e-10)));
+}
+float hypDist(vec2 z1, vec2 z2) {
+    vec2 d = z1 - z2;
+    return acosh(max(1.0, 1.0 + dot(d,d) / (2.0*z1.y*z2.y)));
+}
+
+float distToGeodesicThrough(vec2 z, vec2 A, vec2 B) {
+    if (abs(A.x - B.x) < 0.0001)
+        return distToVert(z, A.x);
+    float center = (dot(A,A) - dot(B,B)) / (2.0*(A.x - B.x));
+    float radius = length(A - vec2(center, 0.0));
+    return distToCirc(z, center, radius);
+}
+
+float distToSegment(vec2 z, vec2 A, vec2 B) {
+    float dA  = hypDist(z, A);
+    float dB  = hypDist(z, B);
+    float dAB = hypDist(A, B);
+    float cosA = (cosh(dA)*cosh(dAB) - cosh(dB)) / max(sinh(dA)*sinh(dAB), 1e-8);
+    float cosB = (cosh(dB)*cosh(dAB) - cosh(dA)) / max(sinh(dB)*sinh(dAB), 1e-8);
+    if (cosA < 0.0) return dA;
+    if (cosB < 0.0) return dB;
+    return distToGeodesicThrough(z, A, B);
+}
+
+struct TriData {
+    HSVert sideA;
+    HSCirc sideB;
+    HSCirc sideC;
+    vec2 vertP, vertQ, vertR;
+};
+
+TriData buildTriangle(int P, int Q, int R) {
+    float p = float(P), q = float(Q), r = float(R);
+    float cosP = cos(PI/p), sinP = sin(PI/p);
+    float cosQ = cos(PI/q), sinQ = sin(PI/q);
+    float cosR = cos(PI/r);
+    float xA = -cosP;
+    HSVert sideA = HSVert(xA, 1.0);
+    HSCirc sideB = HSCirc(0.0, 1.0, 1.0);
+    float coshSR = (cosR + cosP*cosQ) / (sinP*sinQ);
+    float eucH = sinP * exp(acosh(coshSR));
+    float x_off = eucH / tan(PI/q);
+    float cC = xA - x_off;
+    float rC = sqrt(x_off*x_off + eucH*eucH);
+    HSCirc sideC = HSCirc(cC, rC, -1.0);
+    vec2 vertP = vec2(xA, sinP);
+    float dy = sqrt(max(rC*rC - (xA-cC)*(xA-cC), 0.0));
+    vec2 vertR = vec2(xA, dy);
+    float xQ = (1.0 + cC*cC - rC*rC) / (2.0*cC);
+    float yQ = sqrt(max(1.0 - xQ*xQ, 0.0));
+    vec2 vertQ = vec2(xQ, yQ);
+    return TriData(sideA, sideB, sideC, vertP, vertQ, vertR);
+}
+
+vec2 foldIntoTriangle(vec2 z, TriData tri, out int foldCount) {
+    foldCount = 0;
+    for (int i = 0; i < 100; i++) {
+        vec2 z0 = z;
+        z = reflectInto(z, tri.sideA, foldCount);
+        z = reflectInto(z, tri.sideB, foldCount);
+        z = reflectInto(z, tri.sideC, foldCount);
+        if (dot(z - z0, z - z0) < 1e-8) break;
+    }
+    return z;
+}
+
+// Geodesic interpolation in UHP
+vec2 geoInterp(vec2 A, vec2 B, float t) {
+    if (abs(A.x - B.x) < 1e-6) {
+        return vec2(A.x, exp(mix(log(A.y), log(B.y), t)));
+    }
+    float center = (dot(A,A) - dot(B,B)) / (2.0*(A.x - B.x));
+    float R = length(A - vec2(center, 0.0));
+    float thetaA = atan(A.y, A.x - center);
+    float thetaB = atan(B.y, B.x - center);
+    float logTanM = mix(log(tan(thetaA*0.5)), log(tan(thetaB*0.5)), t);
+    float thetaM = 2.0 * atan(exp(logTanM));
+    return vec2(center + R*cos(thetaM), R*sin(thetaM));
+}
+
+// Incenter via gradient descent
+vec2 computeIncenter(TriData tri) {
+    vec2 midAB = geoInterp(tri.vertP, tri.vertQ, 0.5);
+    vec2 z = geoInterp(midAB, tri.vertR, 0.5);
+    for (int i = 0; i < 60; i++) {
+        float dA = distToVert(z, tri.sideA.x);
+        float dB = distToCirc(z, tri.sideB.center, tri.sideB.radius);
+        float dC = distToCirc(z, tri.sideC.center, tri.sideC.radius);
+        float f = (dA-dB)*(dA-dB) + (dB-dC)*(dB-dC) + (dA-dC)*(dA-dC);
+        if (f < 1e-14) break;
+        float eps = z.y * 0.0005;
+        float fx, fy;
+        {
+            vec2 zx = z + vec2(eps, 0);
+            float a=distToVert(zx,tri.sideA.x), b=distToCirc(zx,tri.sideB.center,tri.sideB.radius), c=distToCirc(zx,tri.sideC.center,tri.sideC.radius);
+            fx = (a-b)*(a-b) + (b-c)*(b-c) + (a-c)*(a-c);
+        }
+        {
+            vec2 zy = z + vec2(0, eps);
+            float a=distToVert(zy,tri.sideA.x), b=distToCirc(zy,tri.sideB.center,tri.sideB.radius), c=distToCirc(zy,tri.sideC.center,tri.sideC.radius);
+            fy = (a-b)*(a-b) + (b-c)*(b-c) + (a-c)*(a-c);
+        }
+        vec2 grad = vec2(fx - f, fy - f) / eps;
+        vec2 rGrad = z.y * z.y * grad;
+        float gradLen = length(rGrad);
+        if (gradLen < 1e-14) break;
+        float step = min(0.3 * z.y / gradLen, 0.1);
+        vec2 zNew = z - step * rGrad;
+        zNew.y = max(zNew.y, 0.001);
+        float dAn=distToVert(zNew,tri.sideA.x), dBn=distToCirc(zNew,tri.sideB.center,tri.sideB.radius), dCn=distToCirc(zNew,tri.sideC.center,tri.sideC.radius);
+        float fNew = (dAn-dBn)*(dAn-dBn) + (dBn-dCn)*(dBn-dCn) + (dAn-dCn)*(dAn-dCn);
+        if (fNew < f) z = zNew;
+        else { z = z - 0.25*step*rGrad; z.y = max(z.y, 0.001); }
+    }
+    return z;
+}
+
+// Uniform point finder
+float distToMirror(vec2 z, bool isVert, float p1, float p2) {
+    if (isVert) return distToVert(z, p1);
+    return distToCirc(z, p1, p2);
+}
+vec2 findUniformPoint(vec2 endA, vec2 endB,
+    bool m1Vert, float m1p1, float m1p2,
+    bool m2Vert, float m2p1, float m2p2) {
+    float lo = 0.0, hi = 1.0;
+    for (int i = 0; i < 40; i++) {
+        float mid = 0.5*(lo+hi);
+        vec2 G = geoInterp(endA, endB, mid);
+        float d1 = distToMirror(G, m1Vert, m1p1, m1p2);
+        float d2 = distToMirror(G, m2Vert, m2p1, m2p2);
+        vec2 Glo = geoInterp(endA, endB, lo);
+        float d1lo = distToMirror(Glo, m1Vert, m1p1, m1p2);
+        float d2lo = distToMirror(Glo, m2Vert, m2p1, m2p2);
+        if (d1lo - d2lo > 0.0) { if (d1-d2>0.0) lo=mid; else hi=mid; }
+        else { if (d1-d2<0.0) lo=mid; else hi=mid; }
+    }
+    return geoInterp(endA, endB, 0.5*(lo+hi));
+}
+
+// Generating point
+vec2 getGeneratingPoint(TriData tri) {
+    #if GEN_POINT == 0
+        return tri.vertP;
+    #elif GEN_POINT == 1
+        return tri.vertQ;
+    #elif GEN_POINT == 2
+        return tri.vertR;
+    #elif GEN_POINT == 3
+        return findUniformPoint(tri.vertQ, tri.vertR,
+            true, tri.sideA.x, 0.0, false, tri.sideB.center, tri.sideB.radius);
+    #elif GEN_POINT == 4
+        return findUniformPoint(tri.vertP, tri.vertR,
+            false, tri.sideB.center, tri.sideB.radius, false, tri.sideC.center, tri.sideC.radius);
+    #elif GEN_POINT == 5
+        return findUniformPoint(tri.vertP, tri.vertQ,
+            true, tri.sideA.x, 0.0, false, tri.sideC.center, tri.sideC.radius);
+    #elif GEN_POINT == 6
+        return computeIncenter(tri);
+    #elif GEN_POINT == 7
+        #if GEN_MIRROR == 0
+            return geoInterp(tri.vertP, tri.vertR, float(GEN_T));
+        #elif GEN_MIRROR == 1
+            return geoInterp(tri.vertP, tri.vertQ, float(GEN_T));
+        #elif GEN_MIRROR == 2
+            return geoInterp(tri.vertQ, tri.vertR, float(GEN_T));
+        #endif
+    #endif
+}
+
+vec2 reflectG_A(vec2 G, TriData tri) { return reflectInVert(G, tri.sideA.x); }
+vec2 reflectG_B(vec2 G, TriData tri) { return reflectInCirc(G, tri.sideB.center, tri.sideB.radius); }
+vec2 reflectG_C(vec2 G, TriData tri) { return reflectInCirc(G, tri.sideC.center, tri.sideC.radius); }
+
+bool drawEdgeA() {
+    #if GEN_POINT==0||GEN_POINT==2||GEN_POINT==4||(GEN_POINT==7&&GEN_MIRROR==0)
+        return false;
+    #else
+        return true;
+    #endif
+}
+bool drawEdgeB() {
+    #if GEN_POINT==0||GEN_POINT==1||GEN_POINT==5||(GEN_POINT==7&&GEN_MIRROR==1)
+        return false;
+    #else
+        return true;
+    #endif
+}
+bool drawEdgeC() {
+    #if GEN_POINT==1||GEN_POINT==2||GEN_POINT==3||(GEN_POINT==7&&GEN_MIRROR==2)
+        return false;
+    #else
+        return true;
+    #endif
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = fragCoord / iResolution.xy - 0.5;
+    uv.x *= iResolution.x / iResolution.y;
+    vec2 w = uv * float(ZOOM);
+
+    #ifdef MODEL_POINCARE
+        if (ANIMATE) {
+            float t = iTime * ROTATE_SPEED;
+            w = diskRotate(w, t);
+            w = diskTranslate(w, DRIFT_AMOUNT * vec2(sin(t*1.3), cos(t*0.9)));
+        }
+    #endif
+
+    bool inDomain = false;
+    float borderDist = 1e6;
+    vec2 z;
+
+    #ifdef MODEL_POINCARE
+        inDomain = length(w) < 0.998;
+        borderDist = 1.0 - length(w);
+        z = diskToUHP(w);
+    #endif
+    #ifdef MODEL_KLEIN
+        inDomain = length(w) < 0.998;
+        borderDist = 1.0 - length(w);
+        vec2 dkPt = kleinToDisk(w);
+        if (ANIMATE) {
+            float t = iTime * ROTATE_SPEED;
+            dkPt = diskRotate(dkPt, t);
+            dkPt = diskTranslate(dkPt, DRIFT_AMOUNT * vec2(sin(t*1.3), cos(t*0.9)));
+        }
+        z = diskToUHP(dkPt);
+    #endif
+    #ifdef MODEL_BAND
+        float bandHalf = PI * 0.25 * float(ZOOM) / 2.4;
+        inDomain = abs(w.y) < bandHalf * 0.998;
+        borderDist = bandHalf - abs(w.y);
+        vec2 bdPt = ctanh(w);
+        if (ANIMATE) {
+            float t = iTime * ROTATE_SPEED;
+            bdPt = diskRotate(bdPt, t);
+            bdPt = diskTranslate(bdPt, DRIFT_AMOUNT * vec2(sin(t*1.3), cos(t*0.9)));
+        }
+        z = diskToUHP(bdPt);
+    #endif
+    #ifdef MODEL_UHP
+        z = w * 2.0 + vec2(0, 2.5);
+        inDomain = z.y > 0.0;
+        borderDist = z.y;
+    #endif
+
+    vec3 color = COLOR_BG;
+    #if defined(MODEL_POINCARE) || defined(MODEL_KLEIN) || defined(MODEL_BAND)
+        float pixSize = float(ZOOM) / iResolution.y;
+        if (abs(borderDist) < pixSize * 2.0)
+            color = COLOR_BORDER;
+    #endif
+
+    if (!inDomain) {
+        fragColor = vec4(color, 1.0);
+        return;
+    }
+
+    TriData tri = buildTriangle(TRI_P, TRI_Q, TRI_R);
+    int foldCount;
+    vec2 zf = foldIntoTriangle(z, tri, foldCount);
+    float parity = mod(float(foldCount), 2.0);
+
+    color = COLOR_A;
+    if (DRAW_TRIANGLE_PARITY)
+        color = (parity < 0.5) ? COLOR_A : COLOR_B;
+
+    if (DRAW_TRIANGLE_EDGES) {
+        float dA = distToVert(zf, tri.sideA.x);
+        float dB = distToCirc(zf, tri.sideB.center, tri.sideB.radius);
+        float dC = distToCirc(zf, tri.sideC.center, tri.sideC.radius);
+        if (min(dA, min(dB, dC)) < TRIANGLE_EDGE_THICKNESS)
+            color = mix(color, COLOR_TRI_EDGE, 0.4);
+    }
+
+    vec2 G = getGeneratingPoint(tri);
+    vec2 GA = reflectG_A(G, tri);
+    vec2 GB = reflectG_B(G, tri);
+    vec2 GC = reflectG_C(G, tri);
+
+    if (DRAW_WYTHOFF_EDGES) {
+        float minEdge = 1e6;
+        if (drawEdgeA()) minEdge = min(minEdge, distToSegment(zf, G, GA));
+        if (drawEdgeB()) minEdge = min(minEdge, distToSegment(zf, G, GB));
+        if (drawEdgeC()) minEdge = min(minEdge, distToSegment(zf, G, GC));
+        if (minEdge < WYTHOFF_EDGE_THICKNESS)
+            color = COLOR_WYTHOFF_EDGE;
+    }
+
+    if (DRAW_WYTHOFF_VERTICES) {
+        if (hypDist(zf, G) < WYTHOFF_VERTEX_RADIUS)
+            color = COLOR_WYTHOFF_VERT;
+    }
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+## Apollonian Circle Packing
+`apollonian/image.glsl`
+
+Given three mutually tangent circles (specified by curvature), computes the fourth via Descartes' theorem, then draws the full Apollonian gasket by iterating inversions through the dual circles.
+
+```glsl
+// ============================================================
+//  APOLLONIAN CIRCLE PACKING
+//  Given three mutually tangent circles (specified by curvature),
+//  this shader computes the fourth via Descartes' theorem, then
+//  draws the full Apollonian gasket by iterating inversions
+//  through the dual circles of the initial quadruple.
+// ============================================================
+
+
+// === USER SETTINGS =========================================
+
+// Curvatures of three mutually tangent circles.
+// Use 0.0 for a straight line, negative for exterior circles.
+//   Try: (2, 2, 3), (3, 6, 7), (0, 1, 1), (0, 0, 1)
+const float K1 = 1.0;
+const float K2 = 2.0;
+const float K3 = 3.0;
+
+// Which solution of Descartes' equation for the fourth circle:
+//   false = outer circle (- root, typically negative curvature)
+//   true  = inner circle (+ root, smaller circle in the interstice)
+const bool INNER = false;
+
+
+// Camera: center point and zoom level
+const vec2  CENTER = vec2(0.0, 1.0);
+const float ZOOM   = 4.5;
+
+// Colors for each of the four initial circles (RGB).
+const vec3 COLOR_0 = vec3(0.30, 1.00, 0.40);  // green  (k1)
+const vec3 COLOR_1 = vec3(1.00, 0.45, 0.55);  // pink   (k2)
+const vec3 COLOR_2 = vec3(0.70, 0.40, 0.90);  // purple (k3)
+const vec3 COLOR_3 = vec3(1.00, 1.00, 0.30);  // yellow (k4, computed)
+
+const vec3 COLOR_BG = vec3(0.08);
+const float FADE_RATE = 1.;
+const float BORDER_THICKNESS = 0.003;
+const vec3  BORDER_COLOR = vec3(0.0);
+const float BORDER_FADE  = 0.6;
+const int MAX_ITER = 100;
+
+// === END USER SETTINGS =====================================
+
+const float EPS = 1e-4;
+
+float descartesK4(float a, float b, float c, bool inner) {
+    float disc = a * b + b * c + c * a;
+    float s = a + b + c;
+    float root = sqrt(max(0.0, disc));
+    return inner ? s + 2.0 * root : s - 2.0 * root;
+}
+
+// (Full implementation: Circle struct, inversion, dual circles,
+//  Apollonian solver, and packing renderer — see apollonian/image.glsl
+//  for the complete listing.)
+
+// ... [~300 lines of geometry code omitted for brevity] ...
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (fragCoord - 0.5*iResolution.xy) / iResolution.y * ZOOM + CENTER;
+    float k4 = descartesK4(K1, K2, K3, INNER);
+    vec4 curvatures = vec4(K1, K2, K3, k4);
+    Circle[4] mainCircles = buildQuadruple(curvatures);
+    vec4 result = renderPacking(mainCircles, uv);
+    fragColor = vec4(result.xyz, 1.0);
+}
+```
+
+
+## Hyperbolic 3-Space — Points & Geodesics
+`hyp-basics/common.glsl` and `hyp-basics/image.glsl`
+
+Two Shadertoy tabs. The **Common** tab is a math library for the hyperboloid model of H³ (Minkowski inner product, distances, reflections, parallel transport). The **Image** tab has the user-editable scene (points and geodesics) and the raymarcher.
+
+### Common tab
+
+```glsl
+/////////////////////////////////////////////////////
+//  HYPERBOLIC 3-SPACE — COMMON MATH LIBRARY
+//  Hyperboloid model in R^{3,1}
+//
+//  Points on H^3:   x² + y² + z² - w² = -1, w > 0
+//  Tangent vectors:  spacelike (positive Minkowski norm)
+/////////////////////////////////////////////////////
+
+float arccosh(float x) {
+    x = max(x, 1.0);
+    return log(x + sqrt(x * x - 1.0));
+}
+
+float arccosh_sqrt(float x) {
+    x = max(x, 1.0);
+    return log(sqrt(x) + sqrt(x - 1.0));
+}
+
+float hyp_dot(vec4 u, vec4 v) {
+    return dot(u.xyz, v.xyz) - u.w * v.w;
+}
+
+vec4 normalize_t(vec4 v) { return v / sqrt(-hyp_dot(v, v)); }
+vec4 normalize_s(vec4 v) { return v / sqrt( hyp_dot(v, v)); }
+
+float hyp_dist(vec4 p, vec4 q) {
+    return arccosh(-hyp_dot(p, q));
+}
+
+vec4 hyp_reflect(vec4 p, vec4 n) {
+    return p - 2.0 * hyp_dot(p, n) * n;
+}
+
+void transport_frame(vec4 p, out vec4 X, out vec4 Y, out vec4 Z) {
+    float s = 1.0 / (1.0 + p.w);
+    X = vec4(1.0 + s*p.x*p.x,      s*p.x*p.y,      s*p.x*p.z, p.x);
+    Y = vec4(     s*p.y*p.x,  1.0 + s*p.y*p.y,      s*p.y*p.z, p.y);
+    Z = vec4(     s*p.z*p.x,       s*p.z*p.y,  1.0 + s*p.z*p.z, p.z);
+}
+
+vec4 hyp_cross(vec4 P, vec4 A, vec4 B) {
+    vec4 m1 = A * B.yzwx - B * A.yzwx;
+    vec2 m2 = A.xy * B.zw - B.xy * A.zw;
+    return vec4(
+        +P.y * m1.z - P.z * m2.y + P.w * m1.y,
+        -P.z * m1.w - P.w * m2.x - P.x * m1.z,
+        +P.w * m1.x + P.x * m2.y + P.y * m1.w,
+        +P.x * m1.y - P.y * m2.x + P.z * m1.x
+    );
+}
+```
+
+### Image tab
+
+```glsl
+/////////////////////////////////////////////////////
+//  HYPERBOLIC 3-SPACE — POINTS & GEODESICS
+/////////////////////////////////////////////////////
+
+#define NUM_POINTS    5
+#define NUM_GEODESICS 4
+
+const float BALL_RADIUS = 0.22;
+const float TUBE_RADIUS = 0.06;
+const vec3  BG_COLOR    = vec3(0.015);
+
+void getPoint(int i, out vec3 pos, out vec3 col) {
+    if (i == 0) { pos = vec3( 0.0,  0.0,  0.0); col = vec3(1.0, 1.0,  1.0);  return; }
+    if (i == 1) { pos = vec3( 1.2,  0.0,  0.0); col = vec3(1.0, 0.35, 0.3);  return; }
+    if (i == 2) { pos = vec3( 0.0,  1.2,  0.0); col = vec3(0.3, 0.75, 1.0);  return; }
+    if (i == 3) { pos = vec3( 0.0,  0.0,  1.2); col = vec3(0.35, 1.0, 0.4);  return; }
+                  pos = vec3(-0.8, -0.6,  0.5); col = vec3(1.0, 0.8,  0.25);
+}
+
+void getGeodesic(int i, out int a, out int b, out vec3 col) {
+    col = vec3(0.8, 0.72, 0.6);
+    if (i == 0) { a = 0; b = 1; return; }
+    if (i == 1) { a = 0; b = 2; return; }
+    if (i == 2) { a = 0; b = 3; return; }
+                  a = 1; b = 2; col = vec3(0.9, 0.5, 0.3);
+}
+
+// ===  EDIT ABOVE THIS LINE  ========================
+
+vec4 hPoint(vec3 v) { return vec4(v, sqrt(1.0 + dot(v, v))); }
+
+float geodesicLineDist(vec4 p, vec4 A, vec4 B) {
+    vec4 t = normalize_s(B + hyp_dot(A, B) * A);
+    float alpha = -hyp_dot(p, A);
+    float beta  =  hyp_dot(p, t);
+    return arccosh_sqrt(max(1.0, alpha * alpha - beta * beta));
+}
+
+// ... SDF, raymarching, lighting, camera —
+// see hyp-basics/image.glsl for the complete listing.
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = 1.6 * (fragCoord - 0.5 * iResolution.xy) / iResolution.y;
+    vec4 cam, X, Y, Z;
+    build_camera(cam, X, Y, Z);
+    vec4 ray = normalize_s(uv.x * X + uv.y * Y - Z);
+    float dist;
+    vec4 pos = raymarch(cam, ray, dist);
+    vec3 color = BG_COLOR;
+    if (dist >= 0.0) {
+        vec4 normal = hyp_gradient(pos);
+        color = shade(pos, normal, cam);
+    }
+    color = pow(color, vec3(1.0 / 2.2));
+    fragColor = vec4(color, 1.0);
+}
+```
+
+
+## Dodecahedral Honeycomb {5,3,4}
+`hyp-dodecahedron/common.glsl` and `hyp-dodecahedron/image.glsl`
+
+Uses the same Common tab math library as the basics shader above. The **Image** tab has the dodecahedron geometry: icosahedral bounce, vertex/edge SDFs, and depth-based coloring.
+
+### Image tab
+
+```glsl
+/////////////////////////////////////////////////////
+//  RIGHT-ANGLED DODECAHEDRAL HONEYCOMB  {5,3,4}
+//  Edges + Vertices only
+/////////////////////////////////////////////////////
+
+struct Style {
+    vec3  vertexColor;
+    vec3  edgeColor;
+    vec3  bgColor;
+    float vertexRadius;
+    float edgeRadius;
+    vec3  hue;
+};
+
+Style style = Style(
+    vec3(0.90, 0.35, 0.25),     // vertices: warm red
+    vec3(0.85, 0.82, 0.72),     // edges: warm white
+    vec3(0.0),                   // background
+    0.24, 0.0875,                // radii
+    vec3(1.41, 1.73, 2.72)      // depth hue shift
+);
+
+#define DRAW_VERTICES true
+#define DRAW_EDGES    true
+
+// === DODECAHEDRON CONSTANTS =======================
+const float PHI  = 1.6180339887498948;
+const float SPHI = 1.2720196495140690;
+const vec3  K    = vec3(1.0, PHI, SPHI);
+
+// ... vertex, edge, face constants (see full file) ...
+
+// === BOUNCE =======================================
+vec4 bounce(vec4 P) {
+    for (int k = 0; k < 12; k++) {
+        vec3 q = abs(P.xyz);
+        q += K.y * q.yzx;
+        float M = max(q.x, max(q.y, q.z));
+        float dp = M - K.z * P.w;
+        if (dp <= 0.0) break;
+        if (q.x >= M)      P.xy -= dp * K.xy * sign(P.xy);
+        else if (q.y >= M)  P.yz -= dp * K.xy * sign(P.yz);
+        else                P.zx -= dp * K.xy * sign(P.zx);
+        P.w -= dp * K.z;
+    }
+    return P;
+}
+
+// ... vertex_sdf, edge_sdf, lighting, camera —
+// see hyp-dodecahedron/image.glsl for the complete listing.
+```
+
+
+## Hopf Fibration
+`hopf-fibration/common.glsl` and `hopf-fibration/image.glsl`
+
+This shader uses two Shadertoy tabs. The **Common** tab holds the math library (inverse stereographic projection, Hopf map, camera, lighting). The **Image** tab has the user-editable fiber configuration and the raymarcher.
+
+### Common tab
+
+```glsl
+// ═══════════════════════════════════════════════════════════════
+//  Hopf Fibration — Raymarched Fibers
+//  COMMON tab (math library — nothing to edit here)
+// ═══════════════════════════════════════════════════════════════
+
+#define PI  3.14159265359
+#define TAU 6.28318530718
+
+// ── Hopf Fibration ──────────────────────────────────────────
+
+// Inverse stereographic projection  R^3 → S^3
+// Projects from north pole (0,0,0,1).
+//   σ⁻¹(x) = (2x, |x|²−1) / (|x|²+1)
+vec4 invStereoS3(vec3 p) {
+    float r2 = dot(p, p);
+    return vec4(2.0 * p, r2 - 1.0) / (r2 + 1.0);
+}
+
+// Hopf map  S^3 → S^2
+// Reads q = (z₁, z₂) ∈ C² with z₁ = q.xy, z₂ = q.zw
+//   π(z₁,z₂) = (2Re(z₁z̄₂), 2Im(z₁z̄₂), |z₁|²−|z₂|²)
+vec3 hopfMap(vec4 q) {
+    return vec3(
+        2.0 * (q.x * q.z + q.y * q.w),
+        2.0 * (q.y * q.z - q.x * q.w),
+        dot(q.xy, q.xy) - dot(q.zw, q.zw)
+    );
+}
+
+// ── Color ───────────────────────────────────────────────────
+
+vec3 hsv2rgb(vec3 c) {
+    vec3 p = abs(fract(c.xxx + vec3(0, 2.0/3.0, 1.0/3.0)) * 6.0 - 3.0);
+    return c.z * mix(vec3(1), clamp(p - 1.0, 0.0, 1.0), c.y);
+}
+
+// ── Camera ──────────────────────────────────────────────────
+
+mat3 orbitCamera(float yaw, float pitch) {
+    float cy = cos(yaw), sy = sin(yaw);
+    float cp = cos(pitch), sp = sin(pitch);
+    vec3 fwd   = vec3(sy * cp, sp, -cy * cp);
+    vec3 right = vec3(cy, 0, sy);
+    vec3 up    = cross(right, fwd);
+    return mat3(right, up, fwd);
+}
+
+// ── Lighting ────────────────────────────────────────────────
+
+vec3 shade(vec3 col, vec3 n, vec3 rd, float t) {
+    vec3 l1 = normalize(vec3(1, 2, 3));
+    vec3 l2 = normalize(vec3(-2, 1, -1));
+    float diff = max(dot(n, l1), 0.0)
+               + max(dot(n, l2), 0.0) * 0.3;
+    float amb  = 0.08;
+    vec3 h    = normalize(l1 - rd);
+    float spec = pow(max(dot(n, h), 0.0), 64.0) * 0.5;
+    vec3 result = col * (amb + diff) + vec3(spec);
+    float fog = 1.0 - exp(-0.015 * t * t);
+    return mix(result, vec3(0.01, 0.01, 0.02), fog);
+}
+```
+
+### Image tab
+
+```glsl
+// ═══════════════════════════════════════════════════════════════
+//  ★  EDIT HERE  ★   Fiber Configuration
+// ═══════════════════════════════════════════════════════════════
+//
+//  NUM_FIBERS    — total number of fibers to draw
+//  TUBE_RADIUS   — thickness of each fiber tube
+//  CAMERA_DIST   — initial camera distance (scroll to zoom)
+//
+//  INTRINSIC — how fiber thickness is measured:
+//    0 → uniform Euclidean thickness in R³
+//    1 → uniform thickness on S³ (intrinsic geometry)
+//        fibers swell near ∞ where stereographic projection
+//        stretches space, revealing the conformal factor
+
+#define NUM_FIBERS  60
+#define TUBE_RADIUS 0.04
+#define CAMERA_DIST 5.0
+#define INTRINSIC   0
+
+
+// ── Base points on S² ───────────────────────────────────────
+//  Return the i-th point on S² (i = 0 .. NUM_FIBERS-1).
+//  The Hopf fiber over each point will be drawn.
+//  Uncomment ONE block, or write your own.
+
+/*
+// Latitude rings: 5 rings × 12 points per ring = 60 fibers.
+// Each ring sits at a fixed colatitude, so its fibers all
+// lie on the same Clifford torus.
+vec3 basePoint(int i) {
+    int ptsPerRing = 12;
+    int ring = i / ptsPerRing;
+    int j    = i - ring * ptsPerRing;
+    int numRings = NUM_FIBERS / ptsPerRing;
+    float theta = PI * float(ring + 1) / float(numRings + 1);
+    float phi   = TAU * float(j) / float(ptsPerRing);
+    float st = sin(theta), ct = cos(theta);
+    return vec3(st * cos(phi), st * sin(phi), ct);
+}
+*/
+
+
+// Fibonacci spiral: approximately uniform distribution on S².
+// Good for seeing all the different torus shapes at once.
+vec3 basePoint(int i) {
+    float golden = (1.0 + sqrt(5.0)) * 0.5;
+    float theta = acos(1.0 - 2.0 * (float(i) + 0.5) / float(NUM_FIBERS));
+    float phi   = TAU * float(i) / golden;
+    float st = sin(theta), ct = cos(theta);
+    return vec3(st * cos(phi), st * sin(phi), ct);
+}
+
+
+// ── Fiber color ─────────────────────────────────────────────
+//  Color each fiber by its base point on S².
+//  Default: hue = longitude, brightness = latitude.
+
+vec3 fiberColor(vec3 bp) {
+    float hue = atan(bp.y, bp.x) / TAU + 0.5;
+    float lit = 0.5 + 0.45 * bp.z;
+    return hsv2rgb(vec3(hue, 0.82, lit));
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+//  Implementation — no need to edit below this line
+// ═══════════════════════════════════════════════════════════════
+
+#define MAX_STEPS  100
+#define MAX_DIST   25.0
+#define SURF_DIST  0.001
+
+
+// ── SDF ─────────────────────────────────────────────────────
+//
+//  Distance from x ∈ R³ to the Hopf fiber over p ∈ S²:
+//
+//    d(x, fiber_p) ≈ (|x|²+1)/4 · arccos⟨π(σ⁻¹(x)), p⟩
+//
+//  The (|x|²+1)/4 factor combines:
+//    • (|x|²+1)/2   conformal factor of σ: S³→R³
+//    • 1/2           from the Riemannian submersion S³(1)→S²(½)
+
+float sceneSDF(vec3 x, out vec3 col) {
+    vec4  q = invStereoS3(x);
+    vec3  h = hopfMap(q);
+    float conformal = (dot(x, x) + 1.0) * 0.25;
+
+    float dMin = 1e10;
+    col = vec3(0);
+
+    for (int i = 0; i < NUM_FIBERS; i++) {
+        vec3 bp  = basePoint(i);
+        float ang = acos(clamp(dot(h, bp), -1.0, 1.0));
+
+#if INTRINSIC
+        float dFiber = conformal * (ang - TUBE_RADIUS);
+#else
+        float dFiber = conformal * ang - TUBE_RADIUS;
+#endif
+
+        if (dFiber < dMin) {
+            dMin = dFiber;
+            col  = fiberColor(bp);
+        }
+    }
+    return dMin;
+}
+
+float sdf(vec3 x) {
+    vec3 c;
+    return sceneSDF(x, c);
+}
+
+vec3 calcNormal(vec3 p) {
+    vec2 e = vec2(0.001, 0);
+    return normalize(vec3(
+        sdf(p + e.xyy) - sdf(p - e.xyy),
+        sdf(p + e.yxy) - sdf(p - e.yxy),
+        sdf(p + e.yyx) - sdf(p - e.yyx)
+    ));
+}
+
+
+void mainImage(out vec4 O, in vec2 F) {
+    vec2 uv = (F - 0.5 * iResolution.xy) / iResolution.y;
+
+    vec2 m = iMouse.z > 0.0
+        ? (iMouse.xy / iResolution.xy - 0.5) * vec2(TAU, PI)
+        : vec2(0.5, 0.3);
+
+    mat3 cam = orbitCamera(m.x, m.y);
+    vec3 ro  = -CAMERA_DIST * cam[2];
+    vec3 rd  = normalize(cam * vec3(uv, 1));
+
+    float t = 0.0;
+    vec3  col;
+    bool  hit = false;
+
+    for (int i = 0; i < MAX_STEPS; i++) {
+        vec3  p = ro + t * rd;
+        float d = sceneSDF(p, col);
+        if (d < SURF_DIST) { hit = true; break; }
+        t += d;
+        if (t > MAX_DIST) break;
+    }
+
+    vec3 result;
+    if (hit) {
+        vec3 p = ro + t * rd;
+        vec3 n = calcNormal(p);
+        result = shade(col, n, rd, t);
+    } else {
+        result = mix(vec3(0.01, 0.01, 0.02),
+                     vec3(0.04, 0.03, 0.07), uv.y + 0.5);
+    }
+
+    O = vec4(pow(clamp(result, 0.0, 1.0), vec3(1.0/2.2)), 1);
+}
+```
+
+
+
+## Hopf Preimage of Curves
+`hopf-preimage/common.glsl` and `hopf-preimage/image.glsl`
+
+Define an algebraic curve $f(u,v) = 0$ in the plane. Its preimage under the Hopf fibration (composed with stereographic projections on both $S^2$ and $S^3$) is a surface in $\mathbb{R}^3$. This shader raymarches that surface.
+
+Uses two Shadertoy tabs. The **Common** tab holds the math (inverse stereographic, Hopf map, stereographic on $S^2$, conformal SDF, camera, lighting). The **Image** tab has the curve definition and raymarcher.
+
+### Common tab
+
+```glsl
+// ═══════════════════════════════════════════════════════════════
+//  Hopf Preimage of Algebraic Curves
+//  COMMON tab (math library — nothing to edit here)
+// ═══════════════════════════════════════════════════════════════
+
+#define PI  3.14159265359
+#define TAU 6.28318530718
+
+
+// ── Hopf Fibration ──────────────────────────────────────────
+
+// Inverse stereographic projection  R^3 → S^3
+// From north pole (0,0,0,1):
+//   σ⁻¹(x) = (2x, |x|²−1) / (|x|²+1)
+vec4 invStereoS3(vec3 p) {
+    float r2 = dot(p, p);
+    return vec4(2.0 * p, r2 - 1.0) / (r2 + 1.0);
+}
+
+// Hopf map  S^3 → S^2
+// q = (z₁, z₂) with z₁ = q.xy, z₂ = q.zw
+//   π(z₁,z₂) = (2Re(z₁z̄₂), 2Im(z₁z̄₂), |z₁|²−|z₂|²)
+vec3 hopfMap(vec4 q) {
+    return vec3(
+        2.0 * (q.x * q.z + q.y * q.w),
+        2.0 * (q.y * q.z - q.x * q.w),
+        dot(q.xy, q.xy) - dot(q.zw, q.zw)
+    );
+}
+
+// Stereographic projection  S^2 → R^2  (from north pole)
+//   stereo(p) = p.xy / (1 − p.z)
+// Clamped to avoid blowup when h is near the north pole.
+vec2 stereoS2(vec3 p) {
+    return p.xy / max(1.0 - p.z, 0.01);
+}
+
+
+// ── Preimage SDF ────────────────────────────────────────────
+//
+//  Given x ∈ R³, the full chain is:
+//
+//    x ──σ⁻¹──▶ q ∈ S³ ──π──▶ h ∈ S² ──stereo──▶ w ∈ R²
+//
+//  For a curve f(w) = 0 in the plane, its Hopf preimage
+//  is a surface in R³.  The approximate SDF is:
+//
+//    sdf(x) ≈  (|x|²+1) / (2(|w|²+1))  ·  |f(w)| / |∇f(w)|
+//
+//  The gradient of f is computed numerically.
+
+float preimageDist(vec3 x, vec2 w) {
+    float f  = curve(w);
+    float fu = curve(w + vec2(0.0001, 0));
+    float fv = curve(w + vec2(0, 0.0001));
+    vec2 grad = vec2(fu - f, fv - f) / 0.0001;
+
+    float gradLen = length(grad);
+    if (gradLen < 1e-6) return 10.0;
+
+    float s3 = (dot(x, x) + 1.0) * 0.5;
+    float s2inv = dot(w, w) + 1.0;
+
+    return s3 / s2inv * f / gradLen;
+}
+
+
+// ── Color ───────────────────────────────────────────────────
+
+vec3 hsv2rgb(vec3 c) {
+    vec3 p = abs(fract(c.xxx + vec3(0, 2.0/3.0, 1.0/3.0)) * 6.0 - 3.0);
+    return c.z * mix(vec3(1), clamp(p - 1.0, 0.0, 1.0), c.y);
+}
+
+vec3 surfaceColor(vec3 h) {
+    float hue = atan(h.y, h.x) / TAU + 0.5;
+    float lit = 0.4 + 0.55 * (0.5 + 0.5 * h.z);
+    return hsv2rgb(vec3(hue, 0.7, lit));
+}
+
+
+// ── Camera ──────────────────────────────────────────────────
+
+mat3 orbitCamera(float yaw, float pitch) {
+    float cy = cos(yaw), sy = sin(yaw);
+    float cp = cos(pitch), sp = sin(pitch);
+    vec3 fwd   = vec3(sy * cp, sp, -cy * cp);
+    vec3 right = vec3(cy, 0, sy);
+    vec3 up    = cross(right, fwd);
+    return mat3(right, up, fwd);
+}
+
+
+// ── Lighting ────────────────────────────────────────────────
+
+vec3 shade(vec3 col, vec3 n, vec3 rd, float t) {
+    vec3 l1 = normalize(vec3(2, 3, 1));
+    vec3 l2 = normalize(vec3(-1, 1, -2));
+
+    float diff = max(dot(n, l1), 0.0)
+               + max(dot(n, l2), 0.0) * 0.25;
+    float amb  = 0.12;
+
+    vec3 h     = normalize(l1 - rd);
+    float spec = pow(max(dot(n, h), 0.0), 48.0) * 0.4;
+    float fres = pow(1.0 - max(dot(n, -rd), 0.0), 3.0) * 0.15;
+
+    vec3 result = col * (amb + diff) + vec3(spec + fres);
+
+    float fog = 1.0 - exp(-0.012 * t * t);
+    return mix(result, vec3(0.01, 0.01, 0.02), fog);
+}
+```
+
+### Image tab
+
+```glsl
+// ═══════════════════════════════════════════════════════════════
+//  ★  EDIT HERE  ★   Define your algebraic curve
+// ═══════════════════════════════════════════════════════════════
+//
+//  The Hopf map sends S³ → S², and stereographic projection
+//  sends S² → R².  Define a curve f(u,v) = 0 in this plane.
+//  Its preimage under the Hopf fibration is a surface in R³
+//  (visualized via stereographic projection S³ → R³).
+//
+//  Just return f.  The gradient is computed automatically.
+
+#define THICKNESS   0.03      // surface shell half-width
+#define CAMERA_DIST 7.0       // initial camera distance
+
+
+// ── Your curve ──────────────────────────────────────────────
+//  Uncomment ONE block, or write your own.
+
+
+// Circle  |w|² = 1   (equator of S² → Clifford torus)
+float curve(vec2 w) {
+    return dot(w, w) - 1.0;
+}
+
+/*
+// Line  u = 0   (great circle → torus through ∞)
+float curve(vec2 w) {
+    return w.x;
+}
+*/
+
+/*
+// Lemniscate of Bernoulli  (u²+v²)² = 2(u²−v²)
+float curve(vec2 w) {
+    float r2 = dot(w, w);
+    return r2*r2 - 2.0*(w.x*w.x - w.y*w.y);
+}
+*/
+
+/*
+// Elliptic curve  v² = u³ − u
+float curve(vec2 w) {
+    return w.y*w.y - (w.x*w.x*w.x - w.x);
+}
+*/
+
+/*
+// Trefoil  Re(z³) = ½,  i.e.  u³ − 3uv² = ½
+float curve(vec2 w) {
+    return w.x*w.x*w.x - 3.0*w.x*w.y*w.y - 0.5;
+}
+*/
+
+/*
+// Parabola  v = u²
+float curve(vec2 w) {
+    return w.y - w.x*w.x;
+}
+*/
+
+/*
+// Two concentric circles  (|w|²−1)(|w|²−4) = 0
+// Two Clifford tori at different radii
+float curve(vec2 w) {
+    float r2 = dot(w, w);
+    return (r2 - 1.0) * (r2 - 4.0);
+}
+*/
+
+
+// ═══════════════════════════════════════════════════════════════
+//  Implementation — no need to edit below this line
+// ═══════════════════════════════════════════════════════════════
+
+#define MAX_STEPS  150
+#define MAX_DIST   30.0
+
+
+// ── SDF ─────────────────────────────────────────────────────
+
+float sceneDist(vec3 x, out vec3 col) {
+    vec3 h = hopfMap(invStereoS3(x));
+    vec2 w = stereoS2(h);
+    col = surfaceColor(h);
+    return preimageDist(x, w);
+}
+
+float sdf(vec3 x) {
+    vec3 c;
+    return abs(sceneDist(x, c)) - THICKNESS;
+}
+
+vec3 calcNormal(vec3 p) {
+    vec2 e = vec2(0.0005, 0);
+    return normalize(vec3(
+        sdf(p + e.xyy) - sdf(p - e.xyy),
+        sdf(p + e.yxy) - sdf(p - e.yxy),
+        sdf(p + e.yyx) - sdf(p - e.yyx)
+    ));
+}
+
+
+// ── Main ────────────────────────────────────────────────────
+
+void mainImage(out vec4 O, in vec2 F) {
+    vec2 uv = (F - 0.5 * iResolution.xy) / iResolution.y;
+
+    float yaw   = iTime * 0.25;
+    float pitch = 0.3;
+    if (iMouse.z > 0.0) {
+        vec2 mo = iMouse.xy / iResolution.xy;
+        yaw   += (mo.x - 0.5) * PI;
+        pitch  = (mo.y - 0.5) * PI * 0.7;
+    }
+
+    mat3 cam = orbitCamera(yaw, pitch);
+    vec3 ro  = -CAMERA_DIST * cam[2];
+    vec3 rd  = normalize(cam * vec3(uv, 1));
+
+    float t = 0.0;
+    vec3  col;
+    bool  hit = false;
+    float prevD = sceneDist(ro, col);
+    float prevT = 0.0;
+
+    for (int i = 0; i < MAX_STEPS; i++) {
+        float ad = abs(prevD);
+        if (ad < THICKNESS) { t = prevT; hit = true; break; }
+
+        t = prevT + ad * 0.4;
+        if (t > MAX_DIST) break;
+
+        float d = sceneDist(ro + t * rd, col);
+
+        if (d * prevD < 0.0) {
+            float lo = prevT, hi = t;
+            float loD = prevD;
+            for (int b = 0; b < 8; b++) {
+                float mid = 0.5 * (lo + hi);
+                float dm = sceneDist(ro + mid * rd, col);
+                if (loD * dm < 0.0) hi = mid;
+                else { lo = mid; loD = dm; }
+            }
+            t = 0.5 * (lo + hi);
+            hit = true;
+            break;
+        }
+
+        prevD = d;
+        prevT = t;
+    }
+
+    vec3 result;
+    if (hit) {
+        vec3 p = ro + t * rd;
+        sceneDist(p, col);
+        vec3 n = calcNormal(p);
+        result = shade(col, n, rd, t);
+    } else {
+        result = mix(vec3(0.01, 0.01, 0.02),
+                     vec3(0.04, 0.02, 0.06), uv.y + 0.5);
+    }
+
+    O = vec4(pow(clamp(result, 0.0, 1.0), vec3(1.0/2.2)), 1);
+}
+```
+
+
+## Stereographic Projection
+`stereographic/common.glsl` and `stereographic/image.glsl`
+
+Shows a curve $f(u,v) = 0$ drawn simultaneously on the $z = 0$ plane and lifted onto the unit sphere via inverse stereographic projection. Work in progress.
+
+Uses two Shadertoy tabs. The **Common** tab has ray-sphere/plane intersection, stereographic projection, shadow/AO, and color utilities. The **Image** tab has the curve definition and scene rendering.
+
+### Common tab
+
+```glsl
+// ═══════════════════════════════════════════════════════════════
+//  Stereographic Projection — Curves on Plane & Sphere
+//  COMMON tab (math library — nothing to edit here)
+// ═══════════════════════════════════════════════════════════════
+
+#define PI  3.14159265359
+#define TAU 6.28318530718
+
+// Scene geometry
+#define SPHERE_CENTER vec3(0, 0, 1)
+#define SPHERE_RADIUS 1.0
+
+
+// ── Stereographic Projection ────────────────────────────────
+//
+//  Unit sphere centered at (0,0,1), south pole at origin.
+//  Projection from north pole (0,0,2) to the z=0 plane.
+//
+//  Forward (sphere → plane):
+//    w = 2 · P.xy / (2 − P.z)
+//
+//  This is 2× the standard stereographic projection.
+//  Conformal factor (plane → sphere): λ = 4 / (4 + |w|²)
+
+vec2 stereoForward(vec3 P) {
+    return 2.0 * P.xy / (2.0 - P.z);
+}
+
+float conformalFactor(vec2 w) {
+    return 4.0 / (4.0 + dot(w, w));
+}
+
+
+// ── Ray Intersection ────────────────────────────────────────
+
+float hitPlane(vec3 ro, vec3 rd) {
+    if (abs(rd.z) < 1e-6) return -1.0;
+    float t = -ro.z / rd.z;
+    return t > 0.001 ? t : -1.0;
+}
+
+float hitSphere(vec3 ro, vec3 rd) {
+    vec3 oc = ro - SPHERE_CENTER;
+    float b = dot(oc, rd);
+    float c = dot(oc, oc) - SPHERE_RADIUS * SPHERE_RADIUS;
+    float disc = b * b - c;
+    if (disc < 0.0) return -1.0;
+    float t = -b - sqrt(disc);
+    return t > 0.001 ? t : -1.0;
+}
+
+
+// ── Soft Shadow ─────────────────────────────────────────────
+
+float sphereShadow(vec3 p, vec3 lightDir) {
+    vec3 oc = p - SPHERE_CENTER;
+    float b = dot(oc, lightDir);
+    if (b > 0.0) return 1.0;
+    float closest = sqrt(max(dot(oc, oc) - b * b, 0.0));
+    float d = (closest - SPHERE_RADIUS) / SPHERE_RADIUS;
+    return smoothstep(-0.05, 0.35, d);
+}
+
+
+// ── Ambient Occlusion ───────────────────────────────────────
+
+float sphereAO(vec3 p, vec3 n) {
+    vec3 v = SPHERE_CENTER - p;
+    float d2 = dot(v, v);
+    float cosA = dot(n, v / sqrt(d2));
+    float r2 = SPHERE_RADIUS * SPHERE_RADIUS;
+    return 1.0 - 0.5 * (r2 / d2) * max(cosA, 0.0);
+}
+
+
+// ── Color Utilities ─────────────────────────────────────────
+
+vec3 hsv2rgb(vec3 c) {
+    vec3 p = abs(fract(c.xxx + vec3(0, 2.0/3.0, 1.0/3.0)) * 6.0 - 3.0);
+    return c.z * mix(vec3(1), clamp(p - 1.0, 0.0, 1.0), c.y);
+}
+```
+
+### Image tab
+
+```glsl
+// ═══════════════════════════════════════════════════════════════
+//  ★  EDIT HERE  ★   Define your algebraic curve
+// ═══════════════════════════════════════════════════════════════
+//
+//  Define a curve f(u,v) = 0 in the z=0 plane.
+//  It will be drawn on the plane AND lifted onto the
+//  unit sphere via inverse stereographic projection.
+//
+//  Just return f.  Gradient is computed numerically.
+
+#define CAMERA_DIST 8.0
+#define CURVE_WIDTH 1.5         // line half-width in pixels
+#define CURVE_COLOR vec3(0.85, 0.15, 0.1)
+
+#define SHOW_PLANE  1           // 0 to hide ground plane
+#define SHOW_SPHERE 1           // 0 to hide sphere
+#define PLANE_ALPHA 0.3         // plane opacity when seen from below
+
+
+// ── Your curve ──────────────────────────────────────────────
+//  Uncomment ONE block, or write your own.
+
+
+// Circle  |w|² = 1   →  equator of S²
+float curve(vec2 w) {
+    return dot(w, w) - 1.0;
+}
+
+/*
+// Line  u = 0   →  great circle through poles
+float curve(vec2 w) {
+    return w.x;
+}
+*/
+
+/*
+// Lemniscate of Bernoulli  (u²+v²)² = 2(u²−v²)
+float curve(vec2 w) {
+    float r2 = dot(w, w);
+    return r2*r2 - 2.0*(w.x*w.x - w.y*w.y);
+}
+*/
+
+/*
+// Elliptic curve  v² = u³ − u
+float curve(vec2 w) {
+    return w.y*w.y - (w.x*w.x*w.x - w.x);
+}
+*/
+
+/*
+// Parabola  v = u²
+float curve(vec2 w) {
+    return w.y - w.x*w.x;
+}
+*/
+
+/*
+// Two concentric circles  (|w|²−1)(|w|²−4) = 0
+float curve(vec2 w) {
+    float r2 = dot(w, w);
+    return (r2 - 1.0) * (r2 - 4.0);
+}
+*/
+
+
+// ═══════════════════════════════════════════════════════════════
+//  Implementation — no need to edit below this line
+// ═══════════════════════════════════════════════════════════════
+
+#define LIGHT_DIR normalize(vec3(2.0, 1.5, 4.0))
+#define EPS 0.001
+
+
+// ── Numerical gradient & distance ───────────────────────────
+
+vec2 curveGrad(vec2 w) {
+    return vec2(
+        curve(w + vec2(EPS, 0)) - curve(w - vec2(EPS, 0)),
+        curve(w + vec2(0, EPS)) - curve(w - vec2(0, EPS))
+    ) / (2.0 * EPS);
+}
+
+// Euclidean distance to curve in the plane
+float curveDist(vec2 w) {
+    float f = curve(w);
+    float g = length(curveGrad(w));
+    return abs(f) / max(g, 1e-5);
+}
+
+// Distance to curve on the sphere surface,
+// conformally corrected: d_sphere = d_plane · λ
+float curveDistSphere(vec3 P) {
+    vec2 w = stereoForward(P);
+    return curveDist(w) * conformalFactor(w);
+}
+
+
+// ── Grid on the plane ───────────────────────────────────────
+
+float gridPattern(vec2 w, float t, float px) {
+    vec2 gd = abs(fract(w + 0.5) - 0.5);
+    float gridMin = min(gd.x, gd.y);
+    float grid = 1.0 - smoothstep(0.0, 1.5, gridMin / (t * px));
+
+    float axesDist = min(abs(w.x), abs(w.y));
+    float axes = 1.0 - smoothstep(0.0, 2.0, axesDist / (t * px));
+
+    return max(grid * 0.15, axes * 0.3);
+}
+
+
+// ── Shading ─────────────────────────────────────────────────
+
+vec3 shadePlane(vec3 p, float t, float px) {
+    vec2 w = p.xy;
+
+    vec3 col = vec3(0.95, 0.93, 0.90);
+    col = mix(col, vec3(0.5, 0.5, 0.48), gridPattern(w, t, px));
+
+    float d = curveDist(w);
+    float curvePx = d / (t * px);
+    col = mix(col, CURVE_COLOR, 1.0 - smoothstep(CURVE_WIDTH - 0.5, CURVE_WIDTH + 0.5, curvePx));
+
+    col *= 0.3 + 0.7 * max(dot(vec3(0, 0, 1), LIGHT_DIR), 0.0);
+
+#if SHOW_SPHERE
+    col *= mix(0.35, 1.0, sphereShadow(p, LIGHT_DIR));
+    col *= sphereAO(p, vec3(0, 0, 1));
+#endif
+
+    float fade = exp(-0.02 * dot(w, w));
+    col = mix(vec3(0.85, 0.87, 0.92), col, fade);
+
+    return col;
+}
+
+vec3 shadeSphere(vec3 p, vec3 n, vec3 rd, float t, float px) {
+    vec3 col = vec3(0.92, 0.92, 0.95);
+
+    float d = curveDistSphere(p);
+    float curvePx = d / (t * px);
+    col = mix(col, CURVE_COLOR, 1.0 - smoothstep(CURVE_WIDTH - 0.5, CURVE_WIDTH + 0.5, curvePx));
+
+    float diff = max(dot(n, LIGHT_DIR), 0.0);
+    vec3  h    = normalize(LIGHT_DIR - rd);
+    float spec = pow(max(dot(n, h), 0.0), 64.0) * 0.4;
+    float fres = pow(1.0 - max(dot(n, -rd), 0.0), 4.0) * 0.12;
+
+    col = col * (0.35 + 0.65 * diff) + vec3(spec + fres);
+
+    return col;
+}
+
+
+// ── Main ────────────────────────────────────────────────────
+
+void mainImage(out vec4 O, in vec2 F) {
+    vec2 uv = (F - 0.5 * iResolution.xy) / iResolution.y;
+    float px = 1.0 / iResolution.y;
+
+    // Orbit camera: theta = azimuth, phi = elevation from horizontal
+    float theta = iTime * 0.2;
+    float phi   = 0.45;
+    if (iMouse.z > 0.0) {
+        vec2 mo = iMouse.xy / iResolution.xy;
+        theta += (mo.x - 0.5) * TAU;
+        phi    = mix(-0.8, 1.4, mo.y);  // allow looking from below
+    }
+
+    vec3 target = SPHERE_CENTER;
+    vec3 ro = target + CAMERA_DIST * vec3(
+        cos(theta) * cos(phi),
+        sin(theta) * cos(phi),
+        sin(phi));
+
+    vec3 fwd   = normalize(target - ro);
+    vec3 world_up = vec3(0, 0, 1);
+    // Avoid degeneracy when looking straight up/down
+    if (abs(dot(fwd, world_up)) > 0.999)
+        world_up = vec3(0, 1, 0);
+    vec3 right = normalize(cross(fwd, world_up));
+    vec3 up    = cross(right, fwd);
+    vec3 rd    = normalize(right * uv.x + up * uv.y + fwd);
+
+    float tP = -1.0, tS = -1.0;
+#if SHOW_PLANE
+    tP = hitPlane(ro, rd);
+#endif
+#if SHOW_SPHERE
+    tS = hitSphere(ro, rd);
+#endif
+
+    vec3 bg = vec3(0.85, 0.87, 0.92);
+    vec3 result = bg;
+
+    bool hP = tP > 0.0;
+    bool hS = tS > 0.0;
+    bool planeFromBelow = hP && rd.z > 0.0;
+
+    if (hP && hS) {
+        if (tS < tP) {
+            // Sphere is in front
+            vec3 p = ro + tS * rd;
+            result = shadeSphere(p, normalize(p - SPHERE_CENTER), rd, tS, px);
+        } else if (planeFromBelow) {
+            // Plane is in front but seen from below — blend
+            vec3 sphereCol = shadeSphere(ro + tS * rd,
+                normalize(ro + tS * rd - SPHERE_CENTER), rd, tS, px);
+            vec3 planeCol = shadePlane(ro + tP * rd, tP, px);
+            result = mix(sphereCol, planeCol, PLANE_ALPHA);
+        } else {
+            result = shadePlane(ro + tP * rd, tP, px);
+        }
+    } else if (hS) {
+        vec3 p = ro + tS * rd;
+        result = shadeSphere(p, normalize(p - SPHERE_CENTER), rd, tS, px);
+    } else if (hP) {
+        if (planeFromBelow) {
+            vec3 planeCol = shadePlane(ro + tP * rd, tP, px);
+            result = mix(bg, planeCol, PLANE_ALPHA);
+        } else {
+            result = shadePlane(ro + tP * rd, tP, px);
+        }
+    }
+
+    O = vec4(pow(clamp(result, 0.0, 1.0), vec3(1.0 / 2.2)), 1);
+}
+```

@@ -1,0 +1,121 @@
+### Vector Fields
+
+A vector field $V\colon \mathbb{R}^2 \to \mathbb{R}^2$ assigns a vector to each point.
+The graph lives in $\mathbb{R}^4$ — same dimensionality problem as complex functions — so again we need to encode the output as color or geometry.
+
+The pullback perspective still works: given a way to encode a single vector as a color, we can visualize any vector field by pulling that encoding back through $V$.
+But vector fields also have *dynamics* — they define a flow — and this is something neither scalar functions nor complex functions possess.
+So alongside the pointwise color encoding we'll want tools that show the trajectories of that flow.
+
+There are two complementary approaches.
+The first is *pointwise*: at each pixel, evaluate $V$ and encode direction and magnitude as color.
+The second is *geometric*: draw actual arrows or curves that show the flow structure.
+Neither is complete on its own — the pointwise view shows singularities and index, while the geometric view shows trajectories and flow — so it's worth having both.
+
+
+#### Version 1: Direction and Magnitude Coloring
+
+The simplest approach: map the angle of $V(p)$ to hue (reusing our `rainbow` colormap) and the magnitude to brightness.
+This is literally domain coloring applied to a real vector field instead of a complex function.
+The code is nearly identical — `atan(v.y, v.x)` gives the angle, which maps to a rainbow phase, and the magnitude modulates brightness.
+
+Singularities — points where $V = 0$ — show up as dark points where all colors converge, exactly like zeros in domain coloring.
+The index of a singularity is visible in how the colors wind around it: a source or sink has index $+1$ (all hues appear once in a loop around the singularity), a saddle has index $-1$ (some hues appear three times).
+This is the Poincaré–Hopf theorem made visible.
+
+The only subtlety is normalizing brightness.
+If $|V|$ varies over orders of magnitude, a linear brightness map will be mostly black or mostly white.
+We use $|V| / (1 + |V|)$ — a sigmoid that compresses the range to $[0, 1]$ without ever saturating.
+Near a singularity the brightness goes to zero smoothly; far away it approaches 1.
+This is one of the places where choosing the right transfer function matters more than choosing the right colormap.
+
+{{< shader layout="tabbed" vector-field-color >}}
+
+
+#### Version 2: Arrow Grid
+
+The textbook picture: tile the screen into a grid of cells, evaluate $V$ at each cell center, and draw an arrow pointing in that direction with length proportional to $|V|$.
+
+On a CPU you'd do this with a loop: for each cell, draw an arrow.
+In a shader there are no loops over geometry — every pixel runs the same code independently.
+So the question becomes: how does a single pixel know whether it's inside an arrow?
+
+The answer is **signed distance functions** (SDFs).
+A signed distance function $d(p)$ returns the distance from a point $p$ to the nearest boundary of a shape, with a sign convention: negative inside, positive outside.
+Given an SDF, drawing a shape is just a threshold test: if $d(p) < 0$, color the pixel.
+Antialiasing comes from `smoothstep` across a pixel-width band around $d = 0$.
+
+The arrow is built from two SDF primitives:
+
+- **Shaft**: the signed distance to a line segment (from tail to the base of the head), thickened by subtracting a half-width. Geometrically this is a rectangle aligned with the arrow direction.
+- **Head**: the signed distance to a triangle (the arrowhead), computed by finding the closest point on each of the three edges and checking which side of the boundary we're on.
+
+The union of two SDFs is just `min(d1, d2)` — a pixel is inside the arrow if it's inside *either* piece.
+
+**The grid trick.** Each pixel computes which cell it belongs to via `floor(uv / cellSize)`, finds that cell's center, and evaluates $V$ there.
+Then it works in *local coordinates* relative to the cell center.
+This means every pixel only ever thinks about one arrow — the one in its own cell — so there's no need to loop over all arrows.
+This is the same tiling idea that appears in any shader that draws a repeating pattern: reduce to a fundamental domain, do your geometry there.
+
+The arrow length is scaled by a sigmoid $|V|/(1 + |V|)$ so that arrows always fit inside their cell regardless of how large $|V|$ gets.
+At zero, the arrow vanishes; at moderate values it's nearly proportional; at large values it saturates at the cell size.
+
+{{< shader layout="tabbed" vector-field-arrows >}}
+
+
+#### Version 3: Animated Streamlines
+
+A streamline is a curve $\gamma$ satisfying $\dot\gamma(t) = V(\gamma(t))$ — the integral curve of the vector field.
+Drawing streamlines is the gold standard for visualizing flow, but it's inherently nonlocal: a streamline is a curve, and a shader only knows about one pixel.
+
+The single-pass ideas we might try all have problems.
+Integrating from each pixel and coloring by arc length produces a smooth scalar field whose level sets cut *across* streamlines, not along them.
+Advecting a texture by reading upstream each frame produces noise rather than clean curves.
+
+The solution is a **particle system stored in a framebuffer**.
+This is our first shader that uses Shadertoy's multi-pass buffers, and the idea is beautifully simple.
+
+**Buffer A is the particle array.**
+Every pixel in Buffer A stores one particle's position (in the `.rg` channels).
+On the first frame, particles are scattered randomly across the screen.
+On each subsequent frame, every pixel reads its own previous position from Buffer A, evaluates $V$ at that position, and takes a small step along the velocity — exactly Euler integration of the ODE, one step per frame.
+If a particle leaves the screen, it respawns at a new random position.
+
+The key insight: the framebuffer *is* the particle state.
+Each pixel's red and green channels are the $x$ and $y$ coordinates of its particle, persisted across frames by reading from the buffer's own previous contents.
+This is a feedback loop: Buffer A reads from itself.
+
+**Buffer B draws the particles and accumulates trails.**
+For each pixel on screen, Buffer B loops over the particles (reading their positions from Buffer A) and checks whether any particle is close enough to draw.
+This is a brute-force approach — each pixel tests against `NUMBER` particles — but GPUs are fast at exactly this kind of parallel work.
+
+The trail effect comes from compositing with Buffer B's own previous frame: `max(current, previous * TRAIL_DECAY)`.
+Each frame, the old trails dim slightly, and new bright dots appear at the current particle positions.
+The result: particles leave fading streaks behind them as they flow, producing animated streamlines.
+
+The `MIX_FACTOR` parameter (e.g. 0.99) controls trail length: closer to 1 means longer trails.
+`NUMBER` controls how many particles are visible (more = denser coverage, but the loop in Buffer B gets more expensive).
+`VEL_FACTOR` controls the step size — since we normalize velocity direction, all particles move at the same screen speed regardless of $|V|$, which keeps the visualization evenly readable.
+
+{{< shader layout="tabbed" vector-field-streamlines >}}
+
+#### Comparing the three views
+
+These three shaders are worth running side by side on the same vector field, because each reveals different structure.
+
+The **color view** is the most information-dense: every pixel encodes both direction and magnitude, so you can see the full local structure everywhere at once.
+It's particularly good for locating and classifying singularities — the winding pattern of hues tells you the index without any computation.
+But it's abstract: it takes practice to read, and it says nothing about where things actually go.
+
+The **arrow grid** is the most immediately legible.
+It looks like a textbook figure, and anyone can read it: arrows point in the direction of the field, and longer arrows mean stronger flow.
+But the discrete sampling hides structure between grid points, and you can't trace trajectories by eye beyond a cell or two.
+
+The **animated streamlines** show dynamics directly — you watch particles flow, accumulate in attractors, and separate along unstable manifolds.
+The trade-off is that the visualization has state (it depends on its own history), requires multiple buffers, and takes a few seconds to develop its trail pattern.
+
+Together, the three views illustrate a general principle: there is no single best visualization for a mathematical object.
+Each encoding reveals some structure and hides other structure.
+The art is choosing the right encoding for the question you're trying to answer — or better, building a tool that lets you switch between them.
+
+

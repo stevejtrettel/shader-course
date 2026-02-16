@@ -37,7 +37,9 @@ website:
       #     - fundamentals/colors.qmd
       - text: "---"
       - text: "CIRM 2026"
-        href: /cirm-2026/
+        href: https://shaders.stevejtrettel.site/cirm-2026/
+      - text: "IHP 2026"
+        href: https://shaders.stevejtrettel.site/ihp-2026/
 
 # Shared metadata
 author: "Steve Trettel"

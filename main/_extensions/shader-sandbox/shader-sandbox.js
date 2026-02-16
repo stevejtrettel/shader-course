@@ -2051,7 +2051,9 @@ class Ee {
     this.input.dispose(), this._resizeObserver.disconnect(), this._resizeDebounceTimer !== null && clearTimeout(this._resizeDebounceTimer), this._engine.dispose(), this.errorOverlay.hide(), this.runtimeErrorOverlay.dispose(), this.hideMediaBanner(), this.hideContextLostOverlay();
     for (const e of this._overlays.values())
       e.remove();
-    this._overlays.clear(), this.container.removeChild(this.canvas);
+    this._overlays.clear();
+    const lc = this.gl.getExtension("WEBGL_lose_context"); lc && lc.loseContext();
+    this.container.removeChild(this.canvas);
   }
   // ===========================================================================
   // Canvas Sizing
@@ -6496,7 +6498,7 @@ function on(i, e, t) {
   r.className = "prism-editor-area";
   const a = document.createElement("textarea");
   a.className = "prism-editor-textarea", a.value = e, a.spellcheck = !1, a.autocapitalize = "off", a.autocomplete = "off";
-  const o = document.createElement("pre");
+  const o = document.createElement("div");
   o.className = "prism-editor-highlight";
   const c = document.createElement("code");
   c.className = "language-cpp", o.appendChild(c), r.appendChild(a), r.appendChild(o), n.appendChild(s), n.appendChild(r), i.appendChild(n);

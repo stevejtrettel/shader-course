@@ -1,0 +1,16 @@
+{
+  "name": "Vector Field \u2014 Animated Streamlines",
+  "layout": "tabbed",
+  "controls": false,
+  "mode": "shadertoy",
+  "BufferA": {
+    "iChannel0": "BufferA"
+  },
+  "BufferB": {
+    "iChannel0": "BufferA",
+    "iChannel1": "BufferB"
+  },
+  "Image": {
+    "iChannel0": "BufferB"
+  }
+}

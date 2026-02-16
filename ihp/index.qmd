@@ -1,0 +1,9 @@
+# Shader Workshop {.unnumbered}
+
+This workshop was given at [IHP](https://www.ihp.fr/) in Paris, February 2026.
+It is a short introduction to shader programming as a tool for mathematical illustration and exploration.
+
+Shaders are programs that run in parallel on the GPU, making them exceptionally fast for visualization tasks.
+We write code that "reads like mathematics" using a beginner-friendly web-based platform called Shadertoy, which handles all the low-level programming complexities.
+
+No prior experience with shaders or GLSL is required—only a foundation in undergraduate mathematics and willingness to experiment with code.

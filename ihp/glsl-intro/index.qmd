@@ -1,0 +1,159 @@
+# Intro to GLSL
+
+We'll write all our shaders in [Shadertoy](https://www.shadertoy.com), a web-based environment for fragment shaders.
+There's nothing to install — you open the site, type code in the editor, and hit play.
+
+The setup is minimal.
+You write a single function called `mainImage`.
+It receives the pixel's coordinates as input, and you assign a color as output.
+The GPU calls this function at every pixel, in parallel, every frame.
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    // fragCoord: pixel coordinates (e.g. 0 to 1920)
+    // fragColor: output color (red, green, blue, alpha), each 0 to 1
+}
+```
+
+That's the entire interface.
+Everything else is what you do inside this function.
+
+
+## Coordinates
+
+The first thing you'll do in essentially every shader is convert from pixel coordinates to something mathematically useful.
+`fragCoord` gives you raw pixel positions — `(0, 0)` is the bottom-left corner, and values go up to `iResolution.xy`, which is the canvas size in pixels.
+
+The standard move is to center the origin and normalize so the y-axis runs from $-1$ to $1$:
+
+```glsl
+vec2 uv = (2.0 * fragCoord - iResolution.xy) / iResolution.y;
+```
+
+Now `uv` is a centered, aspect-corrected coordinate system: $(0,0)$ is the middle of the screen, $y$ ranges from $-1$ to $1$, and $x$ ranges a bit wider depending on the aspect ratio.
+
+Shadertoy also provides `iTime`, a float that counts seconds since the shader started, which you use for animation.
+
+
+## A Little Bit of GLSL
+
+GLSL — the language shaders are written in — looks a lot like C.
+The things you need to know:
+
+The basic types are `float`, `int`, `vec2`, `vec3`, and `vec4`.
+A `vec2` is a pair of floats, a `vec3` is a triple, and so on.
+You access components with `.x`, `.y`, `.z`, `.w`, and you can swizzle: `v.xy` gives you the first two components of a `vec3` as a `vec2`.
+
+All the standard math functions exist: `sin`, `cos`, `exp`, `log`, `abs`, `min`, `max`, `pow`.
+They work component-wise on vectors, so `sin(v)` where `v` is a `vec3` gives you `vec3(sin(v.x), sin(v.y), sin(v.z))`.
+
+There are also some functions you might not have seen before: `length(v)` computes $|v|$, `dot(u,v)` is the dot product, `normalize(v)` returns $v/|v|$, `mix(a, b, t)` is the linear interpolation $(1-t)a + tb$.
+
+::: {.callout-note}
+## `smoothstep(a, b, x)`
+
+A smooth threshold function.
+Returns 0 when $x \le a$, returns 1 when $x \ge b$, and interpolates smoothly in between via
+$$s(t) = 3t^2 - 2t^3, \qquad t = \frac{x - a}{b - a}.$$
+This is a $C^1$ monotone interpolant with $s'(0) = s'(1) = 0$.
+We use it constantly — whenever you want to draw a shape with a clean, antialiased edge, threshold a distance with `smoothstep`.
+:::
+
+The best way to learn more GLSL is by reading shaders.
+
+
+## Examples
+
+### A Gradient
+
+The simplest possible shader just uses the pixel coordinates directly as color.
+The red channel increases left to right, green increases bottom to top:
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = fragCoord / iResolution.xy;
+    fragColor = vec4(uv.x, uv.y, 0.0, 1.0);
+}
+```
+
+This isn't mathematically interesting, but it confirms the pipeline: you're writing a function from $[0,1]^2$ to RGB, and the GPU is evaluating it at every pixel.
+
+{{< shader layout="tabbed" gradient >}}
+
+
+### A Disk
+
+Now something geometric.
+We center our coordinates, compute the distance from the origin, and check whether it's less than $0.5$:
+
+```glsl
+vec2 uv = (2.0 * fragCoord - iResolution.xy) / iResolution.y;
+float d = length(uv);
+float disk = smoothstep(0.51, 0.49, d);  // 1 inside, 0 outside
+```
+
+The `smoothstep` handles the boundary — instead of a hard binary test (which would produce jagged pixel edges), the transition ramps smoothly over about two pixels.
+Note the reversed arguments: `smoothstep(0.51, 0.49, d)` is 1 when `d` is small and 0 when `d` is large.
+
+{{< shader layout="tabbed" disk >}}
+
+
+### Drawing a Circle
+
+The disk filled a region.
+But what if we want to draw a *curve* — a one-dimensional object in a two-dimensional image?
+
+The trick: compute the *distance to the curve* and threshold.
+For the unit circle, the distance from $(x,y)$ to the nearest point on the circle is $\bigl| \sqrt{x^2 + y^2} - 1 \bigr|$.
+Where this distance is within about one pixel, we light up:
+
+```glsl
+float d = abs(length(uv) - 1.0);       // distance to the unit circle
+float px = 2.0 / iResolution.y;         // one pixel in world coords
+float circle = smoothstep(1.5*px, 0.5*px, d);
+```
+
+This is the technique that powers everything in the workshop.
+To draw the zero set of a function $f$, compute $|f|/|\nabla f|$ (the distance to the zero set, to first order) and threshold.
+The gradient correction makes the line width consistent regardless of how $f$ behaves — we'll develop this carefully in the level sets section.
+
+{{< shader layout="tabbed" circle >}}
+
+
+### Animated Rings
+
+Add `iTime` and you have animation.
+Every pixel evaluates $\sin(20r - 3t)$ independently — there's no state, no communication between pixels, just a function of position and time:
+
+{{< shader layout="tabbed" rings >}}
+
+
+### Polar Colors
+
+To close: a shader that maps polar coordinates to color.
+The angle $\theta = \operatorname{atan2}(y, x)$ determines hue, and the radius $r$ modulates brightness through logarithmic rings.
+
+This is a preview of *domain coloring* — the technique we'll use for complex functions.
+The idea is to paint the plane with a pattern that encodes position as color, and then pull that pattern back through a function to see what it does.
+Here we're just looking at the pattern itself, applied to the identity.
+
+{{< shader layout="tabbed" polar-color >}}
+
+
+## Using the Workshop Shaders
+
+The rest of this workshop is a collection of prewritten shaders, each designed to do something a working mathematician might actually want.
+They're meant to be used, not just read — open them in Shadertoy, change the function at the top, and see what happens.
+
+Every shader is structured the same way.
+At the top of the file there's a clearly marked block where you enter your math: a function, a vector field, a recurrence relation, whatever the shader visualizes.
+Below that is the visualization code.
+You don't need to read or understand the code below the line to use the shader — just edit the top block and hit play.
+
+Some shaders use Shadertoy's **Common** tab.
+This is code that's shared across all tabs in a shader, and we use it as a math library: complex arithmetic, Möbius transformations, hyperbolic distance, and so on.
+If you want to use `cmul(z, w)` or `mobius(a, b, c, d, z)` in your function at the top, that's where they're defined.
+Think of it as an `#include`.
+
+A few of the shaders use multiple passes — **Buffer A** does a computation (like one timestep of a PDE), and the **Image** tab reads the result and turns it into a picture.
+Shadertoy handles the plumbing; you just need to make sure the tabs and channels are set up as described in each shader's header.

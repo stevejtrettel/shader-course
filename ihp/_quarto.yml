@@ -1,0 +1,55 @@
+project:
+  type: website
+  output-dir: _site
+  resources:
+    - glsl-intro/shaders/**
+    - functions/shaders/**
+    - geometry/shaders/**
+    - dynamics/shaders/**
+
+base-path: /ihp-2026
+
+website:
+  title: "Shader Workshop — IHP 2026"
+  navbar:
+    left:
+      - text: "← Back to Main Site"
+        href: https://shaders.stevejtrettel.site
+
+  sidebar:
+    style: docked
+    contents:
+      - index.qmd
+      - text: "Why Shaders?"
+        href: why-shaders.qmd
+      - text: "Intro to GLSL"
+        href: glsl-intro/index.qmd
+      - text: "Functions"
+        href: functions/index.qmd
+      - text: "Geometry"
+        href: geometry/index.qmd
+      - text: "Dynamics"
+        href: dynamics/index.qmd
+
+# Shared metadata
+author: "Steve Trettel"
+date: "February 2026"
+
+highlight-style: arrow
+
+execute:
+  freeze: auto
+  echo: true
+  warning: false
+
+format:
+  html:
+    theme:
+      light: [cosmo, styles/website.scss]
+      dark: [darkly, styles/website.scss]
+    code-copy: true
+    code-overflow: wrap
+    toc: true
+    toc-depth: 3
+    link-external-newwindow: true
+    smooth-scroll: true

@@ -20,6 +20,9 @@ cd main && quarto render && cd ..
 echo "=== Building CIRM course ==="
 cd cirm && quarto render && cd ..
 
+echo "=== Building IHP workshop ==="
+cd ihp && quarto render && cd ..
+
 echo "=== Combining outputs ==="
 rm -rf _site
 mkdir _site
@@ -29,6 +32,9 @@ cp -r main/_site/* _site/
 
 # Copy CIRM course to /cirm-2026/
 cp -r cirm/_site _site/cirm-2026
+
+# Copy IHP workshop to /ihp-2026/
+cp -r ihp/_site _site/ihp-2026
 
 echo "=== Build complete ==="
 echo "Output in _site/"
