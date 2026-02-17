@@ -8,14 +8,16 @@ We won't be learning computer graphics in any traditional sense.
 We won't talk about game engines, 3D modeling software, or the OpenGL pipeline.
 Instead, we'll focus on a single, specific tool — the *fragment shader*: a small program that runs once per pixel, receives the pixel's coordinates as input, and outputs a color.
 
-The plan: we'll start with ideas, move to a little bit of syntax, and then spend most of our time with a collection of prewritten shaders that do things you might actually want to do — plotting level sets, raymarching implicit surfaces, domain coloring, visualizing hyperbolic geometry, simulating PDEs.
-The goal is that you leave here with tools you can use next week.
+The point of this workshop is not to teach you computer graphics — it's to give you the ability to quickly draw things that show up in your own research.
+You have a surface defined by an equation, a tiling coming from a group action, a PDE you want to watch evolve — and you want to see it *now*.
+We'll start with ideas, move to a little bit of syntax, and then spend most of our time with a collection of prewritten shaders that do things you might actually want to do — plotting level sets, raymarching implicit surfaces, domain coloring, visualizing hyperbolic geometry, simulating PDEs.
 
-Here is your first shader.
-It draws the unit circle by checking, at each pixel, whether $x^2 + y^2 - 1$ is close to zero.
-Try changing the equation — replace `x*x + y*y - 1.0` with `y*y - x*x*x + x` for an elliptic curve, or `x*x - y*y` for a pair of lines.
 
-{{< shader layout="split" width="100%" circle >}}
+{{< shader layout="tabbed" width="80%" height="450px" kummer-surface >}}
+
+For example: the Kummer surface above is a quartic in $\mathbb{R}^3$ with 16 ordinary double points — the maximum for a degree-4 surface.
+The entire shader is a single function `f(x,y,z)` that evaluates the defining polynomial; everything else (the raymarching, lighting, coloring) is template code you don't need to touch.
+Click the *Code* tab above to see it.
 
 
 ## Two Ways to Make Pictures
