@@ -1,12 +1,15 @@
-// ═══════════════════════════════════════════════════════════════
-//  Hopf Fibration — Raymarched Fibers
-//  COMMON tab (math library — nothing to edit here)
-// ═══════════════════════════════════════════════════════════════
+// =============================================
+//  IHP Shader Workshop 2026
+//  HOPF FIBRATION (Common tab)
+//
+//  Library: Hopf map, stereographic projection,
+//  camera utilities.
+// =============================================
 
 #define PI  3.14159265359
 #define TAU 6.28318530718
 
-// ── Hopf Fibration ──────────────────────────────────────────
+// ── Hopf Fibration ───────────────────────────
 
 // Inverse stereographic projection  R^3 → S^3
 // Projects from north pole (0,0,0,1).
@@ -27,14 +30,14 @@ vec3 hopfMap(vec4 q) {
     );
 }
 
-// ── Color ───────────────────────────────────────────────────
+// ── Color ────────────────────────────────────
 
 vec3 hsv2rgb(vec3 c) {
     vec3 p = abs(fract(c.xxx + vec3(0, 2.0/3.0, 1.0/3.0)) * 6.0 - 3.0);
     return c.z * mix(vec3(1), clamp(p - 1.0, 0.0, 1.0), c.y);
 }
 
-// ── Camera ──────────────────────────────────────────────────
+// ── Camera ───────────────────────────────────
 
 mat3 orbitCamera(float yaw, float pitch) {
     float cy = cos(yaw), sy = sin(yaw);
@@ -45,7 +48,7 @@ mat3 orbitCamera(float yaw, float pitch) {
     return mat3(right, up, fwd);
 }
 
-// ── Lighting ────────────────────────────────────────────────
+// ── Lighting ─────────────────────────────────
 
 vec3 shade(vec3 col, vec3 n, vec3 rd, float t) {
     vec3 l1 = normalize(vec3(1, 2, 3));

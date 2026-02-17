@@ -1,175 +1,219 @@
-// ═══════════════════════════════════════════════════════════════
-//  ★  EDIT HERE  ★   Billiard phase portrait
-// ═══════════════════════════════════════════════════════════════
+// =============================================
+//  IHP Shader Workshop 2026
+//  BILLIARD PHASE PORTRAIT
 //
-//  Phase space of a convex billiard table: the cylinder (s, θ)
-//    s = arc length position on the boundary (horizontal axis)
-//    θ = outgoing angle from the tangent   (vertical axis, 0 to π)
+//  Phase space (t, theta) of billiards in an ellipse.
+//  Left panel: phase portrait colored by Poincare section.
+//  Right panel: the ellipse with a selected trajectory.
+//  Click left panel to select an orbit.
+// =============================================
+
+// =============================================
+//  YOUR ELLIPSE
+// =============================================
+
+//  The table boundary is the ellipse (A cos t, sin t).
+//  A = 1.0 is a circle (theta is conserved — horizontal invariant curves).
+//  A < 1.0 is a proper ellipse (invariant curves deform but persist).
+//  Try: 1.0, 0.7, 0.5, 0.3
+
+const float A = 0.7;
+
+// =============================================
+//  PARAMETERS
 //
-//  Each pixel is a different initial condition.
-//  Color encodes the rotation number: the average fraction
-//  of the perimeter traversed per bounce.
-//
-//  Table must be convex.  Change NUM_VERTS and getVertex below.
+//  ITERATIONS — number of bounces to iterate
+// =============================================
 
-#define MAX_ITER 200            // bounces per orbit (more = sharper)
+const int ITERATIONS = 500;
 
-// ── Square (default — completely integrable) ──────────────────
-#define NUM_VERTS 4
-vec2 getVertex(int i) {
-    vec2 v[4];
-    v[0] = vec2(-0.5, -0.5);
-    v[1] = vec2( 0.5, -0.5);
-    v[2] = vec2( 0.5,  0.5);
-    v[3] = vec2(-0.5,  0.5);
-    return v[i];
+// =============================================
+//  VISUALIZATION (nothing below needs editing)
+// =============================================
+
+const float PI = 3.141592653589793238;
+const float PI_INV = 1.0 / PI;
+const float SCALE = 2.5;
+const float EPS = 1e-2;
+
+const float A2 = A * A;
+const float A_INV = 1.0 / A;
+const float A2_INV = A_INV * A_INV;
+
+const vec3 ORBIT_COLOR = vec3(1.0, 0.2, 0.2);
+
+vec2 project(vec2 v, vec2 onto) {
+    return onto * dot(v, onto) / (onto.x * onto.x + onto.y * onto.y);
 }
 
-// ── Regular pentagon ──────────────────────────────────────────
-//#define NUM_VERTS 5
-//vec2 getVertex(int i) {
-//    float a = float(i) * 6.2832 / float(NUM_VERTS) + 1.5708;
-//    return 0.40 * vec2(cos(a), sin(a));
-//}
-
-// ── Equilateral triangle ──────────────────────────────────────
-//#define NUM_VERTS 3
-//vec2 getVertex(int i) {
-//    float a = float(i) * 6.2832 / 3.0 + 1.5708;
-//    return 0.42 * vec2(cos(a), sin(a));
-//}
-
-// ── Regular hexagon ───────────────────────────────────────────
-//#define NUM_VERTS 6
-//vec2 getVertex(int i) {
-//    float a = float(i) * 6.2832 / 6.0;
-//    return 0.40 * vec2(cos(a), sin(a));
-//}
-
-// ── Near-circle (60-gon, nearly integrable) ───────────────────
-//#define NUM_VERTS 60
-//vec2 getVertex(int i) {
-//    float a = float(i) * 6.2832 / float(NUM_VERTS);
-//    return 0.40 * vec2(cos(a), sin(a));
-//}
-
-
-// ═══════════════════════════════════════════════════════════════
-//  Implementation — no need to edit below this line
-// ═══════════════════════════════════════════════════════════════
-
-const float PI  = 3.141592653589793;
-const float TAU = 6.283185307179586;
-
-float edgeLens[NUM_VERTS];
-float cumLens[NUM_VERTS];
-float totalPerim;
-
-void initGeometry() {
-    totalPerim = 0.0;
-    for (int i = 0; i < NUM_VERTS; i++) {
-        cumLens[i] = totalPerim;
-        edgeLens[i] = length(getVertex((i+1) % NUM_VERTS) - getVertex(i));
-        totalPerim += edgeLens[i];
-    }
+vec2 perp(vec2 v, vec2 onto) {
+    return v - project(v, onto);
 }
 
-// Arc length → position on boundary + frame
-void arcToState(float s, out vec2 pos, out vec2 T, out vec2 N) {
-    s = mod(s, totalPerim);
-    for (int i = 0; i < NUM_VERTS; i++) {
-        if (s <= cumLens[i] + edgeLens[i] + 1e-7) {
-            float t = (s - cumLens[i]) / edgeLens[i];
-            vec2 a = getVertex(i);
-            vec2 b = getVertex((i+1) % NUM_VERTS);
-            pos = mix(a, b, clamp(t, 0.0, 1.0));
-            T = normalize(b - a);
-            N = vec2(-T.y, T.x);  // inward normal for CCW polygon
-            return;
+vec2 rotate(vec2 v, float theta) {
+    float c = cos(theta);
+    float s = sin(theta);
+    return vec2(c * v.x - s * v.y, s * v.x + c * v.y);
+}
+
+float atan2(in float y, in float x)
+{
+    bool s = (abs(x) > abs(y));
+    float t = mix(PI/2.0 - atan(x,y), atan(y,x), s);
+    if (t < 0.0) t += 2. * PI;
+    return t;
+}
+
+float angle(vec2 u, vec2 v) {
+    return acos(dot(u, v) / sqrt(dot(u,u) * dot(v,v)));
+}
+
+struct Ray {
+    vec2 source;
+    vec2 direction;
+};
+
+struct State {
+    float t;
+    float theta;
+};
+
+float pointOnSegment(vec2 pt, vec2 start, vec2 end, float thickness) {
+    vec2 dp = pt - start;
+    vec2 v = end - start;
+    float d = dot(dp, v);
+    float f;
+    if (d < 0.0) f = max(0., thickness - length(dp)) / thickness;
+    else if (d > dot(v,v)) f = max(0., thickness - length(end - pt)) / thickness;
+    else f = max(0., thickness - length(perp(dp, v))) / thickness;
+    return min(1., 2. * f);
+}
+
+vec2 gamma(float t) {
+    return vec2(A * cos(t), sin(t));
+}
+
+vec2 gammaPrime(float t) {
+    return normalize(vec2(-A * sin(t), cos(t)));
+}
+
+Ray stateToRay(State state) {
+    vec2 source = gamma(state.t);
+    vec2 gp = gammaPrime(state.t);
+    vec2 direction = rotate(gp, state.theta);
+    return Ray(source, normalize(direction));
+}
+
+State rayToState(Ray ray) {
+    vec2 aff = ray.source * vec2(A_INV, 1.);
+    float t = atan2(aff.y, aff.x);
+    float theta = angle(gammaPrime(t), ray.direction);
+    return State(t, theta);
+}
+
+Ray billiard(Ray ray) {
+    Ray affRay = Ray(ray.source * vec2(A_INV, 1), normalize(ray.direction * vec2(A_INV, 1)));
+    float t = -2.0 * dot(affRay.source, affRay.direction);
+    vec2 affPoint = affRay.source + t * affRay.direction;
+    vec2 point = affPoint * vec2(A, 1);
+    vec2 der = normalize(vec2(-A * affPoint.y, affPoint.x));
+    return Ray(point, 2.0 * dot(ray.direction, der) * der - ray.direction);
+}
+
+
+float pointOnEllipse(vec2 pt, float thickness) {
+    float grad = length(vec2(2. * pt.x * A2_INV, 2. * pt.y));
+    float level = abs(pt.x * pt.x * A2_INV + pt.y * pt.y - 1.) / grad;
+    float f = max(0., (thickness - level) / thickness);
+    return min(1., 2. * f);
+}
+
+vec2 pixelToWorldLeft(vec2 px) {
+    return SCALE * (px / vec2(iResolution.x / 2.)
+        - vec2(0.5, iResolution.y / iResolution.x));
+}
+
+vec2 pixelToWorldRight(vec2 px) {
+    px.x -= iResolution.x / 2.;
+    return SCALE * (px / vec2(iResolution.x / 2.)
+        - vec2(0.5, iResolution.y / iResolution.x));
+}
+
+vec3 colorState(State s) {
+    Ray ray = stateToRay(s);
+    for (int i = 0; i < ITERATIONS; i++) {
+        if (abs(s.t - PI) < EPS) {
+            float th = abs(s.theta * PI_INV - 0.5) * 2.;
+            float rta = round(th * 73.);
+            if (mod(rta, 2.0) <= 0.5) continue;
+            float rt = mod(rta * 64., 79.) / 79.;
+            return vec3(rt, 1.-mod(12.*rt, 1.), 0.5);
         }
+        ray = billiard(ray);
+        s = rayToState(ray);
     }
-    vec2 a = getVertex(0), b = getVertex(1);
-    pos = a; T = normalize(b - a); N = vec2(-T.y, T.x);
+    return vec3(0);
 }
 
-// Ray–edge intersection; returns ray parameter, sets edge parameter et
-float rayEdge(vec2 ro, vec2 rd, vec2 a, vec2 b, out float et) {
-    vec2 e = b - a;
-    float den = rd.x * e.y - rd.y * e.x;
-    if (abs(den) < 1e-10) { et = -1.0; return -1.0; }
-    vec2 d = a - ro;
-    float t = (d.x * e.y - d.y * e.x) / den;
-    float s = (d.x * rd.y - d.y * rd.x) / den;
-    if (t > 0.001 && s > 0.002 && s < 0.998) {
-        et = s; return t;
-    }
-    et = -1.0; return -1.0;
-}
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 mp = pixelToWorldLeft(iMouse.xy);
+    float thickness = SCALE / iResolution.x;
+    vec3 color;
+    if (fragCoord.x >= iResolution.x / 2.) {
+        vec2 pt = pixelToWorldRight(fragCoord);
 
-// One billiard bounce.  Returns arc length of new hit point.
-float bounce(inout vec2 pos, inout vec2 dir) {
-    float bestT = 1e10;
-    float bestET = 0.0;
-    int bestEdge = -1;
-    for (int i = 0; i < NUM_VERTS; i++) {
-        float et;
-        float t = rayEdge(pos, dir, getVertex(i),
-                          getVertex((i+1) % NUM_VERTS), et);
-        if (t > 0.0 && t < bestT) {
-            bestT = t; bestET = et; bestEdge = i;
+        color = vec3(pointOnEllipse(pt, 5. * thickness));
+
+        float time = (mp.x + 1.0) * PI;
+        float theta = (mp.y + 1.0) * PI / 2.0;
+
+        if (time >= 0.0 && time <= 2.0 * PI && theta >= 0.0 && theta <= PI) {
+            Ray ray = stateToRay(State(time,theta));
+
+            for (int i = 0; i < ITERATIONS; i++) {
+                Ray newRay = billiard(ray);
+                float f = pointOnSegment(pt, ray.source, newRay.source, thickness);
+                color = max(color, f * ORBIT_COLOR);
+                ray = newRay;
+            }
         }
-    }
-    if (bestEdge < 0) return -1.0;
-    pos += dir * bestT;
-    vec2 eD = normalize(getVertex((bestEdge+1) % NUM_VERTS)
-                        - getVertex(bestEdge));
-    vec2 n = vec2(-eD.y, eD.x);
-    if (dot(n, dir) > 0.0) n = -n;
-    dir -= 2.0 * dot(dir, n) * n;
-    return cumLens[bestEdge] + bestET * edgeLens[bestEdge];
-}
+    } else {
+        vec2 pt = pixelToWorldLeft(fragCoord);
 
-vec3 palette(float t) {
-    return 0.5 + 0.5 * cos(TAU * (t + vec3(0.0, 0.33, 0.67)));
-}
 
-void mainImage(out vec4 fragColor, in vec2 fragCoord) {
-    initGeometry();
-    vec2 uv = fragCoord / iResolution.xy;
+        float l = pointOnSegment(pt, vec2(-1,-1), vec2(-1,+1), 5. * thickness);
+        float r = pointOnSegment(pt, vec2(+1,-1), vec2(+1,+1), 5. * thickness);
+        float b = pointOnSegment(pt, vec2(-1,-1), vec2(+1,-1), 5. * thickness);
+        float t = pointOnSegment(pt, vec2(-1,+1), vec2(+1,+1), 5. * thickness);
+        float box = max(max(l,r),max(b,t));
 
-    // Phase space: x → arc length, y → outgoing angle
-    float s0    = uv.x * totalPerim;
-    float theta = mix(0.01, PI - 0.01, uv.y);
+        color = vec3(box);
 
-    vec2 pos, T, N;
-    arcToState(s0, pos, T, N);
-    vec2 dir = cos(theta) * T + sin(theta) * N;
+        float time = (pt.x + 1.0) * PI;
+        float theta = (pt.y + 1.0) * PI / 2.0;
 
-    float prevArc = s0;
-    float cumAdv  = 0.0;
-    bool  ok      = true;
-
-    for (int i = 0; i < MAX_ITER; i++) {
-        float newArc = bounce(pos, dir);
-        if (newArc < 0.0) { ok = false; break; }
-        float adv = newArc - prevArc;
-        if (adv < 0.0) adv += totalPerim;
-        cumAdv += adv;
-        prevArc = newArc;
-    }
-
-    vec3 col = vec3(0.02);
-    if (ok) {
-        float rho = cumAdv / (float(MAX_ITER) * totalPerim);
-        col = palette(rho * 5.0);
-
-        // Faint vertex lines (edge boundaries in phase space)
-        float px = 1.0 / iResolution.x;
-        for (int i = 0; i < NUM_VERTS; i++) {
-            float vx = cumLens[i] / totalPerim;
-            col *= smoothstep(0.0, 2.0 * px, abs(uv.x - vx));
+        if (time >= 0.0 && time <= 2.0 * PI && theta >= 0.0 && theta <= PI) {
+            color = colorState(State(time,theta));
         }
-    }
 
-    fragColor = vec4(col, 1.0);
+        time = (mp.x + 1.0) * PI;
+        theta = (mp.y + 1.0) * PI / 2.0;
+
+        if (time >= 0.0 && time <= 2.0 * PI && theta >= 0.0 && theta <= PI) {
+            Ray ray = stateToRay(State(time,theta));
+
+            for (int i = 0; i < 100; i++) {
+                State state = rayToState(ray);
+                vec2 pp = vec2(
+                    state.t * PI_INV - 1.,
+                    state.theta * PI_INV * 2. - 1.
+                );
+                if (length(pt - pp) < 10. * thickness) color = ORBIT_COLOR;
+                ray = billiard(ray);
+            }
+        }
+
+    }
+    fragColor = vec4(color, 1);
 }

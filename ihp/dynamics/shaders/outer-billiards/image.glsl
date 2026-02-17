@@ -1,27 +1,28 @@
-// ═══════════════════════════════════════════════════════════════
-//  ★  EDIT HERE  ★   Choose your polygon
-// ═══════════════════════════════════════════════════════════════
+// =============================================
+//  IHP Shader Workshop 2026
+//  OUTER BILLIARDS
 //
-//  Outer billiards: given a convex polygon, the outer billiard
-//  map reflects each exterior point through the nearest vertex
-//  (in cyclic order). The singularity set is the union of all
-//  preimages of the edge-extension rays under iterates of this map.
-//
+//  Singularity set of the outer billiard map
+//  for convex polygons. Each pixel iterates the
+//  map and checks for singularity line crossings.
+//  Self-similar tilings emerge.
+// =============================================
+
+// =============================================
+//  YOUR POLYGON
+// =============================================
+
 //  Uncomment ONE polygon block below, or write your own.
 //  N must match the number of vertices in the array.
 
-#define SCALE 10.0              // zoom level (larger = more of the plane)
-#define ITERATIONS 1000         // max iterates to check
-
 const float PI = 3.141592653589793238;
-const float DELTA = 0.001;
 
-// ── Animated pentagon (default) ────────────────────────────────
+// -- Animated pentagon (default) --
 //  One vertex drifts slowly with time.
 const int N = 5;
 #define WOBBLE 0.15                 // amplitude of vertex motion (0 = static)
 
-// ── For static polygons, change N above and replace initVertices ──
+// -- For static polygons, change N above and replace initVertices --
 //  Triangle: N = 3    Square: N = 4    Hexagon: N = 6    Heptagon: N = 7
 
 vec2 VERTICES[N];
@@ -37,7 +38,23 @@ void initVertices() {
     VERTICES[0] += WOBBLE * vec2(cos(t), sin(t * 0.7));
 }
 
-// Vector operations
+// =============================================
+//  PARAMETERS
+//
+//  SCALE      — zoom level (larger = more of the plane)
+//  ITERATIONS — max iterates to check
+//  DELTA      — periodicity detection threshold
+// =============================================
+
+#define SCALE 10.0
+#define ITERATIONS 1000
+
+const float DELTA = 0.001;
+
+// =============================================
+//  VISUALIZATION (nothing below needs editing)
+// =============================================
+
 vec2 project(in vec2 v, in vec2 onto) {
     return onto * dot(v, onto) / (onto.x * onto.x + onto.y * onto.y);
 }
@@ -131,7 +148,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
         fragColor = vec4(0.2, 0.4, 0.6, 1.0);
         return;
     }
-    
+
     Ray[N] rays;
     for (int i = 0; i < N; i++) {
         vec2 v2 = VERTICES[(i+1) % N];

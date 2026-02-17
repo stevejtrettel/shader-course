@@ -1,12 +1,13 @@
 # Intro to GLSL
 
+With the conceptual framework in place — a shader is a function from pixel coordinates to colors, evaluated in parallel across the screen — we need just enough of the language to start writing them.
+This section covers the basics of GLSL and works through a handful of small examples.
+The goal is not fluency in the language; it's comfort with the pattern, so the prewritten shaders in the rest of the workshop make sense on first reading.
+
 We'll write all our shaders in [Shadertoy](https://www.shadertoy.com), a web-based environment for fragment shaders.
 There's nothing to install — you open the site, type code in the editor, and hit play.
 
-The setup is minimal.
-You write a single function called `mainImage`.
-It receives the pixel's coordinates as input, and you assign a color as output.
-The GPU calls this function at every pixel, in parallel, every frame.
+The interface is a single function called `mainImage`:
 
 ```glsl
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
@@ -15,7 +16,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 }
 ```
 
-That's the entire interface.
+It receives the pixel's coordinates as input, you assign a color as output, and the GPU calls it at every pixel, in parallel, every frame.
 Everything else is what you do inside this function.
 
 
@@ -37,8 +38,8 @@ Shadertoy also provides `iTime`, a float that counts seconds since the shader st
 
 ## A Little Bit of GLSL
 
-GLSL — the language shaders are written in — looks a lot like C.
-The things you need to know:
+GLSL — the language shaders are written in — looks a lot like C, and you don't need much of it for what we're doing.
+Here are the essentials.
 
 The basic types are `float`, `int`, `vec2`, `vec3`, and `vec4`.
 A `vec2` is a pair of floats, a `vec3` is a triple, and so on.
@@ -56,9 +57,11 @@ The best way to learn more GLSL is by reading shaders.
 
 ## Examples
 
+Let's build up from the simplest possible program to something that starts to feel like mathematics.
+
 ### A Gradient
 
-The simplest possible shader just uses the pixel coordinates directly as color.
+The simplest shader just uses the pixel coordinates directly as color.
 The red channel increases left to right, green increases bottom to top:
 
 ```glsl
@@ -122,7 +125,7 @@ Every pixel evaluates $\sin(20r - 3t)$ independently — there's no state, no co
 
 ### Polar Colors
 
-To close: a shader that maps polar coordinates to color.
+To close this section: a shader that maps polar coordinates to color.
 The angle $\theta = \operatorname{atan2}(y, x)$ determines hue, and the radius $r$ modulates brightness through logarithmic rings.
 
 This is a preview of *domain coloring* — the technique we'll use for complex functions.
@@ -134,7 +137,7 @@ Here we're just looking at the pattern itself, applied to the identity.
 
 ## Using the Workshop Shaders
 
-The rest of this workshop is a collection of prewritten shaders, each designed to do something a working mathematician might actually want.
+With the syntax out of the way, the rest of this workshop is a collection of prewritten shaders.
 They're meant to be used, not just read — open them in Shadertoy, change the function at the top, and see what happens.
 
 Every shader is structured the same way.

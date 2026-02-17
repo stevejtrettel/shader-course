@@ -1,3 +1,6 @@
+// IHP Shader Workshop 2026
+// A circle — distance-to-curve thresholding with smoothstep.
+
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     vec2 uv = (2.0 * fragCoord - iResolution.xy) / iResolution.y;
 

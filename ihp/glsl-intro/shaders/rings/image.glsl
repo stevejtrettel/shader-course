@@ -1,3 +1,6 @@
+// IHP Shader Workshop 2026
+// Animated rings — sin(distance) with iTime for animation.
+
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     vec2 uv = (2.0 * fragCoord - iResolution.xy) / iResolution.y;
 

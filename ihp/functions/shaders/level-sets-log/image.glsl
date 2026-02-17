@@ -1,16 +1,15 @@
 // =============================================
-// 2D LEVEL SETS — LOGARITHMIC CONTOURS
-// =============================================
-// Paste into Shadertoy (no channels needed, single tab)
+//  IHP Shader Workshop 2026
+//  LEVEL SETS — LOGARITHMIC CONTOURS
 //
-// Draws contours of log|f|, blended across multiple octaves.
-// Contours are evenly spaced multiplicatively, so they adapt
-// naturally to functions with zeros, poles, or large dynamic range.
+//  Multi-octave contour lines for functions with
+//  large dynamic range. Contour density adapts to
+//  the local gradient, using log-space spacing that
+//  handles zeros and poles gracefully.
+// =============================================
 
 // =============================================
-// EDIT HERE: Define your function f(z)
-// Return value should be a vec2 (complex number) or
-// use vec2(realValue, 0.0) for real-valued functions.
+//  YOUR FUNCTION
 // =============================================
 
 vec2 myFunction(vec2 z) {
@@ -35,17 +34,23 @@ vec2 myFunction(vec2 z) {
 }
 
 // =============================================
-// PARAMETERS
+//  PARAMETERS
+//
+//  VIEW_RADIUS   — half-width of visible region
+//  MIN_SPACING   — smallest contour spacing in pixels
+//  DIVISIONS     — subdivisions per octave
+//  LINE_WIDTH    — line width in pixels
+//  AA_WIDTH      — antialiasing width
 // =============================================
 
 #define VIEW_RADIUS    4.0
-#define MIN_SPACING    2.0    // smallest contour spacing in pixels
-#define DIVISIONS      6.0    // subdivisions per octave
-#define LINE_WIDTH     1.0    // line width in pixels
-#define AA_WIDTH       1.5    // antialiasing width
+#define MIN_SPACING    2.0
+#define DIVISIONS      6.0
+#define LINE_WIDTH     1.0
+#define AA_WIDTH       1.5
 
 // =============================================
-// VISUALIZATION CODE (no need to edit below)
+//  VISUALIZATION (nothing below needs editing)
 // =============================================
 
 // Numerically stable magnitude

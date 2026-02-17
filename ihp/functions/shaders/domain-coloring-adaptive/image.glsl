@@ -1,15 +1,15 @@
 // =============================================
-// DOMAIN COLORING — ADAPTIVE GRID
-// =============================================
-// Common tab: complex arithmetic (same as domain-coloring)
-// No channels needed
+//  IHP Shader Workshop 2026
+//  DOMAIN COLORING — ADAPTIVE GRID
 //
-// Combines phase coloring, checkerboard shading, and
-// multi-scale adaptive grid lines. Grid density adjusts
-// automatically to the local derivative magnitude.
+//  Phase coloring with multi-scale adaptive grid
+//  lines. Grid density adjusts to the local
+//  derivative, fading finer subdivisions smoothly.
+//  Common tab: complex arithmetic library.
+// =============================================
 
 // =============================================
-// EDIT HERE: Define your complex function f(z)
+//  YOUR FUNCTION
 // =============================================
 
 vec2 f(vec2 z) {
@@ -24,7 +24,15 @@ vec2 f(vec2 z) {
 }
 
 // =============================================
-// PARAMETERS
+//  PARAMETERS
+//
+//  VIEW_RADIUS    — half-width of the view window
+//  GRID_STEPS     — subdivisions per octave
+//  GRID_OPACITY   — 0 = no grid, 1 = full grid
+//  SHADE_OPACITY  — 0 = no checkerboard, 1 = full
+//  PHASE_AMOUNT   — 0 = grayscale, 1 = full color
+//  LINE_WIDTH     — grid line thickness
+//  LINE_FEATHER   — anti-aliasing softness
 // =============================================
 
 #define VIEW_RADIUS    4.0
@@ -36,7 +44,7 @@ vec2 f(vec2 z) {
 #define LINE_FEATHER   1.0
 
 // =============================================
-// VISUALIZATION CODE (no need to edit below)
+//  VISUALIZATION (nothing below needs editing)
 // =============================================
 
 // Numerically careful hypot (avoids overflow near poles)

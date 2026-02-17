@@ -1,14 +1,14 @@
 // =============================================
-// IMPLICIT SURFACE — CROSS-SECTION
+//  IHP Shader Workshop 2026
+//  IMPLICIT SURFACE — CROSS-SECTION
+//
+//  Nested level sets with a sweeping clip plane
+//  that exposes the interior. Colored contour lines
+//  on the cut face show a topographic cross-section.
 // =============================================
-// Raymarches multiple level sets f(x,y,z) = c inside a
-// bounding box, clipped by an animated plane. The cut face
-// shows colored contour lines. Box wall isolines and ground AO.
-// Drag to orbit.
 
 // =============================================
-// EDIT HERE: Define your implicit function f(x, y, z)
-// Should return values spanning your level set range.
+//  YOUR FUNCTION
 // =============================================
 
 #define PI 3.14159265359
@@ -27,30 +27,46 @@ float f(vec3 p) {
 }
 
 // =============================================
-// EDIT HERE: Level set configuration
+//  PARAMETERS
+//
+//  CENTER_LEVEL    — value of the central level set
+//  LEVEL_SPACING   — spacing between consecutive levels
+//  NUM_LEVELS      — number of level sets
+//  HIGHLIGHT       — opaque level index (-1 for all opaque)
+//  GHOST_OPACITY   — opacity of non-highlighted levels (0 to 1)
+//  CLIP_NORMAL     — clip plane normal direction
+//  CLIP_SPEED      — clip plane sweep speed
+//  CLIP_RANGE      — sweep amplitude (fraction of BOX_SIZE)
+//  BOX_SIZE        — bounding box half-size
+//  SHOW_BOX        — 1 = bounding box, 0 = unbounded
+//  MARCH_RADIUS    — max march distance when SHOW_BOX = 0
+//  STEP_SIZE       — ray march step size
+//  CUT_LINE_WIDTH  — contour line width on cut face
+//  SPEC_EXP        — specular exponent
+//  CAM_DIST        — camera distance from origin
+//  CAM_HEIGHT      — camera height
+//  CAM_SPEED       — orbit speed
+//  FOV             — field of view
 // =============================================
 
-#define CENTER_LEVEL  0.0     // value of the central level set
-#define LEVEL_SPACING 0.5     // spacing between consecutive levels
-#define NUM_LEVELS    5        // number of level sets
+// Level set configuration
+#define CENTER_LEVEL  0.0
+#define LEVEL_SPACING 0.5
+#define NUM_LEVELS    5
 
 // Highlight one level set: that level is opaque, the rest translucent.
 // Set to -1 for all opaque (no highlighting).
 #define HIGHLIGHT     -1
-#define GHOST_OPACITY 0.25    // opacity of non-highlighted levels (0 to 1)
+#define GHOST_OPACITY 0.25
 
 // Clipping plane
 vec3 CLIP_NORMAL = normalize(vec3(0.0, 1.0, 0.0));
 #define CLIP_SPEED   0.3
-#define CLIP_RANGE   0.9       // sweep amplitude (fraction of BOX_SIZE)
-
-// =============================================
-// PARAMETERS
-// =============================================
+#define CLIP_RANGE   0.9
 
 #define BOX_SIZE   vec3(1.0)
-#define SHOW_BOX   1               // 1 = bounding box, 0 = unbounded
-#define MARCH_RADIUS 10.0          // max march distance when SHOW_BOX = 0
+#define SHOW_BOX   1
+#define MARCH_RADIUS 10.0
 #define STEP_SIZE  0.01
 #define CUT_LINE_WIDTH 0.15
 #define SPEC_EXP   128.0
@@ -62,7 +78,7 @@ vec3 CLIP_NORMAL = normalize(vec3(0.0, 1.0, 0.0));
 #define FOV        2.0
 
 // =============================================
-// VISUALIZATION CODE (no need to edit below)
+//  VISUALIZATION (nothing below needs editing)
 // =============================================
 
 #define LIGHT_DIR normalize(vec3(cos(-iTime*0.3+PI*0.5), 1.0, sin(-iTime*0.3+PI*0.5)))
@@ -185,8 +201,8 @@ vec3 render(vec3 ro, vec3 rd) {
                     surfAlpha += (1.0 - surfAlpha) * a;
                 }
 
-                if (prevClip > 0.0) { lastHitT = tClip; break; } // kept→clipped: stop
-                // clipped→kept: continue marching to find surfaces behind
+                if (prevClip > 0.0) { lastHitT = tClip; break; } // kept->clipped: stop
+                // clipped->kept: continue marching to find surfaces behind
             }
 
             // Only process level crossings in the kept region

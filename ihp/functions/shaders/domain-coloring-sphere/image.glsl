@@ -1,14 +1,15 @@
 // =============================================
-// DOMAIN COLORING — RIEMANN SPHERE
-// =============================================
-// Common tab: complex arithmetic + rainbow + complexToColor
-// No channels needed
+//  IHP Shader Workshop 2026
+//  DOMAIN COLORING — RIEMANN SPHERE
 //
-// Stereographic projection maps the sphere to the complex
-// plane. We evaluate f(z) and domain-color the result.
+//  Domain coloring on a lit 3D sphere via
+//  stereographic projection. Drag to rotate.
+//  The south pole maps to infinity.
+//  Common tab: complex arithmetic library.
+// =============================================
 
 // =============================================
-// EDIT HERE: Define your complex function f(z)
+//  YOUR FUNCTION
 // =============================================
 
 vec2 f(vec2 z) {
@@ -24,13 +25,18 @@ vec2 f(vec2 z) {
 
     // Other things to try:
     // return cmul(z, z);                                // z^2: two-to-one cover
-    // return cdiv(cmul(z, z) - vec2(1,0), cmul(z, z) + vec2(1,0)); // Möbius
+    // return cdiv(cmul(z, z) - vec2(1,0), cmul(z, z) + vec2(1,0)); // Mobius
     // return csin(z);                                   // wild near poles
     // return cinv(z);                                   // swap 0 and infinity
 }
 
 // =============================================
-// PARAMETERS
+//  PARAMETERS
+//
+//  SPHERE_RADIUS  — radius in screen units
+//  SCALE          — how much of the screen the sphere fills
+//  AUTO_SPEED     — auto-rotation speed when not dragging
+//  BG_COLOR       — background color
 // =============================================
 
 #define SPHERE_RADIUS 3.0     // radius in screen units
@@ -39,7 +45,7 @@ vec2 f(vec2 z) {
 const vec3 BG_COLOR = vec3(0.15); // background: try vec3(0.95) for light
 
 // =============================================
-// VISUALIZATION CODE (no need to edit below)
+//  VISUALIZATION (nothing below needs editing)
 // =============================================
 
 // Rotation matrices
@@ -53,12 +59,12 @@ mat3 rotZ(float a) {
     return mat3(c, -s, 0, s, c, 0, 0, 0, 1);
 }
 
-// Stereographic projection: sphere point (x, y, z) → complex number
+// Stereographic projection: sphere point (x, y, z) -> complex number
 // Projects from the back pole (y = -1, hidden from viewer)
 // Center of visible disk (y = 1) maps to z = 0
 vec2 stereo(vec3 n) {
     float denom = 1.0 + n.y;
-    if (denom < 1e-6) return vec2(1e6); // near back pole → infinity
+    if (denom < 1e-6) return vec2(1e6); // near back pole -> infinity
     return vec2(n.x, n.z) / denom;
 }
 
@@ -93,7 +99,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
         }
         normal = rotZ(azimuth) * rotX(elevation) * normal;
 
-        // Stereographic projection → complex plane
+        // Stereographic projection -> complex plane
         vec2 z = stereo(normal);
 
         // Apply the function and color

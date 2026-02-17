@@ -1,10 +1,11 @@
-## Visualizing Functions
+# Visualizing Functions
 
-Visualizing a function is the prototypical pullback problem.
-Given $f\colon \mathbb{R}^n \to \mathbb{R}$ (or $\mathbb{C} \to \mathbb{C}$, or $\mathbb{R}^3 \to \mathbb{R}$), a shader can show it by evaluating at every pixel and mapping the result to a color.
+This section is the core toolkit of the workshop: shaders for visualizing functions.
+If there's one thing a fragment shader does naturally, it's evaluating a function at every point in a domain and turning the result into a picture.
+Given $f\colon \mathbb{R}^n \to \mathbb{R}$ (or $\mathbb{C} \to \mathbb{C}$, or $\mathbb{R}^3 \to \mathbb{R}$), the shader evaluates $f$ at every pixel and maps the result to a color.
 No meshes, no marching cubes, no parametrizations — the pixel knows its coordinates, calls $f$, and is done.
 
-We build shaders for three flavors of this:
+We build shaders for three settings:
 
 **2D real-valued functions** $f\colon \mathbb{R}^2 \to \mathbb{R}$ — shown as colormaps with level curves.
 This is the simplest case, and we'll use it to develop the gradient-correction technique that makes contour lines look sharp at any zoom level.
@@ -18,8 +19,8 @@ Each trades legibility for completeness.
 
 ### Level Sets of a Scalar Function
 
-The most basic thing you might want to visualize in 2D is a function $f\colon \mathbb{R}^2 \to \mathbb{R}$.
-The shader approach is as direct as it gets: for each pixel, evaluate $f$, and use the result to pick a color.
+The most basic thing you might want to visualize is a function $f\colon \mathbb{R}^2 \to \mathbb{R}$.
+The shader approach is as direct as it gets: for each pixel, evaluate $f$ and use the result to pick a color.
 
 There are two things to show: the *value* of $f$ (via a color map) and its *level curves* $f = c$ for evenly spaced values of $c$ (as dark lines on top of the color).
 
@@ -155,11 +156,11 @@ The default uses four alternating colors, but you can use any number.
 
 A function $f\colon \mathbb{R}^2 \to \mathbb{R}$ maps each point to a single number, and we can turn that number into a color.
 A function $f\colon \mathbb{C} \to \mathbb{C}$ maps each point to a *pair* of numbers — or equivalently, to another point in the plane.
-The graph lives in $\mathbb{C}^2 \cong \mathbb{R}^4$, so we can't just plot it.
+The graph lives in $\mathbb{C}^2 \cong \mathbb{R}^4$, so we can't plot it directly.
 
-The solution is to design a coloring of the plane itself — a pattern that encodes position as color — and then *pull it back* through $f$.
-That is: to visualize $f$, we don't try to draw its graph.
-Instead, we paint the *range* with a known pattern, and look at what that pattern looks like when dragged back to the domain.
+The solution is the pullback idea in its purest form: design a coloring of the plane — a pattern that encodes position as color — and then pull it back through $f$.
+To visualize $f$, we don't try to draw its graph.
+Instead, we paint the *range* with a known pattern and look at what that pattern becomes when dragged back to the domain.
 
 The standard choice: encode a complex number $w = |w|e^{i\theta}$ as color by mapping $\theta$ to hue and $|w|$ to brightness.
 Red is the positive real axis, cyan is the negative real axis, and the colors wrap smoothly around the circle.
@@ -273,7 +274,8 @@ The center of the visible disk maps to $z = 0$.
 
 ### 3D Scalar Functions: Slice Planes
 
-The most direct way to visualize a 3D scalar field is also the most familiar: take 2D slices and draw contour plots on them.
+We now move from 2D to 3D: given a function $f\colon \mathbb{R}^3 \to \mathbb{R}$, how do we see it?
+The most direct approach is also the most familiar: take 2D slices and draw contour plots on them.
 
 Each slice is a standard 2D level-set visualization — the same gradient-corrected contour lines from our earlier shaders, now embedded in 3D space.
 You can see exactly where $f$ is positive, negative, where it crosses zero, and how steeply it varies.
@@ -317,12 +319,13 @@ On reference planes, `REF_COLOR_SAT` keeps the coloring very subtle so the activ
 
 ### 3D Scalar Functions: Implicit Surfaces
 
-A scalar function $f\colon \mathbb{R}^3 \to \mathbb{R}$ has level sets $f^{-1}(c)$ that are (generically) surfaces.
-This is the 3D analogue of the contour plots we drew earlier — but now the level sets are objects you can light, rotate, and walk around.
+Slice planes show one cross-section at a time.
+To see the full surface $f^{-1}(c)$ as a three-dimensional object — lit, shaded, and rotatable — we need a different technique: **raymarching**.
 
+A scalar function $f\colon \mathbb{R}^3 \to \mathbb{R}$ has level sets $f^{-1}(c)$ that are (generically) surfaces — the 3D analogue of the contour curves we drew earlier.
 The challenge is that we can't just evaluate $f$ at each pixel.
 A pixel corresponds to a *ray* through 3D space, and we need to find where that ray intersects the surface $f = c$.
-There's no general closed-form formula for this — the surface could be any shape — so we solve it numerically by **raymarching**: walk along the ray in small steps, evaluate $f$, and watch for the value to cross the target level.
+There's no general closed-form solution — the surface could be any shape — so we solve it numerically: walk along the ray in small steps, evaluate $f$, and watch for the value to cross the target level.
 
 For a true signed distance function (where $|f(p)|$ gives the distance to the nearest surface point), we can step by $|f|$ itself — this is sphere tracing proper, and it converges fast.
 For a general implicit function, we use a fixed step size and watch for sign changes.
@@ -385,8 +388,7 @@ Colors follow a diverging blue → white → red ramp, so the central level is w
 On the box walls, all levels get isolines in their respective colors, giving a topographic map of the entire family.
 
 This reveals topology that a single level set hides.
-A function might have a simple sphere-like level set at one value but develop handles or disconnect at another.
-Watching the family evolve as $c$ changes is exactly Morse theory made visible.
+A function might have a sphere-like level set at one value but develop handles or disconnect at another — watching the family evolve as $c$ changes is exactly Morse theory made visible.
 
 The default shows the Schwarz P family at five levels centered on $c = 0$ with spacing $0.5$.
 At $c = 0$ you see the minimal surface itself (white); as $|c|$ grows the channels pinch off, and the topology changes from a connected network to isolated components.
@@ -415,13 +417,39 @@ The `CLIP_NORMAL` direction controls which way the plane faces — try `vec3(1,0
 {{< shader layout="tabbed" implicit-surface-section >}}
 
 
+### Algebraic Surfaces
+
+The implicit surface shaders above work for any function $f(x,y,z)$ — transcendental, piecewise, whatever you like.
+But there's a distinguished class of functions where the zero set has particularly rich structure: **polynomials**.
+
+A real algebraic surface is the variety $V(f) = \{ (x,y,z) \in \mathbb{R}^3 : f(x,y,z) = 0 \}$ for a polynomial $f$.
+The raymarcher renders these directly — type the polynomial, see the variety.
+No triangulation, no marching cubes, no special handling of singularities.
+In fact, the shader's behavior at singular points is informative: where $\nabla f = 0$, the gradient-based normal degenerates and the shading breaks down, which marks exactly the singular locus.
+Nodes appear as dimples where the lighting flickers; cuspidal edges show up as creases where the normal reverses abruptly.
+
+The shader below is loaded with classic examples from the algebraic geometry literature.
+Here are some highlights worth trying:
+
+- **Clebsch diagonal cubic** (the default) — the unique cubic surface on which all 27 lines are real. The lines are visible as straight creases on the surface. This was one of the first algebraic surfaces to be physically modeled, by Clebsch and Klein in the 1870s.
+- **Cayley cubic** — a cubic with 4 ordinary double points (nodes), the maximum for a cubic. The nodes sit at the vertices of a tetrahedron.
+- **Kummer surface** — a quartic with 16 nodes (the maximum for a quartic), with beautiful tetrahedral symmetry.
+- **Barth sextic** — a degree-6 surface with 65 nodes and icosahedral symmetry. The golden ratio $\varphi$ appears explicitly in the equation. Barth proved in 1996 that 65 is the maximum number of nodes on a sextic.
+- **Togliatti quintic** — a degree-5 surface with 31 nodes, also with icosahedral symmetry.
+- **Whitney umbrella** ($x^2 = y^2 z$) — the simplest non-isolated singularity: a line of double points along the $z$-axis, with a pinch point at the origin where the surface crosses itself.
+- **Steiner surface** ($x^2 y^2 + x^2 z^2 + y^2 z^2 = xyz$) — a self-intersecting surface with three double lines meeting at a triple point. Also called the Roman surface after Steiner's visit to Rome where he discovered it.
+- **Fermat surfaces** ($x^n + y^n + z^n = 1$) — a family interpolating between the sphere ($n=2$) and a cube (as $n \to \infty$). The quartic and sextic members are already visibly box-like.
+
+{{< shader layout="tabbed" algebraic-surface >}}
+
+
 ### 3D Scalar Functions: Volumetric Rendering
 
-Isosurfaces show *where* a function takes a particular value — they're crisp, opaque boundaries.
+Isosurfaces show *where* a function crosses a threshold — crisp, opaque boundaries.
 But a scalar field contains information everywhere, not just on surfaces.
-A probability density, a temperature distribution, an electromagnetic potential — these are quantities that fill all of space, and the interesting structure is often in *how* the field varies, not just where it crosses a threshold.
+A probability density, a temperature distribution, an electromagnetic potential — these fill all of space, and the interesting structure is often in *how* the field varies, not just where it crosses a particular value.
 
-Volume rendering makes the entire field visible by treating $\rho(x,y,z)$ as a density of luminous gas.
+Volume rendering makes the entire field visible at once by treating $\rho(x,y,z)$ as a density of luminous gas.
 Where $\rho$ is large, the volume glows brightly and is opaque.
 Where $\rho$ is near zero, it's transparent.
 The result looks like a glowing nebula or cloud — you see the full spatial structure of the field at once, with no information lost to a level-set choice.

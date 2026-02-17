@@ -1,3 +1,8 @@
+// IHP Shader Workshop 2026
+// Unit circle — implicit curve f(x,y) = 0 with gradient correction.
+// Try changing the equation: y*y - x*x*x + x (elliptic curve),
+// x*x - y*y (pair of lines), sin(x)*sin(y) (lattice of curves).
+
 void mainImage(out vec4 O, in vec2 F) {
     // Map pixel coordinates to math coordinates
     vec2 uv = (F - 0.5 * iResolution.xy) / iResolution.y;

@@ -1,5 +1,10 @@
 // =============================================
-// COMPLEX ARITHMETIC LIBRARY
+//  IHP Shader Workshop 2026
+//  COMPLEX ARITHMETIC LIBRARY (Common tab)
+//
+//  Shared utilities: cmul, cdiv, cexp, clog, cpow,
+//  csin, ccos, csqr, cinv, rainbow, complexToColor.
+//  Used by all domain coloring shaders.
 // =============================================
 
 #define PI 3.14159265359

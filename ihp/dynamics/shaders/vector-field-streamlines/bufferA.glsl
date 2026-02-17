@@ -1,4 +1,10 @@
-// iChannel0 = Buffer A (self, nearest/clamp)
+// =============================================
+//  IHP Shader Workshop 2026
+//  ANIMATED STREAMLINES — Buffer A (particle state)
+//
+//  Reads: iChannel0 = Buffer A (self, nearest/clamp)
+//  Stores particle positions in .rg channels.
+// =============================================
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     if (iFrame == 0) {

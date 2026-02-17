@@ -1,13 +1,14 @@
 # Shader Workshop {.unnumbered}
 
-This workshop was given at [IHP](https://www.ihp.fr/) in Paris, February 2026.
-It is a short introduction to shader programming as a tool for mathematical illustration and exploration, aimed at working mathematicians — especially geometers and topologists — who want to visualize things from their research but haven't encountered GPU programming before.
+Welcome to the Shader Workshop, given at [IHP](https://www.ihp.fr/) in Paris, February 2026.
+This is a short introduction to shader programming as a tool for mathematical illustration and exploration, aimed at working mathematicians — especially geometers and topologists — who want to visualize things from their research but haven't encountered GPU programming before.
+No prior experience with graphics or GPU computing is assumed.
 
 We won't be learning computer graphics in any traditional sense.
 We won't talk about game engines, 3D modeling software, or the OpenGL pipeline.
 Instead, we'll focus on a single, specific tool — the *fragment shader*: a small program that runs once per pixel, receives the pixel's coordinates as input, and outputs a color.
 
-The plan: we'll start with ideas, move to a little bit of syntax, and then spend most of our time with a collection of prewritten shaders that do things you might actually want to do: plotting level sets, raymarching implicit surfaces, domain coloring, visualizing hyperbolic geometry, simulating PDEs.
+The plan: we'll start with ideas, move to a little bit of syntax, and then spend most of our time with a collection of prewritten shaders that do things you might actually want to do — plotting level sets, raymarching implicit surfaces, domain coloring, visualizing hyperbolic geometry, simulating PDEs.
 The goal is that you leave here with tools you can use next week.
 
 Here is your first shader.
@@ -19,8 +20,8 @@ Try changing the equation — replace `x*x + y*y - 1.0` with `y*y - x*x*x + x` f
 
 ## Two Ways to Make Pictures
 
-Every visualization task has the same basic setup: there's a mathematical object, and you want to turn it into a grid of colored pixels.
-There are two fundamentally different approaches to this, and the distinction between them will be familiar — it's the difference between a pushforward and a pullback.
+Every visualization task has the same basic setup: you have a mathematical object, and you want to turn it into a grid of colored pixels.
+There are two fundamentally different approaches, and the distinction will be familiar — it's the difference between a pushforward and a pullback.
 
 
 ### The Pushforward: Meshes
@@ -88,24 +89,24 @@ No sampling, no resolution parameter, no polygon.
 The circle is as smooth as your pixel grid allows.
 But now you have to think about what "close to $1$" means — you need to choose a thickness, handle antialiasing, and the notion of a one-dimensional curve living in a two-dimensional pixel grid becomes a real question.
 
-Neither approach is better.
-They have different strengths, and a big part of developing intuition for shader programming is learning which objects and tasks are natural in each world.
+Neither approach is better — they have different strengths, and a big part of developing intuition for shader programming is learning which objects and tasks are natural in each world.
 
-A rough guide:
+Here is a rough guide:
 
 **Pushforward is natural for:**
 
 - **Parametric curves and surfaces** — you have the map, you just evaluate it. Doing this in a shader requires computing distances to the image of the parameterization, which ranges from annoying to impossible depending on the map.
 - **Sparse objects** — a curve only occupies a thin strip of pixels. A mesh only computes where the curve actually is; a shader has to evaluate every pixel in the image regardless.
-- **Numerical geometry problems where the unknown is an embedding** — finding a harmonic map between surfaces, computing Willmore flow, finding a conformal parameterization of a surface, solving Plateau's problem for a minimal surface spanning a boundary curve. In all of these the combinatorial structure of the domain is fixed from the start (you have a triangulated disk, or surface, or complex), and the unknowns are the positions of the vertices in some target space. You write down an energy on the space of maps — Dirichlet energy, Willmore energy, area — and flow or optimize. The mesh literally *is* the domain of a map, and the computation is a search for the right pushforward. This is the natural framework for these problems because the discretization of the domain is the starting point, not something derived from the answer.
+- **Numerical geometry problems where the unknown is an embedding** — finding a harmonic map, computing Willmore flow, solving Plateau's problem. The mesh *is* the domain, and the computation is a search for the right pushforward.
 
 **Pullback is natural for:**
 
-- **Implicit surfaces, level sets, anything defined by an equation** — you have $f(x,y,z) = 0$, and for each point you just evaluate $f$. Building a mesh for an implicit surface (marching cubes, etc.) is a whole enterprise; in a shader it's almost free.
-- **Scalar fields, coloring by function values** — the pixel knows its coordinates, you evaluate the function, you map the value to a color. Done.
-- **Tilings and quotient spaces** — identifying points under a group action is just modular arithmetic. Drawing a flat torus, or a fundamental domain for a Fuchsian group, is almost trivial in a shader.
-- **Volumetric rendering** — objects that aren't surfaces but regions or densities: probability distributions, energy landscapes, charge densities. There's no surface to mesh; you're rendering a function on a region of space.
-- **Fractals and iterated function systems** — per-pixel iteration is exactly the shader programming model. Julia sets, Mandelbrot sets, escape-time fractals: evaluate a recurrence at each pixel and color by the result.
-- **PDE simulations, cellular automata, anything that updates a grid of values** — and this is where the approach really shines.
+- **Implicit surfaces, level sets, anything defined by an equation** — you have $f(x,y,z) = 0$, and for each point you just evaluate $f$.
+- **Scalar fields, coloring by function values** — the pixel knows its coordinates, you evaluate the function, you map the value to a color.
+- **Tilings and quotient spaces** — identifying points under a group action is just modular arithmetic.
+- **Fractals and iterated function systems** — per-pixel iteration is exactly the shader programming model.
+- **PDE simulations, cellular automata** — anything that updates a grid of values.
 
-All of this is powered by one structural advantage: every pixel is independent, so the GPU runs them all in parallel. A couple million pixels, each doing a hundred operations, sixty times a second — and you can chain multiple passes, each one reading the previous pass as input, all still running in parallel. That's how you get PDE solvers running live on a laptop.
+All of this is powered by one structural advantage: every pixel is independent, so the GPU runs them all in parallel.
+A couple of million pixels, each doing a hundred operations, sixty times a second — and you can chain multiple passes, each reading the previous pass as input, all still running in parallel.
+That's how you get PDE solvers running live on a laptop.

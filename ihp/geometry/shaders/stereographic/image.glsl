@@ -1,23 +1,39 @@
-// ═══════════════════════════════════════════════════════════════
-//  ★  EDIT HERE  ★   Define your algebraic curve
-// ═══════════════════════════════════════════════════════════════
+// =============================================
+//  IHP Shader Workshop 2026
+//  STEREOGRAPHIC PROJECTION
 //
-//  Define a curve f(u,v) = 0 in the z=0 plane.
-//  It will be drawn on the plane AND lifted onto the
-//  unit sphere via inverse stereographic projection.
-//
-//  Just return f.  Gradient is computed numerically.
+//  A curve drawn simultaneously in the plane
+//  and on the sphere, connected by stereographic
+//  projection from the north pole. Work in
+//  progress.
+//  Common tab: stereographic projection
+//  utilities, curve definition.
+// =============================================
+
+// =============================================
+//  YOUR CURVE
+// =============================================
 
 #define CAMERA_DIST 8.0
-#define CURVE_WIDTH 1.5         // line half-width in pixels
+#define CURVE_WIDTH 1.5
 #define CURVE_COLOR vec3(0.85, 0.15, 0.1)
 
-#define SHOW_PLANE  1           // 0 to hide ground plane
-#define SHOW_SPHERE 1           // 0 to hide sphere
-#define PLANE_ALPHA 0.3         // plane opacity when seen from below
+#define SHOW_PLANE  1
+#define SHOW_SPHERE 1
+#define PLANE_ALPHA 0.3
 
+// =============================================
+//  PARAMETERS
+//
+//  CAMERA_DIST  — initial camera distance
+//  CURVE_WIDTH  — line half-width in pixels
+//  CURVE_COLOR  — RGB color of the curve
+//  SHOW_PLANE   — 0 to hide ground plane
+//  SHOW_SPHERE  — 0 to hide sphere
+//  PLANE_ALPHA  — plane opacity from below
+// =============================================
 
-// ── Your curve ──────────────────────────────────────────────
+// ── Your curve ───────────────────────────────
 //  Uncomment ONE return line, or write your own.
 
 float curve(vec2 w) {
@@ -34,9 +50,9 @@ float curve(vec2 w) {
 }
 
 
-// ═══════════════════════════════════════════════════════════════
-//  Implementation — no need to edit below this line
-// ═══════════════════════════════════════════════════════════════
+// =============================================
+//  VISUALIZATION (nothing below needs editing)
+// =============================================
 
 #define LIGHT_DIR normalize(vec3(2.0, 1.5, 4.0))
 #define EPS 0.001

@@ -1,10 +1,15 @@
 // =============================================
-// 2D LEVEL SETS — BASIC
+//  IHP Shader Workshop 2026
+//  LEVEL SETS — BASIC
+//
+//  Draws level curves of f(x,y) using a simple
+//  fract threshold. No gradient correction — line
+//  width varies with |∇f|. Compare with the
+//  gradient-corrected version.
 // =============================================
-// Paste into Shadertoy (no channels needed)
 
 // =============================================
-// EDIT HERE: Define your function f(x, y)
+//  YOUR FUNCTION
 // =============================================
 
 float f(vec2 p) {
@@ -12,12 +17,20 @@ float f(vec2 p) {
 }
 
 // =============================================
-// PARAMETERS
+//  PARAMETERS
+//
+//  VIEW_RADIUS  — half-width of visible region
+//  SPACING      — distance between level curves
+//  LINE_WIDTH   — thickness of level curves (as fraction of spacing)
 // =============================================
 
-#define VIEW_RADIUS  6.0      // half-width of visible region
-#define SPACING      0.25     // distance between level curves
-#define LINE_WIDTH   0.06     // thickness of level curves (as fraction of spacing)
+#define VIEW_RADIUS  6.0
+#define SPACING      0.25
+#define LINE_WIDTH   0.06
+
+// =============================================
+//  VISUALIZATION (nothing below needs editing)
+// =============================================
 
 // Color ramp: blue for negative, white at zero, red for positive
 vec3 colormap(float val) {
@@ -25,10 +38,6 @@ vec3 colormap(float val) {
     if (t < 0.0) return mix(vec3(1.0), vec3(0.2, 0.4, 0.9), -t);
     else          return mix(vec3(1.0), vec3(0.9, 0.2, 0.2), t);
 }
-
-// =============================================
-// MAIN
-// =============================================
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     vec2 uv = (2.0 * fragCoord - iResolution.xy) / iResolution.y;

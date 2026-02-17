@@ -1,38 +1,35 @@
-/////////////////////////////////////////////////////
-//  WYTHOFF TILINGS OF HYPERBOLIC TRIANGLE GROUPS
-//  Workshop Shader — Illustrating Mathematics
+// =============================================
+//  IHP Shader Workshop 2026
+//  WYTHOFF TILINGS
 //
-//  Given a (P, Q, R) triangle group, choose a
-//  generating point and watch the Wythoff construction
-//  tile the hyperbolic plane with polygons.
-//  Drag to orbit.
-/////////////////////////////////////////////////////
+//  Wythoff construction from (P, Q, R) triangle
+//  groups. Choose the generating point position
+//  to get regular, uniform, or omnitruncated
+//  tilings.
+// =============================================
 
-//--------------------------------------------------
-// MODEL (uncomment one)
-//--------------------------------------------------
+// =============================================
+//  YOUR TRIANGLE GROUP
+// =============================================
+
+// Model (uncomment one)
 #define MODEL_POINCARE
 //#define MODEL_UHP
 //#define MODEL_KLEIN
 //#define MODEL_BAND
 
-//--------------------------------------------------
-// THEME (uncomment one)
-//--------------------------------------------------
+// Theme (uncomment one)
 //#define THEME_DARK
 #define THEME_LIGHT
 
-//--------------------------------------------------
-// TRIANGLE GROUP (P, Q, R)
+// Triangle group (P, Q, R)
 //   Angles pi/P, pi/Q, pi/R.
 //   Must satisfy 1/P + 1/Q + 1/R < 1.
-//--------------------------------------------------
 #define TRI_P  2
 #define TRI_Q  3
 #define TRI_R  7
 
-//--------------------------------------------------
-// GENERATING POINT
+// Generating point
 //   Controls which Wythoff tiling you get.
 //
 //   Mirrors:  a = vertical line (has vertices P, R)
@@ -47,39 +44,43 @@
 //   5 = uniform pt on PQ   on b     (equidistant from a,c)
 //   6 = incenter            off all  (equidistant from a,b,c)
 //   7 = MANUAL (see below)
-//--------------------------------------------------
 #define GEN_POINT 5
 
-//--------------------------------------------------
-// MANUAL GENERATING POINT (only when GEN_POINT == 7)
+// Manual generating point (only when GEN_POINT == 7)
 //   GEN_MIRROR: 0 = sideA, 1 = sideB, 2 = sideC
 //   GEN_T: position along mirror (0 to 1, hyperbolic interp)
-//--------------------------------------------------
 #define GEN_MIRROR 0
 #define GEN_T      0.5
 
-//--------------------------------------------------
-// DRAWING OPTIONS
-//--------------------------------------------------
+// Drawing options
 #define DRAW_WYTHOFF_EDGES    true
 #define DRAW_WYTHOFF_VERTICES true
 #define DRAW_TRIANGLE_EDGES   false
 #define DRAW_TRIANGLE_PARITY  false
 
+// =============================================
+//  PARAMETERS
+//
+//  WYTHOFF_EDGE_THICKNESS  — width of Wythoff polygon edges
+//  WYTHOFF_VERTEX_RADIUS   — size of Wythoff polygon vertices
+//  TRIANGLE_EDGE_THICKNESS — width of triangle group edges
+//  ZOOM                    — camera zoom level
+//  ANIMATE                 — enable orbit animation
+//  ROTATE_SPEED            — rotation speed
+//  DRIFT_AMOUNT            — drift amplitude
+// =============================================
+
 #define WYTHOFF_EDGE_THICKNESS  0.012
 #define WYTHOFF_VERTEX_RADIUS   0.04
 #define TRIANGLE_EDGE_THICKNESS 0.004
 
-//--------------------------------------------------
-// ANIMATION
-//--------------------------------------------------
+#define ZOOM 2.4
+
 #define ANIMATE       true
 #define ROTATE_SPEED  0.3
 #define DRIFT_AMOUNT  0.15
 
-//--------------------------------------------------
-// COLORS
-//--------------------------------------------------
+// Colors
 #ifdef THEME_DARK
     const vec3 COLOR_A             = vec3(0.55, 0.70, 0.85);
     const vec3 COLOR_B             = vec3(0.35, 0.50, 0.68);
@@ -98,15 +99,9 @@
     const vec3 COLOR_BORDER        = vec3(0.4, 0.38, 0.35);
 #endif
 
-//--------------------------------------------------
-// ZOOM
-//--------------------------------------------------
-#define ZOOM 2.4
-
-
-/////////////////////////////////////////////////////
-//  IMPLEMENTATION
-/////////////////////////////////////////////////////
+// =============================================
+//  VISUALIZATION (nothing below needs editing)
+// =============================================
 
 const float PI = 3.14159265;
 

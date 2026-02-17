@@ -1,11 +1,39 @@
-### Hyperbolic Geometry
+# Geometry
 
 Everything so far has lived in flat space — Euclidean planes and boxes.
-Now we move to the hyperbolic plane, where the geometry itself is curved: parallel lines diverge, triangles have angle sums less than $\pi$, and a circle's circumference grows exponentially with its radius.
+This section moves into curved and higher-dimensional geometry, where the pullback approach becomes especially powerful.
 
-All three shaders in this section work in the **upper half-plane model** internally, where $\mathbb{H}^2 = \{(x, y) : y > 0\}$ with metric $ds^2 = (dx^2 + dy^2)/y^2$.
+Drawing a geodesic in the hyperbolic plane, tiling $\mathbb{H}^2$ by a Coxeter group, or rendering the Hopf fibration of $S^3$ — these are all situations where the geometry is most naturally described by equations and group actions, not by explicit parameterizations.
+Shaders handle them by evaluating those equations at every pixel, which is exactly the per-pixel computation model we've been building.
+
+A note on difficulty: the shaders in this section are more involved than the earlier ones.
+The 2D examples (stereographic projection, hyperbolic tilings) are comparable to what came before, but the 3D hyperbolic honeycombs and the Hopf fibration use more elaborate distance functions and raymarching setups.
+You don't need to follow every implementation detail to use them — the "edit the function at the top" pattern still applies — but the explanations go deeper into the geometry to show what these techniques can do.
+
+We start with stereographic projection — the bridge between planes and spheres — then move to the hyperbolic plane and its tilings, circle packings, hyperbolic 3-space, and the Hopf fibration.
+
+
+### Stereographic Projection
+
+This shader shows a curve drawn simultaneously in the plane and on the sphere, connected by stereographic projection.
+The sphere sits at the origin with its south pole on the $z = 0$ plane.
+Projection from the north pole sends the plane curve $f(u,v) = 0$ to a curve on $S^2$, and both are rendered together so you can see the correspondence.
+
+The curve on the sphere uses the same $|f|/|\nabla f|$ distance estimate as in the plane, multiplied by the conformal factor $\lambda = 4/(4 + |w|^2)$ to convert Euclidean distance in the plane to geodesic distance on the sphere.
+This keeps the curve width visually consistent across the sphere surface despite the stretching near the north pole.
+
+The scene includes a grid on the ground plane, soft shadow and ambient occlusion from the sphere onto the plane, and Phong shading with Fresnel on the sphere.
+
+{{< shader layout="tabbed" stereographic >}}
+
+
+### Hyperbolic Geometry
+
+The hyperbolic plane is a natural first stop: the geometry is curved, parallel lines diverge, triangles have angle sums less than $\pi$, and a circle's circumference grows exponentially with its radius.
+
+All the hyperbolic shaders work in the **upper half-plane model** internally, where $\mathbb{H}^2 = \{(x, y) : y > 0\}$ with metric $ds^2 = (dx^2 + dy^2)/y^2$.
 You can view the output in any of four models — Poincaré disk, upper half-plane, Klein disk, or the band model — by changing a single `#define`.
-The models are related by conformal (or projective, for Klein) maps, and the shader applies these at the pixel level: convert screen coordinates to UHP, do all geometry there, convert back.
+The models are related by conformal (or projective, for Klein) maps, and the shader applies these at the pixel level: convert screen coordinates to UHP coordinates, do all the geometry there, convert back.
 
 
 #### Models of the hyperbolic plane
@@ -92,6 +120,7 @@ Which edges to draw depends on which mirrors $G$ lies on — if $G$ is on a mirr
 
 ### Apollonian Circle Packing
 
+Leaving hyperbolic tilings, we turn to a classical construction from inversive geometry.
 An **Apollonian gasket** starts from four mutually tangent circles and fills in every interstice: given any three mutually tangent circles, there are exactly two circles tangent to all three, and the gasket is the limit of inserting every such circle.
 
 The starting point is **Descartes' circle theorem**.
@@ -138,8 +167,9 @@ This shader was written by [Summer Haag](https://math.colorado.edu/~suha3163/) (
 
 ### Hyperbolic 3-Space
 
-Everything above lives in the hyperbolic plane $\mathbb{H}^2$.
-Now we go up a dimension to **hyperbolic 3-space** $\mathbb{H}^3$, where the same exponential geometry plays out in three dimensions: geodesics diverge, horospheres replace horocycles, and the volume of a ball grows exponentially with its radius.
+Everything above lives in the hyperbolic plane.
+Now we go up a dimension to $\mathbb{H}^3$, where the same exponential geometry plays out in three dimensions: geodesics diverge, horospheres replace horocycles, and the volume of a ball grows exponentially with its radius.
+The shader techniques generalize naturally — raymarching along hyperbolic geodesics instead of Euclidean rays, and folding into fundamental domains of reflection groups, just as we did for the triangle tilings.
 
 The model we use is the **hyperboloid model**: embed $\mathbb{H}^3$ as the upper sheet of a hyperboloid in Minkowski space $\mathbb{R}^{3,1}$,
 
@@ -209,11 +239,12 @@ Edges are colored by depth: the $w$-coordinate of the hit point controls per-cha
 
 ### Hopf Fibration
 
-The Hopf fibration $\pi\colon S^3 \to S^2$ is the map that sends $(z_1, z_2) \in \mathbb{C}^2$ with $|z_1|^2 + |z_2|^2 = 1$ to the point $z_1/z_2 \in \mathbb{C} \cup \{\infty\} \cong S^2$.
+The Hopf fibration $\pi\colon S^3 \to S^2$ is the map sending $(z_1, z_2) \in \mathbb{C}^2$ with $|z_1|^2 + |z_2|^2 = 1$ to the point $z_1/z_2 \in \mathbb{C} \cup \{\infty\} \cong S^2$.
 The fiber over each point $p \in S^2$ is a great circle in $S^3$.
 We can't see $S^3$ directly, but stereographic projection $\sigma\colon S^3 \to \mathbb{R}^3$ sends each fiber to a circle (or line) in 3-space, and the resulting picture — nested tori woven from linked circles — is one of the iconic images in mathematics.
 
-This shader raymarches those fibers in $\mathbb{R}^3$, but the distance computation lives entirely on the sphere.
+This shader raymarches those fibers in $\mathbb{R}^3$.
+The beautiful part is that the distance computation lives entirely on the sphere — no fiber is ever parameterized, and no closest-point equation is ever solved.
 
 
 #### The SDF via the bundle structure
@@ -229,9 +260,7 @@ Since $\pi$ is a Riemannian submersion from $S^3(1)$ to $S^2(1/2)$, the actual d
 Finally, stereographic projection has conformal factor $(|x|^2 + 1)/2$ at $x$, which converts the $S^3$ distance to a Euclidean distance.
 Combining the $1/2$ from the submersion with the $1/2$ from the conformal factor gives the $1/4$.
 
-The beauty of this approach is that no fiber is ever parametrized.
-We never find a closest point on a circle or solve a quartic.
-We just compose three maps — inverse stereographic, Hopf, dot product — and get an SDF directly from the bundle geometry.
+We just compose three maps — inverse stereographic projection, the Hopf map, and a dot product — and get an SDF directly from the bundle geometry.
 
 
 #### Intrinsic vs. extrinsic thickness
@@ -330,19 +359,3 @@ The shader includes several curves to try:
 - **Two concentric circles** — two Clifford tori at different radii, nested inside each other.
 
 {{< shader layout="tabbed" hopf-preimage >}}
-
-
-### Stereographic Projection
-
-*Work in progress.*
-
-This shader shows a curve drawn simultaneously in the plane and on the sphere, connected by stereographic projection.
-The sphere sits at the origin with its south pole on the $z = 0$ plane.
-Projection from the north pole sends the plane curve $f(u,v) = 0$ to a curve on $S^2$, and both are rendered together so you can see the correspondence.
-
-The curve on the sphere uses the same $|f|/|\nabla f|$ distance estimate as in the plane, multiplied by the conformal factor $\lambda = 4/(4 + |w|^2)$ to convert Euclidean distance in the plane to geodesic distance on the sphere.
-This keeps the curve width visually consistent across the sphere surface despite the stretching near the north pole.
-
-The scene includes a grid on the ground plane, soft shadow and ambient occlusion from the sphere onto the plane, and Phong shading with Fresnel on the sphere.
-
-{{< shader layout="tabbed" stereographic >}}

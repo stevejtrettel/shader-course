@@ -1,16 +1,17 @@
-/////////////////////////////////////////////////////
-//  IDEAL TETRAHEDRAL HONEYCOMB  {3,3,6}
-//  Edges + Faces
+// =============================================
+//  IHP Shader Workshop 2026
+//  IDEAL TETRAHEDRAL HONEYCOMB {3,3,6}
 //
-//  Uses common.glsl math library (Common tab).
-//  Geometry adapted from Alexander Foksha.
-//
-//  Mouse drag to orbit. Static when idle.
-/////////////////////////////////////////////////////
+//  Tiling of H³ by ideal tetrahedra with dihedral
+//  angle π/3. Fold-into-fundamental-domain via
+//  reflection in four face planes. Six tetrahedra
+//  meet at each edge.
+//  Common tab: hyperboloid model utilities.
+// =============================================
 
-
-// === STYLE ========================================
-// Change colors and sizes here.
+// =============================================
+//  YOUR CONFIGURATION
+// =============================================
 
 struct Style {
     vec3  edgeColor;
@@ -19,6 +20,20 @@ struct Style {
     float edgeRadius;
     vec3  hue;            // per-channel exponent for depth coloring
 };
+
+// =============================================
+//  PARAMETERS
+//
+//  edgeColor    — color of tetrahedral edges
+//  faceColor    — color of face panels
+//  bgColor      — background color
+//  edgeRadius   — hyperbolic tube thickness
+//  hue          — per-channel depth color shift
+//  DRAW_EDGES   — toggle edge rendering
+//  DRAW_FACES   — toggle face rendering
+//  FACE_HOLE    — gap width around edges (0 = solid)
+//  FACE_BOUND   — how far faces extend from center
+// =============================================
 
 Style style = Style(
     vec3(1.0, 0.75, 0.3),       // edges: bright amber
@@ -35,6 +50,10 @@ Style style = Style(
 // Face parameters
 #define FACE_HOLE   0.016    // gap width around edges (0 = solid faces)
 #define FACE_BOUND  0.507    // how far faces extend from cell center
+
+// =============================================
+//  VISUALIZATION (nothing below needs editing)
+// =============================================
 
 
 // === TETRAHEDRON CONSTANTS ========================
@@ -240,7 +259,7 @@ vec3 shade(vec4 pos, vec4 normal, vec4 camera) {
 void build_camera(vec4 mouse, vec2 res,
                   out vec4 cam_pos, out vec4 X, out vec4 Y, out vec4 Z) {
 
-    float theta = 1.0, phi = 0.5;
+    float theta = 0.785, phi = 0.615;  // looking through a face center: (1,1,1)/√3
     if (mouse.z > 0.0) {
         theta = 6.2832 * (mouse.x / res.x - 0.5);
         phi   = 2.4 * (mouse.y / res.y - 0.5);

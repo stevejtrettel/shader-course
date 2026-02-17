@@ -1,11 +1,15 @@
 // =============================================
-// DOMAIN COLORING — STANDARD
+//  IHP Shader Workshop 2026
+//  DOMAIN COLORING — STANDARD
+//
+//  Phase coloring for complex functions.
+//  Hue from arg(f(z)), brightness modulated
+//  by |f(z)| with logarithmic rings.
+//  Common tab: complex arithmetic library.
 // =============================================
-// Common tab: complex arithmetic + complexToColor
-// No channels needed
 
 // =============================================
-// EDIT HERE: Define your complex function f(z)
+//  YOUR FUNCTION
 // =============================================
 
 vec2 f(vec2 z) {
@@ -21,13 +25,15 @@ vec2 f(vec2 z) {
 }
 
 // =============================================
-// PARAMETERS
+//  PARAMETERS
+//
+//  VIEW_RADIUS  — half-width of the view window
 // =============================================
 
 #define VIEW_RADIUS  4.0
 
 // =============================================
-// MAIN
+//  VISUALIZATION (nothing below needs editing)
 // =============================================
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {

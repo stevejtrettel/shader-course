@@ -1,19 +1,30 @@
-// ═══════════════════════════════════════════════════════════════
-//  ★  EDIT HERE  ★   Define your algebraic curve
-// ═══════════════════════════════════════════════════════════════
+// =============================================
+//  IHP Shader Workshop 2026
+//  HOPF PREIMAGE OF CURVES
 //
-//  The Hopf map sends S³ → S², and stereographic projection
-//  sends S² → R².  Define a curve f(u,v) = 0 in this plane.
-//  Its preimage under the Hopf fibration is a surface in R³
-//  (visualized via stereographic projection S³ → R³).
+//  Preimage of a plane curve f(w) = 0 under
+//  the Hopf map, rendered as a surface in R3.
+//  SDF via chained conformal factors. Type any
+//  curve equation.
+//  Common tab: Hopf map, stereo projection,
+//  camera.
+// =============================================
+
+// =============================================
+//  YOUR CURVE
+// =============================================
+
+#define THICKNESS   0.03
+#define CAMERA_DIST 7.0
+
+// =============================================
+//  PARAMETERS
 //
-//  Just return f.  The gradient is computed automatically.
+//  THICKNESS    — surface shell half-width
+//  CAMERA_DIST  — initial camera distance
+// =============================================
 
-#define THICKNESS   0.03      // surface shell half-width
-#define CAMERA_DIST 7.0       // initial camera distance
-
-
-// ── Your curve ──────────────────────────────────────────────
+// ── Your curve ───────────────────────────────
 //  Uncomment ONE return line, or write your own.
 
 float curve(vec2 w) {
@@ -30,9 +41,9 @@ float curve(vec2 w) {
 }
 
 
-// ═══════════════════════════════════════════════════════════════
-//  Implementation — no need to edit below this line
-// ═══════════════════════════════════════════════════════════════
+// =============================================
+//  VISUALIZATION (nothing below needs editing)
+// =============================================
 
 
 // ── Preimage SDF ─────────────────────────────────────────────

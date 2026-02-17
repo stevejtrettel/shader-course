@@ -1,13 +1,16 @@
-// ═══════════════════════════════════════════════════════════════
-//  Hopf Preimage of Algebraic Curves
-//  COMMON tab (math library — nothing to edit here)
-// ═══════════════════════════════════════════════════════════════
+// =============================================
+//  IHP Shader Workshop 2026
+//  HOPF PREIMAGE OF CURVES (Common tab)
+//
+//  Library: Hopf map, stereographic projection,
+//  camera.
+// =============================================
 
 #define PI  3.14159265359
 #define TAU 6.28318530718
 
 
-// ── Hopf Fibration ──────────────────────────────────────────
+// ── Hopf Fibration ───────────────────────────
 
 // Inverse stereographic projection  R^3 → S^3
 // From north pole (0,0,0,1):
@@ -36,7 +39,7 @@ vec2 stereoS2(vec3 p) {
 }
 
 
-// ── Color ───────────────────────────────────────────────────
+// ── Color ────────────────────────────────────
 
 vec3 hsv2rgb(vec3 c) {
     vec3 p = abs(fract(c.xxx + vec3(0, 2.0/3.0, 1.0/3.0)) * 6.0 - 3.0);
@@ -50,7 +53,7 @@ vec3 surfaceColor(vec3 h) {
 }
 
 
-// ── Camera ──────────────────────────────────────────────────
+// ── Camera ───────────────────────────────────
 
 mat3 orbitCamera(float yaw, float pitch) {
     float cy = cos(yaw), sy = sin(yaw);
@@ -62,7 +65,7 @@ mat3 orbitCamera(float yaw, float pitch) {
 }
 
 
-// ── Lighting ────────────────────────────────────────────────
+// ── Lighting ─────────────────────────────────
 
 vec3 shade(vec3 col, vec3 n, vec3 rd, float t) {
     vec3 l1 = normalize(vec3(2, 3, 1));

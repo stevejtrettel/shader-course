@@ -1,16 +1,17 @@
-/////////////////////////////////////////////////////
-//  RIGHT-ANGLED DODECAHEDRAL HONEYCOMB  {5,3,4}
-//  Edges + Vertices only
+// =============================================
+//  IHP Shader Workshop 2026
+//  DODECAHEDRAL HONEYCOMB {5,3,4}
 //
-//  Uses common.glsl math library (Common tab).
-//  Geometry adapted from Alexander Foksha.
-//
-//  Mouse drag to orbit. Static when idle.
-/////////////////////////////////////////////////////
+//  Right-angled dodecahedral tiling of H³.
+//  Fold-into-fundamental-domain using icosahedral
+//  symmetry. Edges colored by depth for visual
+//  layering.
+//  Common tab: hyperboloid model utilities.
+// =============================================
 
-
-// === STYLE ========================================
-// Change colors and sizes here.
+// =============================================
+//  YOUR CONFIGURATION
+// =============================================
 
 struct Style {
     vec3  vertexColor;
@@ -21,6 +22,23 @@ struct Style {
     float edgeRadius;
     vec3  hue;            // per-channel exponent for depth coloring
 };
+
+// =============================================
+//  PARAMETERS
+//
+//  vertexColor   — color of vertex balls
+//  edgeColor     — color of edge tubes
+//  faceColor     — color of face panels
+//  bgColor       — background color
+//  vertexRadius  — hyperbolic ball radius
+//  edgeRadius    — hyperbolic tube thickness
+//  hue           — per-channel depth color shift
+//  DRAW_VERTICES — toggle vertex rendering
+//  DRAW_EDGES    — toggle edge rendering
+//  DRAW_FACES    — toggle face rendering
+//  FACE_HOLE     — gap width around edges (0 = solid)
+//  FACE_BOUND    — how far faces extend from center
+// =============================================
 
 Style style = Style(
     vec3(1.0, 0.5, 0.25),       // vertices: bright orange
@@ -40,6 +58,10 @@ Style style = Style(
 // Face parameters
 #define FACE_HOLE   0.04     // gap width around edges (0 = solid faces)
 #define FACE_BOUND  1.0      // how far faces extend from cell center
+
+// =============================================
+//  VISUALIZATION (nothing below needs editing)
+// =============================================
 
 
 // === DODECAHEDRON CONSTANTS =======================

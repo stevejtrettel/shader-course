@@ -1,13 +1,14 @@
 // =============================================
-// VECTOR FIELD — ARROW GRID
-// =============================================
-// Paste into Shadertoy (no channels needed, single tab)
+//  IHP Shader Workshop 2026
+//  VECTOR FIELD — ARROW GRID
 //
-// Draws arrows on a grid. Each pixel checks the SDF
-// of the nearest arrow to decide if it's inside.
+//  Arrows on a grid showing direction and magnitude.
+//  Each pixel tests the SDF of its nearest arrow.
+//  Arrow length uses a sigmoid to always fit inside cells.
+// =============================================
 
 // =============================================
-// EDIT HERE: Define your vector field V(x, y)
+//  YOUR VECTOR FIELD
 // =============================================
 
 vec2 V(vec2 p) {
@@ -25,21 +26,28 @@ vec2 V(vec2 p) {
 }
 
 // =============================================
-// PARAMETERS
+//  PARAMETERS
+//
+//  VIEW_RADIUS — half-width of the visible window
+//  GRID_CELLS  — number of cells across the vertical axis
+//  ARROW_SCALE — max arrow length as fraction of cell size
+//  SHAFT_WIDTH — shaft half-width as fraction of cell size
+//  HEAD_LENGTH — arrowhead length as fraction of arrow length
+//  HEAD_WIDTH  — arrowhead half-width as fraction of cell size
 // =============================================
 
 #define PI 3.14159265359
 #define VIEW_RADIUS   5.0
-#define GRID_CELLS    20.0   // number of cells across the vertical axis
-#define ARROW_SCALE   0.8    // max arrow length as fraction of cell size
-#define SHAFT_WIDTH   0.04   // shaft half-width as fraction of cell size
-#define HEAD_LENGTH   0.3    // arrowhead length as fraction of arrow length
-#define HEAD_WIDTH    0.15   // arrowhead half-width as fraction of cell size
+#define GRID_CELLS    20.0
+#define ARROW_SCALE   0.8
+#define SHAFT_WIDTH   0.04
+#define HEAD_LENGTH   0.3
+#define HEAD_WIDTH    0.15
 const vec3 ARROW_COLOR = vec3(0.1);
 const vec3 BG_COLOR    = vec3(0.97);
 
 // =============================================
-// VISUALIZATION CODE (no need to edit below)
+//  VISUALIZATION (nothing below needs editing)
 // =============================================
 
 // Signed distance to a line segment from a to b

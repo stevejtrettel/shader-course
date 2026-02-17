@@ -1,4 +1,4 @@
-(function(){"use strict";try{if(typeof document<"u"){var o=document.createElement("style");o.appendChild(document.createTextNode(':root,[data-theme=light]{--bg-primary: #f5f5f5;--bg-secondary: #ffffff;--bg-tertiary: #f8f8f8;--bg-canvas: #000000;--text-primary: #000000;--text-secondary: #333333;--text-muted: #666666;--text-disabled: #999999;--border-primary: #e0e0e0;--border-secondary: #cccccc;--accent-primary: #4a9eff;--accent-primary-hover: #3a8eef;--accent-primary-active: #2a7edf;--accent-secondary: #7c4dff;--error-bg: #fff0f0;--error-text: #cc0000;--error-border: #ffcccc;--success-bg: #e8f5e9;--success-text: #4caf50;--success-border: #4caf50;--overlay-bg: rgba(0, 0, 0, .75);--overlay-backdrop: rgba(0, 0, 0, .95);--shadow-sm: 0 2px 8px rgba(0, 0, 0, .1);--shadow-md: 0 10px 30px rgba(0, 0, 0, .2);--shadow-lg: 0 20px 60px rgba(0, 0, 0, .25);--code-bg: #ffffff;--code-text: #000000;--code-line-number: #999999;--code-line-border: #e0e0e0;--code-selection: rgba(173, 214, 255, .4);--syntax-comment: #6a9955;--syntax-keyword: #0000ff;--syntax-string: #a31515;--syntax-number: #098658;--syntax-operator: #000000;--syntax-function: #795e26;--syntax-class: #267f99;--syntax-punctuation: #000000;--tab-bg: #f8f8f8;--tab-text: #666666;--tab-text-hover: #333333;--tab-text-active: #000000;--tab-border-active: #4a9eff;--button-bg: transparent;--button-border: #cccccc;--button-text: #666666;--button-bg-hover: #f0f0f0;--button-border-hover: #999999;--button-text-hover: #333333;--recompile-bg: #e8e8e8;--recompile-text: #333333;--recompile-bg-hover: #d8d8d8;--recompile-bg-active: #c8c8c8;--image-viewer-bg: #f5f5f5;--pane-radius: 8px;--pane-shadow: var(--shadow-lg), var(--shadow-sm)}[data-theme=dark]{--bg-primary: #1a1a1a;--bg-secondary: #252525;--bg-tertiary: #2a2a2a;--bg-canvas: #000000;--text-primary: #ffffff;--text-secondary: #e0e0e0;--text-muted: #a0a0a0;--text-disabled: #666666;--border-primary: #3a3a3a;--border-secondary: #4a4a4a;--accent-primary: #4a9eff;--accent-primary-hover: #5aadff;--accent-primary-active: #3a8eef;--accent-secondary: #9c7cff;--error-bg: #3a1a1a;--error-text: #ff6b6b;--error-border: #5a2a2a;--success-bg: #1a3a1a;--success-text: #6bcf6b;--success-border: #2a5a2a;--overlay-bg: rgba(0, 0, 0, .85);--overlay-backdrop: rgba(0, 0, 0, .98);--shadow-sm: 0 2px 8px rgba(0, 0, 0, .3);--shadow-md: 0 10px 30px rgba(0, 0, 0, .4);--shadow-lg: 0 20px 60px rgba(0, 0, 0, .5);--code-bg: #1e1e1e;--code-text: #d4d4d4;--code-line-number: #858585;--code-line-border: #3a3a3a;--code-selection: rgba(38, 79, 120, .6);--syntax-comment: #6a9955;--syntax-keyword: #569cd6;--syntax-string: #ce9178;--syntax-number: #b5cea8;--syntax-operator: #d4d4d4;--syntax-function: #dcdcaa;--syntax-class: #4ec9b0;--syntax-punctuation: #d4d4d4;--tab-bg: #2a2a2a;--tab-text: #a0a0a0;--tab-text-hover: #d0d0d0;--tab-text-active: #ffffff;--tab-border-active: #4a9eff;--button-bg: transparent;--button-border: #4a4a4a;--button-text: #a0a0a0;--button-bg-hover: #3a3a3a;--button-border-hover: #5a5a5a;--button-text-hover: #e0e0e0;--recompile-bg: #3a3a3a;--recompile-text: #e0e0e0;--recompile-bg-hover: #4a4a4a;--recompile-bg-active: #5a5a5a;--image-viewer-bg: #2a2a2a;--pane-radius: 8px;--pane-shadow: var(--shadow-lg), var(--shadow-sm)}[data-theme=system]{--bg-primary: #f5f5f5;--bg-secondary: #ffffff;--bg-tertiary: #f8f8f8;--bg-canvas: #000000;--text-primary: #000000;--text-secondary: #333333;--text-muted: #666666;--text-disabled: #999999;--border-primary: #e0e0e0;--border-secondary: #cccccc;--accent-primary: #4a9eff;--accent-primary-hover: #3a8eef;--accent-primary-active: #2a7edf;--accent-secondary: #7c4dff;--error-bg: #fff0f0;--error-text: #cc0000;--error-border: #ffcccc;--success-bg: #e8f5e9;--success-text: #4caf50;--success-border: #4caf50;--overlay-bg: rgba(0, 0, 0, .75);--overlay-backdrop: rgba(0, 0, 0, .95);--shadow-sm: 0 2px 8px rgba(0, 0, 0, .1);--shadow-md: 0 10px 30px rgba(0, 0, 0, .2);--shadow-lg: 0 20px 60px rgba(0, 0, 0, .25);--code-bg: #ffffff;--code-text: #000000;--code-line-number: #999999;--code-line-border: #e0e0e0;--code-selection: rgba(173, 214, 255, .4);--syntax-comment: #6a9955;--syntax-keyword: #0000ff;--syntax-string: #a31515;--syntax-number: #098658;--syntax-operator: #000000;--syntax-function: #795e26;--syntax-class: #267f99;--syntax-punctuation: #000000;--tab-bg: #f8f8f8;--tab-text: #666666;--tab-text-hover: #333333;--tab-text-active: #000000;--tab-border-active: #4a9eff;--button-bg: transparent;--button-border: #cccccc;--button-text: #666666;--button-bg-hover: #f0f0f0;--button-border-hover: #999999;--button-text-hover: #333333;--recompile-bg: #e8e8e8;--recompile-text: #333333;--recompile-bg-hover: #d8d8d8;--recompile-bg-active: #c8c8c8;--image-viewer-bg: #f5f5f5;--pane-radius: 8px;--pane-shadow: var(--shadow-lg), var(--shadow-sm)}@media (prefers-color-scheme: dark){[data-theme=system]{--bg-primary: #1a1a1a;--bg-secondary: #252525;--bg-tertiary: #2a2a2a;--bg-canvas: #000000;--text-primary: #ffffff;--text-secondary: #e0e0e0;--text-muted: #a0a0a0;--text-disabled: #666666;--border-primary: #3a3a3a;--border-secondary: #4a4a4a;--accent-primary: #4a9eff;--accent-primary-hover: #5aadff;--accent-primary-active: #3a8eef;--accent-secondary: #9c7cff;--error-bg: #3a1a1a;--error-text: #ff6b6b;--error-border: #5a2a2a;--success-bg: #1a3a1a;--success-text: #6bcf6b;--success-border: #2a5a2a;--overlay-bg: rgba(0, 0, 0, .85);--overlay-backdrop: rgba(0, 0, 0, .98);--shadow-sm: 0 2px 8px rgba(0, 0, 0, .3);--shadow-md: 0 10px 30px rgba(0, 0, 0, .4);--shadow-lg: 0 20px 60px rgba(0, 0, 0, .5);--code-bg: #1e1e1e;--code-text: #d4d4d4;--code-line-number: #858585;--code-line-border: #3a3a3a;--code-selection: rgba(38, 79, 120, .6);--syntax-comment: #6a9955;--syntax-keyword: #569cd6;--syntax-string: #ce9178;--syntax-number: #b5cea8;--syntax-operator: #d4d4d4;--syntax-function: #dcdcaa;--syntax-class: #4ec9b0;--syntax-punctuation: #d4d4d4;--tab-bg: #2a2a2a;--tab-text: #a0a0a0;--tab-text-hover: #d0d0d0;--tab-text-active: #ffffff;--tab-border-active: #4a9eff;--button-bg: transparent;--button-border: #4a4a4a;--button-text: #a0a0a0;--button-bg-hover: #3a3a3a;--button-border-hover: #5a5a5a;--button-text-hover: #e0e0e0;--recompile-bg: #3a3a3a;--recompile-text: #e0e0e0;--recompile-bg-hover: #4a4a4a;--recompile-bg-active: #5a5a5a;--image-viewer-bg: #2a2a2a;--pane-radius: 8px;--pane-shadow: var(--shadow-lg), var(--shadow-sm)}}.unstyled{--pane-radius: 0 !important;--pane-shadow: none !important}:root{--glass-bg: rgba(30, 30, 35, .65);--glass-bg-hover: rgba(30, 30, 35, .8);--glass-border: 1px solid rgba(255, 255, 255, .1);--glass-shadow: 0 4px 16px rgba(0, 0, 0, .25), 0 2px 4px rgba(0, 0, 0, .15), inset 0 1px 0 rgba(255, 255, 255, .1);--glass-shadow-sm: 0 2px 8px rgba(0, 0, 0, .25), inset 0 1px 0 rgba(255, 255, 255, .08);--glass-blur: blur(20px);--glass-radius: 6px;--glass-radius-sm: 6px;--glass-text: rgba(255, 255, 255, .9);--glass-text-muted: rgba(255, 255, 255, .6)}.stats-container{position:absolute;bottom:12px;left:12px;z-index:1000;display:flex;flex-direction:column;align-items:flex-start;gap:6px}.fps-counter{padding:6px 10px;background:var(--glass-bg);color:var(--glass-text);font-family:Monaco,Menlo,Courier New,monospace;font-size:11px;font-weight:500;border-radius:var(--glass-radius-sm);border:var(--glass-border);cursor:pointer;-webkit-user-select:none;user-select:none;backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow-sm);transition:all .2s ease}.fps-counter:hover{background:var(--glass-bg-hover)}.stats-grid{display:flex;flex-direction:row;gap:6px;opacity:0;visibility:hidden;transform:translateY(8px);transition:opacity .2s ease,transform .2s ease,visibility .2s;pointer-events:none}.stats-grid.open{opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto}.stat-item{padding:6px 10px;background:var(--glass-bg);border-radius:var(--glass-radius-sm);border:var(--glass-border);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow-sm);display:flex;flex-direction:column;align-items:center;gap:2px;min-width:48px}.stat-value{color:var(--glass-text);font-family:Monaco,Menlo,Courier New,monospace;font-size:11px;font-weight:600;white-space:nowrap}.stat-label{color:var(--glass-text-muted);font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.5px}.playback-controls{position:absolute;bottom:12px;right:12px;z-index:1000}.controls-menu-button{padding:6px 8px;background:var(--glass-bg);color:var(--glass-text);border:var(--glass-border);border-radius:var(--glass-radius-sm);cursor:pointer;backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow-sm);transition:all .2s ease;display:flex;align-items:center;justify-content:center;width:44px;height:44px;font-size:20px;font-weight:300;line-height:1}.controls-menu-button:hover{background:var(--glass-bg-hover);transform:scale(1.05)}.controls-menu-button:active{transform:scale(.95)}.controls-grid{position:absolute;bottom:0;right:0;display:grid;grid-template-columns:44px 44px 44px 44px;grid-template-rows:44px 44px;gap:6px;opacity:0;visibility:hidden;transform:scale(.8);transform-origin:bottom right;transition:opacity .2s ease,transform .2s ease,visibility .2s;pointer-events:none}.controls-grid.open{opacity:1;visibility:visible;transform:scale(1);pointer-events:auto}.control-button{padding:6px 8px;background:var(--glass-bg);color:var(--glass-text);border:var(--glass-border);border-radius:var(--glass-radius-sm);cursor:pointer;backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow-sm);transition:all .2s ease;display:flex;align-items:center;justify-content:center;width:44px;height:44px}.control-button:hover{background:var(--glass-bg-hover);transform:scale(1.05)}.control-button:active{transform:scale(.95)}.control-button svg{width:16px;height:16px;fill:currentColor}.playback-controls .controls-menu-button{position:relative;z-index:1}.playback-controls.open>.controls-menu-button{opacity:0;pointer-events:none}.shader-error-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:#000000f2;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:2000;padding:60px;overflow-y:auto}.error-overlay-content{background:#1a1a1a;border-radius:6px;max-width:900px;width:100%;display:flex;flex-direction:column;box-shadow:0 20px 60px #000c,0 0 1px #ffffff1a;border:1px solid #2a2a2a;max-height:calc(100vh - 120px)}.error-header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;background:linear-gradient(135deg,#c62828,#b71c1c);color:#fff;border-radius:6px 6px 0 0;border-bottom:1px solid rgba(0,0,0,.3);box-shadow:0 2px 8px #0003}.error-title{font-size:15px;font-weight:600;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;display:flex;align-items:center;gap:8px;letter-spacing:-.01em}.error-close{background:transparent;border:none;color:#ffffffe6;font-size:24px;line-height:1;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all .2s ease;opacity:.8}.error-close:hover{background:#ffffff26;opacity:1;transform:scale(1.05)}.error-body{padding:24px;overflow-y:auto;flex:1}.error-section{margin-bottom:24px}.error-section:last-child{margin-bottom:0}.error-pass-name{font-size:13px;font-weight:600;color:#ffa726;font-family:Monaco,Menlo,Courier New,monospace;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #2a2a2a;letter-spacing:.02em}.error-content{margin:0;padding:14px 16px;background:#0f0f0f;border-radius:4px;color:#ff6b6b;font-size:13px;font-family:Monaco,Menlo,Courier New,monospace;line-height:1.6;overflow-x:auto;border:1px solid #2a2a2a;white-space:pre-wrap;word-break:break-word}.error-code-context{margin:12px 0 0;padding:14px 16px;background:#0d0d0d;border-radius:4px;color:#b0b0b0;font-size:12px;font-family:Monaco,Menlo,Courier New,monospace;line-height:1.6;overflow-x:auto;border:1px solid #2a2a2a;white-space:pre}.error-code-context .context-line{color:#666;display:block}.error-code-context .error-line-highlight{color:#fff;background:#c6282840;display:block;font-weight:600;border-left:3px solid #c62828;margin-left:-16px;padding-left:13px}.context-lost-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:#000000e6;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:3000}.context-lost-content{text-align:center;color:#fff;padding:40px}.context-lost-icon{margin-bottom:16px;opacity:.8}.context-lost-spinner{width:48px;height:48px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;margin:0 auto 16px;animation:context-lost-spin 1s linear infinite}@keyframes context-lost-spin{to{transform:rotate(360deg)}}.context-lost-title{font-size:18px;font-weight:600;margin-bottom:8px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}.context-lost-message{font-size:14px;opacity:.7;margin-bottom:20px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}.context-lost-reload{background:#fff;color:#000;border:none;padding:10px 24px;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;transition:transform .2s,box-shadow .2s;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}.context-lost-reload:hover{transform:scale(1.02);box-shadow:0 4px 12px #fff3}.context-lost-reload:active{transform:scale(.98)}.recording-indicator{position:absolute;top:12px;right:12px;z-index:1000;display:flex;align-items:center;gap:6px;padding:6px 10px;background:#dc2626d9;border-radius:var(--glass-radius-sm);border:1px solid rgba(255,100,100,.3);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow-sm)}.recording-dot{width:8px;height:8px;background:#fff;border-radius:50%;animation:recording-pulse 1s ease-in-out infinite}@keyframes recording-pulse{0%,to{opacity:1}50%{opacity:.4}}.recording-text{color:#fff;font-family:Monaco,Menlo,Courier New,monospace;font-size:11px;font-weight:600;letter-spacing:.5px}.control-button.recording{background:#dc2626b3;border-color:#ff64644d}.control-button.recording:hover{background:#dc2626d9}.control-button.recording svg{fill:#fff}.media-permission-banner{position:absolute;bottom:48px;left:50%;transform:translate(-50%);background:var(--glass-bg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:var(--glass-border);box-shadow:var(--glass-shadow);color:#ffffffe6;padding:8px 16px;border-radius:6px;font-size:13px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;display:flex;align-items:center;gap:12px;z-index:100;white-space:nowrap}.media-banner-button{background:#4a9effcc;color:#fff;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:13px;font-family:inherit}.media-banner-button:hover{background:#4a9eff}.script-error-overlay{position:absolute;bottom:48px;left:12px;right:12px;z-index:1500;pointer-events:auto}.script-error-content{background:#1a1a1a;border-radius:6px;box-shadow:0 8px 32px #0009,0 0 1px #ffffff1a;border:1px solid #2a2a2a;overflow:hidden}.script-error-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:linear-gradient(135deg,#e65100,#bf360c);color:#fff;border-bottom:1px solid rgba(0,0,0,.3)}.script-error-header.disabled{background:linear-gradient(135deg,#6d4c41,#4e342e)}.script-error-header.warning{background:linear-gradient(135deg,#f9a825,#f57f17);color:#1a1a1a}.script-error-header.warning .script-error-close{color:#000000b3}.script-error-header.warning .script-error-close:hover{background:#00000026;color:#000000e6}.script-error-title{font-size:13px;font-weight:600;font-family:Monaco,Menlo,Courier New,monospace;display:flex;align-items:center;gap:6px}.script-error-close{background:transparent;border:none;color:#ffffffe6;font-size:20px;line-height:1;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:4px;opacity:.8;transition:all .2s ease}.script-error-close:hover{background:#ffffff26;opacity:1}.script-error-message{margin:0;padding:10px 14px;color:#ffab91;font-size:12px;font-family:Monaco,Menlo,Courier New,monospace;line-height:1.5;white-space:pre-wrap;word-break:break-word;max-height:80px;overflow-y:auto}.script-error-stack{margin:0;padding:6px 14px 10px;color:#888;font-size:11px;font-family:Monaco,Menlo,Courier New,monospace;line-height:1.4;white-space:pre-wrap;word-break:break-word;max-height:60px;overflow-y:auto;border-top:1px solid #2a2a2a}.script-overlay{position:absolute;z-index:500;padding:6px 10px;background:var(--glass-bg);color:var(--glass-text);font-family:Monaco,Menlo,Courier New,monospace;font-size:11px;border-radius:var(--glass-radius-sm);border:var(--glass-border);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow-sm);pointer-events:none;white-space:pre;max-width:calc(100% - 24px);overflow:hidden;text-overflow:ellipsis}.script-overlay.hidden{display:none}.script-overlay.top-left{top:12px;left:12px}.script-overlay.top-right{top:12px;right:12px}.script-overlay.bottom-left{bottom:12px;left:12px}.script-overlay.bottom-right{bottom:12px;right:12px}@media (prefers-reduced-motion: reduce){*,*:before,*:after{transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}@media (max-width: 428px){.stats-container{bottom:8px;left:8px}.playback-controls{bottom:8px;right:8px}.script-error-overlay{left:8px;right:8px;bottom:40px}.script-overlay.top-left{top:8px;left:8px}.script-overlay.top-right{top:8px;right:8px}.script-overlay.bottom-left{bottom:8px;left:8px}.script-overlay.bottom-right{bottom:8px;right:8px}}.uniforms-panel-wrapper{position:absolute;top:16px;right:16px;z-index:100;display:flex;flex-direction:column;align-items:flex-end}.uniforms-toggle-button{width:44px;height:44px;padding:6px;background:var(--glass-bg);border:var(--glass-border);border-radius:var(--glass-radius-sm);color:var(--glass-text);cursor:pointer;backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow-sm);transition:all .2s ease,opacity .15s ease;display:flex;align-items:center;justify-content:center}.uniforms-toggle-button:hover{background:var(--glass-bg-hover);transform:scale(1.05)}.uniforms-toggle-button:active{transform:scale(.95)}.uniforms-toggle-button svg{width:16px;height:16px}.uniforms-toggle-button.hidden{opacity:0;transform:scale(.8);pointer-events:none;position:absolute}.uniforms-panel{width:175px;max-height:calc(100vh - 100px);background:var(--glass-bg);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-radius:var(--glass-radius);border:var(--glass-border);box-shadow:var(--glass-shadow);overflow:hidden;display:flex;flex-direction:column;transform-origin:top right;transition:opacity .2s ease,transform .2s ease,max-height .2s ease}.uniforms-panel.closed{opacity:0;transform:scale(.25) translate(0);transform-origin:top right;pointer-events:none;max-height:0;padding:0}.uniforms-panel-header{padding:10px 14px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--glass-text-muted);background:#ffffff08;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;display:flex;justify-content:space-between;align-items:center}.uniforms-panel-close{background:transparent;border:none;color:var(--glass-text-muted);font-size:18px;line-height:1;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all .15s ease}.uniforms-panel-close:hover{background:#ffffff1a;color:var(--glass-text)}.uniforms-panel-content{flex:1;overflow-y:auto;overflow-x:hidden}.uniforms-panel .uniform-controls{padding:12px;gap:12px;background:transparent}.uniforms-panel .uniform-controls-header{display:none}.uniforms-panel .uniform-controls-list{gap:14px}.uniforms-panel .uniform-control{gap:6px}.uniforms-panel .uniform-control-label{font-size:11px;color:var(--glass-text)}.uniforms-panel .uniform-control-value{font-size:10px;padding:1px 4px;min-width:40px;color:var(--glass-text-muted);background:#0003;border-radius:3px}.uniforms-panel .uniform-control-slider{height:4px;background:#ffffff26}.uniforms-panel .uniform-control-slider::-webkit-slider-runnable-track{height:4px;background:#ffffff26}.uniforms-panel .uniform-control-slider::-webkit-slider-thumb{width:12px;height:12px;margin-top:-4px;background:#ffffffe6;box-shadow:0 1px 4px #0000004d}.uniforms-panel .uniform-control-slider::-moz-range-track{height:4px;background:#ffffff26}.uniforms-panel .uniform-control-slider::-moz-range-thumb{width:12px;height:12px;background:#ffffffe6;box-shadow:0 1px 4px #0000004d}.uniforms-panel .uniform-control-toggle{width:34px;height:18px}.uniforms-panel .uniform-control-toggle-slider{border-radius:18px}.uniforms-panel .uniform-control-toggle-slider:before{width:12px;height:12px;left:3px;bottom:3px}.uniforms-panel .uniform-control-toggle input:checked+.uniform-control-toggle-slider:before{transform:translate(16px)}.uniforms-panel .uniform-control-xy-pad{height:100px}.uniforms-panel .uniform-control-xy-handle{width:12px;height:12px}.uniforms-panel .uniform-control-color-swatch{height:28px}.uniforms-panel .uniform-control-vec-slider-row{gap:6px}.uniforms-panel .uniform-control-vec-component{font-size:9px;width:12px;color:var(--glass-text-muted)}.uniforms-panel .uniform-control-vec-value{font-size:9px;min-width:32px;color:var(--glass-text-muted);background:#0003;border-radius:3px}.uniforms-panel .uniform-control-xy-pad{background:#00000040;border:1px solid rgba(255,255,255,.1)}.uniforms-panel .uniform-control-xy-handle{background:#ffffffe6;box-shadow:0 1px 4px #0006}.uniforms-panel-content::-webkit-scrollbar{width:6px}.uniforms-panel-content::-webkit-scrollbar-track{background:transparent}.uniforms-panel-content::-webkit-scrollbar-thumb{background:#fff3;border-radius:3px}.uniforms-panel-content::-webkit-scrollbar-thumb:hover{background:#ffffff59}.uniform-controls{display:flex;flex-direction:column;gap:16px;padding:16px;height:100%;overflow-y:auto;background:var(--bg-secondary)}.uniform-controls-empty{color:var(--text-muted);font-size:13px;text-align:center;padding:20px}.uniform-controls-header{display:flex;justify-content:flex-end;padding-bottom:8px;border-bottom:1px solid var(--border-primary);margin-bottom:8px}.uniform-controls-reset{font-family:inherit;font-size:11px;padding:4px 10px;background:var(--bg-tertiary);color:var(--text-secondary);border:1px solid var(--border-primary);border-radius:4px;cursor:pointer;transition:background .15s ease,color .15s ease}.uniform-controls-reset:hover{background:var(--border-primary);color:var(--text-primary)}.uniform-controls-reset:active{transform:translateY(1px)}.uniform-controls-list{display:flex;flex-direction:column;gap:16px}.uniform-control{display:flex;flex-direction:column;gap:8px}.uniform-control-label-row{display:flex;justify-content:space-between;align-items:center}.uniform-control-label{font-family:Monaco,Menlo,Courier New,monospace;font-size:12px;font-weight:500;color:var(--text-primary)}.uniform-control-value{font-family:Monaco,Menlo,Courier New,monospace;font-size:11px;color:var(--text-muted);background:var(--bg-tertiary);padding:2px 6px;border-radius:3px;min-width:50px;text-align:right}.uniform-control-slider{-webkit-appearance:none;-moz-appearance:none;appearance:none;width:100%;height:6px;background:var(--border-primary);border-radius:3px;outline:none;cursor:pointer}.uniform-control-slider::-webkit-slider-runnable-track{height:6px;background:var(--border-primary);border-radius:3px}.uniform-control-slider::-webkit-slider-thumb{-webkit-appearance:none;-moz-appearance:none;appearance:none;width:14px;height:14px;background:var(--accent-primary);border-radius:50%;cursor:pointer;margin-top:-4px;transition:transform .15s ease,box-shadow .15s ease}.uniform-control-slider::-webkit-slider-thumb:hover{transform:scale(1.1);box-shadow:0 2px 6px #0003}.uniform-control-slider::-webkit-slider-thumb:active{transform:scale(.95)}.uniform-control-slider::-moz-range-track{height:6px;background:var(--border-primary);border-radius:3px}.uniform-control-slider::-moz-range-thumb{width:14px;height:14px;background:var(--accent-primary);border:none;border-radius:50%;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease}.uniform-control-slider::-moz-range-thumb:hover{transform:scale(1.1);box-shadow:0 2px 6px #0003}.uniform-control-slider::-moz-range-thumb:active{transform:scale(.95)}.uniform-control-slider:focus{outline:none}.uniform-control-slider:focus::-webkit-slider-thumb{box-shadow:0 0 0 3px var(--code-selection)}.uniform-control-slider:focus::-moz-range-thumb{box-shadow:0 0 0 3px var(--code-selection)}.uniform-control-toggle{position:relative;display:inline-block;width:40px;height:22px;cursor:pointer}.uniform-control-toggle input{opacity:0;width:0;height:0}.uniform-control-toggle-slider{position:absolute;top:0;left:0;right:0;bottom:0;background:var(--border-primary);border-radius:22px;transition:background .2s ease}.uniform-control-toggle-slider:before{content:"";position:absolute;width:16px;height:16px;left:3px;bottom:3px;background:var(--text-muted);border-radius:50%;transition:transform .2s ease,background .2s ease}.uniform-control-toggle input:checked+.uniform-control-toggle-slider{background:var(--accent-primary)}.uniform-control-toggle input:checked+.uniform-control-toggle-slider:before{transform:translate(18px);background:#fff}.uniform-control-toggle input:focus+.uniform-control-toggle-slider{box-shadow:0 0 0 2px var(--code-selection)}.uniform-control-xy-pad{position:relative;width:100%;height:120px;background:var(--bg-tertiary);border:1px solid var(--border-primary);border-radius:4px;cursor:crosshair;overflow:hidden}.uniform-control-xy-pad:before,.uniform-control-xy-pad:after{content:"";position:absolute;background:var(--border-primary);opacity:.5}.uniform-control-xy-pad:before{left:50%;top:0;bottom:0;width:1px}.uniform-control-xy-pad:after{top:50%;left:0;right:0;height:1px}.uniform-control-xy-handle{position:absolute;width:14px;height:14px;background:var(--accent-primary);border:2px solid white;border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 2px 4px #0000004d;pointer-events:none;z-index:1}.uniform-control-color-wrapper{display:flex;align-items:center;gap:8px}.uniform-control-color-swatch{width:100%;height:32px;border-radius:4px;border:1px solid var(--border-primary);cursor:pointer;transition:box-shadow .15s ease}.uniform-control-color-swatch:hover{box-shadow:0 0 0 2px var(--accent-primary)}.uniform-control-color-input{position:absolute;width:0;height:0;opacity:0;pointer-events:none}.uniform-control-vec3{gap:6px}.uniform-control-vec-slider-row{display:flex;align-items:center;gap:8px}.uniform-control-vec-component{font-family:Monaco,Menlo,Courier New,monospace;font-size:10px;font-weight:600;color:var(--text-muted);width:14px;text-align:center}.uniform-control-vec-slider{flex:1}.uniform-control-vec-value{min-width:40px;font-size:10px}.render-dialog-backdrop{position:absolute;top:0;left:0;right:0;bottom:0;background:#000000b3;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:4000}.render-dialog{background:#1a1a1f;border:1px solid rgba(255,255,255,.1);border-radius:10px;box-shadow:0 20px 60px #0009;width:360px;max-width:calc(100% - 32px);overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;color:#e0e0e0}.render-dialog-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:linear-gradient(135deg,#1565c0,#0d47a1);color:#fff;border-bottom:1px solid rgba(0,0,0,.3)}.render-dialog-title{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}.render-dialog-close{background:transparent;border:none;color:#fffc;font-size:20px;line-height:1;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all .15s ease}.render-dialog-close:hover{background:#ffffff26;color:#fff}.render-dialog-body{padding:18px;display:flex;flex-direction:column;gap:14px}.render-field{display:flex;flex-direction:column;gap:5px}.render-field-label{font-size:12px;font-weight:500;color:#fff9;text-transform:uppercase;letter-spacing:.5px}.render-field-row{display:flex;gap:8px;align-items:center}.render-field-row span{color:#fff6;font-size:13px}.render-input{flex:1;background:#0f0f14;border:1px solid rgba(255,255,255,.1);border-radius:5px;color:#e0e0e0;font-family:Monaco,Menlo,monospace;font-size:13px;padding:7px 10px;outline:none;transition:border-color .15s}.render-input:focus{border-color:#648cff80}.render-input[type=number]{-moz-appearance:textfield}.render-input[type=number]::-webkit-inner-spin-button,.render-input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}.render-format-group{display:flex;gap:8px}.render-format-option{flex:1;position:relative}.render-format-option input[type=radio]{position:absolute;opacity:0;pointer-events:none}.render-format-option label{display:block;text-align:center;padding:8px 12px;background:#0f0f14;border:1px solid rgba(255,255,255,.1);border-radius:5px;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s}.render-format-option input[type=radio]:checked+label{background:#648cff26;border-color:#648cff80;color:#8ab4ff}.render-format-option label:hover{border-color:#fff3}.render-estimate{font-size:11px;color:#fff6;font-family:Monaco,Menlo,monospace;text-align:center;padding:4px 0}.render-dialog-actions{display:flex;gap:8px;padding:0 18px 18px}.render-btn{flex:1;padding:9px 16px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s;font-family:inherit}.render-btn-primary{background:linear-gradient(135deg,#1565c0,#0d47a1);color:#fff}.render-btn-primary:hover{filter:brightness(1.1)}.render-btn-primary:disabled{opacity:.5;cursor:not-allowed;filter:none}.render-btn-cancel{background:#ffffff14;color:#ffffffb3;border:1px solid rgba(255,255,255,.1)}.render-btn-cancel:hover{background:#ffffff1f}.render-progress{display:none;flex-direction:column;gap:8px;padding:18px}.render-progress.active{display:flex}.render-progress-bar-bg{height:6px;background:#0f0f14;border-radius:3px;overflow:hidden}.render-progress-bar{height:100%;background:linear-gradient(90deg,#1565c0,#42a5f5);border-radius:3px;width:0%;transition:width .1s ease}.render-progress-text{font-size:12px;color:#ffffff80;font-family:Monaco,Menlo,monospace;text-align:center}.multi-view-controls-wrapper{position:absolute;top:16px;right:16px;z-index:100;display:flex;flex-direction:column;align-items:flex-end}.multi-view-controls-toggle{width:44px;height:44px;padding:6px;background:var(--glass-bg);border:var(--glass-border);border-radius:var(--glass-radius-sm);color:var(--glass-text);cursor:pointer;backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow-sm);transition:all .2s ease,opacity .15s ease;display:flex;align-items:center;justify-content:center}.multi-view-controls-toggle:hover{background:var(--glass-bg-hover);transform:scale(1.05)}.multi-view-controls-toggle:active{transform:scale(.95)}.multi-view-controls-toggle svg{width:16px;height:16px}.multi-view-controls-toggle.hidden{opacity:0;transform:scale(.8);pointer-events:none;position:absolute}.multi-view-controls-panel{width:175px;max-height:calc(100vh - 100px);background:var(--glass-bg);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-radius:var(--glass-radius);border:var(--glass-border);box-shadow:var(--glass-shadow);overflow:hidden;display:flex;flex-direction:column;transform-origin:top right;transition:opacity .2s ease,transform .2s ease,max-height .2s ease}.multi-view-controls-panel.closed{opacity:0;transform:scale(.25) translate(0);transform-origin:top right;pointer-events:none;max-height:0;padding:0}.multi-view-controls-header{padding:10px 14px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--glass-text-muted);background:#ffffff08;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;display:flex;justify-content:space-between;align-items:center}.multi-view-controls-close{background:transparent;border:none;color:var(--glass-text-muted);font-size:18px;line-height:1;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all .15s ease}.multi-view-controls-close:hover{background:#ffffff1a;color:var(--glass-text)}.controls-section{display:flex;flex-direction:column;gap:8px;padding:12px}.controls-section+.controls-section{padding-top:0}.section-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--glass-text-muted);padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:4px}.playback-controls{flex-direction:row;gap:8px;padding:12px}.control-btn{width:44px;height:44px;border:none;border-radius:var(--glass-radius-sm);background:#ffffff1a;color:var(--glass-text);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s ease}.control-btn:hover{background:#fff3}.control-btn:active{transform:scale(.95)}.control-btn svg{width:16px;height:16px}.uniforms-section{border-top:1px solid rgba(255,255,255,.06)}.uniforms-container{display:flex;flex-direction:column;gap:8px}.multi-view-controls-panel .uniform-controls{padding:0;gap:12px;background:transparent}.multi-view-controls-panel .uniform-controls-header{display:none}.multi-view-controls-panel .uniform-controls-list{gap:14px}.multi-view-controls-panel .uniform-control{gap:6px}.multi-view-controls-panel .uniform-control-label{font-size:11px;color:var(--glass-text)}.multi-view-controls-panel .uniform-control-value{font-size:10px;padding:1px 4px;min-width:40px;color:var(--glass-text-muted);background:#0003;border-radius:3px}.multi-view-controls-panel .uniform-control-slider{height:4px;background:#ffffff26}.multi-view-controls-panel .uniform-control-slider::-webkit-slider-runnable-track{height:4px;background:#ffffff26}.multi-view-controls-panel .uniform-control-slider::-webkit-slider-thumb{width:12px;height:12px;margin-top:-4px;background:#ffffffe6;box-shadow:0 1px 4px #0000004d}.multi-view-controls-panel .uniform-control-slider::-moz-range-track{height:4px;background:#ffffff26}.multi-view-controls-panel .uniform-control-slider::-moz-range-thumb{width:12px;height:12px;background:#ffffffe6;box-shadow:0 1px 4px #0000004d}.multi-view-controls-panel .uniform-control-toggle{width:34px;height:18px}.multi-view-controls-panel .uniform-control-toggle-slider{border-radius:18px}.multi-view-controls-panel .uniform-control-toggle-slider:before{width:12px;height:12px;left:3px;bottom:3px}.multi-view-controls-panel .uniform-control-toggle input:checked+.uniform-control-toggle-slider:before{transform:translate(16px)}.layout-fullscreen{width:100%;height:100%}.layout-fullscreen .canvas-container{position:relative;width:100%;height:100%;background:#000}.layout-default{width:100%;height:100%}.layout-default .canvas-container{position:relative;width:100%;height:100%;background:var(--bg-canvas);border-radius:var(--pane-radius);box-shadow:var(--pane-shadow);overflow:hidden}.layout-split{width:100%;height:100%;display:flex;gap:24px}.layout-split .canvas-container{position:relative;flex:1;background:var(--bg-canvas);border-radius:var(--pane-radius);box-shadow:var(--pane-shadow);overflow:hidden}.layout-split .code-panel{position:relative;flex:1;display:flex;flex-direction:column;background:var(--bg-secondary);border-radius:var(--pane-radius);box-shadow:var(--pane-shadow);overflow:hidden}.tab-bar{display:flex;background:var(--tab-bg);border-bottom:1px solid var(--border-primary);padding:8px 8px 0;gap:4px}.tab-button{padding:8px 16px;background:transparent;border:none;border-radius:6px 6px 0 0;font-size:13px;font-family:Monaco,Menlo,Courier New,monospace;cursor:pointer;transition:background .2s,color .2s;color:var(--tab-text)}.tab-button:hover{background:var(--button-bg-hover);color:var(--tab-text-hover)}.tab-button.active{background:var(--bg-secondary);color:var(--tab-text-active);font-weight:500}.copy-button{position:absolute;top:12px;right:12px;padding:6px;background:var(--button-bg);border:none;border-radius:4px;color:var(--button-text);cursor:pointer;transition:all .2s;z-index:10;display:flex;align-items:center;justify-content:center}.copy-button:hover{background:var(--button-bg-hover);color:var(--button-text-hover)}.copy-button:active{transform:scale(.9)}.copy-button.copied{color:var(--success-text)}.code-viewer{flex:1;min-height:0;overflow:auto;position:relative;background:var(--code-bg)}.code-viewer pre{margin:0;padding:16px;font-size:13px;line-height:1.5;font-family:Monaco,Menlo,Courier New,monospace;background:var(--code-bg);color:var(--code-text)}.code-viewer code{font-family:inherit;font-size:inherit}.token.comment{color:var(--syntax-comment)}.token.keyword{color:var(--syntax-keyword)}.token.string{color:var(--syntax-string)}.token.number{color:var(--syntax-number)}.token.operator{color:var(--syntax-operator)}.token.function{color:var(--syntax-function)}.token.class-name{color:var(--syntax-class)}.token.punctuation{color:var(--syntax-punctuation)}.tab-button.image-tab,.tab-button.image-tab.active{color:var(--accent-secondary)}.image-viewer{display:flex;align-items:center;justify-content:center;height:100%;padding:16px;background:var(--image-viewer-bg)}.image-viewer img{max-width:100%;max-height:100%;object-fit:contain;border-radius:4px;box-shadow:var(--shadow-sm)}@media (max-width: 800px){.layout-split{flex-direction:column}}.layout-tabbed{width:100%;height:100%;display:flex;flex-direction:column;box-sizing:border-box}.tabbed-wrapper{display:flex;flex-direction:column;width:100%;height:100%;border-radius:var(--pane-radius);box-shadow:var(--pane-shadow);overflow:hidden}.tabbed-toolbar{display:flex;align-items:center;flex-shrink:0;background:var(--tab-bg);border-bottom:1px solid var(--border-primary);padding-right:8px}.tabbed-tab-bar{display:flex;flex:1;gap:4px;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin}.tabbed-tab-bar::-webkit-scrollbar{height:4px}.tabbed-tab-bar::-webkit-scrollbar-thumb{background:var(--border-secondary);border-radius:2px}.tabbed-tab-button{padding:10px 16px;background:transparent;border:none;border-bottom:2px solid transparent;font-size:12px;font-family:Monaco,Menlo,Courier New,monospace;cursor:pointer;transition:color .15s,border-color .15s;color:var(--tab-text);white-space:nowrap;flex-shrink:0}.tabbed-tab-button:hover{color:var(--tab-text-hover)}.tabbed-tab-button.active{color:var(--tab-text-active);border-bottom-color:var(--tab-border-active)}.tabbed-tab-button.shader-tab{font-family:system-ui,-apple-system,sans-serif}.tabbed-tab-button.image-tab{color:var(--accent-secondary)}.tabbed-tab-button.image-tab.active{color:var(--accent-secondary);border-bottom-color:var(--accent-secondary)}.tabbed-tab-button.uniforms-tab{color:var(--accent-tertiary, var(--accent-primary));padding:8px 12px}.tabbed-tab-button.uniforms-tab.active{color:var(--accent-tertiary, var(--accent-primary));border-bottom-color:var(--accent-tertiary, var(--accent-primary))}.tabbed-tab-button .uniforms-icon{width:18px;height:18px;display:block}.tabbed-content{flex:1;min-height:0;position:relative;background:var(--bg-canvas);overflow:hidden}.tabbed-canvas-container{position:absolute;top:0;left:0;width:100%;height:100%}.tabbed-code-viewer{position:absolute;top:0;left:0;width:100%;height:100%;overflow:auto;background:var(--code-bg)}.tabbed-code-viewer pre{margin:0;padding:16px 16px 16px 0;font-size:13px;line-height:1.6;font-family:Monaco,Menlo,Courier New,monospace;background:var(--code-bg);color:var(--code-text);display:flex}.tabbed-code-viewer code{font-family:inherit;font-size:inherit}.tabbed-line-numbers{text-align:right;padding-right:16px;margin-right:16px;border-right:1px solid var(--code-line-border);color:var(--code-line-number);-webkit-user-select:none;user-select:none;flex-shrink:0;padding-left:16px}.tabbed-code-content{flex:1;overflow-x:auto}.tabbed-image-viewer{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--image-viewer-bg);padding:20px;box-sizing:border-box}.tabbed-image-viewer img{max-width:100%;max-height:100%;object-fit:contain;border-radius:4px;box-shadow:var(--shadow-sm)}.tabbed-code-viewer .token.comment{color:var(--syntax-comment)}.tabbed-code-viewer .token.keyword{color:var(--syntax-keyword)}.tabbed-code-viewer .token.string{color:var(--syntax-string)}.tabbed-code-viewer .token.number{color:var(--syntax-number)}.tabbed-code-viewer .token.operator{color:var(--syntax-operator)}.tabbed-code-viewer .token.function{color:var(--syntax-function)}.tabbed-code-viewer .token.class-name{color:var(--syntax-class)}.tabbed-code-viewer .token.punctuation{color:var(--syntax-punctuation)}@media (max-width: 600px){.tabbed-tab-button{padding:8px 12px;font-size:12px}}.tabbed-editor-container{position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden;background:var(--code-bg)}.tabbed-button-container{display:flex;align-items:center;gap:6px;flex-shrink:0}.tabbed-copy-button{display:flex;align-items:center;justify-content:center;background:var(--button-bg);border:1px solid var(--button-border);color:var(--button-text);width:44px;height:44px;border-radius:4px;cursor:pointer;transition:background .15s,border-color .15s,color .15s}.tabbed-copy-button:hover{background:var(--button-bg-hover);border-color:var(--button-border-hover);color:var(--button-text-hover)}.tabbed-copy-button:active{background:var(--button-bg-hover)}.tabbed-copy-button.copied{background:var(--success-bg);border-color:var(--success-border);color:var(--success-text)}.tabbed-recompile-button{display:flex;align-items:center;gap:6px;background:var(--recompile-bg);border:none;color:var(--recompile-text);padding:6px 12px;border-radius:4px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;transition:background .15s,color .15s}.tabbed-recompile-button:hover{background:var(--recompile-bg-hover)}.tabbed-recompile-button:active{background:var(--recompile-bg-active)}.tabbed-recompile-button svg{flex-shrink:0}.tabbed-error-display{position:absolute;bottom:0;left:0;right:0;background:var(--error-bg);color:var(--error-text);padding:10px 14px;font-family:Monaco,Menlo,Courier New,monospace;font-size:12px;white-space:pre-wrap;overflow:auto;max-height:120px;border-top:1px solid var(--error-border);z-index:10}.tabbed-fallback-textarea{width:100%;height:100%;background:var(--code-bg);color:var(--code-text);border:none;padding:12px;font-family:Monaco,Menlo,Courier New,monospace;font-size:13px;resize:none;outline:none}.tabbed-uniforms-container{position:absolute;top:0;left:0;width:100%;height:100%;overflow-y:auto;background:#00000080;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:flex;justify-content:center;padding:20px;box-sizing:border-box}.tabbed-uniforms-container .uniform-controls{max-width:400px;width:100%;background:#1e1e23f2;border-radius:12px;padding:20px;box-shadow:0 4px 20px #0006;height:fit-content}.tabbed-uniforms-container .uniform-control-label{color:#e0e0e0}.tabbed-uniforms-container .uniform-control-value{color:#a0a0a0;background:#0000004d}.tabbed-uniforms-container .uniform-controls-header{color:#909090;border-bottom-color:#ffffff1a}.tabbed-uniforms-container .uniform-control-slider{background:#ffffff1a}.tabbed-uniforms-container .uniform-control-slider::-webkit-slider-thumb{background:#fff}.tabbed-uniforms-container .uniform-control-slider::-moz-range-thumb{background:#fff}.tabbed-uniforms-container .uniform-control-vec-component{color:#909090}.tabbed-uniforms-container .uniform-control-vec-value{color:#a0a0a0;background:#0000004d}.layout-multi-view{position:relative;width:100%;height:100%;box-sizing:border-box;background:var(--bg-primary)}.multi-view-canvas{position:relative;background:var(--bg-canvas);border-radius:var(--pane-radius);box-shadow:var(--pane-shadow);overflow:hidden}.multi-view-label{position:absolute;top:12px;left:12px;padding:4px 10px;background:#0009;color:#fff;font-family:var(--font-mono);font-size:12px;font-weight:500;border-radius:4px;text-transform:capitalize;z-index:5;pointer-events:none}.multi-view-info{position:absolute;bottom:12px;left:12px;padding:6px 10px;background:#0009;color:#fff;font-family:var(--font-mono);font-size:11px;border-radius:4px;z-index:5;pointer-events:none}.layout-grid-view{display:grid;gap:16px}.layout-grid-view .multi-view-canvas{min-height:0;min-width:0}.layout-grid-view[data-view-count="2"].grid-horizontal{grid-template-columns:1fr 1fr;grid-template-rows:1fr}.layout-grid-view[data-view-count="2"].grid-vertical{grid-template-columns:1fr;grid-template-rows:1fr 1fr}.layout-grid-view[data-view-count="3"].grid-horizontal{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}.layout-grid-view[data-view-count="3"].grid-horizontal .multi-view-canvas:last-child{grid-column:1 / -1}.layout-grid-view[data-view-count="3"].grid-vertical{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}.layout-grid-view[data-view-count="3"].grid-vertical .multi-view-canvas:first-child{grid-column:1 / -1}.layout-grid-view[data-view-count="4"]{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}.layout-inset-view .multi-view-canvas.inset-main{width:100%;height:100%}.layout-inset-view .multi-view-canvas.inset-overlay{position:absolute;bottom:40px;right:40px;width:25%;min-width:200px;aspect-ratio:16 / 9;z-index:10;transition:all .2s ease}.layout-inset-view .multi-view-canvas.inset-overlay.minimized{width:48px;height:48px;min-width:unset;aspect-ratio:unset;cursor:pointer;opacity:.8}.layout-inset-view .multi-view-canvas.inset-overlay.minimized:hover{opacity:1}.inset-minimize-btn{position:absolute;top:8px;right:8px;width:24px;height:24px;border:none;border-radius:4px;background:#00000080;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;z-index:11;transition:background .2s}.inset-minimize-btn:hover{background:#000000b3}.editor-toolbar{display:flex;align-items:center;background:var(--tab-bg);border-bottom:1px solid var(--border-primary);padding-right:8px}.editor-tab-bar{display:flex;flex:1;overflow-x:auto;scrollbar-width:thin}.editor-tab-button{background:transparent;border:none;color:var(--tab-text);padding:10px 16px;cursor:pointer;font-family:Monaco,Menlo,Courier New,monospace;font-size:12px;white-space:nowrap;border-bottom:2px solid transparent;transition:color .15s,border-color .15s}.editor-tab-button:hover{color:var(--tab-text-hover)}.editor-tab-button.active{color:var(--tab-text-active);border-bottom-color:var(--tab-border-active)}.editor-tab-button.image-tab{color:var(--accent-secondary)}.editor-tab-button.image-tab.active{color:var(--accent-secondary);border-bottom-color:var(--accent-secondary)}.editor-tab-button.uniforms-tab{color:var(--accent-tertiary, var(--accent-primary));padding:8px 12px}.editor-tab-button.uniforms-tab.active{color:var(--accent-tertiary, var(--accent-primary));border-bottom-color:var(--accent-tertiary, var(--accent-primary))}.editor-tab-button .uniforms-icon{width:18px;height:18px;display:block}.editor-copy-button{display:flex;align-items:center;justify-content:center;background:var(--button-bg);border:1px solid var(--button-border);color:var(--button-text);width:32px;height:32px;border-radius:4px;cursor:pointer;transition:background .15s,border-color .15s,color .15s;flex-shrink:0;margin-right:6px}.editor-copy-button:hover{background:var(--button-bg-hover);border-color:var(--button-border-hover);color:var(--button-text-hover)}.editor-copy-button:active{background:var(--button-bg-hover)}.editor-copy-button.copied{background:var(--success-bg);border-color:var(--success-border);color:var(--success-text)}.editor-copy-button svg{flex-shrink:0}.editor-recompile-button{display:flex;align-items:center;gap:6px;background:var(--recompile-bg);border:none;color:var(--recompile-text);padding:6px 12px;border-radius:4px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;transition:background .15s,color .15s;flex-shrink:0}.editor-recompile-button:hover{background:var(--recompile-bg-hover)}.editor-recompile-button:active{background:var(--recompile-bg-active)}.editor-recompile-button svg{flex-shrink:0}.editor-content-area{flex:1;overflow:hidden;position:relative;background:var(--code-bg)}.editor-prism-container{height:100%;width:100%}.editor-fallback-textarea{width:100%;height:100%;background:var(--code-bg);color:var(--code-text);border:none;padding:12px;font-family:Monaco,Menlo,Courier New,monospace;font-size:13px;resize:none;outline:none}.editor-image-viewer{display:flex;align-items:center;justify-content:center;height:100%;background:var(--image-viewer-bg);padding:20px}.editor-uniforms-container{height:100%;overflow-y:auto;background:var(--bg-secondary)}.editor-image-viewer img{max-width:100%;max-height:100%;object-fit:contain;border-radius:4px;box-shadow:var(--shadow-sm)}.editor-error-display{background:var(--error-bg);color:var(--error-text);padding:10px 14px;font-family:Monaco,Menlo,Courier New,monospace;font-size:12px;white-space:pre-wrap;overflow:auto;max-height:120px;border-top:1px solid var(--error-border)}.prism-editor-wrapper{display:flex;height:100%;background:var(--code-bg);font-family:Monaco,Menlo,Courier New,monospace;font-size:13px;line-height:1.6}.prism-editor-line-numbers{flex-shrink:0;padding:16px 12px 16px 16px;text-align:right;color:var(--code-line-number);border-right:1px solid var(--code-line-border);-webkit-user-select:none;user-select:none;overflow:hidden}.prism-editor-line-numbers span{display:block}.prism-editor-area{flex:1;position:relative;overflow:hidden}.prism-editor-textarea,.prism-editor-highlight{position:absolute;top:0;left:0;width:100%;height:100%;padding:16px;margin:0;border:none;outline:none;font-family:inherit;font-size:inherit;line-height:inherit;white-space:pre-wrap;word-wrap:break-word;overflow:auto;box-sizing:border-box}.prism-editor-textarea{background:transparent;color:transparent;caret-color:var(--code-text);resize:none;z-index:1;-webkit-text-fill-color:transparent}.prism-editor-textarea::selection{background:var(--code-selection)}.prism-editor-textarea::-moz-selection{background:var(--code-selection)}.prism-editor-highlight{background:var(--code-bg);color:var(--code-text);pointer-events:none;z-index:0}.prism-editor-highlight code{font-family:inherit;font-size:inherit;background:none;padding:0}.prism-editor-highlight .token.comment{color:var(--syntax-comment)}.prism-editor-highlight .token.keyword{color:var(--syntax-keyword)}.prism-editor-highlight .token.string{color:var(--syntax-string)}.prism-editor-highlight .token.number{color:var(--syntax-number)}.prism-editor-highlight .token.operator{color:var(--syntax-operator)}.prism-editor-highlight .token.function{color:var(--syntax-function)}.prism-editor-highlight .token.class-name{color:var(--syntax-class)}.prism-editor-highlight .token.punctuation{color:var(--syntax-punctuation)}')),document.head.appendChild(o)}}catch(r){console.error("vite-plugin-css-injected-by-js",r)}})();
+(function(){"use strict";try{if(typeof document<"u"){var o=document.createElement("style");o.appendChild(document.createTextNode(':root,[data-theme=light]{--bg-primary: #f5f5f5;--bg-secondary: #ffffff;--bg-tertiary: #f8f8f8;--bg-canvas: #000000;--text-primary: #000000;--text-secondary: #333333;--text-muted: #666666;--text-disabled: #999999;--border-primary: #e0e0e0;--border-secondary: #cccccc;--accent-primary: #4a9eff;--accent-primary-hover: #3a8eef;--accent-primary-active: #2a7edf;--accent-secondary: #7c4dff;--error-bg: #fff0f0;--error-text: #cc0000;--error-border: #ffcccc;--success-bg: #e8f5e9;--success-text: #4caf50;--success-border: #4caf50;--overlay-bg: rgba(0, 0, 0, .75);--overlay-backdrop: rgba(0, 0, 0, .95);--shadow-sm: 0 2px 8px rgba(0, 0, 0, .1);--shadow-md: 0 10px 30px rgba(0, 0, 0, .2);--shadow-lg: 0 20px 60px rgba(0, 0, 0, .25);--code-bg: #ffffff;--code-text: #000000;--code-line-number: #999999;--code-line-border: #e0e0e0;--code-selection: rgba(173, 214, 255, .4);--syntax-comment: #6a9955;--syntax-keyword: #0000ff;--syntax-string: #a31515;--syntax-number: #098658;--syntax-operator: #000000;--syntax-function: #795e26;--syntax-class: #267f99;--syntax-punctuation: #000000;--tab-bg: #f8f8f8;--tab-text: #666666;--tab-text-hover: #333333;--tab-text-active: #000000;--tab-border-active: #4a9eff;--button-bg: transparent;--button-border: #cccccc;--button-text: #666666;--button-bg-hover: #f0f0f0;--button-border-hover: #999999;--button-text-hover: #333333;--recompile-bg: #e8e8e8;--recompile-text: #333333;--recompile-bg-hover: #d8d8d8;--recompile-bg-active: #c8c8c8;--image-viewer-bg: #f5f5f5;--pane-radius: 8px;--pane-shadow: var(--shadow-lg), var(--shadow-sm)}[data-theme=dark]{--bg-primary: #1a1a1a;--bg-secondary: #252525;--bg-tertiary: #2a2a2a;--bg-canvas: #000000;--text-primary: #ffffff;--text-secondary: #e0e0e0;--text-muted: #a0a0a0;--text-disabled: #666666;--border-primary: #3a3a3a;--border-secondary: #4a4a4a;--accent-primary: #4a9eff;--accent-primary-hover: #5aadff;--accent-primary-active: #3a8eef;--accent-secondary: #9c7cff;--error-bg: #3a1a1a;--error-text: #ff6b6b;--error-border: #5a2a2a;--success-bg: #1a3a1a;--success-text: #6bcf6b;--success-border: #2a5a2a;--overlay-bg: rgba(0, 0, 0, .85);--overlay-backdrop: rgba(0, 0, 0, .98);--shadow-sm: 0 2px 8px rgba(0, 0, 0, .3);--shadow-md: 0 10px 30px rgba(0, 0, 0, .4);--shadow-lg: 0 20px 60px rgba(0, 0, 0, .5);--code-bg: #1e1e1e;--code-text: #d4d4d4;--code-line-number: #858585;--code-line-border: #3a3a3a;--code-selection: rgba(38, 79, 120, .6);--syntax-comment: #6a9955;--syntax-keyword: #569cd6;--syntax-string: #ce9178;--syntax-number: #b5cea8;--syntax-operator: #d4d4d4;--syntax-function: #dcdcaa;--syntax-class: #4ec9b0;--syntax-punctuation: #d4d4d4;--tab-bg: #2a2a2a;--tab-text: #a0a0a0;--tab-text-hover: #d0d0d0;--tab-text-active: #ffffff;--tab-border-active: #4a9eff;--button-bg: transparent;--button-border: #4a4a4a;--button-text: #a0a0a0;--button-bg-hover: #3a3a3a;--button-border-hover: #5a5a5a;--button-text-hover: #e0e0e0;--recompile-bg: #3a3a3a;--recompile-text: #e0e0e0;--recompile-bg-hover: #4a4a4a;--recompile-bg-active: #5a5a5a;--image-viewer-bg: #2a2a2a;--pane-radius: 8px;--pane-shadow: var(--shadow-lg), var(--shadow-sm)}[data-theme=system]{--bg-primary: #f5f5f5;--bg-secondary: #ffffff;--bg-tertiary: #f8f8f8;--bg-canvas: #000000;--text-primary: #000000;--text-secondary: #333333;--text-muted: #666666;--text-disabled: #999999;--border-primary: #e0e0e0;--border-secondary: #cccccc;--accent-primary: #4a9eff;--accent-primary-hover: #3a8eef;--accent-primary-active: #2a7edf;--accent-secondary: #7c4dff;--error-bg: #fff0f0;--error-text: #cc0000;--error-border: #ffcccc;--success-bg: #e8f5e9;--success-text: #4caf50;--success-border: #4caf50;--overlay-bg: rgba(0, 0, 0, .75);--overlay-backdrop: rgba(0, 0, 0, .95);--shadow-sm: 0 2px 8px rgba(0, 0, 0, .1);--shadow-md: 0 10px 30px rgba(0, 0, 0, .2);--shadow-lg: 0 20px 60px rgba(0, 0, 0, .25);--code-bg: #ffffff;--code-text: #000000;--code-line-number: #999999;--code-line-border: #e0e0e0;--code-selection: rgba(173, 214, 255, .4);--syntax-comment: #6a9955;--syntax-keyword: #0000ff;--syntax-string: #a31515;--syntax-number: #098658;--syntax-operator: #000000;--syntax-function: #795e26;--syntax-class: #267f99;--syntax-punctuation: #000000;--tab-bg: #f8f8f8;--tab-text: #666666;--tab-text-hover: #333333;--tab-text-active: #000000;--tab-border-active: #4a9eff;--button-bg: transparent;--button-border: #cccccc;--button-text: #666666;--button-bg-hover: #f0f0f0;--button-border-hover: #999999;--button-text-hover: #333333;--recompile-bg: #e8e8e8;--recompile-text: #333333;--recompile-bg-hover: #d8d8d8;--recompile-bg-active: #c8c8c8;--image-viewer-bg: #f5f5f5;--pane-radius: 8px;--pane-shadow: var(--shadow-lg), var(--shadow-sm)}@media (prefers-color-scheme: dark){[data-theme=system]{--bg-primary: #1a1a1a;--bg-secondary: #252525;--bg-tertiary: #2a2a2a;--bg-canvas: #000000;--text-primary: #ffffff;--text-secondary: #e0e0e0;--text-muted: #a0a0a0;--text-disabled: #666666;--border-primary: #3a3a3a;--border-secondary: #4a4a4a;--accent-primary: #4a9eff;--accent-primary-hover: #5aadff;--accent-primary-active: #3a8eef;--accent-secondary: #9c7cff;--error-bg: #3a1a1a;--error-text: #ff6b6b;--error-border: #5a2a2a;--success-bg: #1a3a1a;--success-text: #6bcf6b;--success-border: #2a5a2a;--overlay-bg: rgba(0, 0, 0, .85);--overlay-backdrop: rgba(0, 0, 0, .98);--shadow-sm: 0 2px 8px rgba(0, 0, 0, .3);--shadow-md: 0 10px 30px rgba(0, 0, 0, .4);--shadow-lg: 0 20px 60px rgba(0, 0, 0, .5);--code-bg: #1e1e1e;--code-text: #d4d4d4;--code-line-number: #858585;--code-line-border: #3a3a3a;--code-selection: rgba(38, 79, 120, .6);--syntax-comment: #6a9955;--syntax-keyword: #569cd6;--syntax-string: #ce9178;--syntax-number: #b5cea8;--syntax-operator: #d4d4d4;--syntax-function: #dcdcaa;--syntax-class: #4ec9b0;--syntax-punctuation: #d4d4d4;--tab-bg: #2a2a2a;--tab-text: #a0a0a0;--tab-text-hover: #d0d0d0;--tab-text-active: #ffffff;--tab-border-active: #4a9eff;--button-bg: transparent;--button-border: #4a4a4a;--button-text: #a0a0a0;--button-bg-hover: #3a3a3a;--button-border-hover: #5a5a5a;--button-text-hover: #e0e0e0;--recompile-bg: #3a3a3a;--recompile-text: #e0e0e0;--recompile-bg-hover: #4a4a4a;--recompile-bg-active: #5a5a5a;--image-viewer-bg: #2a2a2a;--pane-radius: 8px;--pane-shadow: var(--shadow-lg), var(--shadow-sm)}}.unstyled{--pane-radius: 0 !important;--pane-shadow: none !important}:root{--glass-bg: rgba(30, 30, 35, .65);--glass-bg-hover: rgba(30, 30, 35, .8);--glass-border: 1px solid rgba(255, 255, 255, .1);--glass-shadow: 0 4px 16px rgba(0, 0, 0, .25), 0 2px 4px rgba(0, 0, 0, .15), inset 0 1px 0 rgba(255, 255, 255, .1);--glass-shadow-sm: 0 2px 8px rgba(0, 0, 0, .25), inset 0 1px 0 rgba(255, 255, 255, .08);--glass-blur: blur(20px);--glass-radius: 6px;--glass-radius-sm: 6px;--glass-text: rgba(255, 255, 255, .9);--glass-text-muted: rgba(255, 255, 255, .6)}.stats-container{position:absolute;bottom:12px;left:12px;z-index:1000;display:flex;flex-direction:column;align-items:flex-start;gap:6px}.fps-counter{padding:6px 10px;background:var(--glass-bg);color:var(--glass-text);font-family:Monaco,Menlo,Courier New,monospace;font-size:11px;font-weight:500;border-radius:var(--glass-radius-sm);border:var(--glass-border);cursor:pointer;-webkit-user-select:none;user-select:none;backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow-sm);transition:all .2s ease}.fps-counter:hover{background:var(--glass-bg-hover)}.stats-grid{display:flex;flex-direction:row;gap:6px;opacity:0;visibility:hidden;transform:translateY(8px);transition:opacity .2s ease,transform .2s ease,visibility .2s;pointer-events:none}.stats-grid.open{opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto}.stat-item{padding:6px 10px;background:var(--glass-bg);border-radius:var(--glass-radius-sm);border:var(--glass-border);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow-sm);display:flex;flex-direction:column;align-items:center;gap:2px;min-width:48px}.stat-value{color:var(--glass-text);font-family:Monaco,Menlo,Courier New,monospace;font-size:11px;font-weight:600;white-space:nowrap}.stat-label{color:var(--glass-text-muted);font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.5px}.playback-controls{position:absolute;bottom:12px;right:12px;z-index:1000}.controls-menu-button{padding:6px 8px;background:var(--glass-bg);color:var(--glass-text);border:var(--glass-border);border-radius:var(--glass-radius-sm);cursor:pointer;backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow-sm);transition:all .2s ease;display:flex;align-items:center;justify-content:center;width:44px;height:44px;font-size:20px;font-weight:300;line-height:1}.controls-menu-button:hover{background:var(--glass-bg-hover);transform:scale(1.05)}.controls-menu-button:active{transform:scale(.95)}.controls-grid{position:absolute;bottom:0;right:0;display:grid;grid-template-columns:44px 44px 44px 44px;grid-template-rows:44px 44px;gap:6px;opacity:0;visibility:hidden;transform:scale(.8);transform-origin:bottom right;transition:opacity .2s ease,transform .2s ease,visibility .2s;pointer-events:none}.controls-grid.open{opacity:1;visibility:visible;transform:scale(1);pointer-events:auto}.control-button{padding:6px 8px;background:var(--glass-bg);color:var(--glass-text);border:var(--glass-border);border-radius:var(--glass-radius-sm);cursor:pointer;backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow-sm);transition:all .2s ease;display:flex;align-items:center;justify-content:center;width:44px;height:44px}.control-button:hover{background:var(--glass-bg-hover);transform:scale(1.05)}.control-button:active{transform:scale(.95)}.control-button svg{width:16px;height:16px;fill:currentColor}.playback-controls .controls-menu-button{position:relative;z-index:1}.playback-controls.open>.controls-menu-button{opacity:0;pointer-events:none}.shader-error-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:#000000f2;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:2000;padding:60px;overflow-y:auto}.error-overlay-content{background:#1a1a1a;border-radius:6px;max-width:900px;width:100%;display:flex;flex-direction:column;box-shadow:0 20px 60px #000c,0 0 1px #ffffff1a;border:1px solid #2a2a2a;max-height:calc(100vh - 120px)}.error-header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;background:linear-gradient(135deg,#c62828,#b71c1c);color:#fff;border-radius:6px 6px 0 0;border-bottom:1px solid rgba(0,0,0,.3);box-shadow:0 2px 8px #0003}.error-title{font-size:15px;font-weight:600;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;display:flex;align-items:center;gap:8px;letter-spacing:-.01em}.error-close{background:transparent;border:none;color:#ffffffe6;font-size:24px;line-height:1;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all .2s ease;opacity:.8}.error-close:hover{background:#ffffff26;opacity:1;transform:scale(1.05)}.error-body{padding:24px;overflow-y:auto;flex:1}.error-section{margin-bottom:24px}.error-section:last-child{margin-bottom:0}.error-pass-name{font-size:13px;font-weight:600;color:#ffa726;font-family:Monaco,Menlo,Courier New,monospace;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #2a2a2a;letter-spacing:.02em}.error-content{margin:0;padding:14px 16px;background:#0f0f0f;border-radius:4px;color:#ff6b6b;font-size:13px;font-family:Monaco,Menlo,Courier New,monospace;line-height:1.6;overflow-x:auto;border:1px solid #2a2a2a;white-space:pre-wrap;word-break:break-word}.error-code-context{margin:12px 0 0;padding:14px 16px;background:#0d0d0d;border-radius:4px;color:#b0b0b0;font-size:12px;font-family:Monaco,Menlo,Courier New,monospace;line-height:1.6;overflow-x:auto;border:1px solid #2a2a2a;white-space:pre}.error-code-context .context-line{color:#666;display:block}.error-code-context .error-line-highlight{color:#fff;background:#c6282840;display:block;font-weight:600;border-left:3px solid #c62828;margin-left:-16px;padding-left:13px}.context-lost-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:#000000e6;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:3000}.context-lost-content{text-align:center;color:#fff;padding:40px}.context-lost-icon{margin-bottom:16px;opacity:.8}.context-lost-spinner{width:48px;height:48px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;margin:0 auto 16px;animation:context-lost-spin 1s linear infinite}@keyframes context-lost-spin{to{transform:rotate(360deg)}}.context-lost-title{font-size:18px;font-weight:600;margin-bottom:8px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}.context-lost-message{font-size:14px;opacity:.7;margin-bottom:20px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}.context-lost-reload{background:#fff;color:#000;border:none;padding:10px 24px;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;transition:transform .2s,box-shadow .2s;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}.context-lost-reload:hover{transform:scale(1.02);box-shadow:0 4px 12px #fff3}.context-lost-reload:active{transform:scale(.98)}.recording-indicator{position:absolute;top:12px;right:12px;z-index:1000;display:flex;align-items:center;gap:6px;padding:6px 10px;background:#dc2626d9;border-radius:var(--glass-radius-sm);border:1px solid rgba(255,100,100,.3);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow-sm)}.recording-dot{width:8px;height:8px;background:#fff;border-radius:50%;animation:recording-pulse 1s ease-in-out infinite}@keyframes recording-pulse{0%,to{opacity:1}50%{opacity:.4}}.recording-text{color:#fff;font-family:Monaco,Menlo,Courier New,monospace;font-size:11px;font-weight:600;letter-spacing:.5px}.control-button.recording{background:#dc2626b3;border-color:#ff64644d}.control-button.recording:hover{background:#dc2626d9}.control-button.recording svg{fill:#fff}.media-permission-banner{position:absolute;bottom:48px;left:50%;transform:translate(-50%);background:var(--glass-bg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:var(--glass-border);box-shadow:var(--glass-shadow);color:#ffffffe6;padding:8px 16px;border-radius:6px;font-size:13px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;display:flex;align-items:center;gap:12px;z-index:100;white-space:nowrap}.media-banner-button{background:#4a9effcc;color:#fff;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:13px;font-family:inherit}.media-banner-button:hover{background:#4a9eff}.script-error-overlay{position:absolute;bottom:48px;left:12px;right:12px;z-index:1500;pointer-events:auto}.script-error-content{background:#1a1a1a;border-radius:6px;box-shadow:0 8px 32px #0009,0 0 1px #ffffff1a;border:1px solid #2a2a2a;overflow:hidden}.script-error-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:linear-gradient(135deg,#e65100,#bf360c);color:#fff;border-bottom:1px solid rgba(0,0,0,.3)}.script-error-header.disabled{background:linear-gradient(135deg,#6d4c41,#4e342e)}.script-error-header.warning{background:linear-gradient(135deg,#f9a825,#f57f17);color:#1a1a1a}.script-error-header.warning .script-error-close{color:#000000b3}.script-error-header.warning .script-error-close:hover{background:#00000026;color:#000000e6}.script-error-title{font-size:13px;font-weight:600;font-family:Monaco,Menlo,Courier New,monospace;display:flex;align-items:center;gap:6px}.script-error-close{background:transparent;border:none;color:#ffffffe6;font-size:20px;line-height:1;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:4px;opacity:.8;transition:all .2s ease}.script-error-close:hover{background:#ffffff26;opacity:1}.script-error-message{margin:0;padding:10px 14px;color:#ffab91;font-size:12px;font-family:Monaco,Menlo,Courier New,monospace;line-height:1.5;white-space:pre-wrap;word-break:break-word;max-height:80px;overflow-y:auto}.script-error-stack{margin:0;padding:6px 14px 10px;color:#888;font-size:11px;font-family:Monaco,Menlo,Courier New,monospace;line-height:1.4;white-space:pre-wrap;word-break:break-word;max-height:60px;overflow-y:auto;border-top:1px solid #2a2a2a}.script-overlay{position:absolute;z-index:500;padding:6px 10px;background:var(--glass-bg);color:var(--glass-text);font-family:Monaco,Menlo,Courier New,monospace;font-size:11px;border-radius:var(--glass-radius-sm);border:var(--glass-border);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow-sm);pointer-events:none;white-space:pre;max-width:calc(100% - 24px);overflow:hidden;text-overflow:ellipsis}.script-overlay.hidden{display:none}.script-overlay.top-left{top:12px;left:12px}.script-overlay.top-right{top:12px;right:12px}.script-overlay.bottom-left{bottom:12px;left:12px}.script-overlay.bottom-right{bottom:12px;right:12px}@media (prefers-reduced-motion: reduce){*,*:before,*:after{transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}@media (max-width: 428px){.stats-container{bottom:8px;left:8px}.playback-controls{bottom:8px;right:8px}.script-error-overlay{left:8px;right:8px;bottom:40px}.script-overlay.top-left{top:8px;left:8px}.script-overlay.top-right{top:8px;right:8px}.script-overlay.bottom-left{bottom:8px;left:8px}.script-overlay.bottom-right{bottom:8px;right:8px}}.uniforms-panel-wrapper{position:absolute;top:16px;right:16px;z-index:100;display:flex;flex-direction:column;align-items:flex-end}.uniforms-toggle-button{width:44px;height:44px;padding:6px;background:var(--glass-bg);border:var(--glass-border);border-radius:var(--glass-radius-sm);color:var(--glass-text);cursor:pointer;backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow-sm);transition:all .2s ease,opacity .15s ease;display:flex;align-items:center;justify-content:center}.uniforms-toggle-button:hover{background:var(--glass-bg-hover);transform:scale(1.05)}.uniforms-toggle-button:active{transform:scale(.95)}.uniforms-toggle-button svg{width:16px;height:16px}.uniforms-toggle-button.hidden{opacity:0;transform:scale(.8);pointer-events:none;position:absolute}.uniforms-panel{width:175px;max-height:calc(100vh - 100px);background:var(--glass-bg);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-radius:var(--glass-radius);border:var(--glass-border);box-shadow:var(--glass-shadow);overflow:hidden;display:flex;flex-direction:column;transform-origin:top right;transition:opacity .2s ease,transform .2s ease,max-height .2s ease}.uniforms-panel.closed{opacity:0;transform:scale(.25) translate(0);transform-origin:top right;pointer-events:none;max-height:0;padding:0}.uniforms-panel-header{padding:10px 14px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--glass-text-muted);background:#ffffff08;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;display:flex;justify-content:space-between;align-items:center}.uniforms-panel-close{background:transparent;border:none;color:var(--glass-text-muted);font-size:18px;line-height:1;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all .15s ease}.uniforms-panel-close:hover{background:#ffffff1a;color:var(--glass-text)}.uniforms-panel-content{flex:1;overflow-y:auto;overflow-x:hidden}.uniforms-panel .uniform-controls{padding:12px;gap:12px;background:transparent}.uniforms-panel .uniform-controls-header{display:none}.uniforms-panel .uniform-controls-list{gap:14px}.uniforms-panel .uniform-control{gap:6px}.uniforms-panel .uniform-control-label{font-size:11px;color:var(--glass-text)}.uniforms-panel .uniform-control-value{font-size:10px;padding:1px 4px;min-width:40px;color:var(--glass-text-muted);background:#0003;border-radius:3px}.uniforms-panel .uniform-control-slider{height:4px;background:#ffffff26}.uniforms-panel .uniform-control-slider::-webkit-slider-runnable-track{height:4px;background:#ffffff26}.uniforms-panel .uniform-control-slider::-webkit-slider-thumb{width:12px;height:12px;margin-top:-4px;background:#ffffffe6;box-shadow:0 1px 4px #0000004d}.uniforms-panel .uniform-control-slider::-moz-range-track{height:4px;background:#ffffff26}.uniforms-panel .uniform-control-slider::-moz-range-thumb{width:12px;height:12px;background:#ffffffe6;box-shadow:0 1px 4px #0000004d}.uniforms-panel .uniform-control-toggle{width:34px;height:18px}.uniforms-panel .uniform-control-toggle-slider{border-radius:18px}.uniforms-panel .uniform-control-toggle-slider:before{width:12px;height:12px;left:3px;bottom:3px}.uniforms-panel .uniform-control-toggle input:checked+.uniform-control-toggle-slider:before{transform:translate(16px)}.uniforms-panel .uniform-control-xy-pad{height:100px}.uniforms-panel .uniform-control-xy-handle{width:12px;height:12px}.uniforms-panel .uniform-control-color-swatch{height:28px}.uniforms-panel .uniform-control-vec-slider-row{gap:6px}.uniforms-panel .uniform-control-vec-component{font-size:9px;width:12px;color:var(--glass-text-muted)}.uniforms-panel .uniform-control-vec-value{font-size:9px;min-width:32px;color:var(--glass-text-muted);background:#0003;border-radius:3px}.uniforms-panel .uniform-control-xy-pad{background:#00000040;border:1px solid rgba(255,255,255,.1)}.uniforms-panel .uniform-control-xy-handle{background:#ffffffe6;box-shadow:0 1px 4px #0006}.uniforms-panel-content::-webkit-scrollbar{width:6px}.uniforms-panel-content::-webkit-scrollbar-track{background:transparent}.uniforms-panel-content::-webkit-scrollbar-thumb{background:#fff3;border-radius:3px}.uniforms-panel-content::-webkit-scrollbar-thumb:hover{background:#ffffff59}.uniform-controls{display:flex;flex-direction:column;gap:16px;padding:16px;height:100%;overflow-y:auto;background:var(--bg-secondary)}.uniform-controls-empty{color:var(--text-muted);font-size:13px;text-align:center;padding:20px}.uniform-controls-header{display:flex;justify-content:flex-end;padding-bottom:8px;border-bottom:1px solid var(--border-primary);margin-bottom:8px}.uniform-controls-reset{font-family:inherit;font-size:11px;padding:4px 10px;background:var(--bg-tertiary);color:var(--text-secondary);border:1px solid var(--border-primary);border-radius:4px;cursor:pointer;transition:background .15s ease,color .15s ease}.uniform-controls-reset:hover{background:var(--border-primary);color:var(--text-primary)}.uniform-controls-reset:active{transform:translateY(1px)}.uniform-controls-list{display:flex;flex-direction:column;gap:16px}.uniform-control{display:flex;flex-direction:column;gap:8px}.uniform-control-label-row{display:flex;justify-content:space-between;align-items:center}.uniform-control-label{font-family:Monaco,Menlo,Courier New,monospace;font-size:12px;font-weight:500;color:var(--text-primary)}.uniform-control-value{font-family:Monaco,Menlo,Courier New,monospace;font-size:11px;color:var(--text-muted);background:var(--bg-tertiary);padding:2px 6px;border-radius:3px;min-width:50px;text-align:right}.uniform-control-slider{-webkit-appearance:none;-moz-appearance:none;appearance:none;width:100%;height:6px;background:var(--border-primary);border-radius:3px;outline:none;cursor:pointer}.uniform-control-slider::-webkit-slider-runnable-track{height:6px;background:var(--border-primary);border-radius:3px}.uniform-control-slider::-webkit-slider-thumb{-webkit-appearance:none;-moz-appearance:none;appearance:none;width:14px;height:14px;background:var(--accent-primary);border-radius:50%;cursor:pointer;margin-top:-4px;transition:transform .15s ease,box-shadow .15s ease}.uniform-control-slider::-webkit-slider-thumb:hover{transform:scale(1.1);box-shadow:0 2px 6px #0003}.uniform-control-slider::-webkit-slider-thumb:active{transform:scale(.95)}.uniform-control-slider::-moz-range-track{height:6px;background:var(--border-primary);border-radius:3px}.uniform-control-slider::-moz-range-thumb{width:14px;height:14px;background:var(--accent-primary);border:none;border-radius:50%;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease}.uniform-control-slider::-moz-range-thumb:hover{transform:scale(1.1);box-shadow:0 2px 6px #0003}.uniform-control-slider::-moz-range-thumb:active{transform:scale(.95)}.uniform-control-slider:focus{outline:none}.uniform-control-slider:focus::-webkit-slider-thumb{box-shadow:0 0 0 3px var(--code-selection)}.uniform-control-slider:focus::-moz-range-thumb{box-shadow:0 0 0 3px var(--code-selection)}.uniform-control-toggle{position:relative;display:inline-block;width:40px;height:22px;cursor:pointer}.uniform-control-toggle input{opacity:0;width:0;height:0}.uniform-control-toggle-slider{position:absolute;top:0;left:0;right:0;bottom:0;background:var(--border-primary);border-radius:22px;transition:background .2s ease}.uniform-control-toggle-slider:before{content:"";position:absolute;width:16px;height:16px;left:3px;bottom:3px;background:var(--text-muted);border-radius:50%;transition:transform .2s ease,background .2s ease}.uniform-control-toggle input:checked+.uniform-control-toggle-slider{background:var(--accent-primary)}.uniform-control-toggle input:checked+.uniform-control-toggle-slider:before{transform:translate(18px);background:#fff}.uniform-control-toggle input:focus+.uniform-control-toggle-slider{box-shadow:0 0 0 2px var(--code-selection)}.uniform-control-xy-pad{position:relative;width:100%;height:120px;background:var(--bg-tertiary);border:1px solid var(--border-primary);border-radius:4px;cursor:crosshair;overflow:hidden}.uniform-control-xy-pad:before,.uniform-control-xy-pad:after{content:"";position:absolute;background:var(--border-primary);opacity:.5}.uniform-control-xy-pad:before{left:50%;top:0;bottom:0;width:1px}.uniform-control-xy-pad:after{top:50%;left:0;right:0;height:1px}.uniform-control-xy-handle{position:absolute;width:14px;height:14px;background:var(--accent-primary);border:2px solid white;border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 2px 4px #0000004d;pointer-events:none;z-index:1}.uniform-control-color-wrapper{display:flex;align-items:center;gap:8px}.uniform-control-color-swatch{width:100%;height:32px;border-radius:4px;border:1px solid var(--border-primary);cursor:pointer;transition:box-shadow .15s ease}.uniform-control-color-swatch:hover{box-shadow:0 0 0 2px var(--accent-primary)}.uniform-control-color-input{position:absolute;width:0;height:0;opacity:0;pointer-events:none}.uniform-control-vec3{gap:6px}.uniform-control-vec-slider-row{display:flex;align-items:center;gap:8px}.uniform-control-vec-component{font-family:Monaco,Menlo,Courier New,monospace;font-size:10px;font-weight:600;color:var(--text-muted);width:14px;text-align:center}.uniform-control-vec-slider{flex:1}.uniform-control-vec-value{min-width:40px;font-size:10px}.render-dialog-backdrop{position:absolute;top:0;left:0;right:0;bottom:0;background:#000000b3;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:4000}.render-dialog{background:#1a1a1f;border:1px solid rgba(255,255,255,.1);border-radius:10px;box-shadow:0 20px 60px #0009;width:360px;max-width:calc(100% - 32px);overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;color:#e0e0e0}.render-dialog-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:linear-gradient(135deg,#1565c0,#0d47a1);color:#fff;border-bottom:1px solid rgba(0,0,0,.3)}.render-dialog-title{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}.render-dialog-close{background:transparent;border:none;color:#fffc;font-size:20px;line-height:1;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all .15s ease}.render-dialog-close:hover{background:#ffffff26;color:#fff}.render-dialog-body{padding:18px;display:flex;flex-direction:column;gap:14px}.render-field{display:flex;flex-direction:column;gap:5px}.render-field-label{font-size:12px;font-weight:500;color:#fff9;text-transform:uppercase;letter-spacing:.5px}.render-field-row{display:flex;gap:8px;align-items:center}.render-field-row span{color:#fff6;font-size:13px}.render-input{flex:1;background:#0f0f14;border:1px solid rgba(255,255,255,.1);border-radius:5px;color:#e0e0e0;font-family:Monaco,Menlo,monospace;font-size:13px;padding:7px 10px;outline:none;transition:border-color .15s}.render-input:focus{border-color:#648cff80}.render-input[type=number]{-moz-appearance:textfield}.render-input[type=number]::-webkit-inner-spin-button,.render-input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}.render-format-group{display:flex;gap:8px}.render-format-option{flex:1;position:relative}.render-format-option input[type=radio]{position:absolute;opacity:0;pointer-events:none}.render-format-option label{display:block;text-align:center;padding:8px 12px;background:#0f0f14;border:1px solid rgba(255,255,255,.1);border-radius:5px;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s}.render-format-option input[type=radio]:checked+label{background:#648cff26;border-color:#648cff80;color:#8ab4ff}.render-format-option label:hover{border-color:#fff3}.render-estimate{font-size:11px;color:#fff6;font-family:Monaco,Menlo,monospace;text-align:center;padding:4px 0}.render-dialog-actions{display:flex;gap:8px;padding:0 18px 18px}.render-btn{flex:1;padding:9px 16px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s;font-family:inherit}.render-btn-primary{background:linear-gradient(135deg,#1565c0,#0d47a1);color:#fff}.render-btn-primary:hover{filter:brightness(1.1)}.render-btn-primary:disabled{opacity:.5;cursor:not-allowed;filter:none}.render-btn-cancel{background:#ffffff14;color:#ffffffb3;border:1px solid rgba(255,255,255,.1)}.render-btn-cancel:hover{background:#ffffff1f}.render-progress{display:none;flex-direction:column;gap:8px;padding:18px}.render-progress.active{display:flex}.render-progress-bar-bg{height:6px;background:#0f0f14;border-radius:3px;overflow:hidden}.render-progress-bar{height:100%;background:linear-gradient(90deg,#1565c0,#42a5f5);border-radius:3px;width:0%;transition:width .1s ease}.render-progress-text{font-size:12px;color:#ffffff80;font-family:Monaco,Menlo,monospace;text-align:center}.multi-view-controls-wrapper{position:absolute;top:16px;right:16px;z-index:100;display:flex;flex-direction:column;align-items:flex-end}.multi-view-controls-toggle{width:44px;height:44px;padding:6px;background:var(--glass-bg);border:var(--glass-border);border-radius:var(--glass-radius-sm);color:var(--glass-text);cursor:pointer;backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow-sm);transition:all .2s ease,opacity .15s ease;display:flex;align-items:center;justify-content:center}.multi-view-controls-toggle:hover{background:var(--glass-bg-hover);transform:scale(1.05)}.multi-view-controls-toggle:active{transform:scale(.95)}.multi-view-controls-toggle svg{width:16px;height:16px}.multi-view-controls-toggle.hidden{opacity:0;transform:scale(.8);pointer-events:none;position:absolute}.multi-view-controls-panel{width:175px;max-height:calc(100vh - 100px);background:var(--glass-bg);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-radius:var(--glass-radius);border:var(--glass-border);box-shadow:var(--glass-shadow);overflow:hidden;display:flex;flex-direction:column;transform-origin:top right;transition:opacity .2s ease,transform .2s ease,max-height .2s ease}.multi-view-controls-panel.closed{opacity:0;transform:scale(.25) translate(0);transform-origin:top right;pointer-events:none;max-height:0;padding:0}.multi-view-controls-header{padding:10px 14px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--glass-text-muted);background:#ffffff08;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;display:flex;justify-content:space-between;align-items:center}.multi-view-controls-close{background:transparent;border:none;color:var(--glass-text-muted);font-size:18px;line-height:1;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all .15s ease}.multi-view-controls-close:hover{background:#ffffff1a;color:var(--glass-text)}.controls-section{display:flex;flex-direction:column;gap:8px;padding:12px}.controls-section+.controls-section{padding-top:0}.section-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--glass-text-muted);padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:4px}.playback-controls{flex-direction:row;gap:8px;padding:12px}.control-btn{width:44px;height:44px;border:none;border-radius:var(--glass-radius-sm);background:#ffffff1a;color:var(--glass-text);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s ease}.control-btn:hover{background:#fff3}.control-btn:active{transform:scale(.95)}.control-btn svg{width:16px;height:16px}.uniforms-section{border-top:1px solid rgba(255,255,255,.06)}.uniforms-container{display:flex;flex-direction:column;gap:8px}.multi-view-controls-panel .uniform-controls{padding:0;gap:12px;background:transparent}.multi-view-controls-panel .uniform-controls-header{display:none}.multi-view-controls-panel .uniform-controls-list{gap:14px}.multi-view-controls-panel .uniform-control{gap:6px}.multi-view-controls-panel .uniform-control-label{font-size:11px;color:var(--glass-text)}.multi-view-controls-panel .uniform-control-value{font-size:10px;padding:1px 4px;min-width:40px;color:var(--glass-text-muted);background:#0003;border-radius:3px}.multi-view-controls-panel .uniform-control-slider{height:4px;background:#ffffff26}.multi-view-controls-panel .uniform-control-slider::-webkit-slider-runnable-track{height:4px;background:#ffffff26}.multi-view-controls-panel .uniform-control-slider::-webkit-slider-thumb{width:12px;height:12px;margin-top:-4px;background:#ffffffe6;box-shadow:0 1px 4px #0000004d}.multi-view-controls-panel .uniform-control-slider::-moz-range-track{height:4px;background:#ffffff26}.multi-view-controls-panel .uniform-control-slider::-moz-range-thumb{width:12px;height:12px;background:#ffffffe6;box-shadow:0 1px 4px #0000004d}.multi-view-controls-panel .uniform-control-toggle{width:34px;height:18px}.multi-view-controls-panel .uniform-control-toggle-slider{border-radius:18px}.multi-view-controls-panel .uniform-control-toggle-slider:before{width:12px;height:12px;left:3px;bottom:3px}.multi-view-controls-panel .uniform-control-toggle input:checked+.uniform-control-toggle-slider:before{transform:translate(16px)}.layout-fullscreen{width:100%;height:100%}.layout-fullscreen .canvas-container{position:relative;width:100%;height:100%;background:#000}.layout-default{width:100%;height:100%}.layout-default .canvas-container{position:relative;width:100%;height:100%;background:var(--bg-canvas);border-radius:var(--pane-radius);box-shadow:var(--pane-shadow);overflow:hidden}.layout-split{width:100%;height:100%;display:flex;gap:24px}.layout-split .canvas-container{position:relative;flex:1;background:var(--bg-canvas);border-radius:var(--pane-radius);box-shadow:var(--pane-shadow);overflow:hidden}.layout-split .code-panel{position:relative;flex:1;display:flex;flex-direction:column;background:var(--bg-secondary);border-radius:var(--pane-radius);box-shadow:var(--pane-shadow);overflow:hidden}.tab-bar{display:flex;background:var(--tab-bg);border-bottom:1px solid var(--border-primary);padding:8px 8px 0;gap:4px}.tab-button{padding:8px 16px;background:transparent;border:none;border-radius:6px 6px 0 0;font-size:13px;font-family:Monaco,Menlo,Courier New,monospace;cursor:pointer;transition:background .2s,color .2s;color:var(--tab-text)}.tab-button:hover{background:var(--button-bg-hover);color:var(--tab-text-hover)}.tab-button.active{background:var(--bg-secondary);color:var(--tab-text-active);font-weight:500}.copy-button{position:absolute;top:12px;right:12px;padding:6px;background:var(--button-bg);border:none;border-radius:4px;color:var(--button-text);cursor:pointer;transition:all .2s;z-index:10;display:flex;align-items:center;justify-content:center}.copy-button:hover{background:var(--button-bg-hover);color:var(--button-text-hover)}.copy-button:active{transform:scale(.9)}.copy-button.copied{color:var(--success-text)}.code-viewer{flex:1;min-height:0;overflow:auto;position:relative;background:var(--code-bg)}.code-viewer pre{margin:0;padding:16px;font-size:13px;line-height:1.5;font-family:Monaco,Menlo,Courier New,monospace;background:var(--code-bg);color:var(--code-text)}.code-viewer code{font-family:inherit;font-size:inherit}.token.comment{color:var(--syntax-comment)}.token.keyword{color:var(--syntax-keyword)}.token.string{color:var(--syntax-string)}.token.number{color:var(--syntax-number)}.token.operator{color:var(--syntax-operator)}.token.function{color:var(--syntax-function)}.token.class-name{color:var(--syntax-class)}.token.punctuation{color:var(--syntax-punctuation)}.tab-button.image-tab,.tab-button.image-tab.active{color:var(--accent-secondary)}.image-viewer{display:flex;align-items:center;justify-content:center;height:100%;padding:16px;background:var(--image-viewer-bg)}.image-viewer img{max-width:100%;max-height:100%;object-fit:contain;border-radius:4px;box-shadow:var(--shadow-sm)}@media (max-width: 800px){.layout-split{flex-direction:column}}.layout-tabbed{width:100%;height:100%;display:flex;flex-direction:column;box-sizing:border-box}.tabbed-wrapper{display:flex;flex-direction:column;width:100%;height:100%;border-radius:var(--pane-radius);box-shadow:var(--pane-shadow);overflow:hidden}.tabbed-toolbar{display:flex;align-items:center;flex-shrink:0;background:var(--tab-bg);border-bottom:1px solid var(--border-primary);padding-right:8px}.tabbed-tab-bar{display:flex;flex:1;gap:4px;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin}.tabbed-tab-bar::-webkit-scrollbar{height:4px}.tabbed-tab-bar::-webkit-scrollbar-thumb{background:var(--border-secondary);border-radius:2px}.tabbed-tab-button{padding:10px 16px;background:transparent;border:none;border-bottom:2px solid transparent;font-size:12px;font-family:Monaco,Menlo,Courier New,monospace;cursor:pointer;transition:color .15s,border-color .15s;color:var(--tab-text);white-space:nowrap;flex-shrink:0}.tabbed-tab-button:hover{color:var(--tab-text-hover)}.tabbed-tab-button.active{color:var(--tab-text-active);border-bottom-color:var(--tab-border-active)}.tabbed-tab-button.shader-tab{font-family:system-ui,-apple-system,sans-serif}.tabbed-tab-button.image-tab{color:var(--accent-secondary)}.tabbed-tab-button.image-tab.active{color:var(--accent-secondary);border-bottom-color:var(--accent-secondary)}.tabbed-tab-button.uniforms-tab{color:var(--accent-tertiary, var(--accent-primary));padding:8px 12px}.tabbed-tab-button.uniforms-tab.active{color:var(--accent-tertiary, var(--accent-primary));border-bottom-color:var(--accent-tertiary, var(--accent-primary))}.tabbed-tab-button .uniforms-icon{width:18px;height:18px;display:block}.tabbed-content{flex:1;min-height:0;position:relative;background:var(--bg-canvas);overflow:hidden}.tabbed-canvas-container{position:absolute;top:0;left:0;width:100%;height:100%}.tabbed-code-viewer{position:absolute;top:0;left:0;width:100%;height:100%;overflow:auto;background:var(--code-bg)}.tabbed-code-viewer pre{margin:0;padding:16px 16px 16px 0;font-size:13px;line-height:1.6;font-family:Monaco,Menlo,Courier New,monospace;background:var(--code-bg);color:var(--code-text);display:flex}.tabbed-code-viewer code{font-family:inherit;font-size:inherit}.tabbed-line-numbers{text-align:right;padding-right:16px;margin-right:16px;border-right:1px solid var(--code-line-border);color:var(--code-line-number);-webkit-user-select:none;user-select:none;flex-shrink:0;padding-left:16px}.tabbed-code-content{flex:1;overflow-x:auto}.tabbed-image-viewer{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--image-viewer-bg);padding:20px;box-sizing:border-box}.tabbed-image-viewer img{max-width:100%;max-height:100%;object-fit:contain;border-radius:4px;box-shadow:var(--shadow-sm)}.tabbed-code-viewer .token.comment{color:var(--syntax-comment)}.tabbed-code-viewer .token.keyword{color:var(--syntax-keyword)}.tabbed-code-viewer .token.string{color:var(--syntax-string)}.tabbed-code-viewer .token.number{color:var(--syntax-number)}.tabbed-code-viewer .token.operator{color:var(--syntax-operator)}.tabbed-code-viewer .token.function{color:var(--syntax-function)}.tabbed-code-viewer .token.class-name{color:var(--syntax-class)}.tabbed-code-viewer .token.punctuation{color:var(--syntax-punctuation)}@media (max-width: 600px){.tabbed-tab-button{padding:8px 12px;font-size:12px}}.tabbed-editor-container{position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden;background:var(--code-bg)}.tabbed-button-container{display:flex;align-items:center;gap:6px;flex-shrink:0}.tabbed-copy-button{display:flex;align-items:center;justify-content:center;background:var(--button-bg);border:1px solid var(--button-border);color:var(--button-text);width:44px;height:44px;border-radius:4px;cursor:pointer;transition:background .15s,border-color .15s,color .15s}.tabbed-copy-button:hover{background:var(--button-bg-hover);border-color:var(--button-border-hover);color:var(--button-text-hover)}.tabbed-copy-button:active{background:var(--button-bg-hover)}.tabbed-copy-button.copied{background:var(--success-bg);border-color:var(--success-border);color:var(--success-text)}.tabbed-recompile-button{display:flex;align-items:center;gap:6px;background:var(--recompile-bg);border:none;color:var(--recompile-text);padding:6px 12px;border-radius:4px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;transition:background .15s,color .15s}.tabbed-recompile-button:hover{background:var(--recompile-bg-hover)}.tabbed-recompile-button:active{background:var(--recompile-bg-active)}.tabbed-recompile-button svg{flex-shrink:0}.tabbed-error-display{position:absolute;bottom:0;left:0;right:0;background:var(--error-bg);color:var(--error-text);padding:10px 14px;font-family:Monaco,Menlo,Courier New,monospace;font-size:12px;white-space:pre-wrap;overflow:auto;max-height:120px;border-top:1px solid var(--error-border);z-index:10}.tabbed-fallback-textarea{width:100%;height:100%;background:var(--code-bg);color:var(--code-text);border:none;padding:12px;font-family:Monaco,Menlo,Courier New,monospace;font-size:13px;resize:none;outline:none}.tabbed-uniforms-container{position:absolute;top:0;left:0;width:100%;height:100%;overflow-y:auto;background:#00000080;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:flex;justify-content:center;padding:20px;box-sizing:border-box}.tabbed-uniforms-container .uniform-controls{max-width:400px;width:100%;background:#1e1e23f2;border-radius:12px;padding:20px;box-shadow:0 4px 20px #0006;height:fit-content}.tabbed-uniforms-container .uniform-control-label{color:#e0e0e0}.tabbed-uniforms-container .uniform-control-value{color:#a0a0a0;background:#0000004d}.tabbed-uniforms-container .uniform-controls-header{color:#909090;border-bottom-color:#ffffff1a}.tabbed-uniforms-container .uniform-control-slider{background:#ffffff1a}.tabbed-uniforms-container .uniform-control-slider::-webkit-slider-thumb{background:#fff}.tabbed-uniforms-container .uniform-control-slider::-moz-range-thumb{background:#fff}.tabbed-uniforms-container .uniform-control-vec-component{color:#909090}.tabbed-uniforms-container .uniform-control-vec-value{color:#a0a0a0;background:#0000004d}.layout-multi-view{position:relative;width:100%;height:100%;box-sizing:border-box;background:var(--bg-primary)}.multi-view-canvas{position:relative;background:var(--bg-canvas);border-radius:var(--pane-radius);box-shadow:var(--pane-shadow);overflow:hidden}.multi-view-label{position:absolute;top:12px;left:12px;padding:4px 10px;background:#0009;color:#fff;font-family:var(--font-mono);font-size:12px;font-weight:500;border-radius:4px;text-transform:capitalize;z-index:5;pointer-events:none}.multi-view-info{position:absolute;bottom:12px;left:12px;padding:6px 10px;background:#0009;color:#fff;font-family:var(--font-mono);font-size:11px;border-radius:4px;z-index:5;pointer-events:none}.layout-grid-view{display:grid;gap:16px}.layout-grid-view .multi-view-canvas{min-height:0;min-width:0}.layout-grid-view[data-view-count="2"].grid-horizontal{grid-template-columns:1fr 1fr;grid-template-rows:1fr}.layout-grid-view[data-view-count="2"].grid-vertical{grid-template-columns:1fr;grid-template-rows:1fr 1fr}.layout-grid-view[data-view-count="3"].grid-horizontal{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}.layout-grid-view[data-view-count="3"].grid-horizontal .multi-view-canvas:last-child{grid-column:1 / -1}.layout-grid-view[data-view-count="3"].grid-vertical{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}.layout-grid-view[data-view-count="3"].grid-vertical .multi-view-canvas:first-child{grid-column:1 / -1}.layout-grid-view[data-view-count="4"]{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}.layout-inset-view .multi-view-canvas.inset-main{width:100%;height:100%}.layout-inset-view .multi-view-canvas.inset-overlay{position:absolute;bottom:40px;right:40px;width:25%;min-width:200px;aspect-ratio:16 / 9;z-index:10;transition:all .2s ease}.layout-inset-view .multi-view-canvas.inset-overlay.minimized{width:48px;height:48px;min-width:unset;aspect-ratio:unset;cursor:pointer;opacity:.8}.layout-inset-view .multi-view-canvas.inset-overlay.minimized:hover{opacity:1}.inset-minimize-btn{position:absolute;top:8px;right:8px;width:24px;height:24px;border:none;border-radius:4px;background:#00000080;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;z-index:11;transition:background .2s}.inset-minimize-btn:hover{background:#000000b3}.editor-toolbar{display:flex;align-items:center;background:var(--tab-bg);border-bottom:1px solid var(--border-primary);padding-right:8px}.editor-tab-bar{display:flex;flex:1;overflow-x:auto;scrollbar-width:thin}.editor-tab-button{background:transparent;border:none;color:var(--tab-text);padding:10px 16px;cursor:pointer;font-family:Monaco,Menlo,Courier New,monospace;font-size:12px;white-space:nowrap;border-bottom:2px solid transparent;transition:color .15s,border-color .15s}.editor-tab-button:hover{color:var(--tab-text-hover)}.editor-tab-button.active{color:var(--tab-text-active);border-bottom-color:var(--tab-border-active)}.editor-tab-button.image-tab{color:var(--accent-secondary)}.editor-tab-button.image-tab.active{color:var(--accent-secondary);border-bottom-color:var(--accent-secondary)}.editor-tab-button.uniforms-tab{color:var(--accent-tertiary, var(--accent-primary));padding:8px 12px}.editor-tab-button.uniforms-tab.active{color:var(--accent-tertiary, var(--accent-primary));border-bottom-color:var(--accent-tertiary, var(--accent-primary))}.editor-tab-button .uniforms-icon{width:18px;height:18px;display:block}.editor-copy-button{display:flex;align-items:center;justify-content:center;background:var(--button-bg);border:1px solid var(--button-border);color:var(--button-text);width:32px;height:32px;border-radius:4px;cursor:pointer;transition:background .15s,border-color .15s,color .15s;flex-shrink:0;margin-right:6px}.editor-copy-button:hover{background:var(--button-bg-hover);border-color:var(--button-border-hover);color:var(--button-text-hover)}.editor-copy-button:active{background:var(--button-bg-hover)}.editor-copy-button.copied{background:var(--success-bg);border-color:var(--success-border);color:var(--success-text)}.editor-copy-button svg{flex-shrink:0}.editor-recompile-button{display:flex;align-items:center;gap:6px;background:var(--recompile-bg);border:none;color:var(--recompile-text);padding:6px 12px;border-radius:4px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;transition:background .15s,color .15s;flex-shrink:0}.editor-recompile-button:hover{background:var(--recompile-bg-hover)}.editor-recompile-button:active{background:var(--recompile-bg-active)}.editor-recompile-button svg{flex-shrink:0}.editor-content-area{flex:1;overflow:hidden;position:relative;background:var(--code-bg)}.editor-prism-container{height:100%;width:100%}.editor-fallback-textarea{width:100%;height:100%;background:var(--code-bg);color:var(--code-text);border:none;padding:12px;font-family:Monaco,Menlo,Courier New,monospace;font-size:13px;resize:none;outline:none}.editor-image-viewer{display:flex;align-items:center;justify-content:center;height:100%;background:var(--image-viewer-bg);padding:20px}.editor-uniforms-container{height:100%;overflow-y:auto;background:var(--bg-secondary)}.editor-image-viewer img{max-width:100%;max-height:100%;object-fit:contain;border-radius:4px;box-shadow:var(--shadow-sm)}.editor-error-display{background:var(--error-bg);color:var(--error-text);padding:10px 14px;font-family:Monaco,Menlo,Courier New,monospace;font-size:12px;white-space:pre-wrap;overflow:auto;max-height:120px;border-top:1px solid var(--error-border)}.prism-editor-wrapper{display:flex;height:100%;background:var(--code-bg);font-family:Monaco,Menlo,Courier New,monospace;font-size:13px;line-height:1.6}.prism-editor-line-numbers{flex-shrink:0;padding:16px 12px 16px 16px;text-align:right;color:var(--code-line-number);border-right:1px solid var(--code-line-border);-webkit-user-select:none;user-select:none;overflow:hidden}.prism-editor-line-numbers span{display:block}.prism-editor-area{flex:1;position:relative;overflow:hidden}.prism-editor-textarea,.prism-editor-highlight{position:absolute;top:0;left:0;width:100%;height:100%;padding:16px;margin:0;border:none;outline:none;font-family:inherit;font-size:inherit;line-height:inherit;white-space:pre-wrap;word-wrap:break-word;overflow:auto;box-sizing:border-box;tab-size:2;-moz-tab-size:2;letter-spacing:normal;word-spacing:normal}.prism-editor-textarea{background:transparent;color:transparent;caret-color:var(--code-text);resize:none;z-index:1;-webkit-text-fill-color:transparent}.prism-editor-textarea::selection{background:var(--code-selection)}.prism-editor-textarea::-moz-selection{background:var(--code-selection)}.prism-editor-highlight{background:var(--code-bg);color:var(--code-text);pointer-events:none;z-index:0}.prism-editor-highlight code{font-family:inherit;font-size:inherit;line-height:inherit;background:none;padding:0;margin:0;border:none;display:block;white-space:inherit;word-wrap:inherit;-moz-tab-size:2;tab-size:2}.prism-editor-highlight code[class*=language-],.prism-editor-highlight[class*=language-]{padding:0;margin:0;background:none;border:none;text-shadow:none}.prism-editor-highlight .token.comment{color:var(--syntax-comment)}.prism-editor-highlight .token.keyword{color:var(--syntax-keyword)}.prism-editor-highlight .token.string{color:var(--syntax-string)}.prism-editor-highlight .token.number{color:var(--syntax-number)}.prism-editor-highlight .token.operator{color:var(--syntax-operator)}.prism-editor-highlight .token.function{color:var(--syntax-function)}.prism-editor-highlight .token.class-name{color:var(--syntax-class)}.prism-editor-highlight .token.punctuation{color:var(--syntax-punctuation)}')),document.head.appendChild(o)}}catch(r){console.error("vite-plugin-css-injected-by-js",r)}})();
 var He = Object.defineProperty;
 var Ve = (i, e, t) => e in i ? He(i, e, { enumerable: !0, configurable: !0, writable: !0, value: t }) : i[e] = t;
 var l = (i, e, t) => Ve(i, typeof e != "symbol" ? e + "" : e, t);
@@ -27,9 +27,9 @@ function de(i, e, t) {
   if (!r)
     throw new Error("Failed to create program object");
   if (i.attachShader(r, n), i.attachShader(r, s), i.linkProgram(r), !i.getProgramParameter(r, i.LINK_STATUS)) {
-    const o = i.getProgramInfoLog(r);
+    const a = i.getProgramInfoLog(r);
     throw i.deleteProgram(r), i.deleteShader(n), i.deleteShader(s), new Error(`Program linking failed:
-${o}`);
+${a}`);
   }
   return i.detachShader(r, n), i.detachShader(r, s), i.deleteShader(n), i.deleteShader(s), r;
 }
@@ -142,12 +142,12 @@ function Ke(i) {
   ), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_MIN_FILTER, i.NEAREST), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_MAG_FILTER, i.NEAREST), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_WRAP_S, i.CLAMP_TO_EDGE), i.texParameteri(i.TEXTURE_2D, i.TEXTURE_WRAP_T, i.CLAMP_TO_EDGE), i.bindTexture(i.TEXTURE_2D, null), e;
 }
 function Ye(i, e, t, n) {
-  const a = new Float32Array(3072);
-  for (let o = 0; o < 256; o++) {
-    const c = t.get(o) || !1, u = n.get(o) || 0, d = (0 * 256 + o) * 4;
-    a[d + 0] = c ? 1 : 0, a[d + 1] = c ? 1 : 0, a[d + 2] = c ? 1 : 0, a[d + 3] = 1;
-    const h = (2 * 256 + o) * 4;
-    a[h + 0] = u, a[h + 1] = u, a[h + 2] = u, a[h + 3] = 1;
+  const o = new Float32Array(3072);
+  for (let a = 0; a < 256; a++) {
+    const c = t.get(a) || !1, u = n.get(a) || 0, d = (0 * 256 + a) * 4;
+    o[d + 0] = c ? 1 : 0, o[d + 1] = c ? 1 : 0, o[d + 2] = c ? 1 : 0, o[d + 3] = 1;
+    const h = (2 * 256 + a) * 4;
+    o[h + 0] = u, o[h + 1] = u, o[h + 2] = u, o[h + 3] = 1;
   }
   i.bindTexture(i.TEXTURE_2D, e), i.texSubImage2D(
     i.TEXTURE_2D,
@@ -159,7 +159,7 @@ function Ye(i, e, t, n) {
     3,
     i.RGBA,
     i.FLOAT,
-    a
+    o
   ), i.bindTexture(i.TEXTURE_2D, null);
 }
 function ze(i) {
@@ -235,21 +235,21 @@ function et(i, e, t, n) {
   const s = Ce[i], r = re[i];
   if (s === r)
     return t;
-  const a = r * e, o = n && n.length >= a ? n : new Float32Array(a);
+  const o = r * e, a = n && n.length >= o ? n : new Float32Array(o);
   if (i === "mat3")
     for (let c = 0; c < e; c++) {
       const u = c * 9, d = c * 12;
-      o[d + 0] = t[u + 0], o[d + 1] = t[u + 1], o[d + 2] = t[u + 2], o[d + 3] = 0, o[d + 4] = t[u + 3], o[d + 5] = t[u + 4], o[d + 6] = t[u + 5], o[d + 7] = 0, o[d + 8] = t[u + 6], o[d + 9] = t[u + 7], o[d + 10] = t[u + 8], o[d + 11] = 0;
+      a[d + 0] = t[u + 0], a[d + 1] = t[u + 1], a[d + 2] = t[u + 2], a[d + 3] = 0, a[d + 4] = t[u + 3], a[d + 5] = t[u + 4], a[d + 6] = t[u + 5], a[d + 7] = 0, a[d + 8] = t[u + 6], a[d + 9] = t[u + 7], a[d + 10] = t[u + 8], a[d + 11] = 0;
     }
   else
     for (let c = 0; c < e; c++) {
       const u = c * s, d = c * 4;
       for (let h = 0; h < s; h++)
-        o[d + h] = t[u + h];
+        a[d + h] = t[u + h];
       for (let h = s; h < 4; h++)
-        o[d + h] = 0;
+        a[d + h] = 0;
     }
-  return o;
+  return a;
 }
 const pe = `#version 300 es
 precision highp float;
@@ -396,15 +396,15 @@ out vec4 fragColor;
 void main() {
   mainImage(fragColor, gl_FragCoord.xy);
 }`);
-  const a = n.join(`
-`), o = a.split(`
+  const o = n.join(`
+`), a = o.split(`
 `);
   let c = 0, u = 0, d = 0;
-  for (let h = 0; h < o.length; h++)
-    o[h] === "// Common code" && (c = h + 2, u = t.commonSource ? t.commonSource.split(`
-`).length : 0), o[h] === "// User shader code" && (d = h + 2);
+  for (let h = 0; h < a.length; h++)
+    a[h] === "// Common code" && (c = h + 2, u = t.commonSource ? t.commonSource.split(`
+`).length : 0), a[h] === "// User shader code" && (d = h + 2);
   return {
-    source: a,
+    source: o,
     lineMapping: { commonStartLine: c, commonLines: u, userCodeStartLine: d }
   };
 }
@@ -415,7 +415,7 @@ function st(i, e) {
   }), t.size === 0)
     return i;
   const n = /texture\s*\(\s*(iChannel[0-3])\s*,\s*([^)]+)\)/g;
-  return i.replace(n, (s, r, a) => t.has(r) ? `texture(${r}, _st_dirToEquirect(${a}))` : s);
+  return i.replace(n, (s, r, o) => t.has(r) ? `texture(${r}, _st_dirToEquirect(${o}))` : s);
 }
 class rt {
   constructor(e, t) {
@@ -435,7 +435,7 @@ class rt {
       initialized: !1
     });
     for (const s of n)
-      s.kind === "webcam" ? this._videoTextures.find((a) => a.kind === "webcam") || this._videoTextures.push({
+      s.kind === "webcam" ? this._videoTextures.find((o) => o.kind === "webcam") || this._videoTextures.push({
         texture: me(e),
         video: null,
         stream: null,
@@ -443,7 +443,7 @@ class rt {
         height: 1,
         ready: !1,
         kind: "webcam"
-      }) : s.kind === "video" && (this._videoTextures.find((a) => a.kind === "video" && a.src === s.src) || this._videoTextures.push({
+      }) : s.kind === "video" && (this._videoTextures.find((o) => o.kind === "video" && o.src === s.src) || this._videoTextures.push({
         texture: me(e),
         video: null,
         stream: null,
@@ -530,9 +530,9 @@ class rt {
   // ===========================================================================
   dispose(e) {
     var t, n, s, r;
-    this._audioTexture && ((t = this._audioTexture.stream) == null || t.getTracks().forEach((a) => a.stop()), (n = this._audioTexture.audioContext) == null || n.close(), e.deleteTexture(this._audioTexture.texture));
-    for (const a of this._videoTextures)
-      (s = a.stream) == null || s.getTracks().forEach((o) => o.stop()), (r = a.video) == null || r.pause(), e.deleteTexture(a.texture);
+    this._audioTexture && ((t = this._audioTexture.stream) == null || t.getTracks().forEach((o) => o.stop()), (n = this._audioTexture.audioContext) == null || n.close(), e.deleteTexture(this._audioTexture.texture));
+    for (const o of this._videoTextures)
+      (s = o.stream) == null || s.getTracks().forEach((a) => a.stop()), (r = o.video) == null || r.pause(), e.deleteTexture(o.texture);
     this._audioTexture = null, this._videoTextures = [];
   }
   // ===========================================================================
@@ -545,7 +545,7 @@ class rt {
     return t;
   }
 }
-class at {
+class ot {
   constructor(e) {
     l(this, "definitions");
     l(this, "values", {});
@@ -653,13 +653,13 @@ class at {
     return this.size === 0;
   }
 }
-class ot {
+class at {
   constructor(e, t) {
     l(this, "_store");
     l(this, "_ubos", []);
     l(this, "_dirtyScalars", /* @__PURE__ */ new Set());
     l(this, "_uniforms");
-    this._uniforms = t, this._store = new at(t), this.initUBOs(e);
+    this._uniforms = t, this._store = new ot(t), this.initUBOs(e);
     for (const [n, s] of Object.entries(t))
       L(s) || this._dirtyScalars.add(n);
   }
@@ -718,20 +718,20 @@ class ot {
     if (this._store.set(e, t), L(n)) {
       const s = this._ubos.find((r) => r.name === e);
       if (s) {
-        const r = t, a = O(n.type, n.count), o = O(n.type, 1);
-        if (r.length > a) {
+        const r = t, o = O(n.type, n.count), a = O(n.type, 1);
+        if (r.length > o) {
           console.warn(
-            `setUniformValue('${e}'): Float32Array length ${r.length} exceeds max ${a} (${n.count} × ${n.type})`
+            `setUniformValue('${e}'): Float32Array length ${r.length} exceeds max ${o} (${n.count} × ${n.type})`
           );
           return;
         }
-        if (r.length % o !== 0) {
+        if (r.length % a !== 0) {
           console.warn(
-            `setUniformValue('${e}'): Float32Array length ${r.length} is not a multiple of ${o} (components per ${n.type})`
+            `setUniformValue('${e}'): Float32Array length ${r.length} is not a multiple of ${a} (components per ${n.type})`
           );
           return;
         }
-        const c = r.length / o, u = et(n.type, c, r, s.paddedData);
+        const c = r.length / a, u = et(n.type, c, r, s.paddedData);
         u !== s.paddedData && s.paddedData.set(u);
         const d = Qe(n.type, c), h = s.paddedData.length;
         d < h && s.paddedData.fill(0, d), s.activeCount = c, s.dirty = !0;
@@ -761,31 +761,31 @@ class ot {
       if (!s || L(s)) continue;
       const r = this._store.get(n);
       if (r === void 0) continue;
-      const a = t.custom.get(n);
-      if (a)
+      const o = t.custom.get(n);
+      if (o)
         switch (s.type) {
           case "float":
-            e.uniform1f(a, r);
+            e.uniform1f(o, r);
             break;
           case "int":
-            e.uniform1i(a, r);
+            e.uniform1i(o, r);
             break;
           case "bool":
-            e.uniform1i(a, r ? 1 : 0);
+            e.uniform1i(o, r ? 1 : 0);
             break;
           case "vec2": {
-            const o = r;
-            e.uniform2f(a, o[0], o[1]);
+            const a = r;
+            e.uniform2f(o, a[0], a[1]);
             break;
           }
           case "vec3": {
-            const o = r;
-            e.uniform3f(a, o[0], o[1], o[2]);
+            const a = r;
+            e.uniform3f(o, a[0], a[1], a[2]);
             break;
           }
           case "vec4": {
-            const o = r;
-            e.uniform4f(a, o[0], o[1], o[2], o[3]);
+            const a = r;
+            e.uniform4f(o, a[0], a[1], a[2], a[3]);
             break;
           }
         }
@@ -824,27 +824,27 @@ class ot {
   initUBOs(e) {
     const t = e.getParameter(e.MAX_UNIFORM_BLOCK_SIZE), n = e.getParameter(e.MAX_UNIFORM_BUFFER_BINDINGS);
     let s = 0;
-    for (const [r, a] of Object.entries(this._uniforms)) {
-      if (!L(a)) continue;
-      const o = Je(a.type, a.count);
-      if (o > t)
+    for (const [r, o] of Object.entries(this._uniforms)) {
+      if (!L(o)) continue;
+      const a = Je(o.type, o.count);
+      if (a > t)
         throw new Error(
-          `Array uniform '${r}' requires ${o} bytes but GL MAX_UNIFORM_BLOCK_SIZE is ${t}`
+          `Array uniform '${r}' requires ${a} bytes but GL MAX_UNIFORM_BLOCK_SIZE is ${t}`
         );
       const c = e.createBuffer();
       if (!c) throw new Error(`Failed to create UBO buffer for '${r}'`);
-      if (e.bindBuffer(e.UNIFORM_BUFFER, c), e.bufferData(e.UNIFORM_BUFFER, o, e.DYNAMIC_DRAW), e.bindBuffer(e.UNIFORM_BUFFER, null), s >= n)
+      if (e.bindBuffer(e.UNIFORM_BUFFER, c), e.bufferData(e.UNIFORM_BUFFER, a, e.DYNAMIC_DRAW), e.bindBuffer(e.UNIFORM_BUFFER, null), s >= n)
         throw new Error(
           `Too many array uniforms: binding point ${s} exceeds GL MAX_UNIFORM_BUFFER_BINDINGS (${n})`
         );
       e.bindBufferBase(e.UNIFORM_BUFFER, s, c);
-      const u = new Float32Array(o / 4);
+      const u = new Float32Array(a / 4);
       this._ubos.push({
         name: r,
-        def: a,
+        def: o,
         buffer: c,
         bindingPoint: s,
-        byteSize: o,
+        byteSize: a,
         dirty: !1,
         paddedData: u,
         activeCount: 0
@@ -892,7 +892,7 @@ class fe {
       texture: t,
       width: 256,
       height: 3
-    }, this.initProjectTextures(), this._media = new rt(this.gl, e.project), this._uniformMgr = new ot(this.gl, e.project.uniforms), e.viewNames && e.viewNames.length > 1 && (this._viewNames = e.viewNames), this.initRuntimePasses();
+    }, this.initProjectTextures(), this._media = new rt(this.gl, e.project), this._uniformMgr = new at(this.gl, e.project.uniforms), e.viewNames && e.viewNames.length > 1 && (this._viewNames = e.viewNames), this.initRuntimePasses();
   }
   // ===========================================================================
   // Media Delegates (forwarded to MediaManager)
@@ -928,32 +928,32 @@ class fe {
    * Upload or update a named texture from JavaScript (for script channel).
    */
   updateTexture(e, t, n, s) {
-    const r = this._scriptTextures.get(e), a = s instanceof Float32Array;
-    if (r && r.width === t && r.height === n && r.isFloat === a) {
-      const o = this.gl;
-      o.bindTexture(o.TEXTURE_2D, r.texture), a ? o.texSubImage2D(o.TEXTURE_2D, 0, 0, 0, t, n, o.RGBA, o.FLOAT, s) : o.texSubImage2D(o.TEXTURE_2D, 0, 0, 0, t, n, o.RGBA, o.UNSIGNED_BYTE, s), o.bindTexture(o.TEXTURE_2D, null);
+    const r = this._scriptTextures.get(e), o = s instanceof Float32Array;
+    if (r && r.width === t && r.height === n && r.isFloat === o) {
+      const a = this.gl;
+      a.bindTexture(a.TEXTURE_2D, r.texture), o ? a.texSubImage2D(a.TEXTURE_2D, 0, 0, 0, t, n, a.RGBA, a.FLOAT, s) : a.texSubImage2D(a.TEXTURE_2D, 0, 0, 0, t, n, a.RGBA, a.UNSIGNED_BYTE, s), a.bindTexture(a.TEXTURE_2D, null);
     } else {
-      const o = qe(
+      const a = qe(
         this.gl,
         (r == null ? void 0 : r.texture) ?? null,
         t,
         n,
         s
       );
-      this._scriptTextures.set(e, { texture: o, width: t, height: n, isFloat: a });
+      this._scriptTextures.set(e, { texture: a, width: t, height: n, isFloat: o });
     }
   }
   /**
    * Read pixels from a buffer pass (reads previous frame's data).
    */
   readPixels(e, t, n, s, r) {
-    const a = this._passes.find((u) => u.name === e);
-    if (!a)
+    const o = this._passes.find((u) => u.name === e);
+    if (!o)
       return console.warn(`readPixels: pass '${e}' not found`), new Uint8Array(s * r * 4);
-    const o = this.gl;
-    o.bindFramebuffer(o.FRAMEBUFFER, a.framebuffer), o.framebufferTexture2D(o.FRAMEBUFFER, o.COLOR_ATTACHMENT0, o.TEXTURE_2D, a.previousTexture, 0);
+    const a = this.gl;
+    a.bindFramebuffer(a.FRAMEBUFFER, o.framebuffer), a.framebufferTexture2D(a.FRAMEBUFFER, a.COLOR_ATTACHMENT0, a.TEXTURE_2D, o.previousTexture, 0);
     const c = new Uint8Array(s * r * 4);
-    return o.readPixels(t, n, s, r, o.RGBA, o.UNSIGNED_BYTE, c), o.framebufferTexture2D(o.FRAMEBUFFER, o.COLOR_ATTACHMENT0, o.TEXTURE_2D, a.currentTexture, 0), o.bindFramebuffer(o.FRAMEBUFFER, null), c;
+    return a.readPixels(t, n, s, r, a.RGBA, a.UNSIGNED_BYTE, c), a.framebufferTexture2D(a.FRAMEBUFFER, a.COLOR_ATTACHMENT0, a.TEXTURE_2D, o.currentTexture, 0), a.bindFramebuffer(a.FRAMEBUFFER, null), c;
   }
   // ===========================================================================
   // Public API
@@ -1058,7 +1058,7 @@ class fe {
    * @param touch - optional touch state for touch uniforms
    */
   step(e, t, n, s, r) {
-    const a = this.gl, o = this._lastStepTime === null ? 0 : e - this._lastStepTime;
+    const o = this.gl, a = this._lastStepTime === null ? 0 : e - this._lastStepTime;
     this._lastStepTime = e, this._time = e;
     const c = /* @__PURE__ */ new Date(), u = s ?? {
       count: 0,
@@ -1069,7 +1069,7 @@ class fe {
     }, d = {
       iResolution: [this._width, this._height, 1],
       iTime: this._time,
-      iTimeDelta: o,
+      iTimeDelta: a,
       iFrame: this._frame,
       iMouse: t,
       iMousePressed: n,
@@ -1081,7 +1081,7 @@ class fe {
         // 1-31
         c.getHours() * 3600 + c.getMinutes() * 60 + c.getSeconds() + c.getMilliseconds() / 1e3
       ],
-      iFrameRate: o > 0 ? 1 / o : 60,
+      iFrameRate: a > 0 ? 1 / a : 60,
       iTouchCount: u.count,
       iTouch: u.touches,
       iPinch: u.pinch,
@@ -1089,7 +1089,7 @@ class fe {
       iPinchCenter: u.pinchCenter,
       crossViewStates: r
     };
-    a.viewport(0, 0, this._width, this._height);
+    o.viewport(0, 0, this._width, this._height);
     const h = ["BufferA", "BufferB", "BufferC", "BufferD", "Image"];
     for (const T of h) {
       const _ = this._passes.find((y) => y.name === T);
@@ -1164,18 +1164,18 @@ class fe {
    * @returns Object with success status and error message if failed
    */
   recompilePass(e, t) {
-    const n = this.gl, s = this._passes.find((o) => o.name === e);
+    const n = this.gl, s = this._passes.find((a) => a.name === e);
     if (!s)
       return { success: !1, error: `Pass '${e}' not found` };
     const r = this.project.passes[e];
     if (!r)
       return { success: !1, error: `Project pass '${e}' not found` };
-    const { source: a } = this.buildFragmentShader(t, r.channels, r.namedSamplers);
+    const { source: o } = this.buildFragmentShader(t, r.channels, r.namedSamplers);
     try {
-      const o = de(n, pe, a);
-      return n.deleteProgram(s.uniforms.program), s.uniforms = this.cacheUniformLocations(o, r.namedSamplers), r.glslSource = t, this._compilationErrors = this._compilationErrors.filter((c) => c.passName !== e), this._uniformMgr.markAllScalarsDirty(), { success: !0 };
-    } catch (o) {
-      return { success: !1, error: o instanceof Error ? o.message : String(o) };
+      const a = de(n, pe, o);
+      return n.deleteProgram(s.uniforms.program), s.uniforms = this.cacheUniformLocations(a, r.namedSamplers), r.glslSource = t, this._compilationErrors = this._compilationErrors.filter((c) => c.passName !== e), this._uniformMgr.markAllScalarsDirty(), { success: !0 };
+    } catch (a) {
+      return { success: !1, error: a instanceof Error ? a.message : String(a) };
     }
   }
   /**
@@ -1190,18 +1190,18 @@ class fe {
     this.project.commonSource = e;
     const n = [], s = ["BufferA", "BufferB", "BufferC", "BufferD", "Image"];
     for (const r of s) {
-      const a = this.project.passes[r];
-      if (!a) continue;
-      const o = this.recompilePass(r, a.glslSource);
-      o.success || n.push({ passName: r, error: o.error || "Unknown error" });
+      const o = this.project.passes[r];
+      if (!o) continue;
+      const a = this.recompilePass(r, o.glslSource);
+      a.success || n.push({ passName: r, error: a.error || "Unknown error" });
     }
     if (n.length > 0) {
       this.project.commonSource = t;
       for (const r of s) {
-        const a = this.project.passes[r];
-        if (!a || n.some((c) => c.passName === r)) continue;
-        const o = this.recompilePass(r, a.glslSource);
-        o.success || (console.error(`Failed to revert ${r} to old common source:`, o.error), n.push({ passName: r, error: `Revert failed: ${o.error}` }));
+        const o = this.project.passes[r];
+        if (!o || n.some((c) => c.passName === r)) continue;
+        const a = this.recompilePass(r, o.glslSource);
+        a.success || (console.error(`Failed to revert ${r} to old common source:`, a.error), n.push({ passName: r, error: `Revert failed: ${a.error}` }));
       }
       return { success: !1, errors: n };
     }
@@ -1240,8 +1240,8 @@ class fe {
    */
   cacheUniformLocations(e, t) {
     const n = this.gl, s = /* @__PURE__ */ new Map();
-    for (const [r, a] of Object.entries(this.project.uniforms))
-      L(a) || s.set(r, n.getUniformLocation(e, r));
+    for (const [r, o] of Object.entries(this.project.uniforms))
+      L(o) || s.set(r, n.getUniformLocation(e, r));
     return this._uniformMgr.bindUBOsToProgram(n, e, s), {
       program: e,
       iResolution: n.getUniformLocation(e, "iResolution"),
@@ -1278,37 +1278,37 @@ class fe {
       namedSamplers: (() => {
         const r = /* @__PURE__ */ new Map();
         if (t)
-          for (const [a] of t)
-            r.set(a, n.getUniformLocation(e, a));
+          for (const [o] of t)
+            r.set(o, n.getUniformLocation(e, o));
         return r;
       })(),
       namedSamplerResolutions: (() => {
         const r = /* @__PURE__ */ new Map();
         if (t)
-          for (const [a] of t)
-            r.set(a, n.getUniformLocation(e, `${a}_resolution`));
+          for (const [o] of t)
+            r.set(o, n.getUniformLocation(e, `${o}_resolution`));
         return r;
       })(),
       // Cross-view uniforms for multi-view projects
       crossViewMouse: (() => {
         const r = /* @__PURE__ */ new Map();
         if (this._viewNames.length > 1)
-          for (const a of this._viewNames)
-            r.set(a, n.getUniformLocation(e, `iMouse_${a}`));
+          for (const o of this._viewNames)
+            r.set(o, n.getUniformLocation(e, `iMouse_${o}`));
         return r;
       })(),
       crossViewResolution: (() => {
         const r = /* @__PURE__ */ new Map();
         if (this._viewNames.length > 1)
-          for (const a of this._viewNames)
-            r.set(a, n.getUniformLocation(e, `iResolution_${a}`));
+          for (const o of this._viewNames)
+            r.set(o, n.getUniformLocation(e, `iResolution_${o}`));
         return r;
       })(),
       crossViewMousePressed: (() => {
         const r = /* @__PURE__ */ new Map();
         if (this._viewNames.length > 1)
-          for (const a of this._viewNames)
-            r.set(a, n.getUniformLocation(e, `iMousePressed_${a}`));
+          for (const o of this._viewNames)
+            r.set(o, n.getUniformLocation(e, `iMousePressed_${o}`));
         return r;
       })()
     };
@@ -1339,13 +1339,13 @@ class fe {
       r.crossOrigin = "anonymous", r.onload = () => {
         if (this._disposed || e.isContextLost()) return;
         e.bindTexture(e.TEXTURE_2D, n), e.pixelStorei(e.UNPACK_FLIP_Y_WEBGL, !0), e.texImage2D(e.TEXTURE_2D, 0, e.RGBA, e.RGBA, e.UNSIGNED_BYTE, r), e.pixelStorei(e.UNPACK_FLIP_Y_WEBGL, !1);
-        const a = t.filter !== "nearest";
-        e.texParameteri(e.TEXTURE_2D, e.TEXTURE_MAG_FILTER, a ? e.LINEAR : e.NEAREST), e.texParameteri(e.TEXTURE_2D, e.TEXTURE_MIN_FILTER, a ? e.LINEAR_MIPMAP_LINEAR : e.NEAREST);
-        const o = t.wrap === "clamp" ? e.CLAMP_TO_EDGE : e.REPEAT;
-        e.texParameteri(e.TEXTURE_2D, e.TEXTURE_WRAP_S, o), e.texParameteri(e.TEXTURE_2D, e.TEXTURE_WRAP_T, o), a && e.generateMipmap(e.TEXTURE_2D), s.width = r.width, s.height = r.height, console.log(`Loaded texture '${t.name}': ${r.width}x${r.height}`);
+        const o = t.filter !== "nearest";
+        e.texParameteri(e.TEXTURE_2D, e.TEXTURE_MAG_FILTER, o ? e.LINEAR : e.NEAREST), e.texParameteri(e.TEXTURE_2D, e.TEXTURE_MIN_FILTER, o ? e.LINEAR_MIPMAP_LINEAR : e.NEAREST);
+        const a = t.wrap === "clamp" ? e.CLAMP_TO_EDGE : e.REPEAT;
+        e.texParameteri(e.TEXTURE_2D, e.TEXTURE_WRAP_S, a), e.texParameteri(e.TEXTURE_2D, e.TEXTURE_WRAP_T, a), o && e.generateMipmap(e.TEXTURE_2D), s.width = r.width, s.height = r.height, console.log(`Loaded texture '${t.name}': ${r.width}x${r.height}`);
       }, r.onerror = () => {
-        var a;
-        console.error(`Failed to load texture '${t.name}' from ${t.source}`), (a = this._onAssetError) == null || a.call(this, { type: "texture", name: t.name, detail: t.source });
+        var o;
+        console.error(`Failed to load texture '${t.name}' from ${t.source}`), (o = this._onAssetError) == null || o.call(this, { type: "texture", name: t.name, detail: t.source });
       }, r.src = t.source;
     }
   }
@@ -1357,19 +1357,19 @@ class fe {
     this._sharedVAO = n;
     const s = ["BufferA", "BufferB", "BufferC", "BufferD", "Image"];
     for (const r of s) {
-      const a = t.passes[r];
-      if (!a) continue;
-      const { source: o, lineMapping: c } = this.buildFragmentShader(a.glslSource, a.channels, a.namedSamplers);
+      const o = t.passes[r];
+      if (!o) continue;
+      const { source: a, lineMapping: c } = this.buildFragmentShader(o.glslSource, o.channels, o.namedSamplers);
       try {
-        const u = de(e, pe, o), d = this.cacheUniformLocations(u, a.namedSamplers), h = Y(e, this._width, this._height), T = Y(e, this._width, this._height), _ = he(e, h), y = {
+        const u = de(e, pe, a), d = this.cacheUniformLocations(u, o.namedSamplers), h = Y(e, this._width, this._height), T = Y(e, this._width, this._height), _ = he(e, h), y = {
           name: r,
-          projectChannels: a.channels,
+          projectChannels: o.channels,
           vao: n,
           uniforms: d,
           framebuffer: _,
           currentTexture: h,
           previousTexture: T,
-          namedSamplers: a.namedSamplers
+          namedSamplers: o.namedSamplers
         };
         this._passes.push(y);
       } catch (u) {
@@ -1386,7 +1386,7 @@ class fe {
         this._compilationErrors.push({
           passName: r,
           error: d,
-          source: o,
+          source: a,
           isFromCommon: T,
           originalLine: _,
           lineMapping: c
@@ -1427,16 +1427,16 @@ class fe {
     for (let s = 0; s < 3; s++) {
       const r = e.iTouch[s];
       if (r) {
-        const a = t.iTouch[s];
-        n.uniform4f(r, a[0], a[1], a[2], a[3]);
+        const o = t.iTouch[s];
+        n.uniform4f(r, o[0], o[1], o[2], o[3]);
       }
     }
     if (e.iPinch && n.uniform1f(e.iPinch, t.iPinch), e.iPinchDelta && n.uniform1f(e.iPinchDelta, t.iPinchDelta), e.iPinchCenter && n.uniform2f(e.iPinchCenter, t.iPinchCenter[0], t.iPinchCenter[1]), t.crossViewStates)
       for (const [s, r] of t.crossViewStates) {
-        const a = e.crossViewMouse.get(s);
-        a && n.uniform4f(a, r.mouse[0], r.mouse[1], r.mouse[2], r.mouse[3]);
-        const o = e.crossViewResolution.get(s);
-        o && n.uniform3f(o, r.resolution[0], r.resolution[1], r.resolution[2]);
+        const o = e.crossViewMouse.get(s);
+        o && n.uniform4f(o, r.mouse[0], r.mouse[1], r.mouse[2], r.mouse[3]);
+        const a = e.crossViewResolution.get(s);
+        a && n.uniform3f(a, r.resolution[0], r.resolution[1], r.resolution[2]);
         const c = e.crossViewMousePressed.get(s);
         c && n.uniform1i(c, r.mousePressed ? 1 : 0);
       }
@@ -1444,12 +1444,12 @@ class fe {
   bindChannelTextures(e) {
     const t = this.gl;
     for (let n = 0; n < 4; n++) {
-      const s = e.projectChannels[n], r = this.resolveChannelTexture(s), a = this.resolveChannelResolution(s);
+      const s = e.projectChannels[n], r = this.resolveChannelTexture(s), o = this.resolveChannelResolution(s);
       t.activeTexture(t.TEXTURE0 + n), t.bindTexture(t.TEXTURE_2D, r);
-      const o = e.uniforms.iChannel[n];
-      o && t.uniform1i(o, n);
+      const a = e.uniforms.iChannel[n];
+      a && t.uniform1i(a, n);
       const c = e.uniforms.iChannelResolution[n];
-      c && t.uniform3f(c, a[0], a[1], 1);
+      c && t.uniform3f(c, o[0], o[1], 1);
     }
   }
   /**
@@ -1460,12 +1460,12 @@ class fe {
     const t = this.gl;
     let n = 0;
     for (const [s, r] of e.namedSamplers) {
-      const a = this.resolveChannelTexture(r), o = this.resolveChannelResolution(r);
-      t.activeTexture(t.TEXTURE0 + n), t.bindTexture(t.TEXTURE_2D, a);
+      const o = this.resolveChannelTexture(r), a = this.resolveChannelResolution(r);
+      t.activeTexture(t.TEXTURE0 + n), t.bindTexture(t.TEXTURE_2D, o);
       const c = e.uniforms.namedSamplers.get(s);
       c && t.uniform1i(c, n);
       const u = e.uniforms.namedSamplerResolutions.get(s);
-      u && t.uniform3f(u, o[0], o[1], 1), n++;
+      u && t.uniform3f(u, a[0], a[1], 1), n++;
     }
   }
   /**
@@ -1624,9 +1624,9 @@ function lt(i, e, t) {
 `).map((n) => {
     const s = n.match(/^ERROR:\s*(\d+):(\d+):\s*(.+)$/);
     if (s) {
-      const [, , r, a] = s, o = parseInt(r, 10);
-      let c = o;
-      return t && e.commonStartLine > 0 ? c = o - e.commonStartLine + 1 : e.userCodeStartLine > 0 && o >= e.userCodeStartLine && (c = o - e.userCodeStartLine + 1), `Line ${c}: ${ut(a)}`;
+      const [, , r, o] = s, a = parseInt(r, 10);
+      let c = a;
+      return t && e.commonStartLine > 0 ? c = a - e.commonStartLine + 1 : e.userCodeStartLine > 0 && a >= e.userCodeStartLine && (c = a - e.userCodeStartLine + 1), `Line ${c}: ${ut(o)}`;
     }
     return n;
   }).join(`
@@ -1640,8 +1640,8 @@ function dt(i, e) {
 `);
   if (e < 1 || e > t.length) return null;
   const n = 3, s = Math.max(0, e - n - 1), r = Math.min(t.length, e + n);
-  return t.slice(s, r).map((o, c) => {
-    const u = s + c + 1, d = u === e, h = String(u).padStart(4, " "), T = Se(o);
+  return t.slice(s, r).map((a, c) => {
+    const u = s + c + 1, d = u === e, h = String(u).padStart(4, " "), T = Se(a);
     return d ? `<span class="error-line-highlight">${h} │ ${T}</span>` : `<span class="context-line">${h} │ ${T}</span>`;
   }).join("");
 }
@@ -1850,15 +1850,15 @@ class ht {
   }
   setupMouseTracking() {
     const e = (r) => {
-      const a = this.canvas.getBoundingClientRect(), o = (r.clientX - a.left) * this.pixelRatio, c = (a.height - (r.clientY - a.top)) * this.pixelRatio;
-      return [o, c];
+      const o = this.canvas.getBoundingClientRect(), a = (r.clientX - o.left) * this.pixelRatio, c = (o.height - (r.clientY - o.top)) * this.pixelRatio;
+      return [a, c];
     }, t = (r) => {
-      const [a, o] = e(r);
-      this.isMouseDown = !0, this.mouse[0] = a, this.mouse[1] = o, this.mouse[2] = a, this.mouse[3] = o, this.triggerGesture();
+      const [o, a] = e(r);
+      this.isMouseDown = !0, this.mouse[0] = o, this.mouse[1] = a, this.mouse[2] = o, this.mouse[3] = a, this.triggerGesture();
     }, n = (r) => {
       if (!this.isMouseDown) return;
-      const [a, o] = e(r);
-      this.mouse[0] = a, this.mouse[1] = o;
+      const [o, a] = e(r);
+      this.mouse[0] = o, this.mouse[1] = a;
     }, s = () => {
       this.isMouseDown = !1, this.mouse[2] = -Math.abs(this.mouse[2]), this.mouse[3] = -Math.abs(this.mouse[3]);
     };
@@ -1870,29 +1870,29 @@ class ht {
   }
   setupTouchTracking() {
     this.canvas.style.touchAction = "pan-y";
-    const e = (a, o) => {
-      const c = this.canvas.getBoundingClientRect(), u = (a - c.left) * this.pixelRatio, d = (c.height - (o - c.top)) * this.pixelRatio;
+    const e = (o, a) => {
+      const c = this.canvas.getBoundingClientRect(), u = (o - c.left) * this.pixelRatio, d = (c.height - (a - c.top)) * this.pixelRatio;
       return [u, d];
-    }, t = (a) => {
-      if (a.pointerType === "mouse") return;
-      const [o, c] = e(a.clientX, a.clientY);
-      this.activePointers.set(a.pointerId, {
-        id: a.pointerId,
-        x: o,
+    }, t = (o) => {
+      if (o.pointerType === "mouse") return;
+      const [a, c] = e(o.clientX, o.clientY);
+      this.activePointers.set(o.pointerId, {
+        id: o.pointerId,
+        x: a,
         y: c,
-        startX: o,
+        startX: a,
         startY: c
-      }), this.canvas.setPointerCapture(a.pointerId), this.updateTouchState(), this.activePointers.size === 1 && (this.isMouseDown = !0, this.mouse[0] = o, this.mouse[1] = c, this.mouse[2] = o, this.mouse[3] = c);
-    }, n = (a) => {
-      if (a.pointerType === "mouse") return;
-      const o = this.activePointers.get(a.pointerId);
-      if (!o) return;
-      const [c, u] = e(a.clientX, a.clientY);
-      o.x = c, o.y = u, this.updateTouchState(), this.activePointers.size === 1 && (this.mouse[0] = c, this.mouse[1] = u), a.preventDefault();
-    }, s = (a) => {
-      a.pointerType !== "mouse" && (this.activePointers.delete(a.pointerId), this.canvas.releasePointerCapture(a.pointerId), this.activePointers.size === 0 && (this.isMouseDown = !1, this.mouse[2] = -Math.abs(this.mouse[2]), this.mouse[3] = -Math.abs(this.mouse[3])), this.updateTouchState());
-    }, r = (a) => {
-      s(a);
+      }), this.canvas.setPointerCapture(o.pointerId), this.updateTouchState(), this.activePointers.size === 1 && (this.isMouseDown = !0, this.mouse[0] = a, this.mouse[1] = c, this.mouse[2] = a, this.mouse[3] = c);
+    }, n = (o) => {
+      if (o.pointerType === "mouse") return;
+      const a = this.activePointers.get(o.pointerId);
+      if (!a) return;
+      const [c, u] = e(o.clientX, o.clientY);
+      a.x = c, a.y = u, this.updateTouchState(), this.activePointers.size === 1 && (this.mouse[0] = c, this.mouse[1] = u), o.preventDefault();
+    }, s = (o) => {
+      o.pointerType !== "mouse" && (this.activePointers.delete(o.pointerId), this.canvas.releasePointerCapture(o.pointerId), this.activePointers.size === 0 && (this.isMouseDown = !1, this.mouse[2] = -Math.abs(this.mouse[2]), this.mouse[3] = -Math.abs(this.mouse[3])), this.updateTouchState());
+    }, r = (o) => {
+      s(o);
     };
     this.canvas.addEventListener("pointerdown", t), this.canvas.addEventListener("pointermove", n), this.canvas.addEventListener("pointerup", s), this.canvas.addEventListener("pointercancel", r), this.canvasListeners.push(
       { event: "pointerdown", handler: t },
@@ -1911,9 +1911,9 @@ class ht {
       } else
         this.touchState.touches[n] = [0, 0, 0, 0];
     if (t >= 2) {
-      const n = e[0], s = e[1], r = s.x - n.x, a = s.y - n.y, o = Math.sqrt(r * r + a * a), c = s.startX - n.startX, u = s.startY - n.startY, d = Math.sqrt(c * c + u * u);
+      const n = e[0], s = e[1], r = s.x - n.x, o = s.y - n.y, a = Math.sqrt(r * r + o * o), c = s.startX - n.startX, u = s.startY - n.startY, d = Math.sqrt(c * c + u * u);
       if (d > 0) {
-        const h = o / d;
+        const h = a / d;
         this.touchState.pinchDelta = h - this.touchState.pinch, this.touchState.pinch = h;
       }
       this.touchState.pinchCenter = [
@@ -2049,11 +2049,11 @@ class Ee {
   // ===========================================================================
   dispose() {
     this.input.dispose(), this._resizeObserver.disconnect(), this._resizeDebounceTimer !== null && clearTimeout(this._resizeDebounceTimer), this._engine.dispose(), this.errorOverlay.hide(), this.runtimeErrorOverlay.dispose(), this.hideMediaBanner(), this.hideContextLostOverlay();
-    for (const e of this._overlays.values())
-      e.remove();
+    for (const t of this._overlays.values())
+      t.remove();
     this._overlays.clear();
-    const lc = this.gl.getExtension("WEBGL_lose_context"); lc && lc.loseContext();
-    this.container.removeChild(this.canvas);
+    const e = this.gl.getExtension("WEBGL_lose_context");
+    e && e.loseContext(), this.container.removeChild(this.canvas);
   }
   // ===========================================================================
   // Canvas Sizing
@@ -2171,10 +2171,10 @@ class Fe {
     n.className = "uniform-controls-reset", n.textContent = "Reset", n.title = "Reset all uniforms to defaults", n.addEventListener("click", () => this.resetToDefaults()), t.appendChild(n), this.container.appendChild(t);
     const s = document.createElement("div");
     s.className = "uniform-controls-list";
-    for (const [r, a] of e) {
-      if (L(a) || a.hidden) continue;
-      const o = this.createControl(r, a);
-      o && (this.updaters.set(r, o.update), s.appendChild(o.element));
+    for (const [r, o] of e) {
+      if (L(o) || o.hidden) continue;
+      const a = this.createControl(r, o);
+      a && (this.updaters.set(r, a.update), s.appendChild(a.element));
     }
     this.container.appendChild(s);
   }
@@ -2215,8 +2215,8 @@ class Fe {
       const c = parseFloat(r.value);
       e.onInput(c), s.textContent = e.format(c);
     });
-    const a = document.createElement("div");
-    return a.appendChild(t), a.appendChild(r), { element: a, update: (c) => {
+    const o = document.createElement("div");
+    return o.appendChild(t), o.appendChild(r), { element: o, update: (c) => {
       r.value = String(c), s.textContent = e.format(c);
     } };
   }
@@ -2230,14 +2230,14 @@ class Fe {
       max: t.max ?? 1,
       step: n,
       value: this.values[e],
-      format: (o) => this.formatNumber(o, n),
-      onInput: (o) => {
-        this.values[e] = o, this.onChange(e, o);
+      format: (a) => this.formatNumber(a, n),
+      onInput: (a) => {
+        this.values[e] = a, this.onChange(e, a);
       }
-    }), a = document.createElement("div");
-    return a.className = "uniform-control uniform-control-float", a.appendChild(s), {
-      element: a,
-      update: (o) => r(o)
+    }), o = document.createElement("div");
+    return o.className = "uniform-control uniform-control-float", o.appendChild(s), {
+      element: o,
+      update: (a) => r(a)
     };
   }
   // ===========================================================================
@@ -2250,15 +2250,15 @@ class Fe {
       max: t.max ?? 10,
       step: t.step ?? 1,
       value: this.values[e],
-      format: (a) => String(Math.round(a)),
-      onInput: (a) => {
-        const o = Math.round(a);
-        this.values[e] = o, this.onChange(e, o);
+      format: (o) => String(Math.round(o)),
+      onInput: (o) => {
+        const a = Math.round(o);
+        this.values[e] = a, this.onChange(e, a);
       }
     }), r = document.createElement("div");
     return r.className = "uniform-control uniform-control-int", r.appendChild(n), {
       element: r,
-      update: (a) => s(a)
+      update: (o) => s(o)
     };
   }
   // ===========================================================================
@@ -2267,10 +2267,10 @@ class Fe {
   createBoolToggle(e, t) {
     const n = this.values[e], s = t.label ?? e, r = document.createElement("div");
     r.className = "uniform-control uniform-control-bool";
-    const a = document.createElement("div");
-    a.className = "uniform-control-label-row";
-    const o = document.createElement("label");
-    o.className = "uniform-control-label", o.textContent = s;
+    const o = document.createElement("div");
+    o.className = "uniform-control-label-row";
+    const a = document.createElement("label");
+    a.className = "uniform-control-label", a.textContent = s;
     const c = document.createElement("label");
     c.className = "uniform-control-toggle";
     const u = document.createElement("input");
@@ -2279,7 +2279,7 @@ class Fe {
     return d.className = "uniform-control-toggle-slider", u.addEventListener("change", () => {
       const h = u.checked;
       this.values[e] = h, this.onChange(e, h);
-    }), c.appendChild(u), c.appendChild(d), a.appendChild(o), a.appendChild(c), r.appendChild(a), {
+    }), c.appendChild(u), c.appendChild(d), o.appendChild(a), o.appendChild(c), r.appendChild(o), {
       element: r,
       update: (h) => {
         u.checked = h;
@@ -2290,12 +2290,12 @@ class Fe {
   // Vec2 XY Pad
   // ===========================================================================
   createVec2Pad(e, t) {
-    const n = this.values[e], s = t.min ?? [0, 0], r = t.max ?? [1, 1], a = t.label ?? e, o = document.createElement("div");
-    o.className = "uniform-control uniform-control-vec2";
+    const n = this.values[e], s = t.min ?? [0, 0], r = t.max ?? [1, 1], o = t.label ?? e, a = document.createElement("div");
+    a.className = "uniform-control uniform-control-vec2";
     const c = document.createElement("div");
     c.className = "uniform-control-label-row";
     const u = document.createElement("label");
-    u.className = "uniform-control-label", u.textContent = a;
+    u.className = "uniform-control-label", u.textContent = o;
     const d = document.createElement("span");
     d.className = "uniform-control-value", d.textContent = this.formatVec2(n), c.appendChild(u), c.appendChild(d);
     const h = document.createElement("div");
@@ -2326,8 +2326,8 @@ class Fe {
     }, g = (f) => {
       y && b(f);
     };
-    return h.addEventListener("touchstart", m), document.addEventListener("touchmove", g), document.addEventListener("touchend", p), this.documentListeners.push({ type: "touchmove", handler: g }), this.documentListeners.push({ type: "touchend", handler: p }), o.appendChild(c), o.appendChild(h), {
-      element: o,
+    return h.addEventListener("touchstart", m), document.addEventListener("touchmove", g), document.addEventListener("touchend", p), this.documentListeners.push({ type: "touchmove", handler: g }), this.documentListeners.push({ type: "touchend", handler: p }), a.appendChild(c), a.appendChild(h), {
+      element: a,
       update: (f) => {
         const E = f;
         _(E), d.textContent = this.formatVec2(E);
@@ -2340,12 +2340,12 @@ class Fe {
   createColorPicker(e, t) {
     const n = this.values[e], s = t.label ?? e, r = document.createElement("div");
     r.className = "uniform-control uniform-control-color";
-    const a = document.createElement("div");
-    a.className = "uniform-control-label-row";
-    const o = document.createElement("label");
-    o.className = "uniform-control-label", o.textContent = s;
+    const o = document.createElement("div");
+    o.className = "uniform-control-label-row";
+    const a = document.createElement("label");
+    a.className = "uniform-control-label", a.textContent = s;
     const c = document.createElement("span");
-    c.className = "uniform-control-value", c.textContent = this.rgbToHex(n), a.appendChild(o), a.appendChild(c);
+    c.className = "uniform-control-value", c.textContent = this.rgbToHex(n), o.appendChild(a), o.appendChild(c);
     const u = document.createElement("div");
     u.className = "uniform-control-color-wrapper";
     const d = document.createElement("input");
@@ -2354,7 +2354,7 @@ class Fe {
     return h.className = "uniform-control-color-swatch", h.style.backgroundColor = this.rgbToHex(n), d.addEventListener("input", () => {
       const T = this.hexToRgb(d.value);
       this.values[e] = T, c.textContent = d.value, h.style.backgroundColor = d.value, this.onChange(e, T);
-    }), h.addEventListener("click", () => d.click()), u.appendChild(h), u.appendChild(d), r.appendChild(a), r.appendChild(u), {
+    }), h.addEventListener("click", () => d.click()), u.appendChild(h), u.appendChild(d), r.appendChild(o), r.appendChild(u), {
       element: r,
       update: (T) => {
         const _ = this.rgbToHex(T);
@@ -2369,12 +2369,12 @@ class Fe {
     var b, w, R;
     const n = this.values[e], s = t.label ?? e, r = document.createElement("div");
     r.className = "uniform-control uniform-control-color";
-    const a = document.createElement("div");
-    a.className = "uniform-control-label-row";
-    const o = document.createElement("label");
-    o.className = "uniform-control-label", o.textContent = s;
+    const o = document.createElement("div");
+    o.className = "uniform-control-label-row";
+    const a = document.createElement("label");
+    a.className = "uniform-control-label", a.textContent = s;
     const c = document.createElement("span");
-    c.className = "uniform-control-value", c.textContent = this.rgbToHex(n), a.appendChild(o), a.appendChild(c);
+    c.className = "uniform-control-value", c.textContent = this.rgbToHex(n), o.appendChild(a), o.appendChild(c);
     const u = document.createElement("div");
     u.className = "uniform-control-color-wrapper";
     const d = document.createElement("input");
@@ -2396,7 +2396,7 @@ class Fe {
         m[3] = p, this.onChange(e, [...m]);
       }
     });
-    return r.appendChild(a), r.appendChild(u), r.appendChild(_), {
+    return r.appendChild(o), r.appendChild(u), r.appendChild(_), {
       element: r,
       update: (p) => {
         const m = p, g = this.rgbToHex(m);
@@ -2408,12 +2408,12 @@ class Fe {
   // Vec3/Vec4 Component Sliders
   // ===========================================================================
   createVecSliders(e, t, n) {
-    const s = this.values[e], r = t.label ?? e, a = n === 3 ? ["X", "Y", "Z"] : ["X", "Y", "Z", "W"], o = document.createElement("div");
-    o.className = `uniform-control uniform-control-vec${n}`;
+    const s = this.values[e], r = t.label ?? e, o = n === 3 ? ["X", "Y", "Z"] : ["X", "Y", "Z", "W"], a = document.createElement("div");
+    a.className = `uniform-control uniform-control-vec${n}`;
     const c = document.createElement("div");
-    c.className = "uniform-control-label", c.textContent = r, o.appendChild(c);
+    c.className = "uniform-control-label", c.textContent = r, a.appendChild(c);
     const u = [];
-    return a.forEach((d, h) => {
+    return o.forEach((d, h) => {
       var R, p, m;
       const T = ((R = t.step) == null ? void 0 : R[h]) ?? 0.01, { element: _, update: y } = this.createSliderRow({
         label: d,
@@ -2435,9 +2435,9 @@ class Fe {
         f && f.classList.add("uniform-control-vec-value");
       }
       const w = _.querySelector(".uniform-control-slider");
-      w && w.classList.add("uniform-control-vec-slider"), u.push(y), o.appendChild(_);
+      w && w.classList.add("uniform-control-vec-slider"), u.push(y), a.appendChild(_);
     }), {
-      element: o,
+      element: a,
       update: (d) => {
         const h = d;
         u.forEach((T, _) => T(h[_]));
@@ -2511,7 +2511,7 @@ class mt {
         <line x1="9" y1="8" x2="15" y2="8"></line>
         <line x1="17" y1="16" x2="23" y2="16"></line>
       </svg>
-    `, this.toggleButton.addEventListener("click", () => this.toggle()), this.wrapper.appendChild(this.toggleButton), this.panel = document.createElement("div"), this.panel.className = "uniforms-panel", !Object.values(e.uniforms).some((o) => se(o))) {
+    `, this.toggleButton.addEventListener("click", () => this.toggle()), this.wrapper.appendChild(this.toggleButton), this.panel = document.createElement("div"), this.panel.className = "uniforms-panel", !Object.values(e.uniforms).some((a) => se(a))) {
       this.wrapper.style.display = "none", e.container.appendChild(this.wrapper);
       return;
     }
@@ -2521,9 +2521,9 @@ class mt {
     s.textContent = "Uniforms", n.appendChild(s);
     const r = document.createElement("button");
     r.className = "uniforms-panel-close", r.innerHTML = "&times;", r.title = "Close", r.addEventListener("click", () => this.hide()), n.appendChild(r), this.panel.appendChild(n);
-    const a = document.createElement("div");
-    a.className = "uniforms-panel-content", this.panel.appendChild(a), this.controls = new Fe({
-      container: a,
+    const o = document.createElement("div");
+    o.className = "uniforms-panel-content", this.panel.appendChild(o), this.controls = new Fe({
+      container: o,
       uniforms: e.uniforms,
       initialValues: e.initialValues,
       onChange: e.onChange
@@ -2570,18 +2570,18 @@ class mt {
 }
 const te = (i) => i.replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$/g, "\\$");
 function pt(i, e) {
-  const t = ft(i, e), n = new Blob([t], { type: "text/html" }), r = `${i.root.split("/").pop() || "shader"}.html`, a = URL.createObjectURL(n), o = document.createElement("a");
-  o.href = a, o.download = r, o.click(), URL.revokeObjectURL(a), console.log(`Exported: ${r}`);
+  const t = ft(i, e), n = new Blob([t], { type: "text/html" }), r = `${i.root.split("/").pop() || "shader"}.html`, o = URL.createObjectURL(n), a = document.createElement("a");
+  a.href = o, a.download = r, a.click(), URL.revokeObjectURL(o), console.log(`Exported: ${r}`);
 }
 function ft(i, e) {
   var f, E, x, S;
-  const t = i.meta.title, n = i.commonSource ?? "", s = e.getUniformValues(), r = e.getUBOExportData(), a = ["BufferA", "BufferB", "BufferC", "BufferD", "Image"], o = [];
+  const t = i.meta.title, n = i.commonSource ?? "", s = e.getUniformValues(), r = e.getUBOExportData(), o = ["BufferA", "BufferB", "BufferC", "BufferD", "Image"], a = [];
   let c = !1, u = !1;
-  for (const v of a) {
+  for (const v of o) {
     const C = i.passes[v];
     if (!C) continue;
     const A = C.channels.map((F) => F.kind === "buffer" ? `buffer:${F.buffer}` : F.kind === "texture" ? "procedural" : F.kind === "keyboard" ? (c = !0, "keyboard") : F.kind === "script" ? (u = !0, `script:${F.name}`) : F.kind === "audio" || F.kind === "webcam" || F.kind === "video" ? "black" : "none");
-    o.push({
+    a.push({
       name: v,
       source: C.glslSource,
       channels: C.channels,
@@ -2646,7 +2646,7 @@ float keyDown(int key) { return textureLod(iChannel0, vec2((float(key) + 0.5) / 
 float keyToggle(int key) { return textureLod(iChannel0, vec2((float(key) + 0.5) / 256.0, 0.75), 0.0).x; }
 bool isKeyDown(int key) { return keyDown(key) > 0.5; }
 bool isKeyToggled(int key) { return keyToggle(key) > 0.5; }
-` : "", m = o.map((v) => `  { name: '${v.name}', source: \`${te(v.source)}\`, channels: ${JSON.stringify(v.channelTypes)} }`).join(`,
+` : "", m = a.map((v) => `  { name: '${v.name}', source: \`${te(v.source)}\`, channels: ${JSON.stringify(v.channelTypes)} }`).join(`,
 `), g = `#version 300 es
 precision highp float;
 
@@ -3208,7 +3208,7 @@ class gt {
     }), this.recordedChunks = [], this.mediaRecorder.ondataavailable = (s) => {
       s.data.size > 0 && this.recordedChunks.push(s.data);
     }, this.mediaRecorder.onstop = () => {
-      const s = new Blob(this.recordedChunks, { type: "video/webm" }), r = this.projectRoot.split("/").pop() || "shader", a = /* @__PURE__ */ new Date(), o = a.getFullYear().toString() + (a.getMonth() + 1).toString().padStart(2, "0") + a.getDate().toString().padStart(2, "0") + "-" + a.getHours().toString().padStart(2, "0") + a.getMinutes().toString().padStart(2, "0") + a.getSeconds().toString().padStart(2, "0"), c = `shadertoy-${r}-${o}.webm`, u = URL.createObjectURL(s), d = document.createElement("a");
+      const s = new Blob(this.recordedChunks, { type: "video/webm" }), r = this.projectRoot.split("/").pop() || "shader", o = /* @__PURE__ */ new Date(), a = o.getFullYear().toString() + (o.getMonth() + 1).toString().padStart(2, "0") + o.getDate().toString().padStart(2, "0") + "-" + o.getHours().toString().padStart(2, "0") + o.getMinutes().toString().padStart(2, "0") + o.getSeconds().toString().padStart(2, "0"), c = `shadertoy-${r}-${a}.webm`, u = URL.createObjectURL(s), d = document.createElement("a");
       d.href = u, d.download = c, d.click(), URL.revokeObjectURL(u), console.log(`Recording saved: ${c}`);
     }, this.mediaRecorder.start(), this.isRecording = !0, this.showRecordingIndicator(), console.log("Recording started");
   }
@@ -3289,8 +3289,8 @@ class Et {
   }
   updateTimeDisplay(e) {
     const t = Math.floor(e), n = Math.floor(t / 3600), s = Math.floor(t % 3600 / 60), r = t % 60;
-    let a;
-    n > 0 ? a = `${n}:${s.toString().padStart(2, "0")}:${r.toString().padStart(2, "0")}` : a = `${s}:${r.toString().padStart(2, "0")}`, this.timeDisplay.querySelector(".stat-value").textContent = a;
+    let o;
+    n > 0 ? o = `${n}:${s.toString().padStart(2, "0")}:${r.toString().padStart(2, "0")}` : o = `${s}:${r.toString().padStart(2, "0")}`, this.timeDisplay.querySelector(".stat-value").textContent = o;
   }
   updateResolutionDisplay() {
     this.resolutionDisplay.querySelector(".stat-value").textContent || (this.resolutionDisplay.querySelector(".stat-value").textContent = "0×0");
@@ -3329,21 +3329,21 @@ class vt {
         <circle cx="8" cy="8" r="5"/>
       </svg>
     `, r.addEventListener("click", () => t.onToggleRecording());
-    const a = document.createElement("button");
-    a.className = "control-button", a.title = "Export HTML", a.innerHTML = `
+    const o = document.createElement("button");
+    o.className = "control-button", o.title = "Export HTML", o.innerHTML = `
       <svg viewBox="0 0 16 16">
         <path d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1z"/>
         <path d="M2 14.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
       </svg>
-    `, a.addEventListener("click", () => t.onExportHTML());
-    const o = document.createElement("button");
-    o.className = "control-button", o.title = "Render", o.innerHTML = `
+    `, o.addEventListener("click", () => t.onExportHTML());
+    const a = document.createElement("button");
+    a.className = "control-button", a.title = "Render", a.innerHTML = `
       <svg viewBox="0 0 16 16">
         <path d="M2 3h12v2H2V3zm0 4h12v2H2V7zm0 4h12v2H2v-2z"/>
       </svg>
-    `, o.addEventListener("click", () => t.onRender());
+    `, a.addEventListener("click", () => t.onRender());
     const c = document.createElement("button");
-    c.className = "control-button", c.title = "Close", c.textContent = "−", c.style.fontSize = "20px", c.style.fontWeight = "300", c.addEventListener("click", () => this.toggleMenu()), this.controlsGrid.appendChild(this.playPauseButton), this.controlsGrid.appendChild(n), this.controlsGrid.appendChild(a), this.controlsGrid.appendChild(o), this.controlsGrid.appendChild(s), this.controlsGrid.appendChild(r);
+    c.className = "control-button", c.title = "Close", c.textContent = "−", c.style.fontSize = "20px", c.style.fontWeight = "300", c.addEventListener("click", () => this.toggleMenu()), this.controlsGrid.appendChild(this.playPauseButton), this.controlsGrid.appendChild(n), this.controlsGrid.appendChild(o), this.controlsGrid.appendChild(a), this.controlsGrid.appendChild(s), this.controlsGrid.appendChild(r);
     const u = document.createElement("div");
     this.controlsGrid.appendChild(u), this.controlsGrid.appendChild(c), this.controlsContainer.appendChild(this.controlsGrid), this.controlsContainer.appendChild(this.menuButton), this.container.appendChild(this.controlsContainer);
   }
@@ -3394,8 +3394,8 @@ class Tt {
     });
     const r = document.createElement("div");
     r.className = "render-dialog";
-    const a = document.createElement("div");
-    a.className = "render-dialog-header", a.innerHTML = `
+    const o = document.createElement("div");
+    o.className = "render-dialog-header", o.innerHTML = `
       <div class="render-dialog-title">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
           <path d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1z"/>
@@ -3404,8 +3404,8 @@ class Tt {
         Render
       </div>
     `;
-    const o = document.createElement("button");
-    o.className = "render-dialog-close", o.textContent = "×", o.addEventListener("click", () => this.close()), a.appendChild(o), this.bodyEl = document.createElement("div"), this.bodyEl.className = "render-dialog-body";
+    const a = document.createElement("button");
+    a.className = "render-dialog-close", a.textContent = "×", a.addEventListener("click", () => this.close()), o.appendChild(a), this.bodyEl = document.createElement("div"), this.bodyEl.className = "render-dialog-body";
     const c = this.createField("Resolution"), u = document.createElement("div");
     u.className = "render-field-row", this.widthInput = this.createNumberInput(t, 1, 7680), this.heightInput = this.createNumberInput(n, 1, 4320);
     const d = document.createElement("span");
@@ -3432,7 +3432,7 @@ class Tt {
       <div class="render-progress-text">Preparing...</div>
     `, this.progressBar = this.progressEl.querySelector(".render-progress-bar"), this.progressText = this.progressEl.querySelector(".render-progress-text");
     const f = document.createElement("button");
-    f.className = "render-btn render-btn-cancel", f.textContent = "Cancel Render", f.style.marginTop = "4px", f.addEventListener("click", () => this.cancelRender()), this.progressEl.appendChild(f), r.appendChild(a), r.appendChild(this.bodyEl), r.appendChild(this.actionsEl), r.appendChild(this.progressEl), this.backdrop.appendChild(r);
+    f.className = "render-btn render-btn-cancel", f.textContent = "Cancel Render", f.style.marginTop = "4px", f.addEventListener("click", () => this.cancelRender()), this.progressEl.appendChild(f), r.appendChild(o), r.appendChild(this.bodyEl), r.appendChild(this.actionsEl), r.appendChild(this.progressEl), this.backdrop.appendChild(r);
     const E = () => this.updateEstimate();
     this.widthInput.addEventListener("input", E), this.heightInput.addEventListener("input", E), this.fpsInput.addEventListener("input", E), this.durationInput.addEventListener("input", E), this.formatFrames.addEventListener("change", E), this.formatVideo.addEventListener("change", E), this.updateEstimate();
   }
@@ -3456,8 +3456,8 @@ class Tt {
   updateEstimate() {
     const e = parseInt(this.widthInput.value) || 0, t = parseInt(this.heightInput.value) || 0, n = parseInt(this.fpsInput.value) || 0, s = parseFloat(this.durationInput.value) || 0, r = Math.ceil(n * s);
     if (this.formatFrames.checked) {
-      const o = e * t * 4 / 1048576 * r;
-      this.estimateEl.textContent = `${r} frames, ~${o < 1024 ? Math.round(o) + " MB" : (o / 1024).toFixed(1) + " GB"} raw`;
+      const a = e * t * 4 / 1048576 * r;
+      this.estimateEl.textContent = `${r} frames, ~${a < 1024 ? Math.round(a) + " MB" : (a / 1024).toFixed(1) + " GB"} raw`;
     } else
       this.estimateEl.textContent = `${r} frames, ${s}s at ${n} fps`;
   }
@@ -3469,15 +3469,15 @@ class Tt {
       fps: n,
       duration: s,
       format: r,
-      onProgress: (a, o) => {
-        const c = a / o * 100;
-        this.progressBar.style.width = `${c}%`, this.progressText.textContent = `Frame ${a} / ${o} (${Math.round(c)}%)`;
+      onProgress: (o, a) => {
+        const c = o / a * 100;
+        this.progressBar.style.width = `${c}%`, this.progressText.textContent = `Frame ${o} / ${a} (${Math.round(c)}%)`;
       },
       onComplete: () => {
         this.progressText.textContent = "Done!", this.progressBar.style.width = "100%", setTimeout(() => this.close(), 1500);
       },
-      onError: (a) => {
-        this.progressText.textContent = `Error: ${a.message}`, this.progressBar.style.background = "#c62828";
+      onError: (o) => {
+        this.progressText.textContent = `Error: ${o.message}`, this.progressBar.style.background = "#c62828";
       }
     });
   }
@@ -3527,11 +3527,11 @@ const M = class M {
       const t = e / 1e3, n = t - this.startTime;
       if (this.statsPanel.update(t, n), this.runScriptOnFrame(n, this.statsPanel.totalFrameCount), this.isMultiView) {
         const s = /* @__PURE__ */ new Map();
-        for (const [r, a] of this.views)
+        for (const [r, o] of this.views)
           s.set(r, {
-            mouse: a.getMouseState(),
-            resolution: a.getResolution(),
-            mousePressed: a.getMousePressed()
+            mouse: o.getMouseState(),
+            resolution: o.getResolution(),
+            mousePressed: o.getMousePressed()
           });
         for (const r of this.views.values())
           r.step(n, s);
@@ -3542,21 +3542,21 @@ const M = class M {
     this.container = e.container, this.project = e.project, this.isMultiView = Re(e.project), this.container.hasAttribute("tabindex") || this.container.setAttribute("tabindex", "-1"), this.container.style.outline = "none", this.container.addEventListener("mousedown", () => this.container.focus());
     const t = e.pixelRatio ?? e.project.pixelRatio ?? window.devicePixelRatio;
     if (this.isMultiView) {
-      const s = e.project, r = s.views.map((a) => a.name);
+      const s = e.project, r = s.views.map((o) => o.name);
       if (!e.viewContainers)
         throw new Error("viewContainers required for multi-view projects");
-      for (const a of s.views) {
-        const o = e.viewContainers.get(a.name);
-        if (!o)
-          throw new Error(`No container provided for view "${a.name}"`);
-        const c = this.createViewProject(s, a), u = new Ee({
-          container: o,
+      for (const o of s.views) {
+        const a = e.viewContainers.get(o.name);
+        if (!a)
+          throw new Error(`No container provided for view "${o.name}"`);
+        const c = this.createViewProject(s, o), u = new Ee({
+          container: a,
           project: c,
           keyboardTarget: this.container,
           pixelRatio: t,
           viewNames: r
         });
-        this.views.set(a.name, u);
+        this.views.set(o.name, u);
       }
       this.primaryView = this.views.values().next().value;
     } else {
@@ -3578,8 +3578,8 @@ const M = class M {
           if (this.scriptAPI && ((r = this.project.script) != null && r.setup))
             try {
               this.project.script.setup(this.scriptAPI);
-            } catch (a) {
-              console.error("script.js setup() threw during context restore:", a), this.primaryView.runtimeErrorOverlay.showError("setup", a);
+            } catch (o) {
+              console.error("script.js setup() threw during context restore:", o), this.primaryView.runtimeErrorOverlay.showError("setup", o);
             }
         };
     } else
@@ -3658,7 +3658,7 @@ const M = class M {
       setUniformValue: (t, n) => e.setUniformValue(t, n),
       getUniformValue: (t) => e.primaryView.engine.getUniformValue(t),
       updateTexture: (t, n, s, r) => e.primaryView.engine.updateTexture(t, n, s, r),
-      readPixels: (t, n, s, r, a) => e.primaryView.engine.readPixels(t, n, s, r, a),
+      readPixels: (t, n, s, r, o) => e.primaryView.engine.readPixels(t, n, s, r, o),
       get width() {
         return e.primaryView.engine.width;
       },
@@ -3774,8 +3774,8 @@ const M = class M {
         console.error("Failed to create screenshot blob");
         return;
       }
-      const a = URL.createObjectURL(r), o = document.createElement("a");
-      o.href = a, o.download = s, o.click(), URL.revokeObjectURL(a), console.log(`Screenshot saved: ${s}`);
+      const o = URL.createObjectURL(r), a = document.createElement("a");
+      a.href = o, a.download = s, a.click(), URL.revokeObjectURL(o), console.log(`Screenshot saved: ${s}`);
     }, "image/png");
   }
   toggleRecording() {
@@ -3806,15 +3806,15 @@ const M = class M {
     };
     return (async () => {
       var d, h;
-      const r = this.primaryView.canvas, a = this.primaryView.engine, o = r.width, c = r.height, u = this.isPaused;
+      const r = this.primaryView.canvas, o = this.primaryView.engine, a = r.width, c = r.height, u = this.isPaused;
       try {
-        this.isPaused = !0, r.width = e.width, r.height = e.height, a.resize(e.width, e.height), a.reset(), this.scriptAPI && ((d = this.project.script) != null && d.setup) && this.project.script.setup(this.scriptAPI);
+        this.isPaused = !0, r.width = e.width, r.height = e.height, o.resize(e.width, e.height), o.reset(), this.scriptAPI && ((d = this.project.script) != null && d.setup) && this.project.script.setup(this.scriptAPI);
         const T = Math.ceil(e.fps * e.duration);
         e.format === "video" ? await this.renderVideoFrames(T, e.fps, () => t, e.onProgress) : await this.renderPngFrames(T, e.fps, () => t, e.onProgress), t || e.onComplete();
       } catch (T) {
         t || e.onError(T instanceof Error ? T : new Error(String(T)));
       } finally {
-        if (r.width = o, r.height = c, a.resize(o, c), a.reset(), this.scriptAPI && ((h = this.project.script) != null && h.setup))
+        if (r.width = a, r.height = c, o.resize(a, c), o.reset(), this.scriptAPI && ((h = this.project.script) != null && h.setup))
           try {
             this.project.script.setup(this.scriptAPI);
           } catch {
@@ -3830,26 +3830,26 @@ const M = class M {
         r = await window.showDirectoryPicker({ mode: "readwrite" });
       } catch {
       }
-    for (let a = 0; a < e; a++) {
+    for (let o = 0; o < e; o++) {
       if (n()) return;
-      this.stepForRender(a, t), this.primaryView.presentToScreen();
-      const o = await new Promise((u, d) => {
+      this.stepForRender(o, t), this.primaryView.presentToScreen();
+      const a = await new Promise((u, d) => {
         this.primaryView.canvas.toBlob((h) => h ? u(h) : d(new Error("Failed to capture frame")), "image/png");
-      }), c = `frame_${String(a).padStart(5, "0")}.png`;
+      }), c = `frame_${String(o).padStart(5, "0")}.png`;
       if (r) {
         const d = await (await r.getFileHandle(c, { create: !0 })).createWritable();
-        await d.write(o), await d.close();
+        await d.write(a), await d.close();
       } else {
-        const u = URL.createObjectURL(o), d = document.createElement("a");
+        const u = URL.createObjectURL(a), d = document.createElement("a");
         d.href = u, d.download = c, d.click(), URL.revokeObjectURL(u);
       }
-      s(a + 1, e), a % 10 === 0 && await new Promise((u) => setTimeout(u, 0));
+      s(o + 1, e), o % 10 === 0 && await new Promise((u) => setTimeout(u, 0));
     }
   }
   async renderVideoFrames(e, t, n, s) {
-    const r = this.primaryView.canvas, a = document.createElement("canvas");
-    a.width = r.width, a.height = r.height;
-    const o = a.getContext("2d"), c = a.captureStream(0), u = new MediaRecorder(c, {
+    const r = this.primaryView.canvas, o = document.createElement("canvas");
+    o.width = r.width, o.height = r.height;
+    const a = o.getContext("2d"), c = o.captureStream(0), u = new MediaRecorder(c, {
       mimeType: "video/webm;codecs=vp9",
       videoBitsPerSecond: 8e6
     }), d = [];
@@ -3865,7 +3865,7 @@ const M = class M {
         u.stop(), await h;
         return;
       }
-      this.stepForRender(b, t), this.primaryView.presentToScreen(), o.drawImage(r, 0, 0);
+      this.stepForRender(b, t), this.primaryView.presentToScreen(), a.drawImage(r, 0, 0);
       const w = c.getVideoTracks()[0];
       w != null && w.requestFrame && w.requestFrame(), s(b + 1, e), b % 10 === 0 && await new Promise((R) => setTimeout(R, 0));
     }
@@ -3949,19 +3949,19 @@ class bt {
     s.className = "multi-view-controls-close", s.innerHTML = "&times;", s.title = "Close", s.addEventListener("click", () => this.toggle()), t.appendChild(s), this.panel.appendChild(t);
     const r = document.createElement("div");
     r.className = "controls-section playback-controls";
-    const a = document.createElement("button");
-    a.className = "control-btn play-pause-btn", a.title = "Play/Pause", this.updatePlayPauseIcon(a), a.addEventListener("click", () => {
-      this.opts.onTogglePlayPause(), this.isPaused = this.opts.getPaused(), this.updatePlayPauseIcon(a);
-    }), r.appendChild(a);
     const o = document.createElement("button");
-    if (o.className = "control-btn reset-btn", o.title = "Reset", o.innerHTML = `
+    o.className = "control-btn play-pause-btn", o.title = "Play/Pause", this.updatePlayPauseIcon(o), o.addEventListener("click", () => {
+      this.opts.onTogglePlayPause(), this.isPaused = this.opts.getPaused(), this.updatePlayPauseIcon(o);
+    }), r.appendChild(o);
+    const a = document.createElement("button");
+    if (a.className = "control-btn reset-btn", a.title = "Reset", a.innerHTML = `
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
         <path d="M3 3v5h5"></path>
       </svg>
-    `, o.addEventListener("click", () => {
+    `, a.addEventListener("click", () => {
       this.opts.onReset();
-    }), r.appendChild(o), this.panel.appendChild(r), e && Object.values(e).some((c) => se(c))) {
+    }), r.appendChild(a), this.panel.appendChild(r), e && Object.values(e).some((c) => se(c))) {
       const c = document.createElement("div");
       c.className = "controls-section uniforms-section";
       const u = document.createElement("div");
@@ -4172,13 +4172,13 @@ class _t {
       "BufferC",
       "BufferD"
     ];
-    for (const a of n) {
-      const o = this.project.passes[a];
-      o && this.tabs.push({
+    for (const o of n) {
+      const a = this.project.passes[o];
+      a && this.tabs.push({
         kind: "code",
-        name: `${a.toLowerCase()}.glsl`,
-        passName: a,
-        source: o.glslSource
+        name: `${o.toLowerCase()}.glsl`,
+        passName: o,
+        source: a.glslSource
       });
     }
     const s = this.project.passes.Image;
@@ -4188,44 +4188,44 @@ class _t {
       passName: "Image",
       source: s.glslSource
     });
-    for (const a of this.project.textures)
+    for (const o of this.project.textures)
       this.tabs.push({
         kind: "image",
-        name: a.filename || a.name,
-        url: a.source
+        name: o.filename || o.name,
+        url: o.source
       });
-    const r = async (a) => {
+    const r = async (o) => {
       this.saveCurrentEditorContent();
-      const o = this.tabs[a];
-      if (this.activeTabIndex = a, t.querySelectorAll(".tabbed-tab-button").forEach((c, u) => {
-        c.classList.toggle("active", u === a);
-      }), this.canvasContainer.style.visibility = "hidden", this.imageViewer.style.visibility = "hidden", this.editorContainer.style.visibility = "hidden", this.buttonContainer.style.display = "none", this.editorInstance && (this.editorInstance.destroy(), this.editorInstance = null), o.kind === "shader")
+      const a = this.tabs[o];
+      if (this.activeTabIndex = o, t.querySelectorAll(".tabbed-tab-button").forEach((c, u) => {
+        c.classList.toggle("active", u === o);
+      }), this.canvasContainer.style.visibility = "hidden", this.imageViewer.style.visibility = "hidden", this.editorContainer.style.visibility = "hidden", this.buttonContainer.style.display = "none", this.editorInstance && (this.editorInstance.destroy(), this.editorInstance = null), a.kind === "shader")
         this.canvasContainer.style.visibility = "visible";
-      else if (o.kind === "code") {
+      else if (a.kind === "code") {
         this.editorContainer.style.visibility = "visible", this.buttonContainer.style.display = "flex";
-        const c = this.modifiedSources.get(o.passName) ?? o.source;
+        const c = this.modifiedSources.get(a.passName) ?? a.source;
         this.editorContainer.innerHTML = "";
         try {
           const { createEditor: u } = await Promise.resolve().then(() => Be);
           this.editorInstance = u(this.editorContainer, c, (d) => {
-            this.modifiedSources.set(o.passName, d);
+            this.modifiedSources.set(a.passName, d);
           });
         } catch (u) {
           console.error("Failed to load editor:", u);
           const d = document.createElement("textarea");
           d.className = "tabbed-fallback-textarea", d.value = c, d.addEventListener("input", () => {
-            this.modifiedSources.set(o.passName, d.value);
+            this.modifiedSources.set(a.passName, d.value);
           }), this.editorContainer.appendChild(d);
         }
       } else {
         this.imageViewer.style.visibility = "visible";
         const c = document.createElement("img");
-        c.src = o.url, c.alt = o.name, this.imageViewer.innerHTML = "", this.imageViewer.appendChild(c);
+        c.src = a.url, c.alt = a.name, this.imageViewer.innerHTML = "", this.imageViewer.appendChild(c);
       }
     };
-    return this.tabs.forEach((a, o) => {
+    return this.tabs.forEach((o, a) => {
       const c = document.createElement("button");
-      c.className = "tabbed-tab-button", a.kind === "shader" ? c.classList.add("shader-tab") : a.kind === "image" && c.classList.add("image-tab"), c.textContent = a.name, o === 0 && c.classList.add("active"), c.addEventListener("click", () => r(o)), t.appendChild(c);
+      c.className = "tabbed-tab-button", o.kind === "shader" ? c.classList.add("shader-tab") : o.kind === "image" && c.classList.add("image-tab"), c.textContent = o.name, a === 0 && c.classList.add("active"), c.addEventListener("click", () => r(a)), t.appendChild(c);
     }), e.appendChild(t), e.appendChild(this.buttonContainer), e;
   }
 }
@@ -4241,13 +4241,13 @@ class ve {
     for (const s of e.viewNames) {
       const r = document.createElement("div");
       r.className = "multi-view-canvas", r.setAttribute("data-view-name", s);
-      const a = document.createElement("div");
-      a.className = "multi-view-label", a.textContent = s, r.appendChild(a), this.canvasContainers.set(s, r), this.wrapper.appendChild(r);
+      const o = document.createElement("div");
+      o.className = "multi-view-label", o.textContent = s, r.appendChild(o), this.canvasContainers.set(s, r), this.wrapper.appendChild(r);
     }
     this.container.appendChild(this.wrapper), this.resizeObserver = new ResizeObserver((s) => {
       for (const r of s) {
-        const { width: a, height: o } = r.contentRect;
-        this.updateOrientation(a, o);
+        const { width: o, height: a } = r.contentRect;
+        this.updateOrientation(o, a);
       }
     }), this.resizeObserver.observe(this.wrapper);
     const n = this.wrapper.getBoundingClientRect();
@@ -4354,12 +4354,12 @@ function At(i, e, t) {
     skipUniformsPanel: !1,
     skipPlaybackControls: !1
   });
-  return n.setRecompileHandler && n.setRecompileHandler((r, a) => {
-    const o = s.getEngine();
-    if (!o)
+  return n.setRecompileHandler && n.setRecompileHandler((r, o) => {
+    const a = s.getEngine();
+    if (!a)
       return { success: !1, error: "Engine not initialized" };
     if (r === "common") {
-      const c = o.recompileCommon(a);
+      const c = a.recompileCommon(o);
       if (c.success)
         return { success: !0 };
       const u = c.errors[0];
@@ -4368,16 +4368,16 @@ function At(i, e, t) {
         error: u ? `${u.passName}: ${u.error}` : "Unknown error"
       };
     }
-    return o.recompilePass(r, a);
-  }), n.setUniformHandler && n.setUniformHandler((r, a) => {
-    const o = s.getEngine();
-    o && o.setUniformValue(r, a);
+    return a.recompilePass(r, o);
+  }), n.setUniformHandler && n.setUniformHandler((r, o) => {
+    const a = s.getEngine();
+    a && a.setUniformValue(r, o);
   }), s.hasErrors() || s.start(), Ae(s, () => {
     s.dispose(), n.dispose();
   });
 }
 function Lt(i, e, t) {
-  const n = e.views.map((o) => o.name), s = St(e.viewLayout, {
+  const n = e.views.map((a) => a.name), s = St(e.viewLayout, {
     container: i,
     project: e,
     viewNames: n
@@ -4388,19 +4388,19 @@ function Lt(i, e, t) {
     viewContainers: s.getCanvasContainers(),
     skipPlaybackControls: !0,
     skipUniformsPanel: !0
-  }), a = new bt({
+  }), o = new bt({
     wrapper: s.getWrapperElement(),
     onTogglePlayPause: () => r.togglePlayPause(),
     onReset: () => r.reset(),
     getPaused: () => r.getPaused(),
-    onSetUniformValue: (o, c) => r.setUniformValue(o, c),
+    onSetUniformValue: (a, c) => r.setUniformValue(a, c),
     uniforms: e.uniforms
   });
   return r.hasErrors() || r.start(), Ae(r, () => {
-    a.dispose(), r.dispose(), s.dispose();
+    o.dispose(), r.dispose(), s.dispose();
   });
 }
-function ae(i) {
+function oe(i) {
   return i === "Image" || i === "BufferA" || i === "BufferB" || i === "BufferC" || i === "BufferD";
 }
 function Pt(i) {
@@ -4418,7 +4418,7 @@ function Pt(i) {
   }
 }
 function Le(i) {
-  return typeof i == "string" ? ae(i) ? { buffer: i } : i === "keyboard" ? { keyboard: !0 } : i === "audio" ? { audio: !0 } : i === "webcam" ? { webcam: !0 } : { texture: i } : i;
+  return typeof i == "string" ? oe(i) ? { buffer: i } : i === "keyboard" ? { keyboard: !0 } : i === "audio" ? { audio: !0 } : i === "webcam" ? { webcam: !0 } : { texture: i } : i;
 }
 const ie = ["Image", "BufferA", "BufferB", "BufferC", "BufferD"], kt = ["BufferA", "BufferB", "BufferC", "BufferD"], Pe = ["iChannel0", "iChannel1", "iChannel2", "iChannel3"], Dt = "default", Ut = !0, Mt = "light", Bt = /* @__PURE__ */ new Set([
   "iResolution",
@@ -4526,25 +4526,25 @@ function Ht(i, e) {
   const s = /* @__PURE__ */ new Set();
   if (i.buffers) {
     const r = Object.keys(i.buffers);
-    for (const a of r) {
-      if (typeof a != "string") {
-        n.push(`Buffer name must be a string, got ${typeof a}`);
+    for (const o of r) {
+      if (typeof o != "string") {
+        n.push(`Buffer name must be a string, got ${typeof o}`);
         continue;
       }
-      G(a) || n.push(`Buffer name '${a}' is not a valid GLSL identifier`), s.add(a);
+      G(o) || n.push(`Buffer name '${o}' is not a valid GLSL identifier`), s.add(o);
     }
   }
   if (i.textures && typeof i.textures == "object")
-    for (const [r, a] of Object.entries(i.textures))
-      G(r) || n.push(`Texture name '${r}' is not a valid GLSL identifier`), s.has(r) && n.push(`Texture name '${r}' collides with a buffer name`), typeof a != "string" ? n.push(`Texture source for '${r}' must be a string`) : !ye.has(a) && !/\.\w+$/.test(a) && !G(a) && n.push(`Invalid texture source '${a}' for '${r}'. Expected a file path with extension, a script texture name, or one of: ${[...ye].join(", ")}`);
+    for (const [r, o] of Object.entries(i.textures))
+      G(r) || n.push(`Texture name '${r}' is not a valid GLSL identifier`), s.has(r) && n.push(`Texture name '${r}' collides with a buffer name`), typeof o != "string" ? n.push(`Texture source for '${r}' must be a string`) : !ye.has(o) && !/\.\w+$/.test(o) && !G(o) && n.push(`Invalid texture source '${o}' for '${r}'. Expected a file path with extension, a script texture name, or one of: ${[...ye].join(", ")}`);
   for (const r of ie) {
-    const a = i[r];
-    if (!(!a || typeof a != "object")) {
-      for (const o of Object.keys(a))
-        $t.has(o) || t.push(`Unknown key '${o}' in pass '${r}'`);
-      for (const o of Pe) {
-        const c = a[o];
-        c && typeof c == "string" && ae(c) && c !== "Image" && !i[c] && t.push(`${r}.${o} references '${c}' but no ${c} pass is configured`);
+    const o = i[r];
+    if (!(!o || typeof o != "object")) {
+      for (const a of Object.keys(o))
+        $t.has(a) || t.push(`Unknown key '${a}' in pass '${r}'`);
+      for (const a of Pe) {
+        const c = o[a];
+        c && typeof c == "string" && oe(c) && c !== "Image" && !i[c] && t.push(`${r}.${a} references '${c}' but no ${c} pass is configured`);
       }
     }
   }
@@ -4616,16 +4616,16 @@ function Xt(i, e) {
       case "vec2":
       case "vec3":
       case "vec4": {
-        const a = Vt[r.type];
-        if (!Array.isArray(r.value) || r.value.length !== a)
-          throw new Error(`${s}: 'value' must be an array of ${a} numbers for type '${r.type}'`);
+        const o = Vt[r.type];
+        if (!Array.isArray(r.value) || r.value.length !== o)
+          throw new Error(`${s}: 'value' must be an array of ${o} numbers for type '${r.type}'`);
         if (r.value.some((c) => typeof c != "number"))
           throw new Error(`${s}: all components of 'value' must be numbers`);
-        const o = r;
+        const a = r;
         for (const c of ["min", "max", "step"]) {
-          const u = o[c];
-          if (u !== void 0 && (!Array.isArray(u) || u.length !== a))
-            throw new Error(`${s}: '${c}' must be an array of ${a} numbers for type '${r.type}'`);
+          const u = a[c];
+          if (u !== void 0 && (!Array.isArray(u) || u.length !== o))
+            throw new Error(`${s}: '${c}' must be an array of ${o} numbers for type '${r.type}'`);
         }
         break;
       }
@@ -4647,10 +4647,10 @@ class De {
     l(this, "map", /* @__PURE__ */ new Map());
   }
   register(e, t = "linear", n = "repeat", s) {
-    const r = `${e}|${t}|${n}`, a = this.map.get(r);
-    if (a) return a.name;
-    const o = `tex${this.map.size}`;
-    return this.map.set(r, { name: o, filename: s, source: e, filter: t, wrap: n }), o;
+    const r = `${e}|${t}|${n}`, o = this.map.get(r);
+    if (o) return o.name;
+    const a = `tex${this.map.size}`;
+    return this.map.set(r, { name: a, filename: s, source: e, filter: t, wrap: n }), a;
   }
   toArray() {
     return Array.from(this.map.values());
@@ -4658,10 +4658,10 @@ class De {
 }
 function jt(i, e, t, n, s, r) {
   if ("buffer" in i) {
-    const a = i.buffer;
-    if (!ae(a))
-      throw new Error(`Invalid buffer name '${a}' for ${t} in pass '${e}' at '${n}'.`);
-    return { kind: "buffer", buffer: a, current: !!i.current };
+    const o = i.buffer;
+    if (!oe(o))
+      throw new Error(`Invalid buffer name '${o}' for ${t} in pass '${e}' at '${n}'.`);
+    return { kind: "buffer", buffer: o, current: !!i.current };
   }
   if ("texture" in i)
     return { kind: "texture", name: (r == null ? void 0 : r.get(i.texture)) ?? s.register(i.texture, i.filter, i.wrap), cubemap: i.type === "cubemap" };
@@ -4674,8 +4674,8 @@ function jt(i, e, t, n, s, r) {
 }
 function W(i, e, t, n, s, r) {
   if (!i) return { kind: "none" };
-  const a = Le(i);
-  return a ? jt(a, e, t, n, s, r) : { kind: "none" };
+  const o = Le(i);
+  return o ? jt(o, e, t, n, s, r) : { kind: "none" };
 }
 async function Kt(i, e, t) {
   let n = t == null ? void 0 : t.config;
@@ -4685,8 +4685,8 @@ async function Kt(i, e, t) {
       const r = await i.readText(s);
       try {
         n = JSON.parse(r);
-      } catch (a) {
-        throw new Error(`Invalid JSON in config.json at '${e}': ${(a == null ? void 0 : a.message) ?? String(a)}`);
+      } catch (o) {
+        throw new Error(`Invalid JSON in config.json at '${e}': ${(o == null ? void 0 : o.message) ?? String(o)}`);
       }
     }
   }
@@ -4705,13 +4705,13 @@ async function Yt(i, e, t) {
     throw new Error(
       `Project at '${e}' uses textures (in 'textures/' folder) but has no 'config.json'. Add a config file to define texture bindings.`
     );
-  const a = await i.readText(n);
+  const o = await i.readText(n);
   return Z({
     mode: "standard",
     root: e,
     commonSource: null,
     passes: {
-      Image: { name: "Image", glslSource: a, channels: [{ kind: "none" }, { kind: "none" }, { kind: "none" }, { kind: "none" }] }
+      Image: { name: "Image", glslSource: o, channels: [{ kind: "none" }, { kind: "none" }, { kind: "none" }, { kind: "none" }] }
     },
     script: t == null ? void 0 : t.script
   });
@@ -4725,7 +4725,7 @@ async function zt(i, e, t, n) {
     BufferD: t.BufferD
   };
   s.Image || s.BufferA || s.BufferB || s.BufferC || s.BufferD || (s.Image = {});
-  const a = await ke(i, e, t.common), o = new De(), c = /* @__PURE__ */ new Map();
+  const o = await ke(i, e, t.common), a = new De(), c = /* @__PURE__ */ new Map();
   if (n != null && n.textureUrlResolver)
     for (const d of ie) {
       const h = s[d];
@@ -4735,7 +4735,7 @@ async function zt(i, e, t, n) {
           if (!_) continue;
           const y = Le(_);
           if (y && "texture" in y && !c.has(y.texture)) {
-            const b = await n.textureUrlResolver(y.texture), w = y.texture.split("/").pop(), R = o.register(b, y.filter, y.wrap, w);
+            const b = await n.textureUrlResolver(y.texture), w = y.texture.split("/").pop(), R = a.register(b, y.filter, y.wrap, w);
             c.set(y.texture, R);
           }
         }
@@ -4748,10 +4748,10 @@ async function zt(i, e, t, n) {
     if (!await i.exists(_))
       throw new Error(`Source GLSL file for pass '${d}' not found at '${T}' in '${e}'.`);
     const y = await i.readText(_), b = [
-      W(h.iChannel0, d, "iChannel0", e, o, c),
-      W(h.iChannel1, d, "iChannel1", e, o, c),
-      W(h.iChannel2, d, "iChannel2", e, o, c),
-      W(h.iChannel3, d, "iChannel3", e, o, c)
+      W(h.iChannel0, d, "iChannel0", e, a, c),
+      W(h.iChannel1, d, "iChannel1", e, a, c),
+      W(h.iChannel2, d, "iChannel2", e, a, c),
+      W(h.iChannel3, d, "iChannel3", e, a, c)
     ];
     u[d] = { name: d, glslSource: y, channels: b };
   }
@@ -4768,9 +4768,9 @@ async function zt(i, e, t, n) {
     controls: t.controls,
     startPaused: t.startPaused,
     pixelRatio: t.pixelRatio,
-    commonSource: a,
+    commonSource: o,
     passes: u,
-    textures: o.toArray(),
+    textures: a.toArray(),
     script: n == null ? void 0 : n.script
   });
 }
@@ -4779,10 +4779,10 @@ async function Gt(i, e, t, n) {
   const s = await ke(i, e, t.common), r = t.buffers ?? {};
   if (Object.keys(r).length > 0 || t.textures && Object.keys(t.textures).length > 0)
     return qt(i, e, t, s, n);
-  const a = i.joinPath(e, "image.glsl");
-  if (!await i.exists(a))
+  const o = i.joinPath(e, "image.glsl");
+  if (!await i.exists(o))
     throw new Error(`Standard mode project at '${e}' requires 'image.glsl'.`);
-  const o = await i.readText(a), c = [{ kind: "none" }, { kind: "none" }, { kind: "none" }, { kind: "none" }];
+  const a = await i.readText(o), c = [{ kind: "none" }, { kind: "none" }, { kind: "none" }, { kind: "none" }];
   return Z({
     mode: "standard",
     root: e,
@@ -4796,7 +4796,7 @@ async function Gt(i, e, t, n) {
     pixelRatio: t.pixelRatio,
     commonSource: s,
     passes: {
-      Image: { name: "Image", glslSource: o, channels: c }
+      Image: { name: "Image", glslSource: a, channels: c }
     },
     uniforms: t.uniforms,
     script: n == null ? void 0 : n.script
@@ -4804,16 +4804,16 @@ async function Gt(i, e, t, n) {
 }
 const Wt = /* @__PURE__ */ new Set(["keyboard", "audio", "webcam"]);
 async function qt(i, e, t, n, s) {
-  const r = t.buffers ?? {}, a = Object.keys(r);
-  if (a.length > 4)
+  const r = t.buffers ?? {}, o = Object.keys(r);
+  if (o.length > 4)
     throw new Error(
-      `Standard mode at '${e}' supports max 4 buffers, got ${a.length}: ${a.join(", ")}`
+      `Standard mode at '${e}' supports max 4 buffers, got ${o.length}: ${o.join(", ")}`
     );
-  const o = /* @__PURE__ */ new Map();
-  for (let y = 0; y < a.length; y++)
-    o.set(a[y], kt[y]);
+  const a = /* @__PURE__ */ new Map();
+  for (let y = 0; y < o.length; y++)
+    a.set(o[y], kt[y]);
   const c = new De(), u = /* @__PURE__ */ new Map();
-  for (const [y, b] of o)
+  for (const [y, b] of a)
     u.set(y, { kind: "buffer", buffer: b, current: !1 });
   for (const [y, b] of Object.entries(t.textures ?? {}))
     if (b === "keyboard")
@@ -4839,7 +4839,7 @@ async function qt(i, e, t, n, s) {
       namedSamplers: new Map(u)
     }
   };
-  for (const [y, b] of o) {
+  for (const [y, b] of a) {
     const w = i.joinPath(e, `${y}.glsl`);
     if (!await i.exists(w))
       throw new Error(`Buffer '${y}' requires '${y}.glsl' in '${e}'.`);
@@ -4877,11 +4877,11 @@ function Zt(i) {
   }
   function n(s) {
     const r = t(s);
-    let a = e.get(r);
-    return a || (a = fetch(r).then(
-      (o) => o.ok ? o.text() : null,
+    let o = e.get(r);
+    return o || (o = fetch(r).then(
+      (a) => a.ok ? a.text() : null,
       () => null
-    ), e.set(r, a)), a;
+    ), e.set(r, o)), o;
   }
   return {
     async exists(s) {
@@ -4903,7 +4903,7 @@ function Zt(i) {
       return !1;
     },
     joinPath(...s) {
-      return s.map((r, a) => a === 0 ? r : r.replace(/^\/+/, "")).join("/").replace(/\/+/g, "/");
+      return s.map((r, o) => o === 0 ? r : r.replace(/^\/+/, "")).join("/").replace(/\/+/g, "/");
     },
     baseName(s) {
       return s.split("/").pop() || s;
@@ -4921,7 +4921,7 @@ async function Jt(i) {
 async function Ue(i, e, t) {
   const n = e.endsWith("/") ? e : e + "/", s = Zt(n), r = await Jt(n), o = await Kt(s, ".", {
     script: r,
-    textureUrlResolver: async (c) => new URL(c, n).href
+    textureUrlResolver: async (a) => new URL(a, n).href
   });
   return Ft(i, {
     project: o,
@@ -5097,15 +5097,15 @@ class sn {
       s.className = "editor-prism-container", this.contentArea.appendChild(s);
       try {
         const { createEditor: r } = await Promise.resolve().then(() => Be);
-        this.editorInstance = r(s, n, (a) => {
-          this.modifiedSources.set(t.passName, a);
+        this.editorInstance = r(s, n, (o) => {
+          this.modifiedSources.set(t.passName, o);
         });
       } catch (r) {
         console.error("Failed to load editor:", r);
-        const a = document.createElement("textarea");
-        a.className = "editor-fallback-textarea", a.value = n, a.addEventListener("input", () => {
-          this.modifiedSources.set(t.passName, a.value);
-        }), s.appendChild(a);
+        const o = document.createElement("textarea");
+        o.className = "editor-fallback-textarea", o.value = n, o.addEventListener("input", () => {
+          this.modifiedSources.set(t.passName, o.value);
+        }), s.appendChild(o);
       }
     } else {
       this.copyButton.style.display = "none", this.recompileButton.style.display = "none";
@@ -5182,7 +5182,7 @@ var _e = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
    * @public
    */
   var t = function(n) {
-    var s = /(?:^|\s)lang(?:uage)?-([\w-]+)(?=\s|$)/i, r = 0, a = {}, o = {
+    var s = /(?:^|\s)lang(?:uage)?-([\w-]+)(?=\s|$)/i, r = 0, o = {}, a = {
       /**
        * By default, Prism will attempt to highlight all code elements (by calling {@link Prism.highlightAll}) on the
        * current page after the page finished loading. This might be a problem if e.g. you wanted to asynchronously load
@@ -5281,9 +5281,9 @@ var _e = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
         clone: function p(m, g) {
           g = g || {};
           var f, E;
-          switch (o.util.type(m)) {
+          switch (a.util.type(m)) {
             case "Object":
-              if (E = o.util.objId(m), g[E])
+              if (E = a.util.objId(m), g[E])
                 return g[E];
               f = /** @type {Record<string, any>} */
               {}, g[E] = f;
@@ -5294,7 +5294,7 @@ var _e = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
                 f
               );
             case "Array":
-              return E = o.util.objId(m), g[E] ? g[E] : (f = [], g[E] = f, /** @type {Array} */
+              return E = a.util.objId(m), g[E] ? g[E] : (f = [], g[E] = f, /** @type {Array} */
               /** @type {any} */
               m.forEach(function(S, v) {
                 f[v] = p(S, g);
@@ -5401,10 +5401,10 @@ var _e = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
         /**
          * The grammar for plain, unformatted text.
          */
-        plain: a,
-        plaintext: a,
-        text: a,
-        txt: a,
+        plain: o,
+        plaintext: o,
+        text: o,
+        txt: o,
         /**
          * Creates a deep copy of the language with the given id and appends the given tokens.
          *
@@ -5434,7 +5434,7 @@ var _e = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
          * });
          */
         extend: function(p, m) {
-          var g = o.util.clone(o.languages[p]);
+          var g = a.util.clone(a.languages[p]);
           for (var f in m)
             g[f] = m[f];
           return g;
@@ -5516,7 +5516,7 @@ var _e = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
          */
         insertBefore: function(p, m, g, f) {
           f = f || /** @type {any} */
-          o.languages;
+          a.languages;
           var E = f[p], x = {};
           for (var S in E)
             if (E.hasOwnProperty(S)) {
@@ -5526,18 +5526,18 @@ var _e = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
               g.hasOwnProperty(S) || (x[S] = E[S]);
             }
           var C = f[p];
-          return f[p] = x, o.languages.DFS(o.languages, function(A, F) {
+          return f[p] = x, a.languages.DFS(a.languages, function(A, F) {
             F === C && A != p && (this[A] = x);
           }), x;
         },
         // Traverse a language definition with Depth First Search
         DFS: function p(m, g, f, E) {
           E = E || {};
-          var x = o.util.objId;
+          var x = a.util.objId;
           for (var S in m)
             if (m.hasOwnProperty(S)) {
               g.call(m, S, m[S], f || S);
-              var v = m[S], C = o.util.type(v);
+              var v = m[S], C = a.util.type(v);
               C === "Object" && !E[x(v)] ? (E[x(v)] = !0, p(v, g, null, E)) : C === "Array" && !E[x(v)] && (E[x(v)] = !0, p(v, g, S, E));
             }
         }
@@ -5556,7 +5556,7 @@ var _e = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
        * @public
        */
       highlightAll: function(p, m) {
-        o.highlightAllUnder(document, p, m);
+        a.highlightAllUnder(document, p, m);
       },
       /**
        * Fetches all the descendants of `container` that have a `.language-xxxx` class and then calls
@@ -5579,9 +5579,9 @@ var _e = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
           container: p,
           selector: 'code[class*="language-"], [class*="language-"] code, code[class*="lang-"], [class*="lang-"] code'
         };
-        o.hooks.run("before-highlightall", f), f.elements = Array.prototype.slice.apply(f.container.querySelectorAll(f.selector)), o.hooks.run("before-all-elements-highlight", f);
+        a.hooks.run("before-highlightall", f), f.elements = Array.prototype.slice.apply(f.container.querySelectorAll(f.selector)), a.hooks.run("before-all-elements-highlight", f);
         for (var E = 0, x; x = f.elements[E++]; )
-          o.highlightElement(x, m === !0, f.callback);
+          a.highlightElement(x, m === !0, f.callback);
       },
       /**
        * Highlights the code inside a single element.
@@ -5612,10 +5612,10 @@ var _e = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
        * @public
        */
       highlightElement: function(p, m, g) {
-        var f = o.util.getLanguage(p), E = o.languages[f];
-        o.util.setLanguage(p, f);
+        var f = a.util.getLanguage(p), E = a.languages[f];
+        a.util.setLanguage(p, f);
         var x = p.parentElement;
-        x && x.nodeName.toLowerCase() === "pre" && o.util.setLanguage(x, f);
+        x && x.nodeName.toLowerCase() === "pre" && a.util.setLanguage(x, f);
         var S = p.textContent, v = {
           element: p,
           language: f,
@@ -5623,18 +5623,18 @@ var _e = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
           code: S
         };
         function C(F) {
-          v.highlightedCode = F, o.hooks.run("before-insert", v), v.element.innerHTML = v.highlightedCode, o.hooks.run("after-highlight", v), o.hooks.run("complete", v), g && g.call(v.element);
+          v.highlightedCode = F, a.hooks.run("before-insert", v), v.element.innerHTML = v.highlightedCode, a.hooks.run("after-highlight", v), a.hooks.run("complete", v), g && g.call(v.element);
         }
-        if (o.hooks.run("before-sanity-check", v), x = v.element.parentElement, x && x.nodeName.toLowerCase() === "pre" && !x.hasAttribute("tabindex") && x.setAttribute("tabindex", "0"), !v.code) {
-          o.hooks.run("complete", v), g && g.call(v.element);
+        if (a.hooks.run("before-sanity-check", v), x = v.element.parentElement, x && x.nodeName.toLowerCase() === "pre" && !x.hasAttribute("tabindex") && x.setAttribute("tabindex", "0"), !v.code) {
+          a.hooks.run("complete", v), g && g.call(v.element);
           return;
         }
-        if (o.hooks.run("before-highlight", v), !v.grammar) {
-          C(o.util.encode(v.code));
+        if (a.hooks.run("before-highlight", v), !v.grammar) {
+          C(a.util.encode(v.code));
           return;
         }
         if (m && n.Worker) {
-          var A = new Worker(o.filename);
+          var A = new Worker(a.filename);
           A.onmessage = function(F) {
             C(F.data);
           }, A.postMessage(JSON.stringify({
@@ -5643,7 +5643,7 @@ var _e = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
             immediateClose: !0
           }));
         } else
-          C(o.highlight(v.code, v.grammar, v.language));
+          C(a.highlight(v.code, v.grammar, v.language));
       },
       /**
        * Low-level function, only use if you know what you’re doing. It accepts a string of text as input
@@ -5671,9 +5671,9 @@ var _e = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
           grammar: m,
           language: g
         };
-        if (o.hooks.run("before-tokenize", f), !f.grammar)
+        if (a.hooks.run("before-tokenize", f), !f.grammar)
           throw new Error('The language "' + f.language + '" has no grammar.');
-        return f.tokens = o.tokenize(f.code, f.grammar), o.hooks.run("after-tokenize", f), c.stringify(o.util.encode(f.tokens), f.language);
+        return f.tokens = a.tokenize(f.code, f.grammar), a.hooks.run("after-tokenize", f), c.stringify(a.util.encode(f.tokens), f.language);
       },
       /**
        * This is the heart of Prism, and the most low-level function you can use. It accepts a string of text as input
@@ -5729,7 +5729,7 @@ var _e = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
          * @public
          */
         add: function(p, m) {
-          var g = o.hooks.all;
+          var g = a.hooks.all;
           g[p] = g[p] || [], g[p].push(m);
         },
         /**
@@ -5742,7 +5742,7 @@ var _e = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
          * @public
          */
         run: function(p, m) {
-          var g = o.hooks.all[p];
+          var g = a.hooks.all[p];
           if (!(!g || !g.length))
             for (var f = 0, E; E = g[f++]; )
               E(m);
@@ -5750,7 +5750,7 @@ var _e = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
       },
       Token: c
     };
-    n.Prism = o;
+    n.Prism = a;
     function c(p, m, g, f) {
       this.type = p, this.content = m, this.alias = g, this.length = (f || "").length | 0;
     }
@@ -5771,7 +5771,7 @@ var _e = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
         attributes: {},
         language: g
       }, x = m.alias;
-      x && (Array.isArray(x) ? Array.prototype.push.apply(E.classes, x) : E.classes.push(x)), o.hooks.run("wrap", E);
+      x && (Array.isArray(x) ? Array.prototype.push.apply(E.classes, x) : E.classes.push(x)), a.hooks.run("wrap", E);
       var S = "";
       for (var v in E.attributes)
         S += " " + v + '="' + (E.attributes[v] || "").replace(/"/g, "&quot;") + '"';
@@ -5794,8 +5794,8 @@ var _e = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
           for (var C = 0; C < v.length; ++C) {
             if (x && x.cause == S + "," + C)
               return;
-            var A = v[C], F = A.inside, B = !!A.lookbehind, oe = !!A.greedy, Ne = A.alias;
-            if (oe && !A.pattern.global) {
+            var A = v[C], F = A.inside, B = !!A.lookbehind, ae = !!A.greedy, Ne = A.alias;
+            if (ae && !A.pattern.global) {
               var Ie = A.pattern.toString().match(/[imsuy]*$/)[0];
               A.pattern = RegExp(A.pattern.source, Ie + "g");
             }
@@ -5805,7 +5805,7 @@ var _e = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
                 return;
               if (!(N instanceof c)) {
                 var V = 1, k;
-                if (oe) {
+                if (ae) {
                   if (k = u(ce, D, p, B), !k || k.index >= p.length)
                     break;
                   var X = k.index, Oe = k.index + k[0].length, U = D;
@@ -5822,7 +5822,7 @@ var _e = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
                 x && Q > x.reach && (x.reach = Q);
                 var K = P.prev;
                 J && (K = T(m, K, J), D += J.length), _(m, K, V);
-                var $e = new c(S, F ? o.tokenize(j, F) : j, Ne, j);
+                var $e = new c(S, F ? a.tokenize(j, F) : j, Ne, j);
                 if (P = T(m, K, $e), le && T(m, P, le), V > 1) {
                   var ee = {
                     cause: S + "," + C,
@@ -5854,20 +5854,20 @@ var _e = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
       return m;
     }
     if (!n.document)
-      return n.addEventListener && (o.disableWorkerMessageHandler || n.addEventListener("message", function(p) {
+      return n.addEventListener && (a.disableWorkerMessageHandler || n.addEventListener("message", function(p) {
         var m = JSON.parse(p.data), g = m.language, f = m.code, E = m.immediateClose;
-        n.postMessage(o.highlight(f, o.languages[g], g)), E && n.close();
-      }, !1)), o;
-    var b = o.util.currentScript();
-    b && (o.filename = b.src, b.hasAttribute("data-manual") && (o.manual = !0));
+        n.postMessage(a.highlight(f, a.languages[g], g)), E && n.close();
+      }, !1)), a;
+    var b = a.util.currentScript();
+    b && (a.filename = b.src, b.hasAttribute("data-manual") && (a.manual = !0));
     function w() {
-      o.manual || o.highlightAll();
+      a.manual || a.highlightAll();
     }
-    if (!o.manual) {
+    if (!a.manual) {
       var R = document.readyState;
       R === "loading" || R === "interactive" && b && b.defer ? document.addEventListener("DOMContentLoaded", w) : window.requestAnimationFrame ? window.requestAnimationFrame(w) : window.setTimeout(w, 16);
     }
-    return o;
+    return a;
   }(e);
   i.exports && (i.exports = t), typeof _e < "u" && (_e.Prism = t), t.languages.markup = {
     comment: {
@@ -5961,19 +5961,19 @@ var _e = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
      * addInlined('style', 'css');
      */
     value: function(s, r) {
-      var a = {};
-      a["language-" + r] = {
+      var o = {};
+      o["language-" + r] = {
         pattern: /(^<!\[CDATA\[)[\s\S]+?(?=\]\]>$)/i,
         lookbehind: !0,
         inside: t.languages[r]
-      }, a.cdata = /^<!\[CDATA\[|\]\]>$/i;
-      var o = {
+      }, o.cdata = /^<!\[CDATA\[|\]\]>$/i;
+      var a = {
         "included-cdata": {
           pattern: /<!\[CDATA\[[\s\S]*?\]\]>/i,
-          inside: a
+          inside: o
         }
       };
-      o["language-" + r] = {
+      a["language-" + r] = {
         pattern: /[\s\S]+/,
         inside: t.languages[r]
       };
@@ -5984,7 +5984,7 @@ var _e = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
         }), "i"),
         lookbehind: !0,
         greedy: !0,
-        inside: o
+        inside: a
       }, t.languages.insertBefore("markup", "cdata", c);
     }
   }), Object.defineProperty(t.languages.markup.tag, "addAttribute", {
@@ -6249,7 +6249,7 @@ var _e = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
     Element.prototype.matches || (Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector);
     var n = "Loading…", s = function(b, w) {
       return "✖ Error " + b + " while fetching file: " + w;
-    }, r = "✖ Error: File does not exist or is empty", a = {
+    }, r = "✖ Error: File does not exist or is empty", o = {
       js: "javascript",
       py: "python",
       rb: "ruby",
@@ -6259,7 +6259,7 @@ var _e = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
       bat: "batch",
       h: "c",
       tex: "latex"
-    }, o = "data-src-status", c = "loading", u = "loaded", d = "failed", h = "pre[data-src]:not([" + o + '="' + u + '"]):not([' + o + '="' + c + '"])';
+    }, a = "data-src-status", c = "loading", u = "loaded", d = "failed", h = "pre[data-src]:not([" + a + '="' + u + '"]):not([' + a + '="' + c + '"])';
     function T(b, w, R) {
       var p = new XMLHttpRequest();
       p.open("GET", b, !0), p.onreadystatechange = function() {
@@ -6281,20 +6281,20 @@ var _e = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
         b.element
       );
       if (w.matches(h)) {
-        b.code = "", w.setAttribute(o, c);
+        b.code = "", w.setAttribute(a, c);
         var R = w.appendChild(document.createElement("CODE"));
         R.textContent = n;
         var p = w.getAttribute("data-src"), m = b.language;
         if (m === "none") {
           var g = (/\.(\w+)$/.exec(p) || [, "none"])[1];
-          m = a[g] || g;
+          m = o[g] || g;
         }
         t.util.setLanguage(R, m), t.util.setLanguage(w, m);
         var f = t.plugins.autoloader;
         f && f.loadLanguages(m), T(
           p,
           function(E) {
-            w.setAttribute(o, u);
+            w.setAttribute(a, u);
             var x = _(w.getAttribute("data-range"));
             if (x) {
               var S = E.split(/\r\n?|\n/g), v = x[0], C = x[1] == null ? S.length : x[1];
@@ -6304,7 +6304,7 @@ var _e = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
             R.textContent = E, t.highlightElement(R);
           },
           function(E) {
-            w.setAttribute(o, d), R.textContent = E;
+            w.setAttribute(a, d), R.textContent = E;
           }
         );
       }
@@ -6327,7 +6327,7 @@ var _e = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : t
     };
   }();
 })(Me);
-var an = Me.exports;
+var on = Me.exports;
 Prism.languages.c = Prism.languages.extend("clike", {
   comment: {
     pattern: /\/\/(?:[^\r\n\\]|\\(?:\r\n?|\n|(?![\r\n])))*|\/\*[\s\S]*?(?:\*\/|$)/,
@@ -6489,50 +6489,50 @@ delete Prism.languages.c.boolean;
     "class-name": /\b[a-z_]\w*\b(?!\s*::)/i
   }, i.languages.cpp["base-clause"]);
 })(Prism);
-function on(i, e, t) {
+function an(i, e, t) {
   const n = document.createElement("div");
   n.className = "prism-editor-wrapper";
   const s = document.createElement("div");
   s.className = "prism-editor-line-numbers";
   const r = document.createElement("div");
   r.className = "prism-editor-area";
-  const a = document.createElement("textarea");
-  a.className = "prism-editor-textarea", a.value = e, a.spellcheck = !1, a.autocapitalize = "off", a.autocomplete = "off";
-  const o = document.createElement("div");
-  o.className = "prism-editor-highlight";
+  const o = document.createElement("textarea");
+  o.className = "prism-editor-textarea", o.value = e, o.spellcheck = !1, o.autocapitalize = "off", o.autocomplete = "off";
+  const a = document.createElement("div");
+  a.className = "prism-editor-highlight";
   const c = document.createElement("code");
-  c.className = "language-cpp", o.appendChild(c), r.appendChild(a), r.appendChild(o), n.appendChild(s), n.appendChild(r), i.appendChild(n);
+  c.className = "language-cpp", a.appendChild(c), r.appendChild(o), r.appendChild(a), n.appendChild(s), n.appendChild(r), i.appendChild(n);
   function u() {
-    const T = a.value;
+    const T = o.value;
     c.textContent = T + `
-`, an.highlightElement(c);
+`, on.highlightElement(c);
     const _ = T.split(`
 `);
     s.innerHTML = _.map((y, b) => `<span>${b + 1}</span>`).join(""), t && t(T);
   }
   function d() {
-    o.scrollTop = a.scrollTop, o.scrollLeft = a.scrollLeft, s.scrollTop = a.scrollTop;
+    a.scrollTop = o.scrollTop, a.scrollLeft = o.scrollLeft, s.scrollTop = o.scrollTop;
   }
   function h(T) {
     if (T.key === "Tab") {
       T.preventDefault();
-      const _ = a.selectionStart, y = a.selectionEnd, b = a.value;
-      a.value = b.substring(0, _) + "  " + b.substring(y), a.selectionStart = a.selectionEnd = _ + 2, u();
+      const _ = o.selectionStart, y = o.selectionEnd, b = o.value;
+      o.value = b.substring(0, _) + "  " + b.substring(y), o.selectionStart = o.selectionEnd = _ + 2, u();
     }
   }
-  return a.addEventListener("input", u), a.addEventListener("scroll", d), a.addEventListener("keydown", h), u(), {
-    getSource: () => a.value,
+  return o.addEventListener("input", u), o.addEventListener("scroll", d), o.addEventListener("keydown", h), u(), {
+    getSource: () => o.value,
     setSource: (T) => {
-      a.value = T, u();
+      o.value = T, u();
     },
     destroy: () => {
-      a.removeEventListener("input", u), a.removeEventListener("scroll", d), a.removeEventListener("keydown", h), n.parentNode && n.parentNode.removeChild(n);
+      o.removeEventListener("input", u), o.removeEventListener("scroll", d), o.removeEventListener("keydown", h), n.parentNode && n.parentNode.removeChild(n);
     }
   };
 }
 const Be = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  createEditor: on
+  createEditor: an
 }, Symbol.toStringTag, { value: "Module" }));
 export {
   Ue as loadFromFolder,

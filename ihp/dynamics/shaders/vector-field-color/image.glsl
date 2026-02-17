@@ -1,13 +1,14 @@
 // =============================================
-// VECTOR FIELD — DIRECTION/MAGNITUDE COLORING
-// =============================================
-// Paste into Shadertoy (no channels needed, single tab)
+//  IHP Shader Workshop 2026
+//  VECTOR FIELD — DIRECTION/MAGNITUDE COLORING
 //
-// Hue from direction, brightness from magnitude.
-// Singularities appear as dark points where all colors meet.
+//  Hue from direction, brightness from magnitude.
+//  Singularities appear as dark points where all
+//  colors converge.
+// =============================================
 
 // =============================================
-// EDIT HERE: Define your vector field V(x, y)
+//  YOUR VECTOR FIELD
 // =============================================
 
 vec2 V(vec2 p) {
@@ -25,14 +26,16 @@ vec2 V(vec2 p) {
 }
 
 // =============================================
-// PARAMETERS
+//  PARAMETERS
+//
+//  VIEW_RADIUS — half-width of the visible window
 // =============================================
 
 #define PI 3.14159265359
 #define VIEW_RADIUS 5.0
 
 // =============================================
-// VISUALIZATION CODE (no need to edit below)
+//  VISUALIZATION (nothing below needs editing)
 // =============================================
 
 // Cubehelix rainbow (same as domain coloring)

@@ -1,14 +1,15 @@
 // =============================================
-// DOMAIN COLORING — CHECKERBOARD GRID
-// =============================================
-// Common tab: complex arithmetic (same as domain-coloring)
-// No channels needed
+//  IHP Shader Workshop 2026
+//  DOMAIN COLORING — CHECKERBOARD
 //
-// Pulls back a checkerboard with subdivision grid through f(z).
-// Pure geometry — no phase coloring.
+//  Pulls back a black-and-white checkerboard grid
+//  through f(z). Makes geometric distortion visible:
+//  area changes, angle changes, and conformality.
+//  Common tab: complex arithmetic library.
+// =============================================
 
 // =============================================
-// EDIT HERE: Define your complex function f(z)
+//  YOUR FUNCTION
 // =============================================
 
 vec2 f(vec2 z) {
@@ -22,14 +23,17 @@ vec2 f(vec2 z) {
 }
 
 // =============================================
-// PARAMETERS
+//  PARAMETERS
+//
+//  VIEW_RADIUS   — half-width of the view window
+//  SUBDIVISIONS  — minor grid lines per unit square
 // =============================================
 
 #define VIEW_RADIUS   4.0
 #define SUBDIVISIONS  4.0     // minor grid lines per unit square
 
 // =============================================
-// VISUALIZATION CODE (no need to edit below)
+//  VISUALIZATION (nothing below needs editing)
 // =============================================
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {

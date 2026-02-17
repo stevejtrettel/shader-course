@@ -1,3 +1,6 @@
+// IHP Shader Workshop 2026
+// A disk — smoothstep threshold on distance to the origin.
+
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     vec2 uv = (2.0 * fragCoord - iResolution.xy) / iResolution.y;
 

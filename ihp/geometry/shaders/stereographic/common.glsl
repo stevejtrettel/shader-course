@@ -1,7 +1,10 @@
-// ═══════════════════════════════════════════════════════════════
-//  Stereographic Projection — Curves on Plane & Sphere
-//  COMMON tab (math library — nothing to edit here)
-// ═══════════════════════════════════════════════════════════════
+// =============================================
+//  IHP Shader Workshop 2026
+//  STEREOGRAPHIC PROJECTION (Common tab)
+//
+//  Library: stereographic projection utilities,
+//  curve definition.
+// =============================================
 
 #define PI  3.14159265359
 #define TAU 6.28318530718
@@ -11,7 +14,7 @@
 #define SPHERE_RADIUS 1.0
 
 
-// ── Stereographic Projection ────────────────────────────────
+// ── Stereographic Projection ─────────────────
 //
 //  Unit sphere centered at (0,0,1), south pole at origin.
 //  Projection from north pole (0,0,2) to the z=0 plane.
@@ -31,7 +34,7 @@ float conformalFactor(vec2 w) {
 }
 
 
-// ── Ray Intersection ────────────────────────────────────────
+// ── Ray Intersection ─────────────────────────
 
 float hitPlane(vec3 ro, vec3 rd) {
     if (abs(rd.z) < 1e-6) return -1.0;
@@ -50,7 +53,7 @@ float hitSphere(vec3 ro, vec3 rd) {
 }
 
 
-// ── Soft Shadow ─────────────────────────────────────────────
+// ── Soft Shadow ──────────────────────────────
 
 float sphereShadow(vec3 p, vec3 lightDir) {
     vec3 oc = p - SPHERE_CENTER;
@@ -62,7 +65,7 @@ float sphereShadow(vec3 p, vec3 lightDir) {
 }
 
 
-// ── Ambient Occlusion ───────────────────────────────────────
+// ── Ambient Occlusion ────────────────────────
 
 float sphereAO(vec3 p, vec3 n) {
     vec3 v = SPHERE_CENTER - p;
@@ -73,7 +76,7 @@ float sphereAO(vec3 p, vec3 n) {
 }
 
 
-// ── Color Utilities ─────────────────────────────────────────
+// ── Color Utilities ──────────────────────────
 
 vec3 hsv2rgb(vec3 c) {
     vec3 p = abs(fract(c.xxx + vec3(0, 2.0/3.0, 1.0/3.0)) * 6.0 - 3.0);

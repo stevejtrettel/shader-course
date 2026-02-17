@@ -1,14 +1,15 @@
 // =============================================
-// IMPLICIT SURFACE — NESTED LEVEL SETS
+//  IHP Shader Workshop 2026
+//  IMPLICIT SURFACE — NESTED LEVEL SETS
+//
+//  Renders multiple level sets f = c1, c2, ..., cn
+//  simultaneously with front-to-back compositing.
+//  Highlight one level while ghosting the rest to
+//  reveal nested topology.
 // =============================================
-// Raymarches multiple level sets f(x,y,z) = c inside a
-// bounding box on a ground plane. Colored isolines on
-// box walls, ambient occlusion on the ground.
-// Drag to orbit.
 
 // =============================================
-// EDIT HERE: Define your implicit function f(x, y, z)
-// Should return values spanning your level set range.
+//  YOUR FUNCTION
 // =============================================
 
 #define PI 3.14159265359
@@ -27,25 +28,38 @@ float f(vec3 p) {
 }
 
 // =============================================
-// EDIT HERE: Level set configuration
+//  PARAMETERS
+//
+//  CENTER_LEVEL    — value of the central level set
+//  LEVEL_SPACING   — spacing between consecutive levels
+//  NUM_LEVELS      — number of level sets
+//  HIGHLIGHT       — opaque level index (-1 for all opaque)
+//  GHOST_OPACITY   — opacity of non-highlighted levels (0 to 1)
+//  BOX_SIZE        — bounding box half-size
+//  SHOW_BOX        — 1 = bounding box, 0 = unbounded
+//  MARCH_RADIUS    — max march distance when SHOW_BOX = 0
+//  STEP_SIZE       — ray march step size
+//  ISO_LINE_WIDTH  — isoline width on box faces
+//  SPEC_EXP        — specular exponent
+//  CAM_DIST        — camera distance from origin
+//  CAM_HEIGHT      — camera height
+//  CAM_SPEED       — orbit speed
+//  FOV             — field of view
 // =============================================
 
-#define CENTER_LEVEL  0.0     // value of the central level set
-#define LEVEL_SPACING 0.5     // spacing between consecutive levels
-#define NUM_LEVELS    5        // number of level sets
+// Level set configuration
+#define CENTER_LEVEL  0.0
+#define LEVEL_SPACING 0.5
+#define NUM_LEVELS    5
 
 // Highlight one level set: that level is opaque, the rest translucent.
 // Set to -1 for all opaque (no highlighting).
 #define HIGHLIGHT     -1
-#define GHOST_OPACITY 0.25    // opacity of non-highlighted levels (0 to 1)
-
-// =============================================
-// PARAMETERS
-// =============================================
+#define GHOST_OPACITY 0.25
 
 #define BOX_SIZE   vec3(1.0)
-#define SHOW_BOX   1               // 1 = bounding box, 0 = unbounded
-#define MARCH_RADIUS 10.0          // max march distance when SHOW_BOX = 0
+#define SHOW_BOX   1
+#define MARCH_RADIUS 10.0
 #define STEP_SIZE  0.01
 #define ISO_LINE_WIDTH 0.2
 #define SPEC_EXP   128.0
@@ -57,7 +71,7 @@ float f(vec3 p) {
 #define FOV        2.0
 
 // =============================================
-// VISUALIZATION CODE (no need to edit below)
+//  VISUALIZATION (nothing below needs editing)
 // =============================================
 
 #define LIGHT_DIR normalize(vec3(cos(-iTime*0.3+PI*0.5), 1.0, sin(-iTime*0.3+PI*0.5)))

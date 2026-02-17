@@ -1,13 +1,16 @@
-// ============================================================
+// =============================================
+//  IHP Shader Workshop 2026
 //  APOLLONIAN CIRCLE PACKING
-//  Given three mutually tangent circles (specified by curvature),
-//  this shader computes the fourth via Descartes' theorem, then
-//  draws the full Apollonian gasket by iterating inversions
-//  through the dual circles of the initial quadruple.
-// ============================================================
+//
+//  Apollonian gasket via iterated circle
+//  inversions. Specify three initial curvatures
+//  and a sign choice. Packing is rendered by
+//  folding each pixel into the fundamental domain.
+// =============================================
 
-
-// === USER SETTINGS =========================================
+// =============================================
+//  YOUR CONFIGURATION
+// =============================================
 
 // Curvatures of three mutually tangent circles.
 // Use 0.0 for a straight line, negative for exterior circles.
@@ -21,11 +24,21 @@ const float K3 = 3.0;
 //   true  = inner circle (+ root, smaller circle in the interstice)
 const bool INNER = false;
 
-
 // Camera: center point and zoom level
 const vec2  CENTER = vec2(0.0, 1.0);  // world-space center of the view
 const float ZOOM   = 4.5;             // half-width of view (smaller = zoomed in)
 
+// =============================================
+//  PARAMETERS
+//
+//  COLOR_0 — COLOR_3     — colors for the four initial circles
+//  COLOR_BG              — background color (gasket dust)
+//  FADE_RATE             — depth fade toward white (0 = none, 1 = max)
+//  BORDER_THICKNESS      — circle outline width in world coords
+//  BORDER_COLOR          — circle outline color
+//  BORDER_FADE           — how much borders fade with depth
+//  MAX_ITER              — maximum folding iterations
+// =============================================
 
 // Colors for each of the four initial circles (RGB).
 const vec3 COLOR_0 = vec3(0.30, 1.00, 0.40);  // green  (k1)
@@ -48,16 +61,14 @@ const float BORDER_FADE  = 0.6;        // how much borders fade with depth
 // Maximum iterations
 const int MAX_ITER = 100;
 
-
-// === END USER SETTINGS =====================================
-
-
-
+// =============================================
+//  VISUALIZATION (nothing below needs editing)
+// =============================================
 
 const float EPS = 1e-4;
 
 
-// --- Descartes' Theorem ---
+// Descartes' Theorem
 // (k1+k2+k3+k4)^2 = 2(k1^2+k2^2+k3^2+k4^2)
 // => k4 = k1+k2+k3 +/- 2*sqrt(k1*k2 + k2*k3 + k3*k1)
 
@@ -69,7 +80,7 @@ float descartesK4(float a, float b, float c, bool inner) {
 }
 
 
-// --- Data Structures ---
+// Data Structures
 
 struct Circle {
     vec2 center;
@@ -78,7 +89,7 @@ struct Circle {
 };
 
 
-// --- Geometric Operations ---
+// Geometric Operations
 
 vec2 invert(vec2 z, Circle C) {
     if (abs(C.curvature) < EPS) {
@@ -107,7 +118,7 @@ float distToBoundary(vec2 p, Circle C) {
 }
 
 
-// --- Circle Construction ---
+// Circle Construction
 
 Circle lineFromPoints(vec2 A, vec2 B) {
     vec2 t = normalize(B - A);
@@ -137,7 +148,7 @@ Circle circleFromThreePoints(vec3 A, vec3 B, vec3 C) {
 }
 
 
-// --- Tangent Points ---
+// Tangent Points
 
 vec3 getTangentPoint(Circle c1, Circle c2) {
     bool line1 = abs(c1.curvature) < EPS;
@@ -152,7 +163,7 @@ vec3 getTangentPoint(Circle c1, Circle c2) {
 }
 
 
-// --- Orientation Helpers ---
+// Orientation Helpers
 
 bool checkDescartes(vec4 q) {
     float s = q.x + q.y + q.z + q.w;
@@ -199,7 +210,7 @@ void orientDuals(inout Circle circ[4]) {
 }
 
 
-// --- Apollonian Solver ---
+// Apollonian Solver
 
 mat4 solveApollonianQuad(vec4 kInput) {
     vec4 k = kInput;
@@ -311,7 +322,7 @@ Circle[4] buildQuadruple(vec4 curvatures) {
 }
 
 
-// --- Main Packing Renderer ---
+// Main Packing Renderer
 
 vec4 renderPacking(Circle main[4], vec2 p) {
 
@@ -386,7 +397,7 @@ vec4 renderPacking(Circle main[4], vec2 p) {
 }
 
 
-// --- Entry Point ---
+// Entry Point
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     vec2 uv = (fragCoord - 0.5 * iResolution.xy) / iResolution.y * ZOOM + CENTER;

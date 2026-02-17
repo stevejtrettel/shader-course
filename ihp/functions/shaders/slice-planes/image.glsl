@@ -1,20 +1,15 @@
 // =============================================
-// 3D SLICE PLANES
+//  IHP Shader Workshop 2026
+//  3D SCALAR FIELD — SLICE PLANES
+//
+//  Animated slice planes cutting through f(x,y,z)
+//  with gradient-corrected contour lines. Three
+//  reference planes at x=0, y=0, z=0 plus one
+//  active sweep plane.
 // =============================================
-// Visualizes a scalar field f(x,y,z) using cutting planes:
-//
-//   • Three semi-transparent REFERENCE planes at x=0, y=0, z=0
-//     show a muted colormap with contour lines for spatial context.
-//
-//   • One opaque ACTIVE slice sweeps back and forth along a
-//     chosen axis, showing a rich colormap with gradient-corrected
-//     contour lines — a 2D level-set plot embedded in 3D.
-//
-// The active slice axis (x, y, or z) is configurable.
-// Drag to orbit.
 
 // =============================================
-// EDIT HERE: Define your function f(x, y, z)
+//  YOUR FUNCTION
 // =============================================
 
 float f(vec3 p) {
@@ -31,7 +26,16 @@ float f(vec3 p) {
 }
 
 // =============================================
-// PARAMETERS
+//  PARAMETERS
+//
+//  SLICE_AXIS     — active slice axis (0=x, 1=y, 2=z)
+//  SLICE_SPEED    — sweep oscillation speed
+//  SLICE_RANGE    — sweep amplitude
+//  DOMAIN_SIZE    — bounding box half-extents
+//  SPACING        — distance between contour lines
+//  LINE_PX        — contour line width in pixels
+//  COLOR_SCALE    — colormap saturation
+//  ZERO_LINE_PX   — f=0 contour width (thicker)
 // =============================================
 
 #define PI 3.14159265359
@@ -78,7 +82,7 @@ const vec3 GRID_COLOR   = vec3(0.6, 0.58, 0.55);
 const vec3 AXIS_COLOR   = vec3(0.35, 0.33, 0.3);
 
 // =============================================
-// VISUALIZATION CODE (no need to edit below)
+//  VISUALIZATION (nothing below needs editing)
 // =============================================
 
 #define LIGHT_DIR normalize(vec3(cos(-iTime*0.3 + PI*0.5), 1.0, sin(-iTime*0.3 + PI*0.5)))

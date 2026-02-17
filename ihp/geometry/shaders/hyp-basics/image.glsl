@@ -1,21 +1,27 @@
-/////////////////////////////////////////////////////
-//  HYPERBOLIC 3-SPACE — POINTS & GEODESICS
-//  Balls and geodesic lines in the hyperboloid model.
+// =============================================
+//  IHP Shader Workshop 2026
+//  HYPERBOLIC 3-SPACE — POINTS AND GEODESICS
 //
-//  Uses common.glsl math library (Common tab).
-//  Mouse drag to orbit. Auto-rotates when idle.
-/////////////////////////////////////////////////////
+//  Place balls and geodesic tubes in H³ using
+//  the hyperboloid model. Raymarching along
+//  hyperbolic geodesics. Drag to orbit.
+//  Common tab: hyperboloid model utilities.
+// =============================================
 
-
-// === SCENE =========================================
-// Points: specify (x, y, z) in the ambient R^{3,1}.
-// The hyperboloid coordinate w = sqrt(1 + x² + y² + z²)
-// is computed automatically.
-//
-// Geodesics connect pairs of points (by index).
+// =============================================
+//  YOUR POINTS AND GEODESICS
+// =============================================
 
 #define NUM_POINTS    5
 #define NUM_GEODESICS 10
+
+// =============================================
+//  PARAMETERS
+//
+//  BALL_RADIUS  — hyperbolic radius of each ball
+//  TUBE_RADIUS  — geodesic tube thickness
+//  BG_COLOR     — background color
+// =============================================
 
 const float BALL_RADIUS = 0.30;   // hyperbolic radius
 const float TUBE_RADIUS = 0.065;  // geodesic tube radius
@@ -45,9 +51,9 @@ void getGeodesic(int i, out int a, out int b, out vec3 col) {
                   a = 3; b = 4; col = vec3(0.9, 0.5, 0.3);
 }
 
-// ===================================================
-// ===  EDIT ABOVE THIS LINE  ========================
-// ===================================================
+// =============================================
+//  VISUALIZATION (nothing below needs editing)
+// =============================================
 
 
 // === HELPERS =======================================

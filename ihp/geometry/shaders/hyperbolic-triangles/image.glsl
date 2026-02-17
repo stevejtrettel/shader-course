@@ -1,58 +1,59 @@
-/////////////////////////////////////////////////////
+// =============================================
+//  IHP Shader Workshop 2026
 //  HYPERBOLIC TRIANGLE TILINGS
-//  Workshop Shader — Illustrating Mathematics
 //
-//  Visualizes (P, Q, R) triangle groups in the
+//  (P, Q, R) triangle group tilings of the
 //  hyperbolic plane via iterated reflection.
-//  Drag to orbit.
-/////////////////////////////////////////////////////
+//  Choose the triangle angles and viewing model.
+// =============================================
 
-//--------------------------------------------------
-// MODEL (uncomment one)
-//--------------------------------------------------
+// =============================================
+//  YOUR TRIANGLE GROUP
+// =============================================
+
+// Model (uncomment one)
 #define MODEL_POINCARE
 //#define MODEL_UHP
 //#define MODEL_KLEIN
 //#define MODEL_BAND
 
-//--------------------------------------------------
-// THEME (uncomment one)
-//--------------------------------------------------
+// Theme (uncomment one)
 //#define THEME_DARK
 #define THEME_LIGHT
 
-//--------------------------------------------------
-// TRIANGLE GROUP (P, Q, R)
+// Triangle group (P, Q, R)
 //   Angles pi/P, pi/Q, pi/R.
 //   Must satisfy 1/P + 1/Q + 1/R < 1.
-//--------------------------------------------------
 #define TRI_P  3
 #define TRI_Q  2
 #define TRI_R  10
 
-//--------------------------------------------------
-// WHAT TO DRAW
-//--------------------------------------------------
+// What to draw
 #define DRAW_EDGES    true
 #define DRAW_VERTICES true
 #define DRAW_PARITY   true    // two-color by orientation?
 
-//--------------------------------------------------
-// SIZES (hyperbolic distance units)
-//--------------------------------------------------
+// =============================================
+//  PARAMETERS
+//
+//  EDGE_THICKNESS   — hyperbolic width of edges
+//  VERTEX_RADIUS    — hyperbolic radius of vertices
+//  ZOOM             — camera zoom level
+//  ANIMATE          — enable orbit animation
+//  ROTATE_SPEED     — rotation speed
+//  DRIFT_AMOUNT     — drift amplitude
+// =============================================
+
 #define EDGE_THICKNESS   0.015
 #define VERTEX_RADIUS    0.06
 
-//--------------------------------------------------
-// ANIMATION
-//--------------------------------------------------
+#define ZOOM 2.4
+
 #define ANIMATE       true
 #define ROTATE_SPEED  0.3
 #define DRIFT_AMOUNT  0.15
 
-//--------------------------------------------------
-// COLORS
-//--------------------------------------------------
+// Colors
 #ifdef THEME_DARK
     const vec3 COLOR_A      = vec3(0.55, 0.70, 0.85);
     const vec3 COLOR_B      = vec3(0.20, 0.30, 0.45);
@@ -69,15 +70,9 @@
     const vec3 COLOR_BORDER = vec3(0.4, 0.38, 0.35);
 #endif
 
-//--------------------------------------------------
-// ZOOM
-//--------------------------------------------------
-#define ZOOM 2.4
-
-
-/////////////////////////////////////////////////////
-//  IMPLEMENTATION
-/////////////////////////////////////////////////////
+// =============================================
+//  VISUALIZATION (nothing below needs editing)
+// =============================================
 
 const float PI = 3.14159265;
 

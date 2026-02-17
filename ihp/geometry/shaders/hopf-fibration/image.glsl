@@ -1,25 +1,39 @@
-// ═══════════════════════════════════════════════════════════════
-//  ★  EDIT HERE  ★   Fiber Configuration
-// ═══════════════════════════════════════════════════════════════
+// =============================================
+//  IHP Shader Workshop 2026
+//  HOPF FIBRATION
 //
-//  NUM_FIBERS    — total number of fibers to draw
-//  TUBE_RADIUS   — thickness of each fiber tube
-//  CAMERA_DIST   — initial camera distance (scroll to zoom)
-//
-//  INTRINSIC — how fiber thickness is measured:
-//    0 → uniform Euclidean thickness in R³
-//    1 → uniform thickness on S³ (intrinsic geometry)
-//        fibers swell near ∞ where stereographic projection
-//        stretches space, revealing the conformal factor
+//  Hopf fibers of S3 rendered in R3 via
+//  stereographic projection. SDF computed
+//  directly from the bundle structure -- no
+//  fiber is ever parameterized. Drag to orbit.
+//  Common tab: Hopf map, stereo projection,
+//  camera utilities.
+// =============================================
+
+// =============================================
+//  YOUR FIBER CONFIGURATION
+// =============================================
 
 #define NUM_FIBERS  16
 #define TUBE_RADIUS 0.06
 #define CAMERA_DIST 5.0
 #define INTRINSIC   0
 
+// =============================================
+//  PARAMETERS
+//
+//  NUM_FIBERS   — total number of fibers to draw
+//  TUBE_RADIUS  — thickness of each fiber tube
+//  CAMERA_DIST  — initial camera distance
+//  INTRINSIC    — 0: uniform Euclidean thickness
+//                 1: uniform thickness on S3
+//                    (fibers swell near infinity
+//                    where stereographic projection
+//                    stretches space)
+// =============================================
 
-// ── Base points on S² ───────────────────────────────────────
-//  Return the i-th point on S² (i = 0 .. NUM_FIBERS-1).
+// ── Base points on S2 ────────────────────────
+//  Return the i-th point on S2 (i = 0 .. NUM_FIBERS-1).
 //  The Hopf fiber over each point will be drawn.
 //  Uncomment ONE block, or write your own.
 
@@ -51,8 +65,8 @@ vec3 basePoint(int i) {
 }
 
 
-// ── Fiber color ─────────────────────────────────────────────
-//  Color each fiber by its base point on S².
+// ── Fiber color ──────────────────────────────
+//  Color each fiber by its base point on S2.
 //  Default: hue = longitude, brightness = latitude.
 
 vec3 fiberColor(vec3 bp) {
@@ -62,9 +76,9 @@ vec3 fiberColor(vec3 bp) {
 }
 
 
-// ═══════════════════════════════════════════════════════════════
-//  Implementation — no need to edit below this line
-// ═══════════════════════════════════════════════════════════════
+// =============================================
+//  VISUALIZATION (nothing below needs editing)
+// =============================================
 
 #define MAX_STEPS  100
 #define MAX_DIST   25.0

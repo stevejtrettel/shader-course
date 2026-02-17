@@ -1,13 +1,15 @@
 // =============================================
-// IMPLICIT SURFACE — SINGLE LEVEL SET
+//  IHP Shader Workshop 2026
+//  IMPLICIT SURFACE — SINGLE LEVEL SET
+//
+//  Raymarches the surface f(x,y,z) = 0 inside a
+//  bounding box on a ground plane. Isolines on box
+//  walls show where the surface meets each face.
+//  Drag to orbit.
 // =============================================
-// Raymarches the surface f(x,y,z) = 0 inside a bounding box
-// sitting on a ground plane. Isolines of f on the box walls.
-// Drag to orbit.
 
 // =============================================
-// EDIT HERE: Define your implicit function f(x, y, z)
-// The surface is the level set f = 0.
+//  YOUR FUNCTION
 // =============================================
 
 #define PI 3.14159265359
@@ -31,14 +33,27 @@ float f(vec3 p) {
 }
 
 // =============================================
-// PARAMETERS
+//  PARAMETERS
+//
+//  BOX_SIZE        — bounding box half-size
+//  SHOW_BOX        — 1 = bounding box, 0 = unbounded
+//  MARCH_RADIUS    — max march distance when SHOW_BOX = 0
+//  STEP_SIZE       — ray march step size
+//  ISO_LINE_WIDTH  — isoline width on box faces
+//  SPEC_EXP        — specular exponent
+//  CAM_DIST        — camera distance from origin
+//  CAM_HEIGHT      — camera height
+//  CAM_SPEED       — orbit speed
+//  FOV             — field of view
+//  SURFACE_COLOR   — surface diffuse color
+//  ISO_COLOR       — isoline color on box faces
 // =============================================
 
-#define BOX_SIZE   vec3(1.0)       // bounding box half-size
-#define SHOW_BOX   1              // 1 = bounding box, 0 = unbounded
-#define MARCH_RADIUS 10.0          // max march distance when SHOW_BOX = 0
+#define BOX_SIZE   vec3(1.0)
+#define SHOW_BOX   1
+#define MARCH_RADIUS 10.0
 #define STEP_SIZE  0.01
-#define ISO_LINE_WIDTH 0.2         // isoline width on box faces
+#define ISO_LINE_WIDTH 0.2
 #define SPEC_EXP   128.0
 
 // Camera
@@ -52,7 +67,7 @@ const vec3 SURFACE_COLOR = vec3(0.4, 0.6, 0.95);
 const vec3 ISO_COLOR     = vec3(0.05);
 
 // =============================================
-// VISUALIZATION CODE (no need to edit below)
+//  VISUALIZATION (nothing below needs editing)
 // =============================================
 
 #define LIGHT_DIR normalize(vec3(cos(-iTime*0.3+PI*0.5), 1.0, sin(-iTime*0.3+PI*0.5)))

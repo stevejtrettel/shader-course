@@ -1,36 +1,24 @@
-// ╔══════════════════════════════════════════════════════════════════╗
-// ║  Polygonal Billiard Trajectories                                ║
-// ║                                                                  ║
-// ║  HOW TO EDIT: change the table in the section below marked       ║
-// ║  "TABLE DEFINITION". Set NUM_VERTS and list vertices CCW.        ║
-// ║  Several examples are provided — uncomment the one you want.     ║
-// ║                                                                  ║
-// ║  Mouse.x → launch angle    Mouse.y → start position on edge 0   ║
-// ╚══════════════════════════════════════════════════════════════════╝
-
-
-// ── rendering settings ──────────────────────────────────────────
-#define MAX_BOUNCES    200
-#define DRAW_SPEED     0.8
-#define LINE_WIDTH     1.8
-#define GLOW_WIDTH     12.0
-#define SHOW_SCATTERER 0       // 1 = add central circular obstacle
-#define SCATTERER_R    0.12
-
-
-// ═══════════════════════════════════════════════════════════════
-//  TABLE DEFINITION — edit here!
+// =============================================
+//  IHP Shader Workshop 2026
+//  POLYGONAL BILLIARDS
 //
-//  • Set NUM_VERTS to the number of vertices
-//  • Define getVertex(int i) returning each vertex CCW
-//  • Vertices should be centered roughly around the origin
-//  • Scale to fit in roughly [-0.5, 0.5]
+//  A billiard trajectory inside a convex polygon.
+//  Mouse.x controls launch angle,
+//  Mouse.y controls starting position on edge 0.
+// =============================================
+
+// =============================================
+//  YOUR POLYGON
+// =============================================
+
+//  Set NUM_VERTS to the number of vertices.
+//  Define getVertex(int i) returning each vertex CCW.
+//  Vertices should be centered roughly around the origin.
+//  Scale to fit in roughly [-0.5, 0.5].
 //
 //  Uncomment ONE of the examples below, or write your own.
-// ═══════════════════════════════════════════════════════════════
 
-
-// ── Example 1: Rectangle (classic billiard table) ───────────────
+// -- Example 1: Rectangle (classic billiard table) --
 /*
 #define NUM_VERTS 4
 vec2 getVertex(int i) {
@@ -43,7 +31,7 @@ vec2 getVertex(int i) {
 }
 */
 
-// ── Example 2: Equilateral triangle ─────────────────────────────
+// -- Example 2: Equilateral triangle --
 /*
 #define NUM_VERTS 3
 vec2 getVertex(int i) {
@@ -52,7 +40,7 @@ vec2 getVertex(int i) {
 }
 */
 
-// ── Example 3: Regular pentagon ─────────────────────────────────
+// -- Example 3: Regular pentagon --
 
 #define NUM_VERTS 5
 vec2 getVertex(int i) {
@@ -61,7 +49,7 @@ vec2 getVertex(int i) {
 }
 
 
-// ── Example 4: Regular hexagon ──────────────────────────────────
+// -- Example 4: Regular hexagon --
 /*
 #define NUM_VERTS 6
 vec2 getVertex(int i) {
@@ -70,7 +58,7 @@ vec2 getVertex(int i) {
 }
 */
 
-// ── Example 5: L-shaped room (non-convex) ───────────────────────
+// -- Example 5: L-shaped room (non-convex) --
 /*
 #define NUM_VERTS 6
 vec2 getVertex(int i) {
@@ -85,7 +73,7 @@ vec2 getVertex(int i) {
 }
 */
 
-// ── Example 6: Right triangle (rational angles → periodic) ──────
+// -- Example 6: Right triangle (rational angles -> periodic) --
 /*
 #define NUM_VERTS 3
 vec2 getVertex(int i) {
@@ -97,7 +85,7 @@ vec2 getVertex(int i) {
 }
 */
 
-// ── Example 7: Isosceles triangle (irrational angle → ergodic?) ─
+// -- Example 7: Isosceles triangle (irrational angle -> ergodic?) --
 /*
 #define NUM_VERTS 3
 vec2 getVertex(int i) {
@@ -109,7 +97,7 @@ vec2 getVertex(int i) {
 }
 */
 
-// ── Example 8: Star-shaped (non-convex!) ────────────────────────
+// -- Example 8: Star-shaped (non-convex!) --
 /*
 #define NUM_VERTS 10
 vec2 getVertex(int i) {
@@ -119,11 +107,27 @@ vec2 getVertex(int i) {
 }
 */
 
+// =============================================
+//  PARAMETERS
+//
+//  MAX_BOUNCES    — number of reflections to compute
+//  DRAW_SPEED     — trajectory drawing speed
+//  LINE_WIDTH     — trajectory line thickness (px)
+//  GLOW_WIDTH     — glow radius around trajectory (px)
+//  SHOW_SCATTERER — 1 = add central circular obstacle
+//  SCATTERER_R    — radius of circular scatterer
+// =============================================
 
-// ═══════════════════════════════════════════════════════════════
-//  END TABLE DEFINITION — nothing below here needs editing
-// ═══════════════════════════════════════════════════════════════
+#define MAX_BOUNCES    200
+#define DRAW_SPEED     0.8
+#define LINE_WIDTH     1.8
+#define GLOW_WIDTH     12.0
+#define SHOW_SCATTERER 0
+#define SCATTERER_R    0.12
 
+// =============================================
+//  VISUALIZATION (nothing below needs editing)
+// =============================================
 
 float segDist(vec2 p, vec2 a, vec2 b) {
     vec2 pa = p - a, ba = b - a;

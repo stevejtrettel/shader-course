@@ -1,12 +1,10 @@
-/////////////////////////////////////////////////////
-//  HYPERBOLIC 3-SPACE — COMMON MATH LIBRARY
-//  Hyperboloid model in R^{3,1}
+// =============================================
+//  IHP Shader Workshop 2026
+//  HYPERBOLOID MODEL UTILITIES (Common tab)
 //
-//  Points on H^3:   x² + y² + z² - w² = -1, w > 0
-//  Tangent vectors:  spacelike (positive Minkowski norm)
-//
-//  Paste into Shadertoy "Common" tab.
-/////////////////////////////////////////////////////
+//  Minkowski inner product, geodesics, distance,
+//  camera setup.
+// =============================================
 
 
 // === INVERSE HYPERBOLIC FUNCTIONS =================

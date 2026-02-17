@@ -1,16 +1,15 @@
 // =============================================
-// 3D VOLUMETRIC DENSITY PLOT
-// =============================================
-// Renders a scalar field rho(x,y,z) as a luminous volume
-// using emission-absorption raymarching.
+//  IHP Shader Workshop 2026
+//  3D SCALAR FIELD — VOLUMETRIC RENDERING
 //
-// Positive density glows warm (orange/white).
-// Negative density glows cool (blue/cyan).
-// Near-zero regions are transparent.
-// Drag to orbit.
+//  Emission-absorption volume rendering of a
+//  density field. Positive values glow warm
+//  (orange/white), negative glow cool (blue/cyan).
+//  Gradient lighting for depth.
+// =============================================
 
 // =============================================
-// EDIT HERE: Define your density function rho(x, y, z)
+//  YOUR FUNCTION
 // =============================================
 
 float rho(vec3 p) {
@@ -32,7 +31,14 @@ float rho(vec3 p) {
 }
 
 // =============================================
-// PARAMETERS
+//  PARAMETERS
+//
+//  VOLUME_SIGN    — which sign to render (0=both, 1=pos, -1=neg)
+//  DENSITY_SCALE  — amplifies density for visibility
+//  ABSORPTION     — opacity per unit density
+//  BRIGHTNESS     — emission multiplier
+//  GLOW_POWER     — contrast curve (1 = linear)
+//  NUM_STEPS      — raymarch sample count
 // =============================================
 
 // Which sign to render: 0 = both, 1 = positive only, -1 = negative only
@@ -71,7 +77,7 @@ const vec3 NEG_COLOR_EDGE = vec3(0.1, 0.35, 0.9);
 const vec3 BG_COLOR       = vec3(0.02, 0.02, 0.04);
 
 // =============================================
-// VISUALIZATION CODE (no need to edit below)
+//  VISUALIZATION (nothing below needs editing)
 // =============================================
 
 #define LIGHT_DIR normalize(vec3(cos(-iTime*0.3+PI*0.5), 1.0, sin(-iTime*0.3+PI*0.5)))

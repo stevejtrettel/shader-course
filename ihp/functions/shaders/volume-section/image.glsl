@@ -1,13 +1,14 @@
 // =============================================
-// VOLUMETRIC DENSITY — CROSS-SECTION
+//  IHP Shader Workshop 2026
+//  3D SCALAR FIELD — VOLUME CROSS-SECTION
+//
+//  Same as the volume shader, but with a sweeping
+//  clip plane that progressively reveals the density.
+//  Everything else identical.
 // =============================================
-// Identical to the basic volume shader, but an animated
-// plane clips the density — samples above the plane are
-// simply skipped. The box and grid stay fixed.
-// Drag to orbit.
 
 // =============================================
-// EDIT HERE: Define your density function rho(x, y, z)
+//  YOUR FUNCTION
 // =============================================
 
 float rho(vec3 p) {
@@ -23,7 +24,14 @@ float rho(vec3 p) {
 }
 
 // =============================================
-// PARAMETERS
+//  PARAMETERS
+//
+//  VOLUME_SIGN    — which sign to render (0=both, 1=pos, -1=neg)
+//  DENSITY_SCALE  — amplifies density for visibility
+//  CLIP_SPEED     — clip plane sweep speed
+//  CLIP_RANGE     — clip plane sweep amplitude
+//  CLIP_NORMAL    — clip plane orientation
+//  NUM_STEPS      — raymarch sample count
 // =============================================
 
 const int VOLUME_SIGN = 0;
@@ -66,7 +74,7 @@ const vec3 NEG_COLOR_EDGE = vec3(0.1, 0.35, 0.9);
 const vec3 BG_COLOR       = vec3(0.02, 0.02, 0.04);
 
 // =============================================
-// VISUALIZATION CODE (no need to edit below)
+//  VISUALIZATION (nothing below needs editing)
 // =============================================
 
 #define LIGHT_DIR normalize(vec3(cos(-iTime*0.3+PI*0.5), 1.0, sin(-iTime*0.3+PI*0.5)))

@@ -1,14 +1,15 @@
 // =============================================
-// 2D LEVEL SETS — COLORED STRIPES
-// =============================================
-// Paste into Shadertoy (no channels needed)
+//  IHP Shader Workshop 2026
+//  LEVEL SETS — COLORED CONTOUR REGIONS
 //
-// Fills bands between level sets with distinct colors,
-// antialiased using the error function for correct
-// Gaussian-weighted pixel blending.
+//  Fills bands between level sets with distinct
+//  colors, topographic-map style. Antialiased
+//  using the error function for mathematically
+//  correct pixel blending.
+// =============================================
 
 // =============================================
-// EDIT HERE: Define your function f(x, y)
+//  YOUR FUNCTION
 // =============================================
 
 float f(vec2 p, float t) {
@@ -21,7 +22,7 @@ float f(vec2 p, float t) {
 }
 
 // =============================================
-// EDIT HERE: Stripe colors
+//  STRIPE COLORS
 // =============================================
 
 #define NUM_COLORS 4
@@ -33,14 +34,17 @@ vec3 stripeColors[NUM_COLORS] = vec3[NUM_COLORS](
 );
 
 // =============================================
-// PARAMETERS
+//  PARAMETERS
+//
+//  VIEW_RADIUS   — half-width of visible region
+//  STRIPE_WIDTH  — width of each stripe in value-space
 // =============================================
 
-#define VIEW_RADIUS  5.0      // half-width of visible region
-#define STRIPE_WIDTH 0.5      // width of each stripe in value-space
+#define VIEW_RADIUS  5.0
+#define STRIPE_WIDTH 0.5
 
 // =============================================
-// VISUALIZATION CODE (no need to edit below)
+//  VISUALIZATION (nothing below needs editing)
 // =============================================
 
 // Abramowitz and Stegun, equation 7.1.27

@@ -1,3 +1,7 @@
+// IHP Shader Workshop 2026
+// Polar colors — angle to hue, radius to brightness rings.
+// A preview of domain coloring: the identity map in polar coordinates.
+
 #define PI 3.14159265
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {

@@ -1,29 +1,28 @@
 // =============================================
-// HYPERBOLIC GEOMETRY EXPLORER
+//  IHP Shader Workshop 2026
+//  HYPERBOLIC GEOMETRY EXPLORER
+//
+//  A graphing calculator for the hyperbolic plane.
+//  Define points, geodesics, and horocycles in
+//  upper half-plane coordinates and view them
+//  in any model.
 // =============================================
-// Draw points, geodesics, and horocycles in the
-// hyperbolic plane. All objects are specified in
-// upper half-plane coordinates. Choose your model.
-// Drag to orbit (Poincaré/Klein/Band).
 
 // =============================================
-// MODEL (uncomment one)
+//  YOUR CONFIGURATION
 // =============================================
+
+// Model (uncomment one)
 #define MODEL_POINCARE
 //#define MODEL_UHP
 //#define MODEL_KLEIN
 //#define MODEL_BAND
 
-// =============================================
-// THEME (uncomment one)
-// =============================================
+// Theme (uncomment one)
 //#define THEME_DARK
 #define THEME_LIGHT
 
-// =============================================
-// EDIT HERE: Points in UHP (x + yi, y > 0)
-// =============================================
-
+// Points in UHP (x + yi, y > 0)
 #define NUM_POINTS 3
 vec2 pts[NUM_POINTS] = vec2[NUM_POINTS](
     vec2(0.0, 1.0),        // i
@@ -39,12 +38,9 @@ float ptRadius[NUM_POINTS] = float[NUM_POINTS](
     0.08, 0.08, 0.08
 );
 
-// =============================================
-// EDIT HERE: Geodesics (through two UHP points)
+// Geodesics (through two UHP points)
 // Each vec4 = (z1.x, z1.y, z2.x, z2.y)
 // The full geodesic is drawn, not just the segment.
-// =============================================
-
 #define NUM_GEODESICS 3
 vec4 geos[NUM_GEODESICS] = vec4[NUM_GEODESICS](
     vec4(0.0, 1.0,  1.5, 0.8),      // connecting point 0 and 1
@@ -60,15 +56,12 @@ float geoThick[NUM_GEODESICS] = float[NUM_GEODESICS](
     0.02, 0.02, 0.02
 );
 
-// =============================================
-// EDIT HERE: Horocycles
+// Horocycles
 // vec2(base, radius):
 //   base = point on the real axis where horocycle is tangent
 //   radius = Euclidean radius of the horocycle in UHP
 // For a horocycle at infinity: vec2(INF, height)
 //   where height = the y-coordinate of the horizontal line
-// =============================================
-
 #define INF 1e10
 #define NUM_HOROCYCLES 2
 vec2 horos[NUM_HOROCYCLES] = vec2[NUM_HOROCYCLES](
@@ -84,7 +77,15 @@ float horoThick[NUM_HOROCYCLES] = float[NUM_HOROCYCLES](
 );
 
 // =============================================
-// PARAMETERS
+//  PARAMETERS
+//
+//  AA_WIDTH       — antialiasing width
+//  ZOOM           — camera zoom level
+//  UHP_CENTER     — center of view in UHP mode
+//  UHP_SCALE      — zoom for UHP mode
+//  ANIMATE        — enable orbit animation
+//  ROTATE_SPEED   — rotation speed
+//  DRIFT_AMOUNT   — drift amplitude
 // =============================================
 
 #define PI 3.14159265359
@@ -113,7 +114,7 @@ float horoThick[NUM_HOROCYCLES] = float[NUM_HOROCYCLES](
 #endif
 
 // =============================================
-// IMPLEMENTATION
+//  VISUALIZATION (nothing below needs editing)
 // =============================================
 
 // ---- Complex arithmetic ----

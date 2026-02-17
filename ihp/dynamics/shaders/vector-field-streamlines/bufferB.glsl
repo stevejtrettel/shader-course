@@ -1,5 +1,10 @@
-// iChannel0 = Buffer A (nearest/clamp)
-// iChannel1 = Buffer B (self, linear/clamp)
+// =============================================
+//  IHP Shader Workshop 2026
+//  ANIMATED STREAMLINES — Buffer B (trail accumulation)
+//
+//  Reads: iChannel0 = Buffer A, iChannel1 = Buffer B (self)
+//  Accumulates particle trails with fade.
+// =============================================
 
 float drawPoint(vec2 uv, vec2 p) {
     return smoothstep(SIZE, SIZE * 0.5, length(uv - p));
