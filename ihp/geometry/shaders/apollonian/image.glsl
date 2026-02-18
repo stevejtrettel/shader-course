@@ -155,8 +155,8 @@ vec3 getTangentPoint(Circle c1, Circle c2) {
     bool line2 = abs(c2.curvature) < EPS;
 
     if (line1 && line2) return vec3(0.0, 0.0, 0.0);
-    if (line1) return vec3(c2.center - c1.center / c2.curvature, 1.0);
-    if (line2) return vec3(c1.center - c2.center / c1.curvature, 1.0);
+    if (line1) return vec3(c2.center + c1.center / c2.curvature, 1.0);
+    if (line2) return vec3(c1.center + c2.center / c1.curvature, 1.0);
 
     float k1 = c1.curvature, k2 = c2.curvature;
     return vec3((k1 * c1.center + k2 * c2.center) / (k1 + k2), 1.0);
@@ -239,7 +239,7 @@ mat4 solveApollonianQuad(vec4 kInput) {
         mapToGeom = ivec4(0, 1, 2, 3);
     }
     else if (zeros == 1) {
-        c[0] = Circle(vec2(0.0, 1.0), 0.0, 0.0);
+        c[0] = Circle(vec2(0.0, -1.0), 0.0, 0.0);
         c[1] = Circle(vec2(0.0, 1.0 / k.y), k.y, 0.0);
         c[2] = Circle(vec2(2.0 / sqrt(k.y * k.z), 1.0 / k.z), k.z, 0.0);
         c[3] = Circle(vec2(2.0 / sqrt(k.y * k.w), 1.0 / k.w), k.w, 0.0);
