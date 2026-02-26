@@ -1,0 +1,6 @@
+{
+  "controls": true,
+  "textures": {
+    "envMap": "./equirect.jpg"
+  }
+}

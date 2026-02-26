@@ -1,497 +1,92 @@
+# Materials — Shader Code
+
+Each section title matches the shader shortcode in the materials chapter.
+All shaders use the same camera/raymarching/shadow infrastructure from the Lighting chapter.
+The scene evolves: §3–§5 use the tetrahedron scene; §7 onward use a wider layout.
+Reinhard tone mapping and gamma correction are present in every shader.
+
 ---
-title: "Materials Shaders"
-format:
-  html:
-    code-fold: true
----
 
-
-## fresnel
-
-Fresnel effect demonstration on a sphere.
-
-<!-- TODO: implement fresnel shader -->
-
-
-## reflections
-
-Cornell-box-inspired interior: a chrome sphere and a white box inside a room with red and green walls. The metallic sphere picks up red from the left wall and green from the right — our single-bounce reflection does crude indirect illumination. Point light with inverse-square falloff near the ceiling. Mouse pans the view.
+## materials/mirror
 
 ```glsl
-struct Ray { vec3 origin; vec3 dir; };
-struct Material { vec3 albedo; float metallic; float roughness; };
-
-const int MAX_STEPS = 100;
-const float MAX_DIST = 50.0;
-const float HIT_THRESHOLD = 0.001;
-int gMatID;
-
-float sdSphere(vec3 p, float r) { return length(p) - r; }
-float sdBox(vec3 p, vec3 b) {
-    vec3 d = abs(p) - b;
-    return length(max(d, 0.0)) + min(max(d.x, max(d.y, d.z)), 0.0);
-}
-
-// Room: floor y=-1, ceiling y=3, walls x=+-2.5, back z=-4 (open front)
-float sdScene(vec3 p) {
-    float fl = p.y + 1.0;
-    float cl = 3.0 - p.y;
-    float wl = p.x + 2.5;
-    float wr = 2.5 - p.x;
-    float wb = p.z + 4.0;
-
-    // Rotated tall box
-    vec3 bp = p - vec3(0.9, 0.0, -1.8);
-    float ca = cos(0.3), sa = sin(0.3);
-    bp.xz = mat2(ca, sa, -sa, ca) * bp.xz;
-    float bx = sdBox(bp, vec3(0.55, 1.0, 0.55));
-
-    float sp = sdSphere(p - vec3(-0.9, -0.15, -0.8), 0.85);
-
-    float d = fl; gMatID = 0;
-    if (cl < d) { d = cl; gMatID = 1; }
-    if (wl < d) { d = wl; gMatID = 2; }
-    if (wr < d) { d = wr; gMatID = 3; }
-    if (wb < d) { d = wb; gMatID = 4; }
-    if (bx < d) { d = bx; gMatID = 5; }
-    if (sp < d) { d = sp; gMatID = 6; }
-    return d;
-}
-
-float sdSceneBare(vec3 p) {
-    float fl = p.y + 1.0, cl = 3.0 - p.y;
-    float wl = p.x + 2.5, wr = 2.5 - p.x, wb = p.z + 4.0;
-    vec3 bp = p - vec3(0.9, 0.0, -1.8);
-    float ca = cos(0.3), sa = sin(0.3);
-    bp.xz = mat2(ca, sa, -sa, ca) * bp.xz;
-    float bx = sdBox(bp, vec3(0.55, 1.0, 0.55));
-    float sp = sdSphere(p - vec3(-0.9, -0.15, -0.8), 0.85);
-    return min(min(min(min(min(min(fl, cl), wl), wr), wb), bx), sp);
-}
-
-Material getMaterial(int id, vec3 p) {
-    if (id == 2) return Material(vec3(0.63, 0.065, 0.05), 0.0, 0.9); // Left: red
-    if (id == 3) return Material(vec3(0.14, 0.45, 0.09), 0.0, 0.9);  // Right: green
-    if (id == 6) return Material(vec3(0.95, 0.93, 0.88), 1.0, 0.05); // Sphere: chrome
-    return Material(vec3(0.76), 0.0, 0.9);                            // Walls, box: white
-}
-
-vec3 calcNormal(vec3 p) {
-    vec2 e = vec2(0.001, 0.0);
-    return normalize(vec3(
-        sdSceneBare(p+e.xyy) - sdSceneBare(p-e.xyy),
-        sdSceneBare(p+e.yxy) - sdSceneBare(p-e.yxy),
-        sdSceneBare(p+e.yyx) - sdSceneBare(p-e.yyx)));
-}
-
-float raymarch(Ray ray) {
-    float t = 0.0;
-    for (int i = 0; i < MAX_STEPS; i++) {
-        float d = sdScene(ray.origin + t * ray.dir);
-        if (d < HIT_THRESHOLD) return t;
-        t += d;
-        if (t > MAX_DIST) return -1.0;
-    }
-    return -1.0;
-}
-
-// Shadow march limited to light distance (critical for enclosed rooms —
-// without maxDist the ray passes the light and hits a wall, shadowing everything)
-float softShadow(vec3 p, vec3 dir, float k, float maxDist) {
-    float res = 1.0, t = 0.02, prev = 1e20;
-    for (int i = 0; i < 50; i++) {
-        float d = sdSceneBare(p + dir * t);
-        if (d < 0.001) return 0.0;
-        float y = d*d / (2.0*prev);
-        float h = sqrt(d*d - y*y);
-        res = min(res, k * h / max(0.0, t-y));
-        prev = d; t += d;
-        if (t > maxDist) break;
-    }
-    return res;
-}
-
-float ambientOcclusion(vec3 p, vec3 n) {
-    float ao = 0.0, s = 1.0;
-    for (int i = 1; i <= 5; i++) {
-        float d = 0.05 * float(i);
-        ao += (d - sdSceneBare(p + n*d)) * s;
-        s *= 0.5;
-    }
-    return 1.0 - clamp(ao * 3.0, 0.0, 1.0);
-}
-
-vec3 fresnelSchlick(float ct, vec3 F0) {
-    return F0 + (1.0 - F0) * pow(clamp(1.0 - ct, 0.0, 1.0), 5.0);
-}
-
-vec3 shadeDirect(vec3 n, vec3 v, vec3 l, vec3 lc, Material m) {
-    vec3 h = normalize(l + v);
-    float NdL = max(dot(n,l), 0.0), NdH = max(dot(n,h), 0.0);
-    vec3 F0 = mix(vec3(0.04), m.albedo, m.metallic);
-    vec3 F = fresnelSchlick(max(dot(h,v), 0.0), F0);
-    float sh = mix(512.0, 4.0, m.roughness*m.roughness);
-    vec3 spec = F * ((sh+2.0)/8.0) * pow(NdH, sh);
-    vec3 diff = (vec3(1.0)-F) * m.albedo * (1.0-m.metallic) / 3.14159;
-    return (diff + spec) * lc * NdL;
-}
-
-void mainImage(out vec4 fragColor, in vec2 fragCoord) {
-    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
-    uv.x *= iResolution.x / iResolution.y;
-
-    vec2 mouse = iMouse.xy / iResolution.xy;
-    if (length(iMouse.xy) < 1.0) mouse = vec2(0.5, 0.5);
-
-    Ray ray;
-    ray.origin = vec3(0.0, 1.0, 4.5);
-    ray.dir = normalize(vec3(uv * 0.55 + (mouse - 0.5) * 0.3, -1.0));
-
-    float t = raymarch(ray);
-    vec3 color = vec3(0.0);
-
-    if (t > 0.0) {
-        vec3 p = ray.origin + t * ray.dir;
-        vec3 n = calcNormal(p);
-        Material mat = getMaterial(gMatID, p);
-        vec3 v = -ray.dir;
-        float ao = ambientOcclusion(p, n);
-
-        // Ceiling point light
-        vec3 lp = vec3(0.0, 2.7, -1.5);
-        vec3 toL = lp - p;
-        float ld = length(toL);
-        vec3 lDir = toL / ld;
-        vec3 lCol = vec3(1.0, 0.95, 0.85) * 10.0 / (ld * ld);
-
-        float sh = softShadow(p + n*0.01, lDir, 12.0, ld);
-        vec3 direct = shadeDirect(n, v, lDir, lCol, mat) * sh;
-
-        // Reflection (chrome sphere picks up colored walls)
-        vec3 F0 = mix(vec3(0.04), mat.albedo, mat.metallic);
-        vec3 F = fresnelSchlick(max(dot(n,v), 0.0), F0);
-        Ray rRay = Ray(p + n*0.01, reflect(-v, n));
-        float t2 = raymarch(rRay);
-
-        vec3 refl = vec3(0.0);
-        if (t2 > 0.0) {
-            vec3 p2 = rRay.origin + t2 * rRay.dir;
-            vec3 n2 = calcNormal(p2);
-            Material hm = getMaterial(gMatID, p2);
-            vec3 toL2 = lp - p2;
-            float ld2 = length(toL2);
-            float sh2 = softShadow(p2 + n2*0.01, toL2/ld2, 12.0, ld2);
-            refl = shadeDirect(n2, -rRay.dir, toL2/ld2,
-                               vec3(1.0, 0.95, 0.85) * 10.0 / (ld2*ld2), hm) * sh2;
-            refl += hm.albedo * (1.0 - hm.metallic) * 0.02;
-        }
-
-        float rDamp = 1.0 - mat.roughness * mat.roughness;
-        vec3 ambDiff = (vec3(1.0)-F) * mat.albedo * (1.0-mat.metallic) * 0.03 * ao;
-        color = direct + refl * F * rDamp * ao + ambDiff;
-    }
-
-    fragColor = vec4(pow(color, vec3(1.0/2.2)), 1.0);
-}
-```
-
-
-## roughness
-
-Five gold spheres with roughness increasing left to right: 0.0, 0.25, 0.5, 0.75, 1.0. The leftmost is a perfect mirror; the rightmost is a broad matte. Watch how the specular highlight spreads and environment reflections fade. At roughness 1.0 the metallic sphere gets only a very broad specular lobe from direct light — no diffuse (metallic kills it) and no sharp reflection.
-
-```glsl
-struct Ray { vec3 origin; vec3 dir; };
-struct Material { vec3 albedo; float metallic; float roughness; };
-
-const int MAX_STEPS = 100;
-const float MAX_DIST = 100.0;
-const float HIT_THRESHOLD = 0.001;
-int gMatID;
-
-float sdSphere(vec3 p, float r) { return length(p) - r; }
-float sdPlane(vec3 p, float h) { return p.y - h; }
-
-mat3 rotateX(float a) { float c=cos(a),s=sin(a); return mat3(1,0,0,0,c,-s,0,s,c); }
-mat3 rotateY(float a) { float c=cos(a),s=sin(a); return mat3(c,0,s,0,1,0,-s,0,c); }
-
-Ray makeRay(vec2 fc) {
-    vec2 uv = (fc / iResolution.xy) * 2.0 - 1.0;
-    uv.x *= iResolution.x / iResolution.y;
-    return Ray(vec3(0), normalize(vec3(uv, -1.0)));
-}
-
-Ray orbitRay(Ray r, float d) {
-    vec2 m = iMouse.xy / iResolution.xy;
-    if (length(iMouse.xy) < 1.0) m = vec2(0.6, 0.55);
-    mat3 rot = rotateX((0.5-m.y)*3.14) * rotateY((m.x-0.5)*6.28);
-    r.origin = rot * vec3(0,0,d);
-    r.dir = rot * r.dir;
-    return r;
-}
-
-float sdScene(vec3 p) {
-    float gnd = sdPlane(p, -1.0);
-    float s0 = sdSphere(p - vec3(-4.0, -0.1, 0), 0.9);
-    float s1 = sdSphere(p - vec3(-2.0, -0.1, 0), 0.9);
-    float s2 = sdSphere(p - vec3( 0.0, -0.1, 0), 0.9);
-    float s3 = sdSphere(p - vec3( 2.0, -0.1, 0), 0.9);
-    float s4 = sdSphere(p - vec3( 4.0, -0.1, 0), 0.9);
-
-    float d = gnd; gMatID = 0;
-    if (s0 < d) { d = s0; gMatID = 1; }
-    if (s1 < d) { d = s1; gMatID = 2; }
-    if (s2 < d) { d = s2; gMatID = 3; }
-    if (s3 < d) { d = s3; gMatID = 4; }
-    if (s4 < d) { d = s4; gMatID = 5; }
-    return d;
-}
-
-float sdSceneBare(vec3 p) {
-    float g = sdPlane(p, -1.0);
-    float s0 = sdSphere(p - vec3(-4.0, -0.1, 0), 0.9);
-    float s1 = sdSphere(p - vec3(-2.0, -0.1, 0), 0.9);
-    float s2 = sdSphere(p - vec3( 0.0, -0.1, 0), 0.9);
-    float s3 = sdSphere(p - vec3( 2.0, -0.1, 0), 0.9);
-    float s4 = sdSphere(p - vec3( 4.0, -0.1, 0), 0.9);
-    return min(min(min(min(min(g, s0), s1), s2), s3), s4);
-}
-
-// All gold, roughness 0 → 1
-Material getMaterial(int id, vec3 p) {
-    if (id == 1) return Material(vec3(1.0, 0.76, 0.33), 1.0, 0.0);
-    if (id == 2) return Material(vec3(1.0, 0.76, 0.33), 1.0, 0.25);
-    if (id == 3) return Material(vec3(1.0, 0.76, 0.33), 1.0, 0.5);
-    if (id == 4) return Material(vec3(1.0, 0.76, 0.33), 1.0, 0.75);
-    if (id == 5) return Material(vec3(1.0, 0.76, 0.33), 1.0, 1.0);
-    float ck = mod(floor(p.x) + floor(p.z), 2.0);
-    return Material(mix(vec3(0.15), vec3(0.6), ck), 0.0, 0.8);
-}
-
-vec3 calcNormal(vec3 p) {
-    vec2 e = vec2(0.001, 0.0);
-    return normalize(vec3(
-        sdSceneBare(p+e.xyy) - sdSceneBare(p-e.xyy),
-        sdSceneBare(p+e.yxy) - sdSceneBare(p-e.yxy),
-        sdSceneBare(p+e.yyx) - sdSceneBare(p-e.yyx)));
-}
-
-float raymarch(Ray ray) {
-    float t = 0.0;
-    for (int i = 0; i < MAX_STEPS; i++) {
-        float d = sdScene(ray.origin + t * ray.dir);
-        if (d < HIT_THRESHOLD) return t;
-        t += d;
-        if (t > MAX_DIST) return -1.0;
-    }
-    return -1.0;
-}
-
-float softShadow(vec3 p, vec3 dir, float k) {
-    float res = 1.0, t = 0.02, prev = 1e20;
-    for (int i = 0; i < 50; i++) {
-        float d = sdSceneBare(p + dir * t);
-        if (d < 0.001) return 0.0;
-        float y = d*d / (2.0*prev);
-        float h = sqrt(d*d - y*y);
-        res = min(res, k * h / max(0.0, t-y));
-        prev = d; t += d;
-        if (t > 20.0) break;
-    }
-    return res;
-}
-
-vec3 fresnelSchlick(float ct, vec3 F0) {
-    return F0 + (1.0 - F0) * pow(clamp(1.0 - ct, 0.0, 1.0), 5.0);
-}
-
-vec3 skyGradient(vec3 dir) {
-    float t = dir.y * 0.5 + 0.5;
-    return mix(vec3(0.7, 0.55, 0.4), vec3(0.15, 0.3, 0.65), t);
-}
-
-vec3 shadeDirect(vec3 n, vec3 v, vec3 l, vec3 lc, Material m) {
-    vec3 h = normalize(l + v);
-    float NdL = max(dot(n,l), 0.0), NdH = max(dot(n,h), 0.0);
-    vec3 F0 = mix(vec3(0.04), m.albedo, m.metallic);
-    vec3 F = fresnelSchlick(max(dot(h,v), 0.0), F0);
-    float sh = mix(512.0, 4.0, m.roughness*m.roughness);
-    vec3 spec = F * ((sh+2.0)/8.0) * pow(NdH, sh);
-    vec3 diff = (vec3(1.0)-F) * m.albedo * (1.0-m.metallic) / 3.14159;
-    return (diff + spec) * lc * NdL;
-}
-
-void mainImage(out vec4 fragColor, in vec2 fragCoord) {
-    Ray ray = makeRay(fragCoord);
-    ray = orbitRay(ray, 10.0);
-
-    float t = raymarch(ray);
-    vec3 color = skyGradient(ray.dir);
-
-    if (t > 0.0) {
-        vec3 p = ray.origin + t * ray.dir;
-        vec3 n = calcNormal(p);
-        Material mat = getMaterial(gMatID, p);
-        vec3 v = -ray.dir;
-
-        vec3 F0 = mix(vec3(0.04), mat.albedo, mat.metallic);
-        vec3 F = fresnelSchlick(max(dot(n,v), 0.0), F0);
-
-        // Key light
-        vec3 lDir = normalize(vec3(1.0, 1.2, 0.8));
-        vec3 lCol = vec3(1.4, 1.3, 1.2);
-        float sh = softShadow(p + n*0.01, lDir, 16.0);
-        vec3 direct = shadeDirect(n, v, lDir, lCol, mat) * sh;
-
-        // Reflection
-        Ray rRay = Ray(p + n*0.01, reflect(-v, n));
-        float t2 = raymarch(rRay);
-        vec3 refl = skyGradient(rRay.dir);
-        if (t2 > 0.0) {
-            vec3 p2 = rRay.origin + t2 * rRay.dir;
-            vec3 n2 = calcNormal(p2);
-            Material hm = getMaterial(gMatID, p2);
-            float sh2 = softShadow(p2 + n2*0.01, lDir, 16.0);
-            refl = shadeDirect(n2, -rRay.dir, lDir, lCol, hm) * sh2;
-            refl += hm.albedo * (1.0 - hm.metallic) * 0.05;
-        }
-
-        float rDamp = 1.0 - mat.roughness * mat.roughness;
-        vec3 ambDiff = (vec3(1.0)-F) * mat.albedo * (1.0-mat.metallic) * 0.05;
-        color = direct + refl * F * rDamp + ambDiff;
-    }
-
-    fragColor = vec4(pow(color, vec3(1.0/2.2)), 1.0);
-}
-```
-
-
-## metallic
-
-Metallic vs dielectric material comparison.
-
-<!-- TODO: implement metallic shader -->
-
-
-## rim
-
-Rim lighting effect.
-
-<!-- TODO: implement rim lighting shader -->
-
-
-## complete
-
-Four spheres — chrome, glazed ceramic, terracotta, gold — on a checkerboard ground. Combines every technique from this chapter: Fresnel reflectance (Schlick), single-bounce raymarched reflections, roughness-controlled specular, metallic/dielectric split with energy conservation, rim lighting, ambient occlusion, soft shadows, fog, and gamma correction. Compare chrome (mirror-like, neutral reflections) with gold (mirror-like, but reflections tinted warm — metals color their specular with their albedo). Compare ceramic (glossy dielectric — bright diffuse with sharp white specular and visible Fresnel rim) with terracotta (dead matte — roughness kills all highlights).
-
-```glsl
-struct Ray {
-    vec3 origin;
-    vec3 dir;
-};
-
-struct Material {
-    vec3 albedo;
-    float metallic;
-    float roughness;
-};
+// Materials — Perfect Mirror
+// Delta kernel: top sphere is a hardcoded mirror, rest are matte.
+// getMaterial still returns vec3 — no Material struct yet.
 
 const int MAX_STEPS = 100;
 const float MAX_DIST = 100.0;
 const float HIT_THRESHOLD = 0.001;
 
-// --- Camera ---
+struct Ray { vec3 origin; vec3 dir; };
+struct DirLight { vec3 dir; vec3 color; };
 
 Ray makeRay(vec2 fragCoord) {
     vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
     uv.x *= iResolution.x / iResolution.y;
     float f = 1.0 / tan(radians(90.0) / 2.0);
-    Ray ray;
-    ray.origin = vec3(0.0);
-    ray.dir = normalize(vec3(uv, -f));
-    return ray;
+    return Ray(vec3(0.0), normalize(vec3(uv, -f)));
 }
 
-mat3 rotateX(float a) {
-    float c = cos(a), s = sin(a);
-    return mat3(1, 0, 0, 0, c, -s, 0, s, c);
-}
+mat3 rotateX(float a) { float c=cos(a),s=sin(a); return mat3(1,0,0,0,c,-s,0,s,c); }
+mat3 rotateY(float a) { float c=cos(a),s=sin(a); return mat3(c,0,s,0,1,0,-s,0,c); }
 
-mat3 rotateY(float a) {
-    float c = cos(a), s = sin(a);
-    return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
-}
-
-Ray orbitRay(Ray ray, float dist) {
+Ray orbitRay(Ray ray, float distance) {
     vec2 mouse = iMouse.xy / iResolution.xy;
     if (length(iMouse.xy) < 1.0) mouse = vec2(0.6, 0.55);
-    float ay = (mouse.x - 0.5) * 6.28;
-    float ax = (0.5 - mouse.y) * 3.14;
-    mat3 rot = rotateX(ax) * rotateY(ay);
-    ray.origin = rot * vec3(0.0, 0.0, dist);
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
     ray.dir = rot * ray.dir;
     return ray;
 }
 
-// --- Primitives ---
-
-float sdSphere(vec3 p, float r) {
-    return length(p) - r;
-}
-
-float sdPlane(vec3 p, float h) {
-    return p.y - h;
-}
 
 // --- Scene ---
 
-// Material tracking via global (set by sdScene)
-int gMatID;
+const float R = 0.5;
+const vec3 S1 = vec3( 0.0, 0.5,  0.577);
+const vec3 S2 = vec3(-0.5, 0.5, -0.289);
+const vec3 S3 = vec3( 0.5, 0.5, -0.289);
+const vec3 S4 = vec3( 0.0, 1.317, 0.0);    // mirror
+
+const vec3 C1 = vec3(0.80, 0.45, 0.30);
+const vec3 C2 = vec3(0.50, 0.70, 0.50);
+const vec3 C3 = vec3(0.40, 0.55, 0.75);
+const vec3 CG = vec3(0.60, 0.60, 0.55);
 
 float sdScene(vec3 p) {
-    float ground = sdPlane(p, -1.0);
-    float s1 = sdSphere(p - vec3(-3.3, 0.0, 0.0), 1.0);
-    float s2 = sdSphere(p - vec3(-1.1, 0.0, 0.0), 1.0);
-    float s3 = sdSphere(p - vec3(1.1, 0.0, 0.0), 1.0);
-    float s4 = sdSphere(p - vec3(3.3, 0.0, 0.0), 1.0);
-
-    float d = ground; gMatID = 0;
-    if (s1 < d) { d = s1; gMatID = 1; }
-    if (s2 < d) { d = s2; gMatID = 2; }
-    if (s3 < d) { d = s3; gMatID = 3; }
-    if (s4 < d) { d = s4; gMatID = 4; }
+    float d = length(p - S1) - R;
+    d = min(d, length(p - S2) - R);
+    d = min(d, length(p - S3) - R);
+    d = min(d, length(p - S4) - R);
+    d = min(d, p.y);
     return d;
 }
 
-// SDF without material tracking (for shadows, AO, normals)
-float sdSceneBare(vec3 p) {
-    float ground = sdPlane(p, -1.0);
-    float s1 = sdSphere(p - vec3(-3.3, 0.0, 0.0), 1.0);
-    float s2 = sdSphere(p - vec3(-1.1, 0.0, 0.0), 1.0);
-    float s3 = sdSphere(p - vec3(1.1, 0.0, 0.0), 1.0);
-    float s4 = sdSphere(p - vec3(3.3, 0.0, 0.0), 1.0);
-    return min(min(min(min(ground, s1), s2), s3), s4);
+vec3 getMaterial(vec3 p) {
+    float eps = 0.01;
+    if (length(p - S1) - R < eps) return C1;
+    if (length(p - S2) - R < eps) return C2;
+    if (length(p - S3) - R < eps) return C3;
+    if (length(p - S4) - R < eps) return vec3(-1.0);  // sentinel: mirror
+    return CG;
 }
 
-Material getMaterial(int id, vec3 p) {
-    if (id == 1) return Material(vec3(0.9, 0.9, 0.92), 1.0, 0.05);  // Chrome
-    if (id == 2) return Material(vec3(0.95, 0.9, 0.85), 0.0, 0.1);  // Glazed ceramic
-    if (id == 3) return Material(vec3(0.7, 0.35, 0.15), 0.0, 0.9);  // Terracotta
-    if (id == 4) return Material(vec3(1.0, 0.76, 0.33), 1.0, 0.25); // Gold
-    // Ground: checkerboard
-    float check = mod(floor(p.x) + floor(p.z), 2.0);
-    vec3 albedo = mix(vec3(0.15), vec3(0.6), check);
-    return Material(albedo, 0.0, 0.8);
+bool isMirror(vec3 p) {
+    return length(p - S4) - R < 0.01;
 }
+
 
 // --- Raymarching ---
 
 vec3 calcNormal(vec3 p) {
-    vec2 e = vec2(0.001, 0.0);
+    float eps = 0.001;
     return normalize(vec3(
-        sdSceneBare(p + e.xyy) - sdSceneBare(p - e.xyy),
-        sdSceneBare(p + e.yxy) - sdSceneBare(p - e.yxy),
-        sdSceneBare(p + e.yyx) - sdSceneBare(p - e.yyx)
+        sdScene(p + vec3(eps,0,0)) - sdScene(p - vec3(eps,0,0)),
+        sdScene(p + vec3(0,eps,0)) - sdScene(p - vec3(0,eps,0)),
+        sdScene(p + vec3(0,0,eps)) - sdScene(p - vec3(0,0,eps))
     ));
 }
 
@@ -506,18 +101,19 @@ float raymarch(Ray ray) {
     return -1.0;
 }
 
-// --- Shadows & AO ---
 
-float softShadow(vec3 p, vec3 dir, float k) {
+// --- Shading (from Lighting chapter) ---
+
+float softShadow(vec3 p, vec3 lightDir, float k) {
     float res = 1.0;
     float t = 0.02;
     float prev = 1e20;
     for (int i = 0; i < 50; i++) {
-        float d = sdSceneBare(p + dir * t);
+        float d = sdScene(p + lightDir * t);
         if (d < 0.001) return 0.0;
         float y = d * d / (2.0 * prev);
-        float h = sqrt(d * d - y * y);
-        res = min(res, k * h / max(0.0, t - y));
+        float s = sqrt(d * d - y * y);
+        res = min(res, k * s / max(0.0, t - y));
         prev = d;
         t += d;
         if (t > 20.0) break;
@@ -530,114 +126,1428 @@ float ambientOcclusion(vec3 p, vec3 n) {
     float scale = 1.0;
     for (int i = 1; i <= 5; i++) {
         float dist = 0.02 * float(i);
-        float d = sdSceneBare(p + n * dist);
+        float d = sdScene(p + n * dist);
         ao += (dist - d) * scale;
         scale *= 0.5;
     }
     return 1.0 - clamp(ao, 0.0, 1.0);
 }
 
-// --- Material shading ---
-
-vec3 fresnelSchlick(float cosTheta, vec3 F0) {
-    return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+vec3 ambient(vec3 p, vec3 n, vec3 mat) {
+    float ao = ambientOcclusion(p, n);
+    return mat * 0.15 * ao;
 }
 
-vec3 skyGradient(vec3 dir) {
-    float t = dir.y * 0.5 + 0.5;
-    vec3 horizon = vec3(0.7, 0.55, 0.4);
-    vec3 zenith = vec3(0.15, 0.3, 0.65);
-    return mix(horizon, zenith, t);
+vec3 shade(vec3 p, vec3 n, vec3 mat, DirLight light) {
+    float diff = max(0.0, dot(n, light.dir));
+    float sh = softShadow(p + n * 0.01, light.dir, 16.0);
+    return mat * diff * light.color * sh;
 }
 
-vec3 shadeDirect(vec3 n, vec3 v, vec3 l, vec3 lc, Material mat) {
-    vec3 h = normalize(l + v);
-    float NdotL = max(dot(n, l), 0.0);
-    float NdotH = max(dot(n, h), 0.0);
-
-    vec3 F0 = mix(vec3(0.04), mat.albedo, mat.metallic);
-    vec3 F = fresnelSchlick(max(dot(h, v), 0.0), F0);
-
-    float shininess = mix(512.0, 4.0, mat.roughness * mat.roughness);
-    float norm = (shininess + 2.0) / 8.0;  // Blinn-Phong normalization
-    vec3 specular = F * norm * pow(NdotH, shininess);
-    vec3 diffuse = (vec3(1.0) - F) * mat.albedo * (1.0 - mat.metallic) / 3.14159;
-
-    return (diffuse + specular) * lc * NdotL;
+vec3 shadeDiffuse(vec3 p, vec3 n, vec3 mat, DirLight key, DirLight fill) {
+    vec3 color = ambient(p, n, mat);
+    color += shade(p, n, mat, key);
+    color += shade(p, n, mat, fill);
+    return color;
 }
 
-// --- Main ---
+vec3 shadeMirror(vec3 p, vec3 n, vec3 viewDir, DirLight key, DirLight fill) {
+    vec3 reflDir = reflect(-viewDir, n);
+    Ray reflRay = Ray(p + n * 0.02, reflDir);
+    float t = raymarch(reflRay);
+
+    if (t > 0.0) {
+        vec3 rp = reflRay.origin + t * reflRay.dir;
+        vec3 rn = calcNormal(rp);
+        vec3 rmat = getMaterial(rp);
+        if (rmat.x < 0.0) rmat = vec3(0.8);
+        return shadeDiffuse(rp, rn, rmat, key, fill);
+    }
+    return vec3(0.5, 0.6, 0.7);
+}
+
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     Ray ray = makeRay(fragCoord);
-    ray = orbitRay(ray, 9.0);
+    ray = orbitRay(ray, 5.0);
+
+    DirLight key = DirLight(normalize(vec3(1.0, 1.0, 1.0)), vec3(1.0, 0.9, 0.8));
+    DirLight fill = DirLight(normalize(vec3(-1.0, 0.3, 0.0)), vec3(0.15, 0.2, 0.3));
 
     float t = raymarch(ray);
 
-    vec3 color = skyGradient(ray.dir);
-
+    vec3 color = vec3(0.5, 0.6, 0.7);
     if (t > 0.0) {
         vec3 p = ray.origin + t * ray.dir;
         vec3 n = calcNormal(p);
-        int matID = gMatID;
-        Material mat = getMaterial(matID, p);
-        vec3 v = -ray.dir;
+        vec3 viewDir = -ray.dir;
 
-        float ao = ambientOcclusion(p, n);
-
-        // Fresnel for view direction (controls reflection/diffuse split)
-        vec3 F0 = mix(vec3(0.04), mat.albedo, mat.metallic);
-        vec3 F = fresnelSchlick(max(dot(n, v), 0.0), F0);
-
-        // Key light
-        vec3 lightDir = normalize(vec3(1.0, 1.2, 0.8));
-        vec3 lightColor = vec3(1.4, 1.3, 1.2);
-        float sh = softShadow(p + n * 0.01, lightDir, 16.0);
-        vec3 direct = shadeDirect(n, v, lightDir, lightColor, mat) * sh;
-
-        // Fill light (no shadows, subtle)
-        vec3 fillDir = normalize(vec3(-1.0, 0.3, -0.5));
-        vec3 fill = shadeDirect(n, v, fillDir, vec3(0.06, 0.08, 0.14), mat);
-
-        // Ambient diffuse (weighted by 1-F: what isn't reflected diffuses)
-        vec3 ambDiff = (vec3(1.0) - F) * mat.albedo * (1.0 - mat.metallic) * 0.06 * ao;
-
-        // Reflection (specular indirect)
-        vec3 reflDir = reflect(-v, n);
-        Ray reflRay = Ray(p + n * 0.01, reflDir);
-        float t2 = raymarch(reflRay);
-
-        vec3 reflColor = skyGradient(reflDir);
-        if (t2 > 0.0) {
-            vec3 p2 = reflRay.origin + t2 * reflRay.dir;
-            vec3 n2 = calcNormal(p2);
-            int hitID = gMatID;
-            Material hitMat = getMaterial(hitID, p2);
-
-            float sh2 = softShadow(p2 + n2 * 0.01, lightDir, 16.0);
-            vec3 r2 = shadeDirect(n2, -reflRay.dir, lightDir, lightColor, hitMat) * sh2;
-            vec3 r2fill = shadeDirect(n2, -reflRay.dir, fillDir, vec3(0.06, 0.08, 0.14), hitMat);
-            vec3 r2amb = hitMat.albedo * (1.0 - hitMat.metallic) * 0.06;
-            reflColor = r2amb + r2 + r2fill;
+        if (isMirror(p)) {
+            color = shadeMirror(p, n, viewDir, key, fill);
+        } else {
+            vec3 mat = getMaterial(p);
+            color = shadeDiffuse(p, n, mat, key, fill);
         }
-
-        // Blend reflection by Fresnel, dampened by roughness
-        float reflDamp = 1.0 - mat.roughness * mat.roughness;
-        vec3 ambSpec = reflColor * F * reflDamp * ao;
-
-        // Combine
-        color = ambDiff + ambSpec + direct + fill;
-
-        // Rim light
-        float rim = pow(1.0 - max(dot(n, v), 0.0), 4.0);
-        color += vec3(0.08, 0.12, 0.18) * rim * ao;
-
-        // Fog (very subtle — just softens the far ground)
-        float fog = 1.0 - exp(-t * 0.005);
-        color = mix(color, vec3(0.55, 0.5, 0.45), fog);
     }
 
-    // Gamma
+    color = color / (1.0 + color);
+    color = pow(color, vec3(1.0 / 2.2));
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## materials/partial-mirror
+
+```glsl
+// Materials — Partial Reflectivity
+// Convex combination of Lambertian + delta.
+// Material struct appears: {albedo, reflectivity}.
+// Single-bounce reflection weighted by k.
+
+const int MAX_STEPS = 100;
+const float MAX_DIST = 100.0;
+const float HIT_THRESHOLD = 0.001;
+
+struct Ray { vec3 origin; vec3 dir; };
+struct DirLight { vec3 dir; vec3 color; };
+
+struct Material {
+    vec3 albedo;
+    float reflectivity;
+};
+
+Ray makeRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    float f = 1.0 / tan(radians(90.0) / 2.0);
+    return Ray(vec3(0.0), normalize(vec3(uv, -f)));
+}
+
+mat3 rotateX(float a) { float c=cos(a),s=sin(a); return mat3(1,0,0,0,c,-s,0,s,c); }
+mat3 rotateY(float a) { float c=cos(a),s=sin(a); return mat3(c,0,s,0,1,0,-s,0,c); }
+
+Ray orbitRay(Ray ray, float distance) {
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) mouse = vec2(0.6, 0.55);
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+
+// --- Scene ---
+
+const float R = 0.5;
+const vec3 S1 = vec3( 0.0, 0.5,  0.577);
+const vec3 S2 = vec3(-0.5, 0.5, -0.289);
+const vec3 S3 = vec3( 0.5, 0.5, -0.289);
+const vec3 S4 = vec3( 0.0, 1.317, 0.0);
+
+float sdScene(vec3 p) {
+    float d = length(p - S1) - R;
+    d = min(d, length(p - S2) - R);
+    d = min(d, length(p - S3) - R);
+    d = min(d, length(p - S4) - R);
+    d = min(d, p.y);
+    return d;
+}
+
+Material getMaterial(vec3 p) {
+    float eps = 0.01;
+    if (length(p - S1) - R < eps)
+        return Material(vec3(0.80, 0.45, 0.30), 0.0);   // matte
+    if (length(p - S2) - R < eps)
+        return Material(vec3(0.50, 0.70, 0.50), 0.15);  // subtle sheen
+    if (length(p - S3) - R < eps)
+        return Material(vec3(0.40, 0.55, 0.75), 0.5);   // polished
+    if (length(p - S4) - R < eps)
+        return Material(vec3(0.90, 0.85, 0.75), 1.0);   // mirror
+    return Material(vec3(0.60, 0.60, 0.55), 0.0);
+}
+
+
+// --- Raymarching ---
+
+vec3 calcNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sdScene(p + vec3(eps,0,0)) - sdScene(p - vec3(eps,0,0)),
+        sdScene(p + vec3(0,eps,0)) - sdScene(p - vec3(0,eps,0)),
+        sdScene(p + vec3(0,0,eps)) - sdScene(p - vec3(0,0,eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < MAX_STEPS; i++) {
+        float d = sdScene(ray.origin + t * ray.dir);
+        if (d < HIT_THRESHOLD) return t;
+        t += d;
+        if (t > MAX_DIST) return -1.0;
+    }
+    return -1.0;
+}
+
+
+// --- Shading ---
+
+float softShadow(vec3 p, vec3 lightDir, float k) {
+    float res = 1.0;
+    float t = 0.02;
+    float prev = 1e20;
+    for (int i = 0; i < 50; i++) {
+        float d = sdScene(p + lightDir * t);
+        if (d < 0.001) return 0.0;
+        float y = d * d / (2.0 * prev);
+        float s = sqrt(d * d - y * y);
+        res = min(res, k * s / max(0.0, t - y));
+        prev = d;
+        t += d;
+        if (t > 20.0) break;
+    }
+    return res;
+}
+
+float ambientOcclusion(vec3 p, vec3 n) {
+    float ao = 0.0;
+    float scale = 1.0;
+    for (int i = 1; i <= 5; i++) {
+        float dist = 0.02 * float(i);
+        float d = sdScene(p + n * dist);
+        ao += (dist - d) * scale;
+        scale *= 0.5;
+    }
+    return 1.0 - clamp(ao, 0.0, 1.0);
+}
+
+vec3 ambient(vec3 p, vec3 n, vec3 albedo) {
+    float ao = ambientOcclusion(p, n);
+    return albedo * 0.15 * ao;
+}
+
+vec3 shade(vec3 p, vec3 n, vec3 albedo, DirLight light) {
+    float diff = max(0.0, dot(n, light.dir));
+    float sh = softShadow(p + n * 0.01, light.dir, 16.0);
+    return albedo * diff * light.color * sh;
+}
+
+vec3 shadeDiffuse(vec3 p, vec3 n, vec3 albedo, DirLight key, DirLight fill) {
+    vec3 color = ambient(p, n, albedo);
+    color += shade(p, n, albedo, key);
+    color += shade(p, n, albedo, fill);
+    return color;
+}
+
+vec3 shadeReflected(vec3 p, vec3 n, vec3 viewDir, DirLight key, DirLight fill) {
+    vec3 reflDir = reflect(-viewDir, n);
+    Ray reflRay = Ray(p + n * 0.02, reflDir);
+    float t = raymarch(reflRay);
+
+    if (t > 0.0) {
+        vec3 rp = reflRay.origin + t * reflRay.dir;
+        vec3 rn = calcNormal(rp);
+        Material rmat = getMaterial(rp);
+        return shadeDiffuse(rp, rn, rmat.albedo, key, fill);
+    }
+    return vec3(0.5, 0.6, 0.7);
+}
+
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = makeRay(fragCoord);
+    ray = orbitRay(ray, 5.0);
+
+    DirLight key = DirLight(normalize(vec3(1.0, 1.0, 1.0)), vec3(1.0, 0.9, 0.8));
+    DirLight fill = DirLight(normalize(vec3(-1.0, 0.3, 0.0)), vec3(0.15, 0.2, 0.3));
+
+    float t = raymarch(ray);
+
+    vec3 color = vec3(0.5, 0.6, 0.7);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 n = calcNormal(p);
+        vec3 viewDir = -ray.dir;
+        Material mat = getMaterial(p);
+
+        vec3 diffuse = shadeDiffuse(p, n, mat.albedo, key, fill);
+        vec3 refl = shadeReflected(p, n, viewDir, key, fill);
+        color = mix(diffuse, refl, mat.reflectivity);
+    }
+
+    color = color / (1.0 + color);
+    color = pow(color, vec3(1.0 / 2.2));
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## materials/phong-lobe
+
+```glsl
+// Materials — Phong Lobe Visualization
+// Polar plot of cos^n(theta) for several values of n.
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+
+    // Shift origin to lower-center so the lobe points upward
+    uv.y += 0.8;
+
+    float r = length(uv);
+    float theta = atan(uv.x, uv.y);  // angle from vertical
+
+    vec3 color = vec3(0.12);
+
+    // Grid lines
+    float grid = smoothstep(0.002, 0.001, abs(uv.x)) +
+                 smoothstep(0.002, 0.001, abs(uv.y - 0.8));
+    for (float cr = 0.25; cr <= 1.0; cr += 0.25) {
+        grid += smoothstep(0.003, 0.001, abs(r - cr));
+    }
+    color += vec3(0.08) * grid;
+
+    // Draw lobes for different exponents
+    float exponents[5];
+    exponents[0] = 4.0;
+    exponents[1] = 16.0;
+    exponents[2] = 64.0;
+    exponents[3] = 256.0;
+    exponents[4] = 1024.0;
+
+    vec3 colors[5];
+    colors[0] = vec3(0.9, 0.3, 0.2);
+    colors[1] = vec3(0.9, 0.6, 0.2);
+    colors[2] = vec3(0.3, 0.8, 0.3);
+    colors[3] = vec3(0.3, 0.5, 0.9);
+    colors[4] = vec3(0.7, 0.3, 0.9);
+
+    for (int i = 0; i < 5; i++) {
+        float n = exponents[i];
+        float cosTheta = cos(theta);
+        float lobe = 0.0;
+        if (cosTheta > 0.0) {
+            lobe = pow(cosTheta, n);
+        }
+        float lobeR = lobe * 0.95;
+
+        float dist = abs(r - lobeR);
+        float line = smoothstep(0.005, 0.002, dist);
+        color = mix(color, colors[i], line);
+    }
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## materials/specular
+
+```glsl
+// Materials — Specular Highlights
+// Pure Phong with (n+2)/(2*PI) normalization.
+// Material struct: {albedo, reflectivity, shininess}.
+// Uncoupled diffuse + specular — vec3(0.3) is ad hoc.
+
+const float PI = 3.14159265;
+const int MAX_STEPS = 100;
+const float MAX_DIST = 100.0;
+const float HIT_THRESHOLD = 0.001;
+
+struct Ray { vec3 origin; vec3 dir; };
+struct DirLight { vec3 dir; vec3 color; };
+
+struct Material {
+    vec3 albedo;
+    float reflectivity;
+    float shininess;
+};
+
+Ray makeRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    float f = 1.0 / tan(radians(90.0) / 2.0);
+    return Ray(vec3(0.0), normalize(vec3(uv, -f)));
+}
+
+mat3 rotateX(float a) { float c=cos(a),s=sin(a); return mat3(1,0,0,0,c,-s,0,s,c); }
+mat3 rotateY(float a) { float c=cos(a),s=sin(a); return mat3(c,0,s,0,1,0,-s,0,c); }
+
+Ray orbitRay(Ray ray, float distance) {
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) mouse = vec2(0.6, 0.55);
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+
+// --- Scene ---
+
+const float R = 0.5;
+const vec3 S1 = vec3( 0.0, 0.5,  0.577);
+const vec3 S2 = vec3(-0.5, 0.5, -0.289);
+const vec3 S3 = vec3( 0.5, 0.5, -0.289);
+const vec3 S4 = vec3( 0.0, 1.317, 0.0);
+
+float sdScene(vec3 p) {
+    float d = length(p - S1) - R;
+    d = min(d, length(p - S2) - R);
+    d = min(d, length(p - S3) - R);
+    d = min(d, length(p - S4) - R);
+    d = min(d, p.y);
+    return d;
+}
+
+Material getMaterial(vec3 p) {
+    float eps = 0.01;
+    if (length(p - S1) - R < eps)
+        return Material(vec3(0.80, 0.45, 0.30), 0.0, 4.0);     // rough
+    if (length(p - S2) - R < eps)
+        return Material(vec3(0.50, 0.70, 0.50), 0.15, 32.0);   // satin
+    if (length(p - S3) - R < eps)
+        return Material(vec3(0.40, 0.55, 0.75), 0.5, 128.0);   // glossy
+    if (length(p - S4) - R < eps)
+        return Material(vec3(0.90, 0.85, 0.75), 0.8, 512.0);   // polished
+    return Material(vec3(0.60, 0.60, 0.55), 0.0, 4.0);
+}
+
+
+// --- Raymarching ---
+
+vec3 calcNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sdScene(p + vec3(eps,0,0)) - sdScene(p - vec3(eps,0,0)),
+        sdScene(p + vec3(0,eps,0)) - sdScene(p - vec3(0,eps,0)),
+        sdScene(p + vec3(0,0,eps)) - sdScene(p - vec3(0,0,eps))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < MAX_STEPS; i++) {
+        float d = sdScene(ray.origin + t * ray.dir);
+        if (d < HIT_THRESHOLD) return t;
+        t += d;
+        if (t > MAX_DIST) return -1.0;
+    }
+    return -1.0;
+}
+
+
+// --- Shading ---
+
+float softShadow(vec3 p, vec3 lightDir, float k) {
+    float res = 1.0;
+    float t = 0.02;
+    float prev = 1e20;
+    for (int i = 0; i < 50; i++) {
+        float d = sdScene(p + lightDir * t);
+        if (d < 0.001) return 0.0;
+        float y = d * d / (2.0 * prev);
+        float s = sqrt(d * d - y * y);
+        res = min(res, k * s / max(0.0, t - y));
+        prev = d;
+        t += d;
+        if (t > 20.0) break;
+    }
+    return res;
+}
+
+float ambientOcclusion(vec3 p, vec3 n) {
+    float ao = 0.0;
+    float scale = 1.0;
+    for (int i = 1; i <= 5; i++) {
+        float dist = 0.02 * float(i);
+        float d = sdScene(p + n * dist);
+        ao += (dist - d) * scale;
+        scale *= 0.5;
+    }
+    return 1.0 - clamp(ao, 0.0, 1.0);
+}
+
+vec3 ambient(vec3 p, vec3 n, vec3 albedo) {
+    float ao = ambientOcclusion(p, n);
+    return albedo * 0.15 * ao;
+}
+
+// Phong: diffuse + specular (uncoupled, ad hoc vec3(0.3))
+vec3 shadeDirect(vec3 p, vec3 n, Material mat, vec3 viewDir, DirLight light) {
+    float diff = max(0.0, dot(n, light.dir));
+
+    vec3 reflDir = reflect(-light.dir, n);
+    float normFactor = (mat.shininess + 2.0) / (2.0 * PI);
+    float spec = normFactor * pow(max(0.0, dot(viewDir, reflDir)), mat.shininess);
+
+    float sh = softShadow(p + n * 0.01, light.dir, 16.0);
+    return (mat.albedo * diff + vec3(0.3) * spec) * light.color * sh;
+}
+
+// Reflection (single bounce, diffuse-only hit)
+vec3 shadeReflected(vec3 p, vec3 n, vec3 viewDir, DirLight key, DirLight fill) {
+    vec3 reflDir = reflect(-viewDir, n);
+    Ray reflRay = Ray(p + n * 0.02, reflDir);
+    float t = raymarch(reflRay);
+
+    if (t > 0.0) {
+        vec3 rp = reflRay.origin + t * reflRay.dir;
+        vec3 rn = calcNormal(rp);
+        Material rmat = getMaterial(rp);
+        vec3 color = ambient(rp, rn, rmat.albedo);
+        color += rmat.albedo * max(0.0, dot(rn, key.dir)) * key.color;
+        color += rmat.albedo * max(0.0, dot(rn, fill.dir)) * fill.color;
+        return color;
+    }
+    return vec3(0.5, 0.6, 0.7);
+}
+
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = makeRay(fragCoord);
+    ray = orbitRay(ray, 5.0);
+
+    DirLight key = DirLight(normalize(vec3(1.0, 1.0, 1.0)), vec3(1.0, 0.9, 0.8));
+    DirLight fill = DirLight(normalize(vec3(-1.0, 0.3, 0.0)), vec3(0.15, 0.2, 0.3));
+
+    float t = raymarch(ray);
+
+    vec3 color = vec3(0.5, 0.6, 0.7);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 n = calcNormal(p);
+        vec3 viewDir = -ray.dir;
+        Material mat = getMaterial(p);
+
+        vec3 direct = ambient(p, n, mat.albedo);
+        direct += shadeDirect(p, n, mat, viewDir, key);
+        direct += shadeDirect(p, n, mat, viewDir, fill);
+
+        vec3 refl = shadeReflected(p, n, viewDir, key, fill);
+        color = mix(direct, refl, mat.reflectivity);
+    }
+
+    color = color / (1.0 + color);
+    color = pow(color, vec3(1.0 / 2.2));
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## materials/fresnel-graph
+
+```glsl
+// Materials — Fresnel Graph
+// Exact Fresnel vs Schlick approximation for water, glass, diamond.
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = fragCoord / iResolution.xy;
+
+    float theta = uv.x * 1.5708;  // 0 to pi/2
+    float plotY = uv.y;
+
+    vec3 color = vec3(0.12);
+
+    // Grid
+    for (float g = 0.2; g <= 0.8; g += 0.2) {
+        color += vec3(0.06) * smoothstep(0.003, 0.001, abs(plotY - g));
+        color += vec3(0.06) * smoothstep(0.003, 0.001, abs(uv.x - g));
+    }
+
+    float cosT = cos(theta);
+    float sinT = sin(theta);
+
+    float iors[3];
+    iors[0] = 1.33;  // water
+    iors[1] = 1.5;   // glass
+    iors[2] = 2.42;  // diamond
+
+    vec3 curveColors[3];
+    curveColors[0] = vec3(0.3, 0.5, 0.9);
+    curveColors[1] = vec3(0.3, 0.8, 0.4);
+    curveColors[2] = vec3(0.9, 0.4, 0.3);
+
+    for (int i = 0; i < 3; i++) {
+        float n = iors[i];
+        float f0 = pow((n - 1.0) / (n + 1.0), 2.0);
+
+        // Exact Fresnel
+        float sinT2 = sinT / n;
+        float exact;
+        if (sinT2 >= 1.0) {
+            exact = 1.0;
+        } else {
+            float cosT2 = sqrt(1.0 - sinT2 * sinT2);
+            float rs = (cosT - n * cosT2) / (cosT + n * cosT2);
+            float rp = (n * cosT - cosT2) / (n * cosT + cosT2);
+            exact = 0.5 * (rs * rs + rp * rp);
+        }
+
+        // Schlick
+        float schlick = f0 + (1.0 - f0) * pow(1.0 - cosT, 5.0);
+
+        // Exact: solid line
+        float distExact = abs(plotY - exact);
+        color = mix(color, curveColors[i],
+                    smoothstep(0.004, 0.001, distExact));
+
+        // Schlick: dashed line
+        float dash = step(0.5, fract(uv.x * 30.0));
+        float distSchlick = abs(plotY - schlick);
+        color = mix(color, curveColors[i] * 0.7,
+                    smoothstep(0.004, 0.001, distSchlick) * dash);
+    }
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## materials/reflections
+
+```glsl
+// Materials — Metals, Dielectrics & Reflections
+// Fresnel-coupled Phong. Single-bounce Fresnel-weighted reflections.
+// Material struct: {albedo, shininess, metallic}.
+// Roughness-clarity fade; metals always reflect.
+
+const float PI = 3.14159265;
+const int MAX_STEPS = 100;
+const float MAX_DIST = 100.0;
+const float HIT_THRESHOLD = 0.001;
+
+struct Ray { vec3 origin; vec3 dir; };
+struct DirLight { vec3 dir; vec3 color; };
+
+struct Material {
+    vec3 albedo;
+    float shininess;
+    float metallic;
+};
+
+Ray makeRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    float f = 1.0 / tan(radians(90.0) / 2.0);
+    return Ray(vec3(0.0), normalize(vec3(uv, -f)));
+}
+
+mat3 rotateX(float a) { float c=cos(a),s=sin(a); return mat3(1,0,0,0,c,-s,0,s,c); }
+mat3 rotateY(float a) { float c=cos(a),s=sin(a); return mat3(c,0,s,0,1,0,-s,0,c); }
+
+Ray orbitRay(Ray ray, float distance) {
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) mouse = vec2(0.6, 0.55);
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+
+// --- Scene: 6 spheres, back wall, checker ground ---
+
+const float SR = 0.65;
+const vec3 P0 = vec3(-1.6, 0.65, 0.8);   // dielectric: terra cotta
+const vec3 P1 = vec3( 0.0, 0.65, 0.8);   // dielectric: red plastic
+const vec3 P2 = vec3( 1.6, 0.65, 0.8);   // dielectric: ceramic
+const vec3 P3 = vec3(-1.6, 0.65, -0.8);  // metal: copper
+const vec3 P4 = vec3( 0.0, 0.65, -0.8);  // metal: gold
+const vec3 P5 = vec3( 1.6, 0.65, -0.8);  // metal: chrome
+
+float sdBox(vec3 p, vec3 b) {
+    vec3 d = abs(p) - b;
+    return length(max(d, 0.0)) + min(max(d.x, max(d.y, d.z)), 0.0);
+}
+
+float sdScene(vec3 p) {
+    float d = p.y;
+    d = min(d, sdBox(p - vec3(0.0, 2.5, -4.5), vec3(8.0, 3.5, 0.15)));
+    d = min(d, length(p - P0) - SR);
+    d = min(d, length(p - P1) - SR);
+    d = min(d, length(p - P2) - SR);
+    d = min(d, length(p - P3) - SR);
+    d = min(d, length(p - P4) - SR);
+    d = min(d, length(p - P5) - SR);
+    return d;
+}
+
+float checkerboard(vec3 p) {
+    vec2 q = floor(p.xz);
+    return mod(q.x + q.y, 2.0);
+}
+
+Material getMaterial(vec3 p) {
+    float eps = 0.01;
+
+    if (length(p - P0) - SR < eps)
+        return Material(vec3(0.72, 0.36, 0.24), 8.0, 0.0);
+    if (length(p - P1) - SR < eps)
+        return Material(vec3(0.80, 0.08, 0.05), 64.0, 0.0);
+    if (length(p - P2) - SR < eps)
+        return Material(vec3(0.92, 0.89, 0.82), 256.0, 0.0);
+
+    if (length(p - P3) - SR < eps)
+        return Material(vec3(0.95, 0.64, 0.54), 64.0, 1.0);    // copper
+    if (length(p - P4) - SR < eps)
+        return Material(vec3(1.0, 0.71, 0.29), 256.0, 1.0);    // gold
+    if (length(p - P5) - SR < eps)
+        return Material(vec3(0.95, 0.93, 0.88), 512.0, 1.0);   // chrome
+
+    if (sdBox(p - vec3(0.0, 2.5, -4.5), vec3(8.0, 3.5, 0.15)) < eps)
+        return Material(vec3(0.65, 0.63, 0.6), 2.0, 0.0);
+
+    float check = checkerboard(p);
+    vec3 col = mix(vec3(0.4, 0.38, 0.35), vec3(0.65, 0.62, 0.58), check);
+    return Material(col, 4.0, 0.0);
+}
+
+
+// --- Raymarching ---
+
+vec3 calcNormal(vec3 p) {
+    float e = 0.001;
+    return normalize(vec3(
+        sdScene(p+vec3(e,0,0)) - sdScene(p-vec3(e,0,0)),
+        sdScene(p+vec3(0,e,0)) - sdScene(p-vec3(0,e,0)),
+        sdScene(p+vec3(0,0,e)) - sdScene(p-vec3(0,0,e))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < MAX_STEPS; i++) {
+        float d = sdScene(ray.origin + t * ray.dir);
+        if (d < HIT_THRESHOLD) return t;
+        t += d;
+        if (t > MAX_DIST) return -1.0;
+    }
+    return -1.0;
+}
+
+
+// --- Shading ---
+
+float softShadow(vec3 p, vec3 ld, float k) {
+    float res = 1.0;
+    float t = 0.02;
+    float prev = 1e20;
+    for (int i = 0; i < 50; i++) {
+        float d = sdScene(p + ld * t);
+        if (d < 0.001) return 0.0;
+        float y = d * d / (2.0 * prev);
+        float s = sqrt(d * d - y * y);
+        res = min(res, k * s / max(0.0, t - y));
+        prev = d;
+        t += d;
+        if (t > 20.0) break;
+    }
+    return res;
+}
+
+float ambientOcclusion(vec3 p, vec3 n) {
+    float ao = 0.0;
+    float scale = 1.0;
+    for (int i = 1; i <= 5; i++) {
+        float dist = 0.03 * float(i);
+        float d = sdScene(p + n * dist);
+        ao += (dist - d) * scale;
+        scale *= 0.5;
+    }
+    return 1.0 - clamp(ao * 3.0, 0.0, 1.0);
+}
+
+vec3 fresnelSchlick(float cosTheta, vec3 f0) {
+    return f0 + (1.0 - f0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+
+vec3 skyColor(vec3 dir) {
+    float t = 0.5 + 0.5 * dir.y;
+    return mix(vec3(0.68, 0.63, 0.58), vec3(0.25, 0.4, 0.7), clamp(t*t, 0.0, 1.0));
+}
+
+vec3 ambient(vec3 p, vec3 n, Material mat) {
+    float ao = ambientOcclusion(p, n);
+    vec3 diffAlbedo = mat.albedo * (1.0 - mat.metallic);
+    vec3 amb = mix(vec3(0.25, 0.22, 0.18), vec3(0.3, 0.4, 0.6), 0.5 + 0.5 * n.y);
+    return diffAlbedo * amb * 0.2 * ao;
+}
+
+// Phong, Fresnel-coupled
+vec3 shadeDirect(vec3 p, vec3 n, Material mat, vec3 V, DirLight light) {
+    vec3 L = light.dir;
+    float NdotL = max(0.0, dot(n, L));
+    if (NdotL <= 0.0) return vec3(0.0);
+
+    vec3 diffColor = mat.albedo * (1.0 - mat.metallic);
+    vec3 specColor = mix(vec3(0.04), mat.albedo, mat.metallic);
+
+    vec3 reflDir = reflect(-L, n);
+    float RdotV = max(0.0, dot(reflDir, V));
+
+    vec3 F = fresnelSchlick(RdotV, specColor);
+    float normFactor = (mat.shininess + 2.0) / (2.0 * PI);
+    float spec = normFactor * pow(RdotV, mat.shininess);
+
+    vec3 diffuse = (vec3(1.0) - F) * diffColor / PI;
+    vec3 specular = F * spec;
+
+    float sh = softShadow(p + n * 0.02, L, 12.0);
+    return (diffuse + specular) * light.color * NdotL * sh;
+}
+
+vec3 shadePoint(vec3 p, vec3 n, Material mat, vec3 V, DirLight l1, DirLight l2) {
+    vec3 color = ambient(p, n, mat);
+    color += shadeDirect(p, n, mat, V, l1);
+    color += shadeDirect(p, n, mat, V, l2);
+    return color;
+}
+
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = makeRay(fragCoord);
+    ray = orbitRay(ray, 8.0);
+
+    DirLight key  = DirLight(normalize(vec3(2.0, 3.0, 1.5)), vec3(1.0, 0.95, 0.9) * 2.5);
+    DirLight fill = DirLight(normalize(vec3(-1.5, 1.0, -0.5)), vec3(0.5, 0.6, 0.75) * 0.5);
+
+    float t = raymarch(ray);
+    vec3 color;
+
+    if (t < 0.0) {
+        color = skyColor(ray.dir);
+    } else {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 n = calcNormal(p);
+        Material mat = getMaterial(p);
+        vec3 V = -ray.dir;
+        float NdotV = max(0.001, dot(n, V));
+
+        vec3 f0 = mix(vec3(0.04), mat.albedo, mat.metallic);
+        vec3 Fenv = fresnelSchlick(NdotV, f0);
+
+        vec3 directColor = shadePoint(p, n, mat, V, key, fill);
+
+        // Single-bounce reflection
+        vec3 reflDir = reflect(-V, n);
+        Ray reflRay = Ray(p + n * 0.02, reflDir);
+        float rt = raymarch(reflRay);
+
+        vec3 reflColor;
+        if (rt < 0.0) {
+            reflColor = skyColor(reflDir);
+        } else {
+            vec3 rp = reflRay.origin + rt * reflRay.dir;
+            vec3 rn = calcNormal(rp);
+            Material rmat = getMaterial(rp);
+            vec3 rv = -reflDir;
+            reflColor = shadePoint(rp, rn, rmat, rv, key, fill);
+        }
+
+        color = directColor + Fenv * reflColor;
+
+        // Roughness fade (metals always reflect)
+        float clarity = clamp((mat.shininess - 16.0) / 112.0, 0.0, 1.0);
+        clarity = max(clarity, mat.metallic);
+        color = mix(directColor, color, clarity);
+    }
+
+    color = color / (1.0 + color);
+    color = pow(color, vec3(1.0 / 2.2));
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## materials/clearcoat
+
+```glsl
+// Materials — Clear Coat
+// Layered BRDF: smooth dielectric coat over arbitrary base.
+// Material struct: {albedo, shininess, metallic, clearcoat}.
+// Coat has F0=0.04, shininess=256.
+
+const float PI = 3.14159265;
+const int MAX_STEPS = 100;
+const float MAX_DIST = 100.0;
+const float HIT_THRESHOLD = 0.001;
+
+struct Ray { vec3 origin; vec3 dir; };
+struct DirLight { vec3 dir; vec3 color; };
+
+struct Material {
+    vec3 albedo;
+    float shininess;
+    float metallic;
+    float clearcoat;
+};
+
+Ray makeRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    float f = 1.0 / tan(radians(90.0) / 2.0);
+    return Ray(vec3(0.0), normalize(vec3(uv, -f)));
+}
+
+mat3 rotateX(float a) { float c=cos(a),s=sin(a); return mat3(1,0,0,0,c,-s,0,s,c); }
+mat3 rotateY(float a) { float c=cos(a),s=sin(a); return mat3(c,0,s,0,1,0,-s,0,c); }
+
+Ray orbitRay(Ray ray, float distance) {
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) mouse = vec2(0.6, 0.55);
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+
+
+// --- Scene: 3 spheres comparing bare/coated/glossy ---
+
+const float SR = 0.65;
+const vec3 P0 = vec3(-1.8, 0.65, 0.0);   // bare terra cotta
+const vec3 P1 = vec3( 0.0, 0.65, 0.0);   // glazed terra cotta
+const vec3 P2 = vec3( 1.8, 0.65, 0.0);   // glossy plastic
+
+float sdBox(vec3 p, vec3 b) {
+    vec3 d = abs(p) - b;
+    return length(max(d, 0.0)) + min(max(d.x, max(d.y, d.z)), 0.0);
+}
+
+float sdScene(vec3 p) {
+    float d = p.y;
+    d = min(d, sdBox(p - vec3(0.0, 2.5, -4.0), vec3(8.0, 3.5, 0.15)));
+    d = min(d, length(p - P0) - SR);
+    d = min(d, length(p - P1) - SR);
+    d = min(d, length(p - P2) - SR);
+    return d;
+}
+
+float checkerboard(vec3 p) {
+    vec2 q = floor(p.xz);
+    return mod(q.x + q.y, 2.0);
+}
+
+Material getMaterial(vec3 p) {
+    float eps = 0.01;
+
+    if (length(p - P0) - SR < eps)
+        return Material(vec3(0.72, 0.36, 0.24), 6.0, 0.0, 0.0);    // bare
+    if (length(p - P1) - SR < eps)
+        return Material(vec3(0.65, 0.35, 0.22), 6.0, 0.0, 1.0);    // glazed
+    if (length(p - P2) - SR < eps)
+        return Material(vec3(0.80, 0.08, 0.05), 64.0, 0.0, 0.0);   // glossy
+
+    if (sdBox(p - vec3(0.0, 2.5, -4.0), vec3(8.0, 3.5, 0.15)) < eps)
+        return Material(vec3(0.65, 0.63, 0.6), 2.0, 0.0, 0.0);
+
+    float check = checkerboard(p);
+    vec3 col = mix(vec3(0.4, 0.38, 0.35), vec3(0.65, 0.62, 0.58), check);
+    return Material(col, 4.0, 0.0, 0.0);
+}
+
+
+// --- Raymarching ---
+
+vec3 calcNormal(vec3 p) {
+    float e = 0.001;
+    return normalize(vec3(
+        sdScene(p+vec3(e,0,0)) - sdScene(p-vec3(e,0,0)),
+        sdScene(p+vec3(0,e,0)) - sdScene(p-vec3(0,e,0)),
+        sdScene(p+vec3(0,0,e)) - sdScene(p-vec3(0,0,e))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < MAX_STEPS; i++) {
+        float d = sdScene(ray.origin + t * ray.dir);
+        if (d < HIT_THRESHOLD) return t;
+        t += d;
+        if (t > MAX_DIST) return -1.0;
+    }
+    return -1.0;
+}
+
+
+// --- Shading ---
+
+float softShadow(vec3 p, vec3 ld, float k) {
+    float res = 1.0;
+    float t = 0.02;
+    float prev = 1e20;
+    for (int i = 0; i < 50; i++) {
+        float d = sdScene(p + ld * t);
+        if (d < 0.001) return 0.0;
+        float y = d * d / (2.0 * prev);
+        float s = sqrt(d * d - y * y);
+        res = min(res, k * s / max(0.0, t - y));
+        prev = d;
+        t += d;
+        if (t > 20.0) break;
+    }
+    return res;
+}
+
+float ambientOcclusion(vec3 p, vec3 n) {
+    float ao = 0.0;
+    float scale = 1.0;
+    for (int i = 1; i <= 5; i++) {
+        float dist = 0.03 * float(i);
+        float d = sdScene(p + n * dist);
+        ao += (dist - d) * scale;
+        scale *= 0.5;
+    }
+    return 1.0 - clamp(ao * 3.0, 0.0, 1.0);
+}
+
+vec3 fresnelSchlick(float cosTheta, vec3 f0) {
+    return f0 + (1.0 - f0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+
+vec3 skyColor(vec3 dir) {
+    float t = 0.5 + 0.5 * dir.y;
+    return mix(vec3(0.68, 0.63, 0.58), vec3(0.25, 0.4, 0.7), clamp(t*t, 0.0, 1.0));
+}
+
+vec3 ambient(vec3 p, vec3 n, Material mat) {
+    float ao = ambientOcclusion(p, n);
+    vec3 diffAlbedo = mat.albedo * (1.0 - mat.metallic);
+    vec3 amb = mix(vec3(0.25, 0.22, 0.18), vec3(0.3, 0.4, 0.6), 0.5 + 0.5 * n.y);
+    return diffAlbedo * amb * 0.2 * ao;
+}
+
+// Phong, Fresnel-coupled, with clearcoat
+vec3 shadeDirect(vec3 p, vec3 n, Material mat, vec3 V, DirLight light) {
+    vec3 L = light.dir;
+    float NdotL = max(0.0, dot(n, L));
+    if (NdotL <= 0.0) return vec3(0.0);
+
+    vec3 diffColor = mat.albedo * (1.0 - mat.metallic);
+    vec3 specColor = mix(vec3(0.04), mat.albedo, mat.metallic);
+
+    vec3 reflDir = reflect(-L, n);
+    float RdotV = max(0.0, dot(reflDir, V));
+
+    vec3 F = fresnelSchlick(RdotV, specColor);
+    float normFactor = (mat.shininess + 2.0) / (2.0 * PI);
+    float spec = normFactor * pow(RdotV, mat.shininess);
+
+    vec3 diffuse = (vec3(1.0) - F) * diffColor / PI;
+    vec3 specular = F * spec;
+    vec3 base = (diffuse + specular) * light.color * NdotL;
+
+    // Clear coat
+    if (mat.clearcoat > 0.0) {
+        vec3 Fcoat = fresnelSchlick(RdotV, vec3(0.04));
+        float coatShininess = 256.0;
+        float coatNorm = (coatShininess + 2.0) / (2.0 * PI);
+        float coatSpec = coatNorm * pow(RdotV, coatShininess);
+        vec3 coat = Fcoat * coatSpec * light.color * NdotL;
+        base = base * (vec3(1.0) - Fcoat * mat.clearcoat) + coat * mat.clearcoat;
+    }
+
+    float sh = softShadow(p + n * 0.02, L, 12.0);
+    return base * sh;
+}
+
+vec3 shadePoint(vec3 p, vec3 n, Material mat, vec3 V, DirLight l1, DirLight l2) {
+    vec3 color = ambient(p, n, mat);
+    color += shadeDirect(p, n, mat, V, l1);
+    color += shadeDirect(p, n, mat, V, l2);
+    return color;
+}
+
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = makeRay(fragCoord);
+    ray = orbitRay(ray, 7.0);
+
+    DirLight key  = DirLight(normalize(vec3(2.0, 3.0, 1.5)), vec3(1.0, 0.95, 0.9) * 2.5);
+    DirLight fill = DirLight(normalize(vec3(-1.5, 1.0, -0.5)), vec3(0.5, 0.6, 0.75) * 0.5);
+
+    float t = raymarch(ray);
+    vec3 color;
+
+    if (t < 0.0) {
+        color = skyColor(ray.dir);
+    } else {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 n = calcNormal(p);
+        Material mat = getMaterial(p);
+        vec3 V = -ray.dir;
+        float NdotV = max(0.001, dot(n, V));
+
+        vec3 f0 = mix(vec3(0.04), mat.albedo, mat.metallic);
+        vec3 Fenv = fresnelSchlick(NdotV, f0);
+
+        // Clearcoat boosts reflection Fresnel
+        if (mat.clearcoat > 0.0) {
+            vec3 Fcoat = fresnelSchlick(NdotV, vec3(0.04));
+            Fenv = mix(Fenv, max(Fenv, Fcoat), mat.clearcoat);
+        }
+
+        vec3 directColor = shadePoint(p, n, mat, V, key, fill);
+
+        // Single-bounce reflection
+        vec3 reflDir = reflect(-V, n);
+        Ray reflRay = Ray(p + n * 0.02, reflDir);
+        float rt = raymarch(reflRay);
+
+        vec3 reflColor;
+        if (rt < 0.0) {
+            reflColor = skyColor(reflDir);
+        } else {
+            vec3 rp = reflRay.origin + rt * reflRay.dir;
+            vec3 rn = calcNormal(rp);
+            Material rmat = getMaterial(rp);
+            vec3 rv = -reflDir;
+            reflColor = shadePoint(rp, rn, rmat, rv, key, fill);
+        }
+
+        color = directColor + Fenv * reflColor;
+
+        // Roughness fade (clearcoat overrides, metals always reflect)
+        float effectiveShininess = mat.shininess;
+        if (mat.clearcoat > 0.0)
+            effectiveShininess = max(effectiveShininess, 256.0 * mat.clearcoat);
+        float clarity = clamp((effectiveShininess - 16.0) / 112.0, 0.0, 1.0);
+        clarity = max(clarity, mat.metallic);
+        color = mix(directColor, color, clarity);
+    }
+
+    color = color / (1.0 + color);
+    color = pow(color, vec3(1.0 / 2.2));
+    fragColor = vec4(color, 1.0);
+}
+```
+
+---
+
+## materials/materials-complete
+
+```glsl
+// Materials — Complete Scene
+// Nine spheres: dielectrics, clearcoat, metals.
+// Single-bounce Fresnel-weighted reflections.
+// Full pipeline: Phong + Fresnel + clearcoat + shadows + AO.
+
+const float PI = 3.14159265;
+const int MAX_STEPS = 150;
+const float MAX_DIST = 80.0;
+const float HIT_THRESHOLD = 0.001;
+
+struct Ray { vec3 origin; vec3 dir; };
+struct DirLight { vec3 dir; vec3 color; };
+
+struct Material {
+    vec3 albedo;
+    float shininess;
+    float metallic;
+    float clearcoat;
+};
+
+Ray makeRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    float f = 1.0 / tan(radians(50.0) / 2.0);
+    return Ray(vec3(0.0), normalize(vec3(uv, -f)));
+}
+
+mat3 rotateX(float a) { float c=cos(a),s=sin(a); return mat3(1,0,0,0,c,-s,0,s,c); }
+mat3 rotateY(float a) { float c=cos(a),s=sin(a); return mat3(c,0,s,0,1,0,-s,0,c); }
+
+Ray orbitRay(Ray ray, float dist) {
+    vec2 m = iMouse.xy / iResolution.xy;
+    if (length(iMouse.xy) < 1.0) m = vec2(0.55, 0.45);
+    float ay = (m.x - 0.5) * 6.28;
+    float ax = (0.5 - m.y) * 3.14 * 0.5;
+    ax = clamp(ax, -0.2, 1.2);
+    mat3 rot = rotateX(ax) * rotateY(ay);
+    ray.origin = rot * vec3(0.0, 0.0, dist);
+    ray.dir = rot * ray.dir;
+    ray.origin.y += 2.0;
+    return ray;
+}
+
+
+// --- SDF ---
+
+float sdBox(vec3 p, vec3 b) {
+    vec3 d = abs(p) - b;
+    return length(max(d, 0.0)) + min(max(d.x, max(d.y, d.z)), 0.0);
+}
+
+const float SR = 0.9;
+
+// Back row: dielectrics
+const vec3 P0 = vec3(-3.0, 0.9, -3.5);
+const vec3 P1 = vec3( 0.0, 0.9, -3.5);
+const vec3 P2 = vec3( 3.0, 0.9, -3.5);
+// Middle row: clearcoat
+const vec3 P3 = vec3(-3.0, 0.9, 0.0);
+const vec3 P4 = vec3( 0.0, 0.9, 0.0);
+const vec3 P5 = vec3( 3.0, 0.9, 0.0);
+// Front row: metals
+const vec3 P6 = vec3(-3.0, 0.9, 3.5);
+const vec3 P7 = vec3( 0.0, 0.9, 3.5);
+const vec3 P8 = vec3( 3.0, 0.9, 3.5);
+
+float sdWall(vec3 p) {
+    return sdBox(p - vec3(0.0, 3.5, -8.0), vec3(16.0, 5.5, 0.15));
+}
+
+float sdScene(vec3 p) {
+    float d = p.y;
+    d = min(d, sdWall(p));
+    d = min(d, length(p - P0) - SR);
+    d = min(d, length(p - P1) - SR);
+    d = min(d, length(p - P2) - SR);
+    d = min(d, length(p - P3) - SR);
+    d = min(d, length(p - P4) - SR);
+    d = min(d, length(p - P5) - SR);
+    d = min(d, length(p - P6) - SR);
+    d = min(d, length(p - P7) - SR);
+    d = min(d, length(p - P8) - SR);
+    return d;
+}
+
+float checkerboard(vec3 p) {
+    vec2 q = floor(p.xz);
+    return mod(q.x + q.y, 2.0);
+}
+
+Material getMaterial(vec3 p) {
+    float eps = 0.02;
+
+    // Back: dielectrics
+    if (length(p - P0) - SR < eps)
+        return Material(vec3(0.72, 0.36, 0.24), 4.0, 0.0, 0.0);      // matte terra cotta
+    if (length(p - P1) - SR < eps)
+        return Material(vec3(0.8, 0.08, 0.05), 64.0, 0.0, 0.0);      // glossy red plastic
+    if (length(p - P2) - SR < eps)
+        return Material(vec3(0.95, 0.93, 0.90), 512.0, 0.0, 0.0);    // polished ceramic
+
+    // Middle: clearcoat
+    if (length(p - P3) - SR < eps)
+        return Material(vec3(0.65, 0.35, 0.22), 6.0, 0.0, 1.0);      // glazed terra cotta
+    if (length(p - P4) - SR < eps)
+        return Material(vec3(0.6, 0.03, 0.02), 8.0, 0.0, 1.0);       // deep red car paint
+    if (length(p - P5) - SR < eps)
+        return Material(vec3(0.92, 0.90, 0.85), 4.0, 0.0, 1.0);      // white lacquer
+
+    // Front: metals
+    if (length(p - P6) - SR < eps)
+        return Material(vec3(0.95, 0.64, 0.54), 64.0, 1.0, 0.0);     // copper
+    if (length(p - P7) - SR < eps)
+        return Material(vec3(0.9, 0.15, 0.10), 256.0, 1.0, 0.0);     // red metal
+    if (length(p - P8) - SR < eps)
+        return Material(vec3(0.95, 0.93, 0.88), 512.0, 1.0, 0.0);    // chrome
+
+    // Wall
+    if (sdWall(p) < eps)
+        return Material(vec3(0.65, 0.63, 0.6), 2.0, 0.0, 0.0);
+
+    // Ground
+    float check = checkerboard(p);
+    vec3 col = mix(vec3(0.4, 0.38, 0.35), vec3(0.7, 0.67, 0.63), check);
+    return Material(col, 4.0, 0.0, 0.0);
+}
+
+
+// --- Raymarching ---
+
+vec3 calcNormal(vec3 p) {
+    float e = 0.001;
+    return normalize(vec3(
+        sdScene(p+vec3(e,0,0)) - sdScene(p-vec3(e,0,0)),
+        sdScene(p+vec3(0,e,0)) - sdScene(p-vec3(0,e,0)),
+        sdScene(p+vec3(0,0,e)) - sdScene(p-vec3(0,0,e))
+    ));
+}
+
+float raymarch(Ray ray) {
+    float t = 0.0;
+    for (int i = 0; i < MAX_STEPS; i++) {
+        float d = sdScene(ray.origin + t * ray.dir);
+        if (d < HIT_THRESHOLD) return t;
+        t += d;
+        if (t > MAX_DIST) return -1.0;
+    }
+    return -1.0;
+}
+
+
+// --- Shadows & AO ---
+
+float softShadow(vec3 p, vec3 ld, float k, float maxDist) {
+    float res = 1.0;
+    float t = 0.03;
+    float prev = 1e20;
+    for (int i = 0; i < 64; i++) {
+        float d = sdScene(p + ld * t);
+        if (d < 0.001) return 0.0;
+        float y = d * d / (2.0 * prev);
+        float s = sqrt(d * d - y * y);
+        res = min(res, k * s / max(0.001, t - y));
+        prev = d;
+        t += d;
+        if (t > maxDist) break;
+    }
+    return clamp(res, 0.0, 1.0);
+}
+
+float ambientOcclusion(vec3 p, vec3 n) {
+    float ao = 0.0;
+    float scale = 1.0;
+    for (int i = 1; i <= 5; i++) {
+        float dist = 0.04 * float(i);
+        float d = sdScene(p + n * dist);
+        ao += (dist - d) * scale;
+        scale *= 0.5;
+    }
+    return 1.0 - clamp(ao * 3.0, 0.0, 1.0);
+}
+
+
+// --- BRDF ---
+
+vec3 fresnelSchlick(float cosTheta, vec3 f0) {
+    return f0 + (1.0 - f0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+
+vec3 skyColor(vec3 dir) {
+    float t = 0.5 + 0.5 * dir.y;
+    return mix(vec3(0.68, 0.63, 0.58), vec3(0.25, 0.4, 0.7), clamp(t*t, 0.0, 1.0));
+}
+
+vec3 ambient(vec3 p, vec3 n, Material mat) {
+    float ao = ambientOcclusion(p, n);
+    vec3 diffAlbedo = mat.albedo * (1.0 - mat.metallic);
+    vec3 amb = mix(vec3(0.25, 0.22, 0.18), vec3(0.3, 0.4, 0.6), 0.5 + 0.5 * n.y);
+    return diffAlbedo * amb * 0.2 * ao;
+}
+
+// Phong, Fresnel-coupled, with clearcoat
+vec3 shadeDirect(vec3 p, vec3 n, Material mat, vec3 V, DirLight light) {
+    vec3 L = light.dir;
+    float NdotL = max(0.0, dot(n, L));
+    if (NdotL <= 0.0) return vec3(0.0);
+
+    vec3 diffColor = mat.albedo * (1.0 - mat.metallic);
+    vec3 specColor = mix(vec3(0.04), mat.albedo, mat.metallic);
+
+    vec3 reflDir = reflect(-L, n);
+    float RdotV = max(0.0, dot(reflDir, V));
+
+    vec3 F = fresnelSchlick(RdotV, specColor);
+    float normFactor = (mat.shininess + 2.0) / (2.0 * PI);
+    float spec = normFactor * pow(RdotV, mat.shininess);
+
+    vec3 diffuse = (vec3(1.0) - F) * diffColor / PI;
+    vec3 specular = F * spec;
+    vec3 base = (diffuse + specular) * light.color * NdotL;
+
+    // Clear coat
+    if (mat.clearcoat > 0.0) {
+        vec3 Fcoat = fresnelSchlick(RdotV, vec3(0.04));
+        float coatShininess = 256.0;
+        float coatNorm = (coatShininess + 2.0) / (2.0 * PI);
+        float coatSpec = coatNorm * pow(RdotV, coatShininess);
+        vec3 coat = Fcoat * coatSpec * light.color * NdotL;
+        base = base * (vec3(1.0) - Fcoat * mat.clearcoat) + coat * mat.clearcoat;
+    }
+
+    float sh = softShadow(p + n * 0.02, L, 10.0, 30.0);
+    return base * sh;
+}
+
+vec3 shadePoint(vec3 p, vec3 n, Material mat, vec3 V,
+                DirLight l1, DirLight l2, DirLight l3) {
+    vec3 color = ambient(p, n, mat);
+    color += shadeDirect(p, n, mat, V, l1);
+    color += shadeDirect(p, n, mat, V, l2);
+    color += shadeDirect(p, n, mat, V, l3);
+    return color;
+}
+
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = makeRay(fragCoord);
+    ray = orbitRay(ray, 18.0);
+
+    DirLight key  = DirLight(normalize(vec3(2.0, 3.5, 2.0)),  vec3(1.0, 0.96, 0.92) * 2.5);
+    DirLight fill = DirLight(normalize(vec3(-2.0, 1.0, -1.0)), vec3(0.5, 0.6, 0.75) * 0.6);
+    DirLight rim  = DirLight(normalize(vec3(0.0, 0.5, -2.0)),  vec3(0.8, 0.75, 0.7) * 0.3);
+
+    float t = raymarch(ray);
+    vec3 color;
+
+    if (t < 0.0) {
+        color = skyColor(ray.dir);
+    } else {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 n = calcNormal(p);
+        Material mat = getMaterial(p);
+        vec3 V = -ray.dir;
+        float NdotV = max(0.001, dot(n, V));
+
+        vec3 f0 = mix(vec3(0.04), mat.albedo, mat.metallic);
+        vec3 Fenv = fresnelSchlick(NdotV, f0);
+
+        // Clearcoat boosts reflection Fresnel
+        if (mat.clearcoat > 0.0) {
+            vec3 Fcoat = fresnelSchlick(NdotV, vec3(0.04));
+            Fenv = mix(Fenv, max(Fenv, Fcoat), mat.clearcoat);
+        }
+
+        vec3 directColor = shadePoint(p, n, mat, V, key, fill, rim);
+
+        // Single-bounce reflection
+        vec3 reflDir = reflect(-V, n);
+        Ray reflRay = Ray(p + n * 0.02, reflDir);
+        float rt = raymarch(reflRay);
+
+        vec3 reflColor;
+        if (rt < 0.0) {
+            reflColor = skyColor(reflDir);
+        } else {
+            vec3 rp = reflRay.origin + rt * reflRay.dir;
+            vec3 rn = calcNormal(rp);
+            Material rmat = getMaterial(rp);
+            vec3 rv = -reflDir;
+            reflColor = shadePoint(rp, rn, rmat, rv, key, fill, rim);
+        }
+
+        color = directColor + Fenv * reflColor;
+
+        // Roughness fade (clearcoat overrides, metals always reflect)
+        float effectiveShininess = mat.shininess;
+        if (mat.clearcoat > 0.0)
+            effectiveShininess = max(effectiveShininess, 256.0 * mat.clearcoat);
+        float clarity = clamp((effectiveShininess - 16.0) / 112.0, 0.0, 1.0);
+        clarity = max(clarity, mat.metallic);
+        color = mix(directColor, color, clarity);
+    }
+
+    color = color / (1.0 + color);
     color = pow(color, vec3(1.0 / 2.2));
     fragColor = vec4(color, 1.0);
 }

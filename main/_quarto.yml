@@ -24,8 +24,8 @@ website:
             href: notes/3d/04-sculpting/notes.qmd
           - text: "Lighting & Shadows"
             href: notes/3d/05-lighting/notes.qmd
-          # - text: "Materials"
-          #   href: notes/3d/06-materials/notes.qmd
+          - text: "Materials"
+            href: notes/3d/06-materials/notes.qmd
           # - text: "Refraction"
           #   href: notes/3d/07-refraction/notes.qmd
           # - text: "Procedural Patterns"

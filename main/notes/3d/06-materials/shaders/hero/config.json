@@ -1,0 +1,6 @@
+{
+  "mode": "shadertoy",
+  "Image": {
+    "iChannel0": "./equirect.jpg"
+  }
+}
