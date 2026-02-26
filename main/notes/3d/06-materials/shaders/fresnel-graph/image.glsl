@@ -50,13 +50,13 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
         // Exact: solid line
         float distExact = abs(plotY - exact);
         color = mix(color, curveColors[i],
-                    smoothstep(0.004, 0.001, distExact));
+                    smoothstep(0.020, 0.010, distExact));
 
         // Schlick: dashed line
         float dash = step(0.5, fract(uv.x * 30.0));
         float distSchlick = abs(plotY - schlick);
         color = mix(color, curveColors[i] * 0.7,
-                    smoothstep(0.004, 0.001, distSchlick) * dash);
+                    smoothstep(0.020, 0.010, distSchlick) * dash);
     }
 
     fragColor = vec4(color, 1.0);

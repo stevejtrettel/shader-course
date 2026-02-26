@@ -226,21 +226,23 @@ vec3 shadeDirect(vec3 p, vec3 n, Material mat, vec3 V, vec3 L, vec3 lightCol) {
     vec3 reflDir = reflect(-L, n);
     float RdotV = max(0.0, dot(reflDir, V));
 
-    vec3 F = fresnelSchlick(RdotV, specColor);
+    vec3 Fi = fresnelSchlick(NdotL, specColor);
+    vec3 Fr = fresnelSchlick(RdotV, specColor);
     float normFactor = (mat.shininess + 2.0) / (2.0 * PI);
     float spec = normFactor * pow(RdotV, mat.shininess);
 
-    vec3 diffuse = (vec3(1.0) - F) * diffColor / PI;
-    vec3 specular = F * spec;
+    vec3 diffuse = (vec3(1.0) - Fi) * diffColor / PI;
+    vec3 specular = Fr * spec;
     vec3 base = (diffuse + specular) * lightCol * NdotL;
 
     if (mat.clearcoat > 0.0) {
-        vec3 Fcoat = fresnelSchlick(RdotV, vec3(0.04));
+        vec3 FcoatR = fresnelSchlick(RdotV, vec3(0.04));
+        vec3 FcoatI = fresnelSchlick(NdotL, vec3(0.04));
         float coatShininess = 256.0;
         float coatNorm = (coatShininess + 2.0) / (2.0 * PI);
         float coatSpec = coatNorm * pow(RdotV, coatShininess);
-        vec3 coat = Fcoat * coatSpec * lightCol * NdotL;
-        base = base * (vec3(1.0) - Fcoat * mat.clearcoat) + coat * mat.clearcoat;
+        vec3 coat = FcoatR * coatSpec * lightCol * NdotL;
+        base = base * (vec3(1.0) - FcoatI * mat.clearcoat) + coat * mat.clearcoat;
     }
 
     float sh = softShadow(p + n * 0.02, L, 12.0);

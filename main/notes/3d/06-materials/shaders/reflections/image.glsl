@@ -15,7 +15,7 @@ struct Material {
 Ray makeRay(vec2 fragCoord) {
     vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
     uv.x *= iResolution.x / iResolution.y;
-    float f = 1.0 / tan(radians(90.0) / 2.0);
+    float f = 1.0 / tan(radians(40.0) / 2.0);
     return Ray(vec3(0.0), normalize(vec3(uv, -f)));
 }
 

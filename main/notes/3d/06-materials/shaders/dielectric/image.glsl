@@ -8,7 +8,6 @@ struct DirLight { vec3 dir; vec3 color; };
 
 struct Material {
     vec3 albedo;
-    float reflectivity;
     float shininess;
 };
 
@@ -34,7 +33,7 @@ Ray orbitRay(Ray ray, float distance) {
 }
 
 
-// --- Scene: four spheres with varying shininess on checkerboard ---
+// --- Scene: four dielectric spheres with varying shininess ---
 
 const vec3 P0 = vec3(-2.0, 0.7, 0.0);
 const vec3 P1 = vec3(-0.6, 0.7, 0.0);
@@ -58,16 +57,16 @@ float checkerboard(vec3 p) {
 Material getMaterial(vec3 p) {
     float eps = 0.01;
     if (length(p - P0) - 0.7 < eps)
-        return Material(vec3(0.80, 0.45, 0.30), 0.0, 4.0);     // rough
+        return Material(vec3(0.80, 0.45, 0.30), 4.0);     // rough
     if (length(p - P1) - 0.7 < eps)
-        return Material(vec3(0.50, 0.70, 0.50), 0.15, 32.0);   // satin
+        return Material(vec3(0.50, 0.70, 0.50), 32.0);    // satin
     if (length(p - P2) - 0.7 < eps)
-        return Material(vec3(0.40, 0.55, 0.75), 0.5, 128.0);   // glossy
+        return Material(vec3(0.40, 0.55, 0.75), 128.0);   // glossy
     if (length(p - P3) - 0.7 < eps)
-        return Material(vec3(0.90, 0.85, 0.75), 0.8, 512.0);   // polished
+        return Material(vec3(0.90, 0.85, 0.75), 512.0);   // polished
     float check = checkerboard(p);
     vec3 col = mix(vec3(0.4, 0.38, 0.35), vec3(0.65, 0.62, 0.58), check);
-    return Material(col, 0.0, 4.0);
+    return Material(col, 4.0);
 }
 
 
@@ -121,34 +120,45 @@ float ambientOcclusion(vec3 p, vec3 n) {
     return 1.0 - clamp(ao, 0.0, 1.0);
 }
 
-// Phong: diffuse + specular (uncoupled, ad hoc vec3(0.3))
-vec3 shadeDirect(vec3 p, vec3 n, Material mat, vec3 viewDir, DirLight light) {
-    float diff = max(0.0, dot(n, light.dir));
-
-    vec3 reflDir = reflect(-light.dir, n);
-    float normFactor = (mat.shininess + 2.0) / (2.0 * PI);
-    float spec = normFactor * pow(max(0.0, dot(viewDir, reflDir)), mat.shininess);
-
-    float sh = softShadow(p + n * 0.01, light.dir, 16.0);
-    return (mat.albedo * diff + vec3(0.3) * spec) * light.color * sh;
+vec3 fresnelSchlick(float cosTheta, vec3 f0) {
+    return f0 + (1.0 - f0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
-vec3 shadeReflected(vec3 p, vec3 n, vec3 viewDir, DirLight key, DirLight fill) {
-    vec3 reflDir = reflect(-viewDir, n);
-    Ray reflRay = Ray(p + n * 0.02, reflDir);
-    float t = raymarch(reflRay);
+vec3 skyColor(vec3 dir) {
+    float t = 0.5 + 0.5 * dir.y;
+    return mix(vec3(0.68, 0.63, 0.58), vec3(0.25, 0.4, 0.7), clamp(t * t, 0.0, 1.0));
+}
 
-    if (t > 0.0) {
-        vec3 rp = reflRay.origin + t * reflRay.dir;
-        vec3 rn = calcNormal(rp);
-        Material rmat = getMaterial(rp);
-        float ao = ambientOcclusion(rp, rn);
-        vec3 color = rmat.albedo * 0.15 * ao;
-        color += rmat.albedo * max(0.0, dot(rn, key.dir)) * key.color;
-        color += rmat.albedo * max(0.0, dot(rn, fill.dir)) * fill.color;
-        return color;
-    }
-    return vec3(0.5, 0.6, 0.7);
+vec3 ambient(vec3 p, vec3 n, Material mat) {
+    float ao = ambientOcclusion(p, n);
+    return mat.albedo * 0.15 * ao;
+}
+
+vec3 shadeDirect(vec3 p, vec3 n, Material mat, vec3 V, DirLight light) {
+    vec3 L = light.dir;
+    float NdotL = max(0.0, dot(n, L));
+    if (NdotL <= 0.0) return vec3(0.0);
+
+    vec3 reflDir = reflect(-L, n);
+    float RdotV = max(0.0, dot(reflDir, V));
+
+    vec3 Fi = fresnelSchlick(NdotL, vec3(0.04));
+    vec3 Fr = fresnelSchlick(RdotV, vec3(0.04));
+    float normFactor = (mat.shininess + 2.0) / (2.0 * PI);
+    float spec = normFactor * pow(RdotV, mat.shininess);
+
+    vec3 diffuse = (vec3(1.0) - Fi) * mat.albedo / PI;
+    vec3 specular = Fr * spec;
+
+    float sh = softShadow(p + n * 0.01, L, 16.0);
+    return (diffuse + specular) * light.color * NdotL * sh;
+}
+
+vec3 shadePoint(vec3 p, vec3 n, Material mat, vec3 V, DirLight l1, DirLight l2) {
+    vec3 color = ambient(p, n, mat);
+    color += shadeDirect(p, n, mat, V, l1);
+    color += shadeDirect(p, n, mat, V, l2);
+    return color;
 }
 
 
@@ -160,21 +170,42 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     DirLight fill = DirLight(normalize(vec3(-1.0, 0.3, 0.0)), vec3(0.15, 0.2, 0.3));
 
     float t = raymarch(ray);
+    vec3 color;
 
-    vec3 color = vec3(0.5, 0.6, 0.7);
-    if (t > 0.0) {
+    if (t < 0.0) {
+        color = skyColor(ray.dir);
+    } else {
         vec3 p = ray.origin + t * ray.dir;
         vec3 n = calcNormal(p);
-        vec3 viewDir = -ray.dir;
         Material mat = getMaterial(p);
+        vec3 V = -ray.dir;
+        float NdotV = max(0.001, dot(n, V));
 
-        float ao = ambientOcclusion(p, n);
-        vec3 direct = mat.albedo * 0.15 * ao;
-        direct += shadeDirect(p, n, mat, viewDir, key);
-        direct += shadeDirect(p, n, mat, viewDir, fill);
+        vec3 Fenv = fresnelSchlick(NdotV, vec3(0.04));
 
-        vec3 refl = shadeReflected(p, n, viewDir, key, fill);
-        color = mix(direct, refl, mat.reflectivity);
+        vec3 directColor = shadePoint(p, n, mat, V, key, fill);
+
+        // Single-bounce reflection
+        vec3 reflDir = reflect(-V, n);
+        Ray reflRay = Ray(p + n * 0.02, reflDir);
+        float rt = raymarch(reflRay);
+
+        vec3 reflColor;
+        if (rt < 0.0) {
+            reflColor = skyColor(reflDir);
+        } else {
+            vec3 rp = reflRay.origin + rt * reflRay.dir;
+            vec3 rn = calcNormal(rp);
+            Material rmat = getMaterial(rp);
+            vec3 rv = -reflDir;
+            reflColor = shadePoint(rp, rn, rmat, rv, key, fill);
+        }
+
+        color = directColor + Fenv * reflColor;
+
+        // Roughness fade: suppress reflections for rough surfaces
+        float clarity = clamp((mat.shininess - 16.0) / 112.0, 0.0, 1.0);
+        color = mix(directColor, color, clarity);
     }
 
     color = color / (1.0 + color);

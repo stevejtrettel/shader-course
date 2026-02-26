@@ -1,5 +1,5 @@
 // Materials — Phong Lobe Visualization
-// Polar plot of cos^n(theta) for several values of n.
+// Polar plot of normalized (n+2)/(2pi) * cos^n(theta) for several values of n.
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
@@ -21,32 +21,31 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     }
     color += vec3(0.08) * grid;
 
-    // Draw lobes for different exponents
-    float exponents[5];
+    // Draw normalized lobes for different exponents
+    float exponents[4];
     exponents[0] = 4.0;
     exponents[1] = 16.0;
     exponents[2] = 64.0;
     exponents[3] = 256.0;
-    exponents[4] = 1024.0;
 
-    vec3 colors[5];
+    vec3 colors[4];
     colors[0] = vec3(0.9, 0.3, 0.2);
     colors[1] = vec3(0.9, 0.6, 0.2);
     colors[2] = vec3(0.3, 0.8, 0.3);
     colors[3] = vec3(0.3, 0.5, 0.9);
-    colors[4] = vec3(0.7, 0.3, 0.9);
 
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 4; i++) {
         float n = exponents[i];
         float cosTheta = cos(theta);
         float lobe = 0.0;
         if (cosTheta > 0.0) {
-            lobe = pow(cosTheta, n);
+            float norm = (n + 2.0) / (2.0 * 3.14159265);
+            lobe = norm * pow(cosTheta, n);
         }
-        float lobeR = lobe * 0.95;
+        float lobeR = lobe * 0.30;
 
         float dist = abs(r - lobeR);
-        float line = smoothstep(0.005, 0.002, dist);
+        float line = smoothstep(0.025, 0.012, dist);
         color = mix(color, colors[i], line);
     }
 
