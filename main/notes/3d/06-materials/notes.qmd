@@ -638,50 +638,15 @@ But what about gold? Copper? Chrome? These materials have much larger $F_0$, it 
 
 ### Two fates for transmitted light
 
+The dielectric pipeline from §6 uses $F_0 = 0.04$ everywhere. What happens to the remaining $1 - F$ — the light that transmits into the material? The answer splits materials into two fundamentally different classes.
+
 **Dielectrics** — plastic, ceramic, wood, skin, stone — are electrical insulators. Light that enters the material scatters off pigment particles, internal fibers, or crystal boundaries, bouncing around before some of it escapes back through the surface. This subsurface scattering is the physical origin of the diffuse term: light enters, randomizes its direction inside the material, and exits uniformly. The color of the surface is determined by which wavelengths survive this internal journey — red pigment absorbs blue and green, so only red light escapes.
 
-But the specular reflection happens at the surface interface *before* the light ever encounters the pigment. It is governed by the refractive index, which for most dielectrics is nearly constant across the visible spectrum. The specular highlight is the color of the light, not the color of the material.
-
-This is why a red plastic ball has a white highlight.
+But the specular reflection happens at the surface interface *before* the light ever encounters the pigment. It is governed by the refractive index, which for most dielectrics is nearly constant across the visible spectrum. The specular highlight is the color of the light, not the color of the material. This is why a red plastic ball has a white highlight — and why the §6 shader uses `vec3(0.04)` for all its spheres.
 
 **Metals** — gold, copper, aluminum, steel — are electrical conductors. Light that penetrates past the interface is absorbed within nanometers by the free electron gas. There is no subsurface scattering, no internal bouncing, no diffuse term. All reflected light comes from the interface. But unlike dielectrics, the free electron response *does* depend on wavelength: gold absorbs short wavelengths (blue) more than long ones (red, yellow), so its specular reflection is warm. Copper absorbs blue and green. Aluminum reflects all wavelengths nearly equally, giving a neutral metallic sheen.
 
-The color of a metal *is* its specular color. There is no separate diffuse color.
-
-This resolves both open questions from §5 simultaneously. The specular highlight on a dielectric is white because the interface reflection is wavelength-independent — $F_0 \approx 0.04$ at all wavelengths. The specular highlight on a metal is colored because $F_0$ varies with wavelength and is typically large — gold has $F_0 \approx (1.0, 0.71, 0.29)$ in RGB.
-
-
-### What this means for rendering
-
-A surface point's final color comes from two sources of incoming light, both filtered by Fresnel:
-
-**Direct lighting from lights.** Each light contributes a diffuse term (weighted by $1 - F$) and a specular highlight (weighted by $F$). This is the `shadeDirect` integral, now Fresnel-coupled instead of using the ad hoc `vec3(0.3)` from §5.
-
-**Reflected light from the environment.** A ray bounced off the surface hits some other object (or the sky). This is the reflection from §4, now weighted by $F$ instead of the manual `reflectivity`.
-
-For dielectrics, $F_0 \approx 0.04$ — direct lighting dominates, and reflections are subtle except at grazing angles where Fresnel pushes $F$ toward 1. For metals, $F_0$ is large — both the highlights and the environmental reflections are strong, and between them there is no diffuse term to fill in. A metal's appearance *is* these two components together. Without reflections, a metal is just a dark sphere with a colored dot — there is no diffuse color to show.
-
-
-### The Material struct, updated
-
-Fresnel absorbs the `reflectivity` parameter from §4. That parameter was a manual knob controlling how much of the rendering came from the mirror term versus the diffuse term. Fresnel replaces it: the weight is $F(\theta)$, derived from the material and the viewing angle.
-
-The `reflectivity` field disappears. In its place: `metallic`, which selects the regime.
-
-```glsl
-struct Material {
-    vec3 albedo;
-    float shininess;
-    float metallic;       // 0 = dielectric, 1 = metal
-};
-```
-
-The `metallic` parameter does not control a continuous physical quantity — a material is either a conductor or it isn't. But the interpolation is useful for worn or coated metals where a patina or oxide layer introduces some diffuse scattering.
-
-The meaning of `albedo` shifts with `metallic`:
-
-- At `metallic = 0`: albedo is the diffuse color (subsurface absorption spectrum).
-- At `metallic = 1`: albedo is $F_0$ — the specular reflectance at normal incidence (interface absorption spectrum).
+The color of a metal *is* its specular color. There is no separate diffuse color. And $F_0$ is large — gold has $F_0 \approx (1.0, 0.71, 0.29)$ in RGB.
 
 ::: {.callout-note}
 ## Metal $F_0$ values
@@ -699,92 +664,52 @@ These are the values we put in `albedo` for metallic surfaces. The warm color of
 :::
 
 
-### The complete shading pipeline
+### The metallic parameter
 
-The direct lighting function couples diffuse and specular through Fresnel:
+The dielectric pipeline from §6 needs two changes to handle metals. First, $F_0$ is no longer `vec3(0.04)` — it is the material's albedo, which now encodes the measured interface reflectance. Second, the diffuse term vanishes — all light is either reflected at the interface or absorbed.
+
+A single parameter `metallic` interpolates between the two regimes:
 
 ```glsl
-vec3 shadeDirect(vec3 p, vec3 n, Material mat, vec3 viewDir, DirLight light) {
-    vec3 diffColor = mat.albedo * (1.0 - mat.metallic);
-    vec3 specColor = mix(vec3(0.04), mat.albedo, mat.metallic);
-
-    float NdotL = max(0.0, dot(n, light.dir));
-    if (NdotL <= 0.0) return vec3(0.0);
-
-    vec3 reflDir = reflect(-light.dir, n);
-    float RdotV = max(0.0, dot(reflDir, viewDir));
-
-    vec3 Fi = fresnelSchlick(NdotL, specColor);
-    vec3 Fr = fresnelSchlick(RdotV, specColor);
-    float normFactor = (mat.shininess + 2.0) / (2.0 * PI);
-    float spec = normFactor * pow(RdotV, mat.shininess);
-
-    vec3 diffuse = (vec3(1.0) - Fi) * diffColor / PI;
-    vec3 specular = Fr * spec;
-
-    float sh = softShadow(p + n * 0.02, light.dir, 16.0);
-    return (diffuse + specular) * light.color * NdotL * sh;
-}
+struct Material {
+    vec3 albedo;
+    float shininess;
+    float metallic;       // 0 = dielectric, 1 = metal
+};
 ```
 
-Compare this to the uncoupled version from §5. The ad hoc `vec3(0.3)` is replaced by Fresnel — a physically derived quantity that depends on the angle and the material. For dielectrics, `specColor` is `vec3(0.04)` — a dim, achromatic highlight that brightens at grazing angles. For metals, `specColor` is the albedo — a bright, colored highlight. The diffuse term carries the factor $(1 - F_i)$: energy that reflects at the interface cannot also scatter diffusely.
+The `metallic` parameter does not control a continuous physical quantity — a material is either a conductor or it isn't. But the interpolation is useful for worn or coated metals where a patina or oxide layer introduces some diffuse scattering.
 
-We evaluate Fresnel at two different angles. The **specular** Fresnel $F_r$ uses $\cos\theta = \omega_o \cdot R(\mathbf{l})$ — the angle between the viewing direction and the mirror reflection of the light. At the peak of the highlight ($\omega_o = R(\mathbf{l})$), $\cos\theta = 1$ and $F_r = F_0$. Away from the peak, $\cos\theta$ decreases and $F_r$ increases. The **diffuse** Fresnel $F_i$ uses the incidence angle $\cos\theta = \mathbf{n} \cdot \mathbf{l}$ — how much light enters the material at this surface point. This depends only on the light's angle of incidence, not on where the camera is. Using the same reflection-based angle for both terms would make the diffuse contribution vanish whenever the camera is far from the specular highlight — an artifact that is especially visible on flat surfaces like floors.
+The meaning of `albedo` shifts with `metallic`:
 
-The environmental reflection uses a different angle — the incidence angle at the surface, $\cos\theta = \mathbf{n} \cdot \omega_o$:
+- At `metallic = 0`: albedo is the diffuse color (subsurface absorption spectrum).
+- At `metallic = 1`: albedo is $F_0$ — the specular reflectance at normal incidence (interface absorption spectrum).
+
+In `shadeDirect`, only two lines change from the §6 version. The hardcoded `vec3(0.04)` becomes a `specColor` that interpolates between dielectric and metallic $F_0$, and the diffuse color is scaled down by `(1 - metallic)`:
+
+```glsl
+vec3 diffColor = mat.albedo * (1.0 - mat.metallic);
+vec3 specColor = mix(vec3(0.04), mat.albedo, mat.metallic);
+```
+
+These replace every `vec3(0.04)` in the Fresnel calls and every `mat.albedo` in the diffuse term. The rest of the function — the two-angle Fresnel evaluation, the normalized Phong lobe, the shadow query — is identical.
+
+The environmental reflection weight updates similarly:
 
 ```glsl
 vec3 f0 = mix(vec3(0.04), mat.albedo, mat.metallic);
 vec3 Fenv = fresnelSchlick(max(0.0, dot(n, viewDir)), f0);
 ```
 
-Here we are asking: "what fraction of light from the environment reflects off this surface toward the camera?" That depends on how the camera sees the surface, not on where any particular light is. The reflected hit gets the full pipeline — Fresnel-coupled diffuse and specular, shadows, the works:
+For dielectrics, $F_0 = 0.04$: direct lighting dominates, and reflections are subtle except at grazing angles. For metals, $F_0$ is large: both the highlights and the environmental reflections are strong, and between them there is no diffuse term to fill in. A metal's appearance *is* these two components together. Without reflections, a metal is just a dark sphere with a colored dot.
 
-```glsl
-// Direct lighting
-vec3 directColor = shadePoint(p, n, mat, viewDir, key, fill);
-
-// Fresnel weight for environmental reflection
-vec3 f0 = mix(vec3(0.04), mat.albedo, mat.metallic);
-vec3 Fenv = fresnelSchlick(max(0.0, dot(n, viewDir)), f0);
-
-// Single-bounce reflection
-vec3 reflDir = reflect(-viewDir, n);
-Ray reflRay = Ray(p + n * 0.02, reflDir);
-float rt = raymarch(reflRay);
-
-vec3 reflColor;
-if (rt < 0.0) {
-    reflColor = skyColor(reflDir);
-} else {
-    vec3 rp = reflRay.origin + rt * reflRay.dir;
-    vec3 rn = calcNormal(rp);
-    Material rmat = getMaterial(rp);
-    vec3 rv = -reflDir;
-    reflColor = shadePoint(rp, rn, rmat, rv, key, fill);
-}
-
-color = directColor + Fenv * reflColor;
-```
-
-Compare this to the §4 version: `mix(diffuse, refl, mat.reflectivity)`. The manual weight is gone. In its place: a physically derived $F_{\text{env}}$ that varies with angle, and an additive formulation — the direct lighting already accounts for $(1 - F)$ in its diffuse term, so we add the reflection weighted by $F$ rather than interpolating.
-
-
-### The roughness–clarity fade
-
-A matte terra cotta sphere ($\text{shininess} = 8$) should not show crisp mirror reflections — a rough surface scatters reflected light into a broad cone, producing blurry reflections at best. But we cannot blur reflected rays without sampling multiple directions per pixel, which is what a path tracer does.
-
-The compromise: fade out reflections for rough surfaces. If the shininess is low, suppress the reflection term. If it is high, show it in full:
+The clarity fade from §6 also needs one addition — a rough metal must still show reflections, because without them there is no diffuse term to fall back on:
 
 ```glsl
 float clarity = clamp((mat.shininess - 16.0) / 112.0, 0.0, 1.0);
 clarity = max(clarity, mat.metallic);  // metals always reflect
 color = mix(directColor, color, clarity);
 ```
-
-The `max(clarity, mat.metallic)` is essential. A rough metal still needs reflections — without them, there is no diffuse term to fall back on, and the surface goes black. Better to show overly sharp reflections than none at all.
-
-This is a hack, not a physical model. The Further Topics section describes the correct approach: stochastic rough reflections, where the reflected direction is randomly perturbed within a cone scaled by roughness and the image converges over multiple frames. For now, the clarity fade is an acceptable compromise.
 
 
 ### In the scene
