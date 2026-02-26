@@ -57,11 +57,17 @@ const vec3 BPOS = vec3(0.0, 1.05, 0.0);
 
 float sdBunny(vec3 p) {
     vec3 q = (p - BPOS) / BSCALE;
+    q = erot(q, vec3(1,0,0), PI/2.0);  // ears along Z → ears along Y
     return bunnyRaw(q) * BSCALE;
 }
 
 float sdScene(vec3 p) {
     return min(sdBunny(p), p.y);
+}
+
+float checkerboard(vec3 p) {
+    vec2 q = floor(p.xz);
+    return mod(q.x + q.y, 2.0);
 }
 
 vec3 calcNormal(vec3 p) {
@@ -199,14 +205,10 @@ vec3 fresnelSchlick(float cosTheta, vec3 f0) {
 float softShadow(vec3 p, vec3 ld, float k) {
     float res = 1.0;
     float t = 0.03;
-    float prev = 1e20;
     for (int i = 0; i < 40; i++) {
         float d = sdScene(p + ld * t);
         if (d < 0.001) return 0.0;
-        float y = d * d / (2.0 * prev);
-        float s = sqrt(d * d - y * y);
-        res = min(res, k * s / max(0.001, t - y));
-        prev = d;
+        res = min(res, k * d / t);
         t += d;
         if (t > 8.0) break;
     }
@@ -272,7 +274,9 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
         if (bunny) {
             mat = cycleMaterial(iTime);
         } else {
-            mat = Material(vec3(0.35, 0.33, 0.30), 4.0, 0.0, 0.0);
+            float check = checkerboard(p);
+            vec3 groundCol = mix(vec3(0.4, 0.38, 0.35), vec3(0.7, 0.67, 0.63), check);
+            mat = Material(groundCol, 4.0, 0.0, 0.0);
         }
 
         // Ambient: env map diffuse approximation

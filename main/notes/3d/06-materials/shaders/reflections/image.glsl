@@ -111,18 +111,14 @@ float raymarch(Ray ray) {
 float softShadow(vec3 p, vec3 lightDir, float k) {
     float res = 1.0;
     float t = 0.02;
-    float prev = 1e20;
     for (int i = 0; i < 50; i++) {
         float d = sdScene(p + lightDir * t);
         if (d < 0.001) return 0.0;
-        float y = d * d / (2.0 * prev);
-        float x = sqrt(d * d - y * y);
-        res = min(res, k * x / max(0.0, t - y));
-        prev = d;
+        res = min(res, k * d / t);
         t += d;
         if (t > 20.0) break;
     }
-    return res;
+    return clamp(res, 0.0, 1.0);
 }
 
 float ambientOcclusion(vec3 p, vec3 n) {
@@ -163,12 +159,13 @@ vec3 shadeDirect(vec3 p, vec3 n, Material mat, vec3 V, DirLight light) {
     vec3 reflDir = reflect(-L, n);
     float RdotV = max(0.0, dot(reflDir, V));
 
-    vec3 F = fresnelSchlick(RdotV, specColor);
+    vec3 Fi = fresnelSchlick(NdotL, specColor);
+    vec3 Fr = fresnelSchlick(RdotV, specColor);
     float normFactor = (mat.shininess + 2.0) / (2.0 * PI);
     float spec = normFactor * pow(RdotV, mat.shininess);
 
-    vec3 diffuse = (vec3(1.0) - F) * diffColor / PI;
-    vec3 specular = F * spec;
+    vec3 diffuse = (vec3(1.0) - Fi) * diffColor / PI;
+    vec3 specular = Fr * spec;
 
     float sh = softShadow(p + n * 0.01, L, 16.0);
     return (diffuse + specular) * light.color * NdotL * sh;

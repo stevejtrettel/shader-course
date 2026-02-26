@@ -88,18 +88,14 @@ float raymarch(Ray ray) {
 float softShadow(vec3 p, vec3 lightDir, float k) {
     float res = 1.0;
     float t = 0.02;
-    float prev = 1e20;
     for (int i = 0; i < 50; i++) {
         float d = sdScene(p + lightDir * t);
         if (d < 0.001) return 0.0;
-        float y = d * d / (2.0 * prev);
-        float x = sqrt(d * d - y * y);
-        res = min(res, k * x / max(0.0, t - y));
-        prev = d;
+        res = min(res, k * d / t);
         t += d;
         if (t > 20.0) break;
     }
-    return res;
+    return clamp(res, 0.0, 1.0);
 }
 
 float ambientOcclusion(vec3 p, vec3 n) {
