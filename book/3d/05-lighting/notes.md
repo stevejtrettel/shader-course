@@ -20,7 +20,7 @@ Call this function
 
 $$\operatorname{Light}(\mathbf{p}, \omega)$$
 
-It returns **radiance** — power per unit projected area per unit solid angle, in $\text{W}\,\text{m}^{-2}\,\text{sr}^{-1}$. (Solid angle is the 2D analogue of angle, measuring the size of a cone of directions in steradians; the full sphere subtends $4\pi\;\text{sr}$.) Radiance is the right physical quantity here because it is conserved along rays in vacuum — the radiance leaving one surface equals the radiance arriving at the next, regardless of distance. This is the analogue of a conservation law: the intensity does not spread out along a ray the way total power does.
+It returns **radiance** — power per unit projected area per unit solid angle, in $\text{W}\,\text{m}^{-2}\,\text{sr}^{-1}$. (Solid angle is the 2D analog of angle, measuring the size of a cone of directions in steradians; the full sphere subtends $4\pi\;\text{sr}$.) Radiance is the right physical quantity here because it is conserved along rays in vacuum — the radiance leaving one surface equals the radiance arriving at the next, regardless of distance. This is the analog of a conservation law: the intensity does not spread out along a ray the way total power does.
 
 We want to compute $\operatorname{Light}(\mathbf{p}, \omega_o)$ where $\omega_o$ points from the surface toward the camera.
 

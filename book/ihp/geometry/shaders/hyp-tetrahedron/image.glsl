@@ -122,7 +122,7 @@ float edge_sdf(vec4 p) {
 // === FACE SDF =====================================
 //
 // Distance to nearest face (totally geodesic plane).
-// The 4 face centers (in the neighbouring copy) are at
+// The 4 face centers (in the neighboring copy) are at
 //   (±beta, ±beta, ∓beta, gamma).
 //
 // The SDF is bounded by a ball of hyperbolic radius ~0.507

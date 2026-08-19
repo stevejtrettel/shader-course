@@ -340,7 +340,7 @@ The GPU is doing nothing fancy; it's the mathematics of the rule that does the w
 ### PDEs
 
 Cellular automata update a discrete grid with a discrete rule.
-The continuous analogue is a PDE: a field $u(x, t)$ evolving according to a differential equation that couples each point to its neighbors through spatial derivatives.
+The continuous analog is a PDE: a field $u(x, t)$ evolving according to a differential equation that couples each point to its neighbors through spatial derivatives.
 
 On a pixel grid, the connection between the two is almost literal.
 A discrete Laplacian at pixel $p$ is just the sum of the four neighbors minus four times the center:

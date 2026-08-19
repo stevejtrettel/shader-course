@@ -1,10 +1,10 @@
 # Quickstart {.unnumbered}
 
-A shader is a function from a pixel to a colour. You write the function once;
+A shader is a function from a pixel to a color. You write the function once;
 the GPU runs it for every pixel on the screen at the same time, sixty times a
 second. That is the whole idea, and it is why shaders suit mathematics so
 well — a great many mathematical objects are already defined pointwise. Does
-this sequence escape? Is this point inside the set? What colour should this
+this sequence escape? Is this point inside the set? What color should this
 direction be? Answer that for one point and the picture draws itself.
 
 Everything here is written in GLSL, and every example runs in the page. To
@@ -117,7 +117,7 @@ there and injected automatically, with a control built for each type:
 ```
 
 A `float` gets a slider, a `bool` a toggle, a `vec2` an XY pad, a `vec3` three
-sliders or a colour picker. You write `uSpeed` in the shader with no `uniform`
+sliders or a color picker. You write `uSpeed` in the shader with no `uniform`
 declaration and drag it while the thing runs — which changes how you work more
 than it sounds, because the parameter you are hunting for is now something you
 find by hand rather than by recompiling.

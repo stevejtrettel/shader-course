@@ -2,7 +2,7 @@
 // pixels. The image is computed at full precision from the first frame —
 // what changes is the size of the sample grid, which starts at 64 screen
 // pixels and shrinks to one, so the picture resolves rather than fades in.
-// Colour quantization eases out on the same schedule, so the opening frames
+// Color quantization eases out on the same schedule, so the opening frames
 // read as a handful of flat blocks and the last as continuous tone.
 //
 // It loops: resolve, hold, coarsen again, and away. The camera never stops
@@ -18,7 +18,7 @@ const float COARSEST  = 72.0;  // screen pixels per fake pixel at the coarsest
 // Kaleidoscopic inversion: fold into the unit cell, invert about the origin,
 // repeat. The running scale factor turns the folded distance back into a
 // distance estimate in the original space. `orbit` records how close the
-// point came to each axis, which is what the colour is read from.
+// point came to each axis, which is what the color is read from.
 
 float apollonian(vec3 p, out vec4 orbit) {
     float scale = 1.0;
@@ -74,7 +74,7 @@ float shadow(vec3 p, vec3 l) {
 
 // A ramp rather than a cosine cycle: cycling hues gives the rainbow every
 // Apollonian on the internet already wears. This runs deep blue → slate →
-// gold → cream, which are the book's own accent and definition colours, and
+// gold → cream, which are the book's own accent and definition colors, and
 // never leaves that line.
 vec3 palette(float t) {
     t = clamp(t, 0.0, 1.0);
@@ -116,7 +116,7 @@ vec3 render(vec2 uv, float time) {
     apollonian(p, orbit);
 
     // The orbit trap is compressed hard: raw, almost everything lands in the
-    // first tenth of the ramp and the picture is one colour.
+    // first tenth of the ramp and the picture is one color.
     float trap = pow(clamp(1.18 * orbit.w + 0.30 * orbit.y, 0.0, 1.0), 0.50);
     vec3 base = palette(trap);
 
@@ -157,7 +157,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     float steps = log2(COARSEST);
     float px = max(1.0, exp2(floor(mix(steps, 0.0, k) * 1.0)));
 
-    // Sample at the centre of each cell, so a block is the colour of its
+    // Sample at the center of each cell, so a block is the color of its
     // middle rather than of its corner.
     vec2 cell = (floor(fragCoord / px) + 0.5) * px;
     vec2 uv = (2.0 * cell - iResolution.xy) / iResolution.y;

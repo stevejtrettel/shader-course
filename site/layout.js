@@ -66,7 +66,7 @@ function bookNav(book, entry, { collapsible = false, current = null } = {}) {
 }
 
 export function chapterPage(book, ch, fragment) {
-  // A standalone page is not in the reading order, so it has no neighbours.
+  // A standalone page is not in the reading order, so it has no neighbors.
   const chapters = book.chapters;
   const i = chapters.indexOf(ch);
   const prev = i > 0 ? chapters[i - 1] : undefined;

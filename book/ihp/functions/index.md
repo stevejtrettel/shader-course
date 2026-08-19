@@ -322,7 +322,7 @@ On reference planes, `REF_COLOR_SAT` keeps the coloring very subtle so the activ
 Slice planes show one cross-section at a time.
 To see the full surface $f^{-1}(c)$ as a three-dimensional object — lit, shaded, and rotatable — we need a different technique: **raymarching**.
 
-A scalar function $f\colon \mathbb{R}^3 \to \mathbb{R}$ has level sets $f^{-1}(c)$ that are (generically) surfaces — the 3D analogue of the contour curves we drew earlier.
+A scalar function $f\colon \mathbb{R}^3 \to \mathbb{R}$ has level sets $f^{-1}(c)$ that are (generically) surfaces — the 3D analog of the contour curves we drew earlier.
 The challenge is that we can't just evaluate $f$ at each pixel.
 A pixel corresponds to a *ray* through 3D space, and we need to find where that ray intersects the surface $f = c$.
 There's no general closed-form solution — the surface could be any shape — so we solve it numerically: walk along the ray in small steps, evaluate $f$, and watch for the value to cross the target level.

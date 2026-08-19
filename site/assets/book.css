@@ -94,7 +94,7 @@ a:hover { color: var(--accent-hover); }
   margin: 1.2rem 0 0.4rem;
 }
 /* A course is a <details>: shut unless it is the one being read. The caret
-   is drawn here because the native marker cannot be positioned or coloured. */
+   is drawn here because the native marker cannot be positioned or colored. */
 .book-rail summary.part, .drawer summary.part {
   display: flex; align-items: center; gap: 0.45rem;
   cursor: pointer; list-style: none;
@@ -429,10 +429,10 @@ figcaption .figno { font-family: var(--font-heading); font-weight: 600; font-siz
 /* ===== Shiki: dual-themed code, both palettes shipped as variables =====
    Shiki is run at build time with defaultColor:false, so every token carries
    --shiki-light and --shiki-dark and the page picks a side here. No client
-   JS is involved, and a theme toggle recolours code with everything else.
+   JS is involved, and a theme toggle recolors code with everything else.
    Shiki's own page backgrounds (#ffffff / #121212) are discarded: a code
    block is a surface in this book, so it wears --bg-subtle like every other
-   one and only the token colours come from the theme. */
+   one and only the token colors come from the theme. */
 .prose pre.shiki, .prose pre.shiki span { color: var(--shiki-light); }
 [data-theme="dark"] .prose pre.shiki,
 [data-theme="dark"] .prose pre.shiki span { color: var(--shiki-dark); }
@@ -453,7 +453,7 @@ figcaption .figno { font-family: var(--font-heading); font-weight: 600; font-siz
 
 /* ===== Callouts =====
    Four kinds carried over from Quarto. Same left-bar vocabulary as the
-   theorem environments, in their own colours so an aside never reads as a
+   theorem environments, in their own colors so an aside never reads as a
    numbered result. */
 .callout {
   border-left: 3px solid var(--callout-bar);
@@ -528,17 +528,17 @@ figcaption .figno { font-family: var(--font-heading); font-weight: 600; font-siz
    no shadow DOM, so the whole component can be re-themed from here and the
    overrides simply fall away whenever the component is next rebuilt.
 
-   Two things were wrong out of the box. Its panel is cool grey against this
-   book's warm paper, and its editor colours code in VS Code blue-and-red
+   Two things were wrong out of the box. Its panel is cool gray against this
+   book's warm paper, and its editor colors code in VS Code blue-and-red
    while every other code block on the page is vitesse — two code styles in
    one column. Both are settled below: the sandbox now wears --bg-code like
-   the book's own <pre>, and its syntax colours are the vitesse values Shiki
+   the book's own <pre>, and its syntax colors are the vitesse values Shiki
    assigns to the same GLSL tokens, sampled from the themes themselves.
 
    The selectors carry [data-theme] because the component stamps that
    attribute on itself and styles its own palette through it — a bare
    `shader-sandbox` rule is a tenth of a specificity point short and loses
-   every token colour back to the defaults. */
+   every token color back to the defaults. */
 
 shader-sandbox[data-theme] {
   --bg-primary: var(--bg-code);
@@ -578,7 +578,7 @@ shader-sandbox[data-theme] {
   --recompile-bg-hover: var(--bg-subtle);
   --recompile-bg-active: var(--border-subtle);
 
-  /* vitesse-light, as Shiki colours these same GLSL tokens */
+  /* vitesse-light, as Shiki colors these same GLSL tokens */
   --syntax-comment: #A0ADA0;
   --syntax-keyword: #AB5959;
   --syntax-string: #B56959;
