@@ -1,15 +1,14 @@
 /**
- * The environment and kind registry — the single list both emitters and the
- * resolver read. Adding a numbered environment later is one entry here; the
- * LaTeX preamble declarations are generated from it.
+ * The environment and kind registry — the single list the emitter and the
+ * resolver read. Adding a numbered environment later is one entry here.
  */
 
 /**
  * Theorem-family directives. All numbered ones share one per-chapter counter.
- * `style` is the amsthm style (print); `family` is the web's visual family —
- * which colored bar the environment wears (results blue, definitions gold,
- * notes faint). The two classifications are deliberately independent:
- * examples are amsthm-definition in print but read as notes on the web.
+ * `family` is the visual family — which colored bar the environment wears
+ * (results blue, definitions gold, notes faint). `style` is the amsthm style,
+ * carried so this list stays interchangeable with the sibling books that do
+ * produce print.
  */
 export const environments = {
   theorem:     { style: "plain",      family: "result",     word: "theorem" },
@@ -51,7 +50,6 @@ export const refWords = {
   chapter: "chapter",
   section: "section",
   subsection: "section",
-  figure: "figure",
   equation: null,
   ...Object.fromEntries(
     Object.entries(environments).map(([name, e]) => [name, e.word])

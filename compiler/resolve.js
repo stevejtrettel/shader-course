@@ -2,12 +2,10 @@
  * Stage 2: the book pass — the ONLY code that counts anything.
  *
  * Walks every chapter in book order, stamps {kind, number} onto each
- * numberable node, and builds the global label table. Emitters either defer
- * to LaTeX's own counters (print) or consume these numbers (web); neither
- * ever counts. The aux check (tools/aux-check) later verifies LaTeX agreed
- * with every number assigned here.
+ * numberable node, and builds the global label table. The emitter consumes
+ * these numbers and never counts anything itself.
  *
- * Numbering rules mirrored against LaTeX (see design/crossref.md):
+ * Numbering rules:
  *   chapter N (book order) · section N.M · subsection N.M.K
  *
  * `numbering: per-part` in book.yml restarts the chapter counter at each
@@ -17,7 +15,6 @@
  * chapter number and follows automatically.
  *   theorem family: one shared counter per chapter → N.M
  *   equations: labeled display math only, per chapter → N.M
- *   figures: per chapter → N.M
  */
 
 import { environments, proofLike, callouts } from "./registry.js";
@@ -50,7 +47,7 @@ export function resolveBook(chapters, { perPart = false } = {}) {
     const h1 = ch.tree.children.find((n) => n.type === "heading" && n.depth === 1);
     ch.unnumbered = Boolean(h1?.data?.unnumbered);
     ch.number = ch.unnumbered ? null : ++numbered;
-    const c = { section: 0, subsection: 0, theorem: 0, equation: 0, figure: 0 };
+    const c = { section: 0, subsection: 0, theorem: 0, equation: 0 };
     let sawChapterHeading = false;
 
     walk(ch.tree, (node) => {
@@ -83,29 +80,13 @@ export function resolveBook(chapters, { perPart = false } = {}) {
           node.data = { ...node.data, kind: "subsection", number };
         }
       } else if (node.type === "containerDirective") {
-        if (ch.unnumbered && (environments[node.name] || node.name === "figure" || node.name === "demo")) {
+        if (ch.unnumbered && environments[node.name]) {
           errors.push(`${ch.file}: :::${node.name} needs a numbered chapter — remove {.unnumbered} from the "#" heading`);
         } else if (environments[node.name]) {
           c.theorem += 1;
           const number = `${ch.number}.${c.theorem}`;
           define(node.attributes?.id, node.name, number, ch, node);
           node.data = { ...node.data, kind: node.name, number };
-        } else if (node.name === "figure") {
-          if (!node.attributes?.id)
-            errors.push(`${ch.file}: figure directive needs an id (#fig-…) — the id names its code under figures/`);
-          c.figure += 1;
-          const number = `${ch.number}.${c.figure}`;
-          define(node.attributes?.id, "figure", number, ch, node);
-          node.data = { ...node.data, kind: "figure", number };
-        } else if (node.name === "demo") {
-          // Numbered as a figure; the body is mounted by the book's own demo
-          // runtime (demo-kit/) from the chapter's demos/ dir, not captured.
-          if (!node.attributes?.id)
-            errors.push(`${ch.file}: demo directive needs an id (#fig-…) — the id names its code under the chapter's demos/`);
-          c.figure += 1;
-          const number = `${ch.number}.${c.figure}`;
-          define(node.attributes?.id, "figure", number, ch, node);
-          node.data = { ...node.data, kind: "figure", number };
         } else if (!proofLike[node.name] && !callouts[node.name]) {
           errors.push(`${ch.file}: unknown directive :::${node.name}`);
         }

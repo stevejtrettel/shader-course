@@ -1,5 +1,4 @@
-# Day 5: Exercises
-
+# Day 5: Exercises {.unnumbered}
 ## Checkpoints
 
 Quick exercises to verify understanding. A few minutes each.

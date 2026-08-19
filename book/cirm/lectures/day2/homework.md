@@ -1,5 +1,4 @@
-# Day 2: Fractals — Homework
-
+# Day 2: Fractals — Homework {.unnumbered}
 ## Checkpoints
 
 These verify you've understood the core material.

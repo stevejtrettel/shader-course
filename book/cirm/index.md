@@ -8,12 +8,18 @@ We progress from 2D foundations (fractals, tilings, simulations) to 3D rendering
 
 No prior experience with shaders or GLSL is required—only a strong foundation in undergraduate mathematics and willingness to put in some time with code through daily homework exercises.
 
-Here are some examples of things we make:
+Here are three of the things we build over the week, running as you read.
+Each one carries its own source: open the tab to see the whole program.
 
-![](images/julia.png)
+A Julia set, with the parameter under the mouse — drag it:
 
-![](images/tiling.png)
+::shader{src="julia-explorer" layout="tabbed" height="420px"}
 
-![](images/reaction-diffusion.png)
+A hyperbolic tiling, built by reflecting one shape across its own edges:
 
-![](images/cubic.png)
+::shader{src="hook-animated-tiling" layout="tabbed" height="420px"}
+
+And the wave equation, solved on the pixel grid — it starts with one pulse,
+and you can drag on it to make more:
+
+::shader{src="wave-equation" layout="tabbed" height="420px"}

@@ -114,6 +114,12 @@ a:hover { color: var(--accent-hover); }
 .book-rail details.course, .drawer details.course { margin-bottom: 0.2rem; }
 /* A one-chapter part: the link alone, sitting where a course heading would. */
 .book-rail .solo, .drawer .solo { margin: 0 0 1.1rem; }
+/* An attachment to the entry above it — a day's homework under its lecture.
+   Indented and quieter, so a day reads as one thing with a second page. */
+.book-rail li.sub, .drawer li.sub { margin-left: 0.95rem; margin-top: 0.1rem; }
+.book-rail li.sub a, .drawer li.sub a { color: var(--text-tertiary); font-size: 0.94em; }
+.book-rail li.sub a:hover, .drawer li.sub a:hover { color: var(--accent); }
+.book-rail li.sub.current > a, .drawer li.sub.current > a { color: var(--text-heading); }
 .book-rail ol, .drawer ol { list-style: none; }
 .book-rail li, .drawer li { margin: 0.35rem 0; }
 .book-rail a, .drawer a { color: var(--text-secondary); display: block; line-height: 1.4; }
@@ -355,6 +361,15 @@ figcaption .figno { font-family: var(--font-heading); font-weight: 600; font-siz
 }
 .hero-shader shader-sandbox .fps-counter { display: none; }
 .hero-demo calc3-demo { width: 100%; }
+/* One friendly line, tucked under the blurb it continues and set well clear
+   of the action below — it is an aside to the sentence above, not a second
+   button. Italic keeps it from reading as more blurb. */
+.hero-blurb:has(+ .hero-note) { margin-bottom: 0.7rem; }
+.hero-note {
+  max-width: 30rem; margin: 0 auto;
+  font-size: 0.98rem; font-style: italic; color: var(--text-secondary);
+}
+.hero-note + .hero-actions { margin-top: 3rem; }
 .hero-blurb {
   max-width: 34rem; margin: 0 auto 2.4rem;
   font-size: 1.25rem; line-height: 1.62; color: var(--text-secondary);
@@ -388,16 +403,18 @@ figcaption .figno { font-family: var(--font-heading); font-weight: 600; font-siz
   margin-top: 3rem; padding-top: 2.6rem;
   border-top: 1px dotted var(--border);
 }
-.cover-contents .course-kind {
-  text-align: center; font-size: 0.7rem; font-weight: 500;
-  text-transform: uppercase; letter-spacing: 0.14em;
-  color: var(--text-tertiary);
-  margin-bottom: 0.35rem;
-}
 .cover-contents .part {
-  color: var(--text-heading); font-size: 0.95rem; font-weight: 600;
+  color: var(--text-heading); font-size: 1.05rem; font-weight: 600;
   letter-spacing: 0.01em; text-align: center;
-  margin: 0 0 1.2rem;
+  margin: 0 0 0.3rem;
+}
+/* What the course was, under its name: smaller, quieter, and in the body
+   face, so the name stays the thing you read first. */
+.cover-contents .course-subtitle {
+  text-align: center; font-family: var(--font-body);
+  font-size: 0.92rem; font-style: italic;
+  color: var(--text-secondary);
+  margin: 0 0 1.3rem;
 }
 .cover-contents ol { list-style: none; }
 .cover-contents li { margin: 0.45rem 0; }
@@ -459,16 +476,30 @@ figcaption .figno { font-family: var(--font-heading); font-weight: 600; font-siz
 /* ===== Nav groups =====
    A part may gather its chapters into named groups — the five CIRM days,
    each holding a lecture and a homework. One level only, by design. */
+/* A group name labels a run of chapters; it is not itself a chapter and is
+   not one of the things you click. Quiet — the days beside it are plain
+   entries now, and a bold heading among them reads as the most important
+   line in the list, which it is not. */
 .book-rail .group, .drawer .group {
-  font-size: 0.78rem; color: var(--text-secondary);
-  font-weight: 600; margin: 0.7rem 0 0.2rem;
+  font-size: 0.72rem; color: var(--text-tertiary);
+  font-weight: 400; text-transform: uppercase; letter-spacing: 0.07em;
+  /* Indented with the list it labels, so it reads as nested under the course
+     rather than as a second course heading. */
+  margin: 1rem 0 0.3rem 0.7rem;
 }
 .book-rail ol.grouped, .drawer ol.grouped { margin-left: 0.7rem; }
 .cover-contents .group {
-  font-family: var(--font-heading); font-size: 0.85rem;
-  color: var(--text-secondary); font-weight: 600; margin: 0.8rem 0 0.3rem;
+  font-family: var(--font-heading); font-size: 0.74rem;
+  color: var(--text-tertiary); font-weight: 400;
+  text-transform: uppercase; letter-spacing: 0.09em;
+  margin: 1.1rem 0 0.4rem;
 }
 .cover-contents ol.grouped { margin-left: 1rem; }
+/* The lone Introduction link: it opens the contents with nothing over it. */
+.cover-contents .solo { margin-bottom: 2.4rem; }
+.cover-contents li.sub { margin-left: 2.1rem; margin-top: 0.1rem; }
+.cover-contents li.sub a { color: var(--text-tertiary); font-size: 0.94em; }
+.cover-contents li.sub a:hover { color: var(--accent); }
 
 /* ===== Tables ===== */
 .table-wrap { overflow-x: auto; margin-bottom: var(--rhythm); }

@@ -1,5 +1,4 @@
-# Day 1 Exercises
-
+# Day 1 Exercises {.unnumbered}
 This was broken before so running atest and adding this line 
 
 Homework is organized into four types:

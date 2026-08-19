@@ -12,20 +12,12 @@
 import { environments, proofLike, callouts, refWords } from "./registry.js";
 import { renderMath } from "./math.js";
 
-/** figures: Map id → {entry, width, height} (resolved + captured by the build) */
-let figureTable = new Map();
-/** demos: Map id → {src, name, poster} (resolved by the build, chapter-relative paths) */
-let demoTable = new Map();
-let demosEmitted = 0;
 /** shaders: Map source name → {src} (resolved by the build, page-relative) */
 let shaderTable = new Map();
 let shadersEmitted = 0;
 
 /** → { html, sections: [{id, number|null, title}], hasDemos } */
-export function emitChapterFragment(ch, figures = new Map(), demos = new Map(), shaders = new Map()) {
-  figureTable = figures;
-  demoTable = demos;
-  demosEmitted = 0;
+export function emitChapterFragment(ch, shaders = new Map()) {
   shaderTable = shaders;
   shadersEmitted = 0;
   const sections = [];
@@ -57,7 +49,7 @@ export function emitChapterFragment(ch, figures = new Map(), demos = new Map(), 
     header + "\n" +
     intro.join("\n") + "\n" +
     groups.map((g) => `<section id="${g.id}">\n${g.blocks.join("\n")}\n</section>`).join("\n");
-  return { html, sections, hasDemos: demosEmitted > 0, hasShaders: shadersEmitted > 0 };
+  return { html, sections, hasShaders: shadersEmitted > 0 };
 }
 
 function blocks(nodes) {
@@ -148,40 +140,6 @@ function directive(node) {
     );
   }
 
-  if (node.name === "figure") {
-    const id = node.attributes.id;
-    const fig = figureTable.get(id);
-    if (!fig) throw new Error(`figure "${id}" has no captured artifacts — build order bug`);
-    return (
-      `<figure id="${id}">\n${figureEmbed(id, fig)}\n` +
-      `<figcaption><span class="figno">Figure ${node.data.number}</span> ` +
-      `${inline(node.children[0]?.children ?? [])}</figcaption>\n</figure>`
-    );
-  }
-
-  if (node.name === "demo") {
-    // The book's own runtime (<calc3-demo>, demo-kit/runtime.js) does the
-    // mounting, lazy-loading, and teardown; we emit the element it expects,
-    // exactly as the Quarto-era demo filter did.
-    const id = node.attributes.id;
-    const d = demoTable.get(id);
-    if (!d) throw new Error(`demo "${id}" was not resolved — build order bug`);
-    demosEmitted += 1;
-    const attrs = [
-      `data-src="${esc(d.src)}"`,
-      `data-name="${esc(d.name)}"`,
-      `data-size="${esc(node.attributes.size ?? "wide")}"`,
-    ];
-    for (const key of ["engine", "width", "zoom"])
-      if (node.attributes[key]) attrs.push(`data-${key}="${esc(node.attributes[key])}"`);
-    if (d.poster) attrs.push(`data-poster="${esc(d.poster)}"`);
-    return (
-      `<figure id="${id}" class="demo-figure">\n<calc3-demo ${attrs.join(" ")}></calc3-demo>\n` +
-      `<figcaption><span class="figno">Figure ${node.data.number}</span> ` +
-      `${inline(node.children[0]?.children ?? [])}</figcaption>\n</figure>`
-    );
-  }
-
   const env = environments[node.name];
   const word = env.word[0].toUpperCase() + env.word.slice(1);
   const title = node.attributes?.title;
@@ -266,18 +224,9 @@ function ref(node) {
   return `<a ${attrs}>${shown}&nbsp;${r.number}</a>`;
 }
 
-/**
- * The island embed: poster now, live figure on approach (site/assets/embed.js
- * mounts data-entry when the figure nears the viewport, swapping invisibly
- * once its boot frame is ready). Shared with the landing hero via layout.js.
- */
-export function figureEmbed(id, fig) {
-  return (
-    `<div class="fig-embed" data-entry="${fig.entry}">` +
-    `<img class="fig-poster" src="/assets/figures/${id}-light.png" ` +
-    `data-light="/assets/figures/${id}-light.png" data-dark="/assets/figures/${id}-dark.png" ` +
-    `width="${fig.width}" height="${fig.height}" alt=""></div>`
-  );
+/** A paragraph node → inline HTML. The cover's note is one line of markdown. */
+export function emitInline(paragraph) {
+  return inline(paragraph.children);
 }
 
 export function text(nodes) {

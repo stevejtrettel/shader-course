@@ -10,7 +10,7 @@ import { build, BuildError } from "../compiler/build.js";
 
 process.on("message", async () => {
   try {
-    await build({ pdf: false });
+    await build();
     process.send({ ok: true });
   } catch (e) {
     process.send({ ok: false, msg: e instanceof BuildError ? "build failed:\n" + e.message : e.stack });

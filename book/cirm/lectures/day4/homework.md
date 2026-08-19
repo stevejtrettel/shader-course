@@ -1,5 +1,4 @@
-# Day 4 Exercises
-
+# Day 4 Exercises {.unnumbered}
 ## Checkpoints
 
 **C1. Rainbow Paint.** Modify the painting shader so the brush paints in color instead of white. Use the position to determine the hue:

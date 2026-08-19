@@ -8,6 +8,16 @@ pdf: false
 # The cover's one picture, in book/shaders/.
 shader: hero
 
+# A line under the cover's opening, in markdown. Links are the point of it.
+note: "New to this? The [quickstart](/quickstart/) gets you set up to write
+  your own in a few minutes."
+
+# Standalone pages: built and addressable, but outside the reading order —
+# no number, no place in the contents, no previous/next. Reached from a link
+# rather than from the nav.
+pages:
+  - { file: quickstart.md, slug: quickstart }
+
 # Each course numbers its own chapters from 1 — a reader in the CIRM notes
 # should meet chapters 1, 2, 3, not 14, 15, 16.
 numbering: per-part
@@ -20,41 +30,21 @@ numbering: per-part
 # `<path>.html` to its `<path>/`.
 
 parts:
-  # The page "Begin reading" opens to. Unnumbered: it is the way in, not
-  # chapter one of anything.
-  - title: Introduction
+  - title: Learning Shaders
+    subtitle: Graduate Mini Course, CIRM 2026
     chapters:
-      - { file: main/index.md, slug: intro }
+      - { file: cirm/index.md, slug: cirm-2026, label: Introduction }
 
-  - title: CIRM 2026
-    kicker: Graduate Mini-Course
-    chapters:
-      - { file: cirm/index.md, slug: cirm-2026 }
-
-      - group: "Day 1: Pixels"
-        chapters:
-          - { file: cirm/lectures/day1/notes.md, slug: cirm-2026/lectures/day1/notes }
-          - { file: cirm/lectures/day1/homework.md, slug: cirm-2026/lectures/day1/homework }
-
-      - group: "Day 2: Fractals"
-        chapters:
-          - { file: cirm/lectures/day2/notes.md, slug: cirm-2026/lectures/day2/notes }
-          - { file: cirm/lectures/day2/homework.md, slug: cirm-2026/lectures/day2/homework }
-
-      - group: "Day 3: Tilings"
-        chapters:
-          - { file: cirm/lectures/day3/notes.md, slug: cirm-2026/lectures/day3/notes }
-          - { file: cirm/lectures/day3/homework.md, slug: cirm-2026/lectures/day3/homework }
-
-      - group: "Day 4: Simulations"
-        chapters:
-          - { file: cirm/lectures/day4/notes.md, slug: cirm-2026/lectures/day4/notes }
-          - { file: cirm/lectures/day4/homework.md, slug: cirm-2026/lectures/day4/homework }
-
-      - group: "Day 5: Rendering"
-        chapters:
-          - { file: cirm/lectures/day5/notes.md, slug: cirm-2026/lectures/day5/notes }
-          - { file: cirm/lectures/day5/homework.md, slug: cirm-2026/lectures/day5/homework }
+      - { file: cirm/lectures/day1/notes.md, slug: cirm-2026/lectures/day1/notes, label: Pixels }
+      - { file: cirm/lectures/day1/homework.md, slug: cirm-2026/lectures/day1/homework, label: Homework, sub: true }
+      - { file: cirm/lectures/day2/notes.md, slug: cirm-2026/lectures/day2/notes, label: Fractals }
+      - { file: cirm/lectures/day2/homework.md, slug: cirm-2026/lectures/day2/homework, label: Homework, sub: true }
+      - { file: cirm/lectures/day3/notes.md, slug: cirm-2026/lectures/day3/notes, label: Tilings }
+      - { file: cirm/lectures/day3/homework.md, slug: cirm-2026/lectures/day3/homework, label: Homework, sub: true }
+      - { file: cirm/lectures/day4/notes.md, slug: cirm-2026/lectures/day4/notes, label: Simulations }
+      - { file: cirm/lectures/day4/homework.md, slug: cirm-2026/lectures/day4/homework, label: Homework, sub: true }
+      - { file: cirm/lectures/day5/notes.md, slug: cirm-2026/lectures/day5/notes, label: Rendering }
+      - { file: cirm/lectures/day5/homework.md, slug: cirm-2026/lectures/day5/homework, label: Homework, sub: true }
 
       - group: Appendices
         chapters:
@@ -62,21 +52,21 @@ parts:
           - { file: cirm/appendices/coordinates.md, slug: cirm-2026/appendices/coordinates }
           - { file: cirm/appendices/color.md, slug: cirm-2026/appendices/color }
 
-  - title: IHP 2026
-    kicker: Conference Workshop
+  - title: Useful Shaders for Research
+    subtitle: Conference Workshop, IHP 2026
     chapters:
-      - { file: ihp/index.md, slug: ihp-2026 }
+      - { file: ihp/index.md, slug: ihp-2026, label: Introduction }
       - { file: ihp/glsl-intro/index.md, slug: ihp-2026/glsl-intro }
       - { file: ihp/functions/index.md, slug: ihp-2026/functions }
       - { file: ihp/geometry/index.md, slug: ihp-2026/geometry }
       - { file: ihp/dynamics/index.md, slug: ihp-2026/dynamics }
 
   - title: 3D Rendering
-    kicker: Lecture Series
+    subtitle: IHP Lecture Series 2026
     chapters:
-      - { file: main/notes/3d/01-first-rays/notes.md,   slug: notes/3d/01-first-rays/notes }
-      - { file: main/notes/3d/02-raymarching/notes.md,  slug: notes/3d/02-raymarching/notes }
-      - { file: main/notes/3d/03-deriving-sdfs/notes.md, slug: notes/3d/03-deriving-sdfs/notes }
-      - { file: main/notes/3d/04-sculpting/notes.md,    slug: notes/3d/04-sculpting/notes }
-      - { file: main/notes/3d/05-lighting/notes.md,     slug: notes/3d/05-lighting/notes }
-      - { file: main/notes/3d/06-materials/notes.md,    slug: notes/3d/06-materials/notes }
+      - { file: 3d/01-first-rays/notes.md,   slug: notes/3d/01-first-rays/notes }
+      - { file: 3d/02-raymarching/notes.md,  slug: notes/3d/02-raymarching/notes }
+      - { file: 3d/03-deriving-sdfs/notes.md, slug: notes/3d/03-deriving-sdfs/notes }
+      - { file: 3d/04-sculpting/notes.md,    slug: notes/3d/04-sculpting/notes }
+      - { file: 3d/05-lighting/notes.md,     slug: notes/3d/05-lighting/notes }
+      - { file: 3d/06-materials/notes.md,    slug: notes/3d/06-materials/notes }

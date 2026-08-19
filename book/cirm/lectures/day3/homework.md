@@ -1,5 +1,4 @@
-# Day 3: Hyperbolic Tilings — Homework
-
+# Day 3: Hyperbolic Tilings — Homework {.unnumbered}
 ## Checkpoints
 
 These verify you've understood the core material.

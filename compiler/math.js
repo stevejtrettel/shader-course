@@ -57,7 +57,10 @@ export async function initMath(root) {
     stylesheet = saved.css ?? null;
   }
 
-  const macrosFile = path.join(root, "latex", "macros.tex");
+  // Book-wide \newcommand definitions, if the author wants any. It lived
+  // under latex/ when this compiler also produced a PDF; here it is simply
+  // part of the book.
+  const macrosFile = path.join(root, "book", "macros.tex");
   const macros = existsSync(macrosFile) ? readFileSync(macrosFile, "utf8") : "";
   const version = JSON.parse(
     readFileSync(path.join(root, "node_modules", "mathjax", "package.json"), "utf8")
