@@ -1,0 +1,608 @@
+/* book.css — the presentation layer's single stylesheet.
+   Descended from the ratified mocks (design/mockups/); tokens lifted from
+   sjtSite. Light values live on :root so the page renders without JS; an
+   explicit data-theme (set pre-paint by the shell's boot script, toggled by
+   page.js) picks the mode thereafter. */
+
+/* Token blocks match any [data-theme] element (not just :root) so a subtree
+   can pin its theme — the capture harness pins figures light/dark this way. */
+:root,
+[data-theme="light"] {
+  --bg: #F7F5F0; --bg-subtle: #EDEBE6;
+  --text: #2C2C2C; --text-heading: #1A1A1A;
+  --text-secondary: #6B6B6B; --text-tertiary: #999999;
+  --accent: #3D5A80; --accent-hover: #2C4560;
+  --border: #DDD9D2; --border-subtle: #E6E3DC;
+  --shadow: rgba(0,0,0,0.06);
+  --bg-code: #F0EDE8;
+  --bar-result: #317EAB;      /* the figure-solution blue, ratified for result bars */
+  --bar-definition: #B3922D;  /* gold — decided over green */
+  --fig-faint: #A4B3BE; --fig-blue: #317EAB; --fig-gold: #B3922D; --fig-ink: #2E2E2E;
+  --fig-axis: #C9C5BD;
+  --scrim: rgba(0,0,0,0.35);
+}
+[data-theme="dark"] {
+  --bg: #1e1d1b; --bg-subtle: #272623;
+  --text: #d5d3cf; --text-heading: #eeece8;
+  --text-secondary: #9a9894; --text-tertiary: #6d6b67;
+  --accent: #7a9abb; --accent-hover: #9ab4d0;
+  --border: #383735; --border-subtle: #302f2d;
+  --shadow: rgba(0,0,0,0.35);
+  --bg-code: #242320;
+  --bar-result: #65A4D1;
+  --bar-definition: #AC9E68;
+  --fig-faint: #464C51; --fig-blue: #65A4D1; --fig-gold: #AC9E68; --fig-ink: #D2D8DC;
+  --fig-axis: #45443F;
+  --scrim: rgba(0,0,0,0.55);
+}
+:root {
+  --content-width: 44rem;
+  --body-size: 1.175rem; --body-lh: 1.68;
+  --rhythm: 1.974rem;
+  --font-heading: 'IBM Plex Sans', 'Helvetica Neue', sans-serif;
+  --font-body: 'EB Garamond', 'Georgia', serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --mobile-bar-h: 2.9rem;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--body-size); line-height: var(--body-lh);
+  transition: background 0.25s ease, color 0.25s ease;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--accent-hover); }
+
+/* ===== Three-zone layout ===== */
+.layout {
+  display: grid;
+  grid-template-columns: 15rem minmax(0, var(--content-width)) 15rem;
+  justify-content: center;
+  gap: 4rem;
+  padding: 1.5rem 2rem 6rem;
+}
+@media (max-width: 1279.98px) {
+  .layout { grid-template-columns: minmax(0, var(--content-width)); padding: 1.5rem 1.2rem 5rem; }
+  .book-rail, .toc-rail { display: none; }
+  html { scroll-padding-top: calc(var(--mobile-bar-h) + 0.5rem); }
+}
+
+/* ===== Left rail: book nav (shared vocabulary with the mobile drawer) ===== */
+.book-rail, .drawer { font-family: var(--font-heading); font-size: 0.85rem; }
+/* Both rails scroll independently once their contents outgrow the window —
+   with three courses in the book the left rail is far taller than a screen,
+   and a sticky column that simply overflows is unreachable. */
+.book-rail .sticky, .toc-rail .sticky {
+  position: sticky; top: 3rem;
+  max-height: calc(100vh - 4.5rem);
+  overflow-y: auto; overscroll-behavior: contain;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  padding-right: 0.5rem;
+}
+.book-title {
+  font-weight: 600; font-size: 0.95rem; color: var(--text-heading);
+  margin-bottom: 1.5rem; line-height: 1.3;
+}
+.book-title a { color: inherit; }
+.book-title a:hover { color: var(--accent); }
+.book-rail .part, .drawer .part {
+  color: var(--text-tertiary); text-transform: uppercase;
+  letter-spacing: 0.08em; font-size: 0.72rem;
+  margin: 1.2rem 0 0.4rem;
+}
+/* A course is a <details>: shut unless it is the one being read. The caret
+   is drawn here because the native marker cannot be positioned or coloured. */
+.book-rail summary.part, .drawer summary.part {
+  display: flex; align-items: center; gap: 0.45rem;
+  cursor: pointer; list-style: none;
+}
+.book-rail summary.part::-webkit-details-marker,
+.drawer summary.part::-webkit-details-marker { display: none; }
+.book-rail summary.part::before, .drawer summary.part::before {
+  content: ""; flex: none;
+  border-left: 4px solid currentColor;
+  border-top: 3.5px solid transparent;
+  border-bottom: 3.5px solid transparent;
+  transition: transform 0.15s ease;
+}
+.book-rail details[open] > summary.part::before,
+.drawer details[open] > summary.part::before { transform: rotate(90deg); }
+.book-rail summary.part:hover, .drawer summary.part:hover { color: var(--accent); }
+.book-rail details.course, .drawer details.course { margin-bottom: 0.2rem; }
+/* A one-chapter part: the link alone, sitting where a course heading would. */
+.book-rail .solo, .drawer .solo { margin: 0 0 1.1rem; }
+.book-rail ol, .drawer ol { list-style: none; }
+.book-rail li, .drawer li { margin: 0.35rem 0; }
+.book-rail a, .drawer a { color: var(--text-secondary); display: block; line-height: 1.4; }
+.book-rail a:hover, .drawer a:hover { color: var(--accent); }
+.book-rail li.current > a, .drawer li.current > a { color: var(--text-heading); font-weight: 600; }
+.book-rail li.current { border-left: 2px solid var(--accent); padding-left: 0.6rem; margin-left: -0.72rem; }
+
+/* ===== Right rail: chapter ToC ===== */
+.toc-rail { font-family: var(--font-heading); font-size: 0.82rem; }
+.toc-label {
+  color: var(--text-tertiary); text-transform: uppercase;
+  letter-spacing: 0.08em; font-size: 0.72rem; margin-bottom: 0.6rem;
+}
+.toc-rail ol { list-style: none; border-left: 1px solid var(--border-subtle); }
+.toc-rail li a {
+  display: block; color: var(--text-secondary);
+  padding: 0.3rem 0 0.3rem 0.9rem; line-height: 1.4;
+  border-left: 2px solid transparent; margin-left: -1.5px;
+}
+.toc-rail li a:hover { color: var(--accent); }
+.toc-rail li.active a { color: var(--text-heading); border-left-color: var(--accent); }
+
+/* ===== Mobile bar: auto-hiding sticky nav (Quarto-style headroom) ===== */
+.mobile-bar {
+  display: none;
+  position: fixed; top: 0; left: 0; right: 0; z-index: 30;
+  height: var(--mobile-bar-h);
+  align-items: center; gap: 0.85rem;
+  padding: 0 1.1rem;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border-subtle);
+  font-family: var(--font-heading);
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+.mobile-bar.hidden { transform: translateY(-100%); }
+.mobile-bar-title {
+  font-size: 0.85rem; color: var(--text-secondary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+@media (max-width: 1279.98px) {
+  .mobile-bar { display: flex; }
+  .mobile-bar ~ .page-head { padding-top: calc(var(--mobile-bar-h) + 0.6rem); }
+}
+
+/* ===== Mobile drawer ===== */
+.drawer {
+  position: fixed; top: 0; bottom: 0; left: 0; z-index: 50;
+  width: min(19rem, 85vw);
+  background: var(--bg);
+  border-right: 1px solid var(--border);
+  padding: 1.6rem 1.4rem;
+  overflow-y: auto;
+  transform: translateX(-103%);
+  transition: transform 0.25s ease;
+}
+body.drawer-open .drawer { transform: none; }
+.drawer-scrim {
+  position: fixed; inset: 0; z-index: 40;
+  background: var(--scrim);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+body.drawer-open .drawer-scrim { opacity: 1; pointer-events: auto; }
+body.drawer-open { overflow: hidden; }
+.drawer-sections { margin: 0.3rem 0 0.5rem; padding-left: 0.9rem; border-left: 1px solid var(--border-subtle); }
+.drawer-sections a { font-size: 0.82rem; }
+
+/* ===== Prose ===== */
+.prose p { margin-bottom: var(--rhythm); }
+.prose > section > p:last-child { margin-bottom: 0; }
+.chapter-number {
+  font-family: var(--font-heading); color: var(--text-tertiary);
+  text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.8rem;
+  margin-bottom: 0.5rem;
+}
+h1 {
+  font-family: var(--font-heading); color: var(--text-heading);
+  font-size: 2.3rem; font-weight: 600; line-height: 1.2;
+  margin-bottom: calc(var(--rhythm) * 1.5);
+}
+h2 {
+  font-family: var(--font-heading); color: var(--text-heading);
+  font-size: 1.4rem; font-weight: 600; line-height: 1.25;
+  margin: calc(var(--rhythm) * 2) 0 calc(var(--rhythm) * 0.75);
+}
+h3 {
+  font-family: var(--font-heading); color: var(--text-heading);
+  font-size: 1.12rem; font-weight: 600; line-height: 1.3;
+  margin: calc(var(--rhythm) * 1.4) 0 calc(var(--rhythm) * 0.6);
+}
+h2 .secno, h3 .secno { color: var(--text-tertiary); font-weight: 500; margin-right: 0.6rem; }
+.prose ul, .prose ol { margin: 0 0 var(--rhythm) 1.4rem; }
+blockquote { border-left: 3px solid var(--border); padding-left: 1.1rem; color: var(--text-secondary); margin-bottom: var(--rhythm); }
+hr { border: none; border-top: 1px solid var(--border-subtle); margin: calc(var(--rhythm) * 1.5) 0; }
+code {
+  font-family: var(--font-mono); font-size: 0.82em;
+  background: var(--bg-code); padding: 0.15em 0.4em; border-radius: 3px;
+}
+pre {
+  background: var(--bg-code); border: 1px solid var(--border-subtle); border-radius: 6px;
+  padding: 0.9rem 1.1rem; overflow-x: auto; margin-bottom: var(--rhythm);
+  line-height: 1.6;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+.broken-ref { color: #c33; font-family: var(--font-mono); font-size: 0.85em; }
+
+/* ===== Display equations with margin-hung numbers ===== */
+.disp { position: relative; margin: calc(var(--rhythm) * 0.75) 0; }
+.disp .eqno {
+  position: absolute; right: -3.5rem; top: 50%; transform: translateY(-50%);
+  font-size: 1rem; color: var(--text-secondary);
+}
+@media (max-width: 1279.98px) { .disp .eqno { right: 0; } }
+.disp mjx-container[display] {
+  margin: 0 !important;
+  overflow-x: auto; overflow-y: hidden;
+  padding: 3px 0;
+}
+@media (max-width: 1279.98px) {
+  /* keep long equations clear of the in-flow number on narrow screens */
+  .disp:has(.eqno) mjx-container[display] { padding-right: 3.2rem; }
+}
+
+/* ===== Theorem-family environments =====
+   Ratified: run-in Plex header, upright bodies, colored left bar by semantic
+   family (results blue, definitions gold, notes faint), proofs bare with a
+   tombstone. No background tints, ever. */
+.env { margin-bottom: var(--rhythm); padding-left: 1.1rem; border-left: 3px solid transparent; }
+.env > p:last-child { margin-bottom: 0; }
+.env-result { border-left-color: var(--bar-result); }
+.env-definition { border-left-color: var(--bar-definition); }
+.env-note { border-left-color: var(--border); }
+.env-proof { border-left-color: transparent; padding-left: 0; }
+.env-head {
+  font-family: var(--font-heading); font-weight: 600;
+  font-size: 0.98rem; color: var(--text-heading);
+  margin-right: 0.4rem;
+}
+.env-head .env-title { font-weight: 500; color: var(--text-secondary); }
+.env-proof .env-head { font-family: var(--font-body); font-style: italic; font-weight: 400; font-size: inherit; }
+.tombstone { float: right; color: var(--text-secondary); }
+
+/* ===== Figures ===== */
+figure { margin: calc(var(--rhythm) * 1.25) 0; }
+figure svg { width: 100%; height: auto; display: block; }
+.fig-embed { position: relative; }
+.fig-embed .fig-poster { width: 100%; height: auto; display: block; }
+.fig-embed.live .fig-poster { display: none; }
+figcaption {
+  font-size: 0.98rem; color: var(--text-secondary);
+  margin-top: 0.8rem; line-height: 1.5;
+}
+figcaption .figno { font-family: var(--font-heading); font-weight: 600; font-size: 0.88rem; color: var(--text-heading); margin-right: 0.4rem; }
+
+/* ===== Crossref hover previews ===== */
+.xref-preview {
+  position: absolute; z-index: 60;
+  max-width: 26rem;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+  box-shadow: 0 6px 24px var(--shadow);
+  padding: 0.9rem 1.1rem;
+  font-size: 0.92em; line-height: 1.55;
+}
+.xref-preview .env, .xref-preview .disp, .xref-preview figure { margin: 0; }
+.xref-preview .disp .eqno { position: static; float: right; transform: none; margin-left: 0.8rem; }
+.xref-preview .fig-placeholder { aspect-ratio: 3 / 1; }
+
+/* ===== Prev/next footer ===== */
+.chapter-footer {
+  display: flex; justify-content: space-between; gap: 2rem;
+  margin-top: calc(var(--rhythm) * 2.5);
+  padding-top: var(--rhythm);
+  border-top: 1px solid var(--border-subtle);
+  font-family: var(--font-heading); font-size: 0.9rem;
+}
+.chapter-footer .dir { display: block; color: var(--text-tertiary); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.3rem; }
+.chapter-footer a { color: var(--text-secondary); }
+.chapter-footer a:hover { color: var(--accent); }
+.chapter-footer .next { text-align: right; }
+
+/* ===== Page tools: three raw icons, in flow, scroll away ===== */
+.page-head {
+  display: flex; justify-content: flex-end; gap: 1.1rem;
+  padding: 1.1rem 1.5rem 0;
+}
+.tool-btn {
+  display: flex; align-items: center; justify-content: center;
+  padding: 0; background: none; border: none; cursor: pointer;
+  color: var(--text-tertiary); text-decoration: none;
+  transition: color 0.2s ease;
+}
+.tool-btn:hover { color: var(--accent); }
+.tool-btn svg { width: 14px; height: 14px; }
+.mobile-bar .tool-btn svg { width: 17px; height: 17px; }
+[data-theme="light"] .icon-sun { display: none; }
+[data-theme="light"] .icon-moon { display: block; }
+[data-theme="dark"] .icon-sun { display: block; }
+[data-theme="dark"] .icon-moon { display: none; }
+
+/* ===== Site footer (chapter pages only — the cover ends at its actions) ===== */
+.site-footer {
+  margin-top: 3rem; padding-top: 1.2rem;
+  border-top: 1px solid var(--border-subtle);
+  font-family: var(--font-heading); font-size: 0.78rem;
+  color: var(--text-tertiary); text-align: center;
+}
+.site-footer a { color: var(--text-secondary); }
+.site-footer a:hover { color: var(--accent); }
+
+/* ===== Landing cover ===== */
+.cover { max-width: 58rem; margin: 0 auto; padding: 4rem 2rem 5rem; text-align: center; }
+.hero-kicker {
+  font-family: var(--font-heading); font-size: 0.78rem; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.18em; color: var(--text-tertiary);
+  margin-bottom: 1.4rem;
+}
+.hero-title {
+  font-family: var(--font-body); font-weight: 500;
+  font-size: 3.6rem; line-height: 1.12; color: var(--text-heading);
+  margin: 0 auto 1.2rem; max-width: 40rem;
+}
+.hero-author {
+  font-family: var(--font-heading); font-size: 0.95rem; font-weight: 500;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-secondary);
+}
+.hero-fig { margin: 3rem auto 2.6rem; }
+.hero-fig svg { width: 100%; height: auto; display: block; }
+/* A live hero sits narrower than the cover's text, so the title still leads,
+   and it gets more air beneath it than a still would: a moving picture needs
+   the blurb to stay clear of it. */
+.hero-demo { max-width: 42rem; margin-bottom: 4.4rem; }
+/* The cover shader: wider than the demo hero and squarer, since it is the
+   one picture on the page. No frame — it should read as an image, not a
+   widget — and no FPS badge, which is a working tool, not cover furniture. */
+.hero-shader { max-width: 40rem; margin-bottom: 4.4rem; }
+.hero-shader .shader {
+  width: 100%; aspect-ratio: 16 / 10; height: auto;
+  margin: 0; border: none; background: #000;
+}
+.hero-shader shader-sandbox .fps-counter { display: none; }
+.hero-demo calc3-demo { width: 100%; }
+.hero-blurb {
+  max-width: 34rem; margin: 0 auto 2.4rem;
+  font-size: 1.25rem; line-height: 1.62; color: var(--text-secondary);
+}
+.hero-actions { display: flex; justify-content: center; gap: 1.4rem; font-family: var(--font-heading); font-size: 0.95rem; }
+.action {
+  padding: 0.55rem 1.3rem; border: 1px solid var(--border); border-radius: 6px;
+  color: var(--text-secondary); transition: color 0.2s ease, border-color 0.2s ease;
+}
+.action.primary { color: var(--accent); border-color: var(--accent); }
+.action:hover { color: var(--accent-hover); border-color: var(--accent-hover); }
+
+/* Contents on the cover: a second movement below the cover proper — big
+   air above and its own kicker, so the cover still "ends" at the actions.
+   Chapters only; each chapter page's rails carry its sections. */
+.cover-contents {
+  max-width: 24rem; margin: 7.5rem auto 0;
+  text-align: left; font-family: var(--font-heading); font-size: 0.9rem;
+}
+.contents-kicker {
+  text-align: center;
+  font-size: 0.78rem; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.18em;
+  color: var(--text-tertiary);
+  margin-bottom: 2.2rem; /* the first course title sits below this, not against it */
+}
+/* Each course is its own block: the three parts of this cover are separate
+   courses, so they are separated rather than run together. A dotted rule and
+   real air between them; the first needs neither. */
+.cover-contents .course + .course {
+  margin-top: 3rem; padding-top: 2.6rem;
+  border-top: 1px dotted var(--border);
+}
+.cover-contents .course-kind {
+  text-align: center; font-size: 0.7rem; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.14em;
+  color: var(--text-tertiary);
+  margin-bottom: 0.35rem;
+}
+.cover-contents .part {
+  color: var(--text-heading); font-size: 0.95rem; font-weight: 600;
+  letter-spacing: 0.01em; text-align: center;
+  margin: 0 0 1.2rem;
+}
+.cover-contents ol { list-style: none; }
+.cover-contents li { margin: 0.45rem 0; }
+.cover-contents a { color: var(--text-secondary); display: block; line-height: 1.45; }
+.cover-contents a:hover { color: var(--accent); }
+.cover-contents .chapno { color: var(--text-tertiary); display: inline-block; min-width: 1.6rem; }
+@media (max-width: 640px) {
+  .hero-title { font-size: 2.4rem; }
+  .cover { padding-top: 2.5rem; }
+}
+
+/* ===== Shiki: dual-themed code, both palettes shipped as variables =====
+   Shiki is run at build time with defaultColor:false, so every token carries
+   --shiki-light and --shiki-dark and the page picks a side here. No client
+   JS is involved, and a theme toggle recolours code with everything else.
+   Shiki's own page backgrounds (#ffffff / #121212) are discarded: a code
+   block is a surface in this book, so it wears --bg-subtle like every other
+   one and only the token colours come from the theme. */
+.prose pre.shiki, .prose pre.shiki span { color: var(--shiki-light); }
+[data-theme="dark"] .prose pre.shiki,
+[data-theme="dark"] .prose pre.shiki span { color: var(--shiki-dark); }
+.prose pre.shiki code { font-size: 0.875rem; }
+/* Shiki's line spans are inline and the newlines inside <pre> do the
+   breaking — making them blocks as well would double every line. */
+
+/* ===== Shader embeds =====
+   A slot the runtime fills (site/assets/shader.js). The height is the
+   author's, from the directive; the 75% width and centring are the
+   proportions the Quarto shortcode used, kept so pages look unchanged. */
+.shader {
+  width: 75%; margin: var(--rhythm) auto;
+  border-radius: 6px; overflow: hidden;
+  background: var(--bg-subtle); border: 1px solid var(--border-subtle);
+}
+@media (max-width: 899.98px) { .shader { width: 100%; } }
+
+/* ===== Callouts =====
+   Four kinds carried over from Quarto. Same left-bar vocabulary as the
+   theorem environments, in their own colours so an aside never reads as a
+   numbered result. */
+.callout {
+  border-left: 3px solid var(--callout-bar);
+  background: var(--bg-subtle);
+  border-radius: 0 6px 6px 0;
+  padding: 0.9rem 1.2rem; margin-bottom: var(--rhythm);
+}
+.callout-title {
+  font-family: var(--font-heading); font-weight: 600; font-size: 0.9rem;
+  color: var(--text-heading); margin-bottom: 0.4rem;
+}
+.callout-body > *:last-child { margin-bottom: 0; }
+.callout-note      { --callout-bar: var(--bar-result); }
+.callout-tip       { --callout-bar: #4E8A5C; }
+.callout-warning   { --callout-bar: var(--bar-definition); }
+.callout-important { --callout-bar: #B5563F; }
+[data-theme="dark"] .callout-tip       { --callout-bar: #6FA87C; }
+[data-theme="dark"] .callout-important { --callout-bar: #C8735E; }
+
+/* ===== Nav groups =====
+   A part may gather its chapters into named groups — the five CIRM days,
+   each holding a lecture and a homework. One level only, by design. */
+.book-rail .group, .drawer .group {
+  font-size: 0.78rem; color: var(--text-secondary);
+  font-weight: 600; margin: 0.7rem 0 0.2rem;
+}
+.book-rail ol.grouped, .drawer ol.grouped { margin-left: 0.7rem; }
+.cover-contents .group {
+  font-family: var(--font-heading); font-size: 0.85rem;
+  color: var(--text-secondary); font-weight: 600; margin: 0.8rem 0 0.3rem;
+}
+.cover-contents ol.grouped { margin-left: 1rem; }
+
+/* ===== Tables ===== */
+.table-wrap { overflow-x: auto; margin-bottom: var(--rhythm); }
+.prose table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
+.prose th, .prose td {
+  text-align: left; padding: 0.45rem 0.8rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.prose th {
+  font-family: var(--font-heading); font-size: 0.82rem; font-weight: 600;
+  color: var(--text-heading); text-transform: uppercase; letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ===== Bare markdown images =====
+   Figures have their own treatment; these are images dropped straight into
+   the prose (the course front pages open with a row of them). */
+.prose > p > img, .prose p > img {
+  display: block; max-width: 100%; height: auto;
+  margin: var(--rhythm) auto; border-radius: 6px;
+}
+
+/* ===== The shader sandbox, dressed for this book =====
+   @stevejtrettel/shader-sandbox ships prebuilt and is never edited. It needs
+   no editing: it defines its palette as custom properties on :root and uses
+   no shadow DOM, so the whole component can be re-themed from here and the
+   overrides simply fall away whenever the component is next rebuilt.
+
+   Two things were wrong out of the box. Its panel is cool grey against this
+   book's warm paper, and its editor colours code in VS Code blue-and-red
+   while every other code block on the page is vitesse — two code styles in
+   one column. Both are settled below: the sandbox now wears --bg-code like
+   the book's own <pre>, and its syntax colours are the vitesse values Shiki
+   assigns to the same GLSL tokens, sampled from the themes themselves.
+
+   The selectors carry [data-theme] because the component stamps that
+   attribute on itself and styles its own palette through it — a bare
+   `shader-sandbox` rule is a tenth of a specificity point short and loses
+   every token colour back to the defaults. */
+
+shader-sandbox[data-theme] {
+  --bg-primary: var(--bg-code);
+  --bg-secondary: var(--bg-code);
+  --bg-tertiary: var(--bg-code);
+  --code-bg: var(--bg-code);
+  --code-text: #393A34;
+  --code-line-number: var(--text-tertiary);
+  --code-line-border: var(--border-subtle);
+  --code-selection: rgba(61, 90, 128, 0.16);
+
+  --text-primary: var(--text-heading);
+  --text-secondary: var(--text);
+  --text-muted: var(--text-secondary);
+  --text-disabled: var(--text-tertiary);
+  --border-primary: var(--border-subtle);
+  --border-secondary: var(--border);
+  --accent-primary: var(--accent);
+  --accent-primary-hover: var(--accent-hover);
+  --accent-primary-active: var(--accent-hover);
+
+  /* Tabs, after sjtSite's ::sandbox: flat, monospace, quiet until selected,
+     and then marked by an accent rule rather than a raised chip. */
+  --tab-bg: var(--bg-code);
+  --tab-text: var(--text-tertiary);
+  --tab-text-hover: var(--text-secondary);
+  --tab-text-active: var(--text-heading);
+  --tab-border-active: var(--accent);
+  --button-bg: transparent;
+  --button-border: var(--border);
+  --button-text: var(--text-tertiary);
+  --button-bg-hover: transparent;
+  --button-border-hover: var(--border);
+  --button-text-hover: var(--text-heading);
+  --recompile-bg: transparent;
+  --recompile-text: var(--text-secondary);
+  --recompile-bg-hover: var(--bg-subtle);
+  --recompile-bg-active: var(--border-subtle);
+
+  /* vitesse-light, as Shiki colours these same GLSL tokens */
+  --syntax-comment: #A0ADA0;
+  --syntax-keyword: #AB5959;
+  --syntax-string: #B56959;
+  --syntax-number: #2F798A;
+  --syntax-operator: #999999;
+  --syntax-function: #59873A;
+  --syntax-class: #2E8F82;
+  --syntax-punctuation: #999999;
+
+  /* Flat, like every other code block here — the border does the work. */
+  --pane-radius: 6px;
+  --pane-shadow: none;
+  --image-viewer-bg: var(--bg-code);
+}
+
+shader-sandbox[data-theme="dark"] {
+  --code-text: #DBD7CA;
+  --code-selection: rgba(122, 154, 187, 0.22);
+  /* vitesse-dark */
+  --syntax-comment: #758575;
+  --syntax-keyword: #CB7676;
+  --syntax-string: #C98A7D;
+  --syntax-number: #4C9A91;
+  --syntax-operator: #666666;
+  --syntax-function: #80A665;
+  --syntax-class: #5DA994;
+  --syntax-punctuation: #666666;
+}
+
+/* The component hardcodes Monaco and its own sizes in a few places; these are
+   the only rules that reach past the custom properties. */
+shader-sandbox .tabbed-wrapper {
+  border: 1px solid var(--border-subtle);
+}
+shader-sandbox .tabbed-tab-button,
+shader-sandbox .editor-tab-button,
+shader-sandbox .tab-button {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 0.5rem 0.7rem;
+  letter-spacing: 0;
+}
+/* The live view is a tab among the files here, so it is lettered like them. */
+shader-sandbox .tabbed-tab-button.shader-tab { font-family: var(--font-mono); }
+/* The toolbar buttons come as raised chips; flat suits the rest of this. */
+shader-sandbox .tabbed-recompile-button,
+shader-sandbox .editor-recompile-button {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+shader-sandbox .copy-button { color: var(--text-tertiary); }
+shader-sandbox .tabbed-code-viewer pre,
+shader-sandbox .code-viewer pre {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}

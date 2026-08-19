@@ -1,6 +1,21 @@
-[build]
-  command = "bash build.sh"
-  publish = "_site"
+# This repo is not built by Netlify. `npm run deploy` builds dist/ locally and
+# uploads it, refusing to run on a dirty tree or unpushed commits, so what is
+# live is always exactly a pushed commit. There is deliberately no [build]
+# section: a repo-connected build would need a Node toolchain here for no gain,
+# and the guarantee it used to provide is now the deploy script's job.
 
-[build.environment]
-  QUARTO_PRINT_STACK = "true"
+# stats.json is read by stevejtrettel.site at ITS build time to render this
+# site's stats line. It must not be cached hard: the site only sees a new
+# number when it rebuilds AND the CDN hands over a fresh copy, so a long
+# max-age here would freeze the numbers. Minutes, not months.
+[[headers]]
+  for = "/stats.json"
+  [headers.values]
+    Content-Type = "application/json"
+    Cache-Control = "public, max-age=300, must-revalidate"
+
+[[headers]]
+  for = "/*/stats.json"
+  [headers.values]
+    Content-Type = "application/json"
+    Cache-Control = "public, max-age=300, must-revalidate"

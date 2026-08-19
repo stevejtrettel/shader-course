@@ -1,0 +1,307 @@
+# Day 1 Exercises
+
+This was broken before so running atest and adding this line 
+
+Homework is organized into four types:
+
+**Checkpoints** — Short exercises to verify you understood the lecture material. Required for anyone new to shader programming.
+
+**Explorations** — Open-ended problems that extend the lecture topics. Pick the ones that interest you. If you can do several of these, you're on track with the course.
+
+**Challenges** — Problems that may require learning new concepts beyond what was covered in lecture. Attempt these if you skipped the checkpoints and found an exploration or two too easy.
+
+**Projects** — Extended projects to make a shader you'd be proud to show someone.
+
+---
+
+## Checkpoints
+
+**C1. Solid Colors.** Modify the red screen shader to display: (a) green, (b) cyan, (c) a color of your choice using all three RGB channels.
+
+**C2. Vertical Split.** Using the standard coordinate setup, divide the screen into left (red) and right (blue) by testing `p.x < 0.0`.
+
+**C3. Off-Center Circle.** Draw a filled circle of radius 0.5 centered at the point $(1, 1)$ instead of the origin.
+
+**C4. Pulsing Circle.** Make a circle whose radius oscillates between 0.5 and 1.5 over time using `iTime`.
+
+**C5. Ring Thickness.** Draw a ring (circle outline) centered at the origin. Experiment with different values of `eps` to understand how it controls thickness.
+
+---
+
+## Explorations
+
+**E1. Concentric Rings.** Draw several concentric rings (circles of different radii, all centered at the origin). Can you color alternate rings differently?
+
+**E2. Moon Orbit.** Extend the sun-earth shader to add a moon that orbits the earth. The moon should be smaller than the earth and orbit faster.
+
+**E3. Your Favorite Curve.** Pick an implicit curve and render it with gradient correction for uniform thickness. Some suggestions:
+
+- **Cardioid**: $(x^2 + y^2 - ax)^2 = a^2(x^2 + y^2)$. Heart-shaped with one cusp.
+- **Folium of Descartes**: $x^3 + y^3 = 3axy$. Has a loop and an asymptote.
+- **Lemniscate of Gerono**: $x^4 = x^2 - y^2$. A figure-eight, simpler than Bernoulli's.
+- **Astroid**: $x^{2/3} + y^{2/3} = a^{2/3}$. Four cusps. (Be careful with the fractional powers—you'll need to handle signs.)
+- **Tricuspoid (deltoid)**: $(x^2 + y^2 + 12ax + 9a^2)^2 = 4a(2x + 3a)^3$. Three cusps, looks like a curved triangle.
+
+**E4. Curve Explorer.** Take any one-parameter family of curves and build a mouse-controlled explorer (like the folium example). Map `iMouse.x` to the parameter and drag to explore the family.
+
+**E5. Two Circles.** Draw two filled circles at different positions. What happens when they overlap? Can you make one "in front of" the other? Can you make the intersection a different color, like a Venn diagram?
+
+**E6. Soft Circles.** Use `smoothstep` and `mix` to draw a circle with anti-aliased edges. Then try adding a glow effect: instead of a hard edge, make the color fade gradually as you move away from the boundary.
+
+**E7. HSV Experiments.** Use the `hsv2rgb` function from the Color Appendix to create colorful effects:
+- Color a filled circle so that hue varies with angle (a color wheel).
+- Color based on distance from origin: hue increasing as you move outward, creating rainbow rings.
+- Animate: make hue depend on `iTime` so colors cycle smoothly.
+- Color an implicit curve so that hue varies along the curve (hint: use `atan(p.y, p.x)` even for non-circular curves).
+
+---
+
+## Challenges
+
+**H1. Parabola Graphing Calculator.** Build an interactive graphing calculator for the parabola $y = ax^2 + bx + c$. Requirements:
+
+- Draw coordinate axes (the lines $x = 0$ and $y = 0$)
+- Draw the parabola using implicit curve techniques
+- Find the roots (where $y = 0$) and draw small circles around them
+- Use mouse position to control two of the coefficients (e.g., $a$ and $b$, with $c$ fixed, or $b$ and $c$ with $a$ fixed)
+
+As you drag the mouse, the parabola should reshape and the root indicators should move (or appear/disappear as roots become real or complex).
+
+**H2. Signed Distance Functions.** For a filled circle, $f(p) = |p| - r$ is the *signed* distance function: negative inside, positive outside, with $|f|$ giving the actual distance to the boundary. What is the signed distance function for a half-plane? For an axis-aligned rectangle? Implement both and draw them with uniform-thickness boundaries. Note: when you have the true signed distance function, you don't need the gradient correction trick—that's the payoff for computing the right thing from the start.
+
+**H3. Smooth Blending.** When two circles overlap, we currently just draw one on top of the other. Research *smooth minimum* functions (e.g., `smin`) that blend distance fields smoothly. Draw two circles that "melt together" where they meet.
+
+**H4. Inversion.** Circle inversion is the map $p \mapsto p / |p|^2$. Apply this transformation to your coordinate $p$ before drawing a shape. What happens to a line? What happens to a circle not passing through the origin? Experiment with different shapes.
+
+**H5. Fourier Epicycles.** Build an animation of Fourier series using epicycles—circles whose centers ride on the edges of other circles. For the square wave, the Fourier series uses odd harmonics: frequencies $\omega, 3\omega, 5\omega, \ldots$ with radii $1, 1/3, 1/5, \ldots$ Stack N circles, each rotating at its frequency, and draw a bright dot at the final position. Bonus: draw the arms connecting circle centers, fade the outer circles, or let the mouse control the number of terms.
+
+---
+
+
+
+
+## Project: Grid Patterns
+
+This project introduces a powerful technique—dividing the plane into a grid of cells, each with its own local coordinate system. Master this pattern now; we'll use it again on Day 2 to create grids of Julia sets.
+
+### The Core Idea
+
+We want to tile the screen with square cells. For each pixel, we need to answer two questions:
+
+1. **Which cell am I in?** An integer pair $(i, j)$ identifying the cell.
+2. **Where in that cell?** Local coordinates measuring displacement from the cell's center.
+
+### Setting Up the Grid
+
+First, we decide how many columns of cells we want and compute the cell size:
+
+```glsl
+float aspect = iResolution.x / iResolution.y;
+float N = 5.0;                        // number of columns
+float L = (4.0 * aspect) / N;         // cell side length
+```
+
+Why `4.0 * aspect`? Our coordinate system (after aspect correction) spans roughly $4 \cdot \text{aspect}$ units horizontally. Dividing by $N$ gives us $N$ square cells across.
+
+### The Grid Formula
+
+Here's the complete pattern—three lines that we'll reuse throughout the course:
+
+```glsl
+vec2 cell_id = floor(p / L + 0.5);        // which cell (round to nearest)
+vec2 cell_center = cell_id * L;           // world position of cell center
+vec2 local = p - cell_center;             // offset from center
+```
+
+**How it works:**
+
+- `floor(p / L + 0.5)` rounds to the nearest integer—giving the index of the closest cell center
+- Cell $(0, 0)$ is centered at the origin; cell $(i, j)$ is centered at $(iL, jL)$
+- Subtracting the center gives local coordinates in the range $[-L/2, L/2]$
+
+That's it. The geometry is clean: cell centers fall at integer multiples of $L$, with the origin at the center of cell $(0,0)$.
+
+### Drawing in Each Cell
+
+Let's draw a yellow circle at the center of each cell:
+
+```glsl
+float d = length(local);          // distance from cell center
+float r = L * 0.4;                // radius (40% of cell size)
+
+vec3 color;
+if (d < r) {
+    color = vec3(1.0, 1.0, 0.0);  // yellow inside
+} else {
+    color = vec3(0.1, 0.1, 0.3);  // dark blue outside
+}
+```
+
+::shader{src="grid-circles" layout="tabbed"}
+
+Try changing `N` to get more or fewer columns. The cells stay square regardless of screen shape.
+
+### Normalized Local Coordinates
+
+Sometimes it's convenient to have local coordinates in $[-1, 1]$ rather than $[-L/2, L/2]$. This lets you write drawing code that doesn't depend on cell size:
+
+```glsl
+vec2 uv = local / (L * 0.5);      // now in [-1, 1] × [-1, 1]
+```
+
+With this normalization, a circle of radius 1 exactly fills the cell. We'll use this form on Day 2, where each cell contains a Julia set rendered in its own $[-1,1]$ coordinate system.
+
+### Varying by Cell
+
+The `cell_id` lets each cell behave differently. Here are some techniques:
+
+**Checkerboard pattern:**
+```glsl
+float checker = mod(cell_id.x + cell_id.y, 2.0);
+vec3 bg = mix(vec3(0.2, 0.2, 0.3), vec3(0.3, 0.2, 0.2), checker);
+```
+
+**Radius varying by position:**
+```glsl
+float r = L * (0.2 + 0.15 * mod(cell_id.x + cell_id.y, 3.0));
+```
+
+**Ripple animation:**
+```glsl
+float dist_from_origin = length(cell_id);
+float r = L * (0.3 + 0.1 * sin(iTime * 2.0 - dist_from_origin * 0.5));
+```
+
+### Quick Reference
+
+Copy this block whenever you need a grid:
+
+```glsl
+// Grid setup
+float aspect = iResolution.x / iResolution.y;
+float N = 5.0;                              // columns
+float L = (4.0 * aspect) / N;               // cell size
+
+// Per-pixel grid calculation
+vec2 cell_id = floor(p / L + 0.5);          // integer cell index (nearest)
+vec2 cell_center = cell_id * L;             // center of this cell
+vec2 local = p - cell_center;               // offset from center, in [-L/2, L/2]
+vec2 uv = local / (L * 0.5);                // optional: normalize to [-1, 1]
+```
+
+### Design Challenge
+
+Create a grid-based pattern you find visually compelling. Some directions to explore:
+
+**Connecting shapes:** Quarter-circles in cell corners can create continuous networks across boundaries. What happens with other curve fragments?
+
+**Alternating motifs:** Use `mod(cell_id.x, 2.0)` or similar to alternate between different shapes or orientations.
+
+**Color fields:** Map `cell_id` to colors—try distance from origin, diagonal stripes, or cycling through a palette.
+
+**Phase-shifted animation:** Give each cell a different phase offset based on `cell_id` to create traveling waves.
+
+**Complex local drawings:** Use the normalized `uv` coordinates to draw something intricate in each cell—implicit curves, nested shapes, or patterns that vary with `cell_id`.
+
+The goal: produce an image you'd be happy to hang on a wall.
+
+
+
+
+
+## Project: Elliptic Curve Family
+
+This project builds a beautiful visualization of elliptic curves—the kind used in cryptography and studied throughout number theory. We'll draw not just one curve, but a family of curves that morph as you drag the mouse.
+
+### Part 1: One Elliptic Curve
+
+An elliptic curve in Weierstrass form is $y^2 = x^3 + ax + b$. As an implicit curve: $F(x, y) = y^2 - x^3 - ax - b = 0$.
+
+Start with fixed parameters, say $a = -1$ and $b = 1$:
+
+```glsl
+float a = -1.0;
+float b = 1.0;
+
+float F = p.y * p.y - p.x * p.x * p.x - a * p.x - b;
+vec2 grad = vec2(-3.0 * p.x * p.x - a, 2.0 * p.y);
+float dist = abs(F) / max(length(grad), 0.01);
+
+if (dist < 0.05) {
+    color = vec3(1.0, 0.85, 0.3);  // gold
+}
+```
+
+Get this working first. You should see a smooth curve.
+
+### Part 2: Mouse Controls a Parameter
+
+Let the mouse $y$-coordinate control $b$:
+
+```glsl
+float a = -1.0;
+float b = mix(-2.0, 2.0, iMouse.y / iResolution.y);
+```
+
+Drag up and down. Notice how the curve changes shape—sometimes it's connected, sometimes it splits into two pieces.
+
+### Part 3: The Discriminant
+
+The discriminant $\Delta = 4a^3 + 27b^2$ determines the curve's topology:
+
+- $\Delta > 0$: one connected component
+- $\Delta < 0$: two components (an "egg" and an infinite piece)
+- $\Delta = 0$: singular (the curve crosses itself)
+
+Color the curve based on this:
+
+```glsl
+float disc = 4.0 * a * a * a + 27.0 * b * b;
+
+vec3 curveColor;
+if (abs(disc) < 0.3) {
+    curveColor = vec3(1.0, 0.2, 0.2);  // red for singular
+} else if (disc > 0.0) {
+    curveColor = vec3(1.0, 0.85, 0.3); // gold for one component
+} else {
+    curveColor = vec3(0.3, 0.5, 0.8);  // blue for two components
+}
+```
+
+### Part 4: A Family of Curves
+
+Instead of one curve, draw many curves at nearby parameter values. Use a loop to vary $b$ around the mouse position:
+
+```glsl
+float b_center = mix(-2.0, 2.0, iMouse.y / iResolution.y);
+
+for (int j = -10; j <= 10; j++) {
+    float b = b_center + float(j) * 0.15;
+    // ... draw curve with this b
+}
+```
+
+### Part 5: Fading
+
+The family looks cluttered. Make curves fade as they get further from the center:
+
+- **Thickness**: thinner curves further from center
+- **Brightness**: dimmer curves further from center
+
+```glsl
+float dist_from_center = abs(float(j));
+float thickness = 0.05 / (1.0 + dist_from_center * 0.8);
+float brightness = 1.0 / (1.0 + dist_from_center * 0.4);
+curveColor *= brightness;
+```
+
+### Part 6: Two-Parameter Control
+
+Finally, let the mouse control both parameters: $x$ controls $a$, $y$ controls $b$. The family sweeps through $b$ values around the mouse position, while $a$ is set by mouse $x$.
+
+```glsl
+float a = mix(-2.0, 1.0, iMouse.x / iResolution.x);
+float b_center = mix(-2.0, 2.0, iMouse.y / iResolution.y);
+```
+
+Now you can explore the full parameter space. Find where the singular curves live—they form a cusp in $(a, b)$ space!

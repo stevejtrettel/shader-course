@@ -1,12 +1,23 @@
 {
   "name": "shader-course",
   "private": true,
+  "type": "module",
   "scripts": {
-    "shaders:build": "npm run shaders:build:cirm && npm run shaders:build:main",
-    "shaders:build:cirm": "node scripts/build-shaders.mjs cirm",
-    "shaders:build:main": "node scripts/build-shaders.mjs main"
+    "build": "node compiler/build.js",
+    "dev": "node site/dev.js",
+    "deploy": "node tools/deploy.mjs"
   },
   "dependencies": {
-    "@stevejtrettel/shader-sandbox": "^0.1.10"
+    "mathjax": "^4.1.3",
+    "mdast-util-to-string": "^4.0.0",
+    "remark-directive": "^4.0.0",
+    "remark-frontmatter": "^5.0.0",
+    "remark-gfm": "^4.0.1",
+    "remark-math": "^6.0.0",
+    "remark-parse": "^11.0.0",
+    "shiki": "^3.13.0",
+    "unified": "^11.0.5",
+    "unist-util-visit": "^5.1.0",
+    "yaml": "^2.9.0"
   }
 }

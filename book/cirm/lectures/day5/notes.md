@@ -1,0 +1,734 @@
+# Day 5: Rendering
+
+## Overview
+
+Today we render 3D scenes. Each pixel casts a ray into the world; we find where it hits a surface, compute how light interacts there, and return a color. This is raytracing—the same idea behind photorealistic rendering in film and games, stripped to its essentials.
+
+It's a big day. We'll build cameras, implement lighting models, and develop two different approaches to the core problem of finding ray-surface intersections. By the exercises, you can make something like this:
+
+::shader{src="barth-sextic-final" layout="tabbed"}
+
+The Barth sextic—a degree-6 algebraic surface with icosahedral symmetry, rotating under two colored lights.
+
+We start with **analytical intersection**: write down the ray equation, substitute into the surface equation, solve for the parameter. This is clean and exact—for a sphere, you get a quadratic. But for a torus you get a quartic, and the algebra only gets worse from there.
+
+Then we develop **raymarching** with signed distance functions. Instead of solving for the exact intersection, we march along the ray in safe steps, asking "how far to the nearest surface?" at each point. The SDF answers that question, and the algorithm converges to the surface. This trades some precision for dramatic flexibility: if you can write a distance function, you can render the shape.
+
+
+## Cameras and Rays
+
+Light travels from sources, bounces off surfaces, and some of it reaches a camera. Simulating this forward process is expensive—most light never hits the camera. So we reverse it: cast rays *from* the camera into the scene, and ask what each ray hits.
+
+We use the simplest camera model: a **pinhole camera**, where all light enters through a single point. Every ray passes through the same origin (the camera position); only the direction varies from pixel to pixel.
+
+Our camera sits at the origin, looking down the negative $z$-axis. We use the standard graphics convention: $y$ points up, $x$ points right, $z$ points toward the camera. Right-handed coordinates.
+
+A **ray** is a half-line:
+$$\mathbf{r}(t) = \mathbf{o} + t\mathbf{d}$$
+where $\mathbf{o}$ is the origin, $\mathbf{d}$ is a unit direction vector, and $t \geq 0$. We bundle these into a struct:
+
+```glsl
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+```
+
+### Field of View
+
+The **field of view** (FOV) controls how wide the camera sees. Imagine an image plane at distance $f$ in front of the camera, spanning $[-1, 1]$ in both $x$ and $y$. Each pixel maps to a point on this plane; the ray direction is the vector from the camera through that point.
+
+A ray to the top edge reaches $(0, 1, -f)$, forming a right triangle with opposite side 1 and adjacent side $f$. If $\theta$ is half the FOV, then $\tan\theta = 1/f$, so:
+$$f = \frac{1}{\tan(\text{FOV}/2)}$$
+
+Wide FOV means the image plane is close and rays spread sharply. Narrow FOV means rays stay nearly parallel—a telephoto lens.
+
+### Generating Rays
+
+For a pixel at `fragCoord`, we normalize to $[-1,1]^2$, correct the aspect ratio, and form the direction toward the image plane:
+
+```glsl
+Ray generateRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+    
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+    
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+```
+
+The $z$-component is $-f$ because we look down the negative $z$-axis.
+
+### Visualizing Rays
+
+We can verify the setup by coloring pixels according to their ray direction:
+
+::shader{src="ray-visualization" layout="tabbed"}
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    vec3 color = ray.dir * 0.5 + 0.5;
+    fragColor = vec4(color, 1.0);
+}
+```
+
+The center is bluish (ray pointing into $-z$); edges shift toward red and green (larger $x$ and $y$ components). The gradient confirms our rays fan out correctly from the camera.
+
+
+## Raytracing
+
+We have rays. Now we find where they hit things.
+
+### Sphere Intersection
+
+A sphere of radius $r$ centered at $\mathbf{c}$ is the set of points with $|\mathbf{p} - \mathbf{c}|^2 = r^2$. Substituting the ray equation $\mathbf{p} = \mathbf{o} + t\mathbf{d}$:
+
+$$|\mathbf{o} + t\mathbf{d} - \mathbf{c}|^2 = r^2$$
+
+Let $\boldsymbol{\delta} = \mathbf{o} - \mathbf{c}$. Expanding and using $|\mathbf{d}|^2 = 1$:
+
+$$t^2 + 2(\boldsymbol{\delta} \cdot \mathbf{d})t + (|\boldsymbol{\delta}|^2 - r^2) = 0$$
+
+A quadratic in $t$. The discriminant tells us: no real roots means the ray misses; two roots means it enters and exits. We want the smallest positive $t$—the first intersection in front of the camera.
+
+```glsl
+float intersectSphere(Ray ray, vec3 center, float radius) {
+    vec3 delta = ray.origin - center;
+    
+    float b = dot(delta, ray.dir);
+    float c = dot(delta, delta) - radius * radius;
+    float discriminant = b * b - c;
+    
+    if (discriminant < 0.0) return -1.0;
+    
+    float sqrtDisc = sqrt(discriminant);
+    float t1 = -b - sqrtDisc;
+    float t2 = -b + sqrtDisc;
+    
+    if (t1 > 0.0) return t1;
+    if (t2 > 0.0) return t2;
+    return -1.0;
+}
+```
+
+We return $-1$ as a sentinel for "no hit"—any negative value works since valid intersections have $t > 0$.
+
+Testing it:
+
+::shader{src="sphere-flat" layout="tabbed"}
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    
+    float t = intersectSphere(ray, vec3(0.0, 0.0, -3.0), 1.0);
+    
+    vec3 color = vec3(0.1, 0.1, 0.2);
+    if (t > 0.0) color = vec3(1.0, 0.0, 0.0);
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+A red disk. We found the sphere, but it looks flat—every hit pixel gets the same color. To see the curvature, we need lighting, and lighting depends on surface orientation.
+
+### Surface Normals
+
+The **surface normal** is the unit vector perpendicular to the surface. For a sphere, it points radially outward:
+
+$$\mathbf{n} = \frac{\mathbf{p} - \mathbf{c}}{r}$$
+
+We can visualize normals as colors by mapping components from $[-1,1]$ to $[0,1]$:
+
+::shader{src="sphere-normals" layout="tabbed"}
+
+```glsl
+if (t > 0.0) {
+    vec3 hitPoint = ray.origin + t * ray.dir;
+    vec3 normal = (hitPoint - sphereCenter) / sphereRadius;
+    color = normal * 0.5 + 0.5;
+}
+```
+
+Now we see the shape: red on the right ($+x$), green on top ($+y$), blue facing us ($+z$).
+
+### The Hit Struct
+
+We now have three pieces of information about where a ray hits a surface: the parameter $t$, the hit point, and the normal. We also know what color the surface should be. Let's bundle these:
+
+```glsl
+struct Hit {
+    float t;       // ray parameter; negative means no hit
+    vec3 point;    // intersection point
+    vec3 normal;   // surface normal
+    vec3 color;    // surface color
+};
+```
+
+And update our intersection function to return a `Hit`:
+
+```glsl
+Hit intersectSphere(Ray ray, vec3 center, float radius, vec3 color) {
+    Hit hit;
+    hit.t = -1.0;
+    
+    vec3 delta = ray.origin - center;
+    float b = dot(delta, ray.dir);
+    float c = dot(delta, delta) - radius * radius;
+    float discriminant = b * b - c;
+    
+    if (discriminant < 0.0) return hit;
+    
+    float sqrtDisc = sqrt(discriminant);
+    float t1 = -b - sqrtDisc;
+    float t2 = -b + sqrtDisc;
+    
+    if (t1 > 0.0) hit.t = t1;
+    else if (t2 > 0.0) hit.t = t2;
+    else return hit;
+    
+    hit.point = ray.origin + hit.t * ray.dir;
+    hit.normal = (hit.point - center) / radius;
+    hit.color = color;
+    return hit;
+}
+```
+
+Now intersection gives us everything we need for shading in one package.
+
+### Lighting
+
+A matte surface scatters light equally in all directions. The brightness depends on the angle between the normal and the light direction—head-on is bright, glancing is dim. This is **Lambertian** (diffuse) shading:
+
+$$I_{\text{diffuse}} = \max(0, \mathbf{n} \cdot \mathbf{l})$$
+
+where $\mathbf{l}$ points toward the light.
+
+Shiny surfaces also have **specular highlights**—bright spots where light reflects toward the viewer. The Phong model compares the reflection direction to the view direction:
+
+$$I_{\text{specular}} = \max(0, \mathbf{r} \cdot \mathbf{v})^n$$
+
+The exponent $n$ controls tightness: large $n$ gives a sharp highlight (metal), small $n$ gives a soft glow (plastic).
+
+A light has a direction and a color (which encodes intensity). We bundle these too:
+
+```glsl
+struct Light {
+    vec3 dir;    // direction toward the light
+    vec3 color;  // light color and intensity
+};
+```
+
+Now we can write a shading function:
+
+```glsl
+vec3 shade(Hit hit, Light light, vec3 viewDir) {
+    float diffuse = max(0.0, dot(hit.normal, light.dir));
+    vec3 reflected = reflect(-light.dir, hit.normal);
+    float specular = pow(max(0.0, dot(reflected, viewDir)), 32.0);
+    
+    vec3 diff = hit.color * light.color * diffuse;
+    vec3 spec = light.color * specular * 0.5;
+    return diff + spec;
+}
+```
+
+GLSL's `reflect(-light.dir, hit.normal)` computes the reflection of incoming light about the normal. Note that `shade` returns only the contribution from this one light—we add ambient separately so it doesn't get multiplied when using multiple lights.
+
+Putting it together:
+
+::shader{src="sphere-lit" layout="tabbed"}
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    Light light = Light(normalize(vec3(1.0, 1.0, 1.0)), vec3(1.0));
+    
+    Hit hit = intersectSphere(ray, vec3(0.0, 0.0, -3.0), 1.0, vec3(1.0, 0.0, 0.0));
+    
+    vec3 color = vec3(0.1, 0.1, 0.2);
+    if (hit.t > 0.0) {
+        vec3 ambient = hit.color * 0.1;
+        color = ambient + shade(hit, light, -ray.dir);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+The sphere looks 3D: bright where it faces the light, dark on the opposite side, with a specular highlight where the reflection aligns with our view.
+
+### Camera Motion
+
+A static camera gets boring. Let's drag to orbit around the scene.
+
+We map mouse position to rotation angles and transform the ray accordingly. Here's a function we'll reuse throughout the chapter:
+
+```glsl
+mat3 rotateX(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(1, 0, 0, 0, c, -s, 0, s, c);
+}
+
+mat3 rotateY(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
+}
+
+Ray orbitCamera(Ray ray, float distance) {
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
+    
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+```
+
+Usage is simple:
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 5.0);
+    
+    // ... rest of shading
+}
+```
+
+::shader{src="sphere-orbit" layout="tabbed"}
+
+Drag to orbit. The sphere stays at the origin; the camera circles it.
+
+
+## The Limits of Analytical Methods
+
+The sphere gave us a quadratic—easy. What about a torus?
+
+A torus is a circle revolved around an axis. It has two radii: the **major radius** $R$ (center of torus to center of tube) and the **minor radius** $r$ (radius of the tube). The implicit equation for a torus centered at the origin with axis along $y$:
+
+$$\left(\sqrt{x^2 + z^2} - R\right)^2 + y^2 = r^2$$
+
+Substituting the ray equation and eliminating the square root (by squaring twice) yields a **quartic** in $t$:
+
+$$a_4 t^4 + a_3 t^3 + a_2 t^2 + a_1 t + a_0 = 0$$
+
+Unlike quadratics, there's no formula you'd want to memorize. Solving a quartic requires either the [quartic formula](https://en.wikipedia.org/wiki/Quartic_function#General_formula_for_roots) (unwieldy), numerical methods (iterative), or careful algebraic manipulation.
+
+Inigo Quilez, the creator of Shadertoy, worked out an analytical solution:
+
+```glsl
+// Torus intersection by Inigo Quilez
+// https://iquilezles.org/articles/intersectors/
+float intersectTorusRaw(Ray ray, vec2 tor) {
+    float po = 1.0;
+    float Ra2 = tor.x * tor.x;
+    float ra2 = tor.y * tor.y;
+    
+    float m = dot(ray.origin, ray.origin);
+    float n = dot(ray.origin, ray.dir);
+    
+    float h = n*n - m + (tor.x + tor.y) * (tor.x + tor.y);
+    if (h < 0.0) return -1.0;
+    
+    float k = (m - ra2 - Ra2) / 2.0;
+    float k3 = n;
+    float k2 = n*n + Ra2*ray.dir.y*ray.dir.y + k;
+    float k1 = k*n + Ra2*ray.origin.y*ray.dir.y;
+    float k0 = k*k + Ra2*ray.origin.y*ray.origin.y - Ra2*ra2;
+    
+    if (abs(k3*(k3*k3 - k2) + k1) < 0.01) {
+        po = -1.0;
+        float tmp = k1; k1 = k3; k3 = tmp;
+        k0 = 1.0/k0;
+        k1 = k1*k0;
+        k2 = k2*k0;
+        k3 = k3*k0;
+    }
+    
+    float c2 = 2.0*k2 - 3.0*k3*k3;
+    float c1 = k3*(k3*k3 - k2) + k1;
+    float c0 = k3*(k3*(-3.0*k3*k3 + 4.0*k2) - 8.0*k1) + 4.0*k0;
+    
+    c2 /= 3.0;
+    c1 *= 2.0;
+    c0 /= 3.0;
+    
+    float Q = c2*c2 + c0;
+    float R = 3.0*c0*c2 - c2*c2*c2 - c1*c1;
+    
+    float h2 = R*R - Q*Q*Q;
+    float z = 0.0;
+    
+    if (h2 < 0.0) {
+        float sQ = sqrt(Q);
+        z = 2.0*sQ*cos(acos(R/(sQ*Q)) / 3.0);
+    } else {
+        float sQ = pow(sqrt(h2) + abs(R), 1.0/3.0);
+        z = sign(R)*abs(sQ + Q/sQ);
+    }
+    
+    z = c2 - z;
+    
+    float d1 = z - 3.0*c2;
+    float d2 = z*z - 3.0*c0;
+    
+    if (abs(d1) < 1.0e-4) {
+        if (d2 < 0.0) return -1.0;
+        d2 = sqrt(d2);
+    } else {
+        if (d1 < 0.0) return -1.0;
+        d1 = sqrt(d1/2.0);
+        d2 = c1/d1;
+    }
+    
+    float result = 1e20;
+    
+    h2 = d1*d1 - z + d2;
+    if (h2 > 0.0) {
+        h2 = sqrt(h2);
+        float t1 = -d1 - h2 - k3;
+        float t2 = -d1 + h2 - k3;
+        t1 = (po < 0.0) ? 2.0/t1 : t1;
+        t2 = (po < 0.0) ? 2.0/t2 : t2;
+        if (t1 > 0.0) result = t1;
+        if (t2 > 0.0) result = min(result, t2);
+    }
+    
+    h2 = d1*d1 - z - d2;
+    if (h2 > 0.0) {
+        h2 = sqrt(h2);
+        float t1 = d1 - h2 - k3;
+        float t2 = d1 + h2 - k3;
+        t1 = (po < 0.0) ? 2.0/t1 : t1;
+        t2 = (po < 0.0) ? 2.0/t2 : t2;
+        if (t1 > 0.0) result = min(result, t1);
+        if (t2 > 0.0) result = min(result, t2);
+    }
+    
+    if (result > 1e10) return -1.0;
+    return result;
+}
+```
+
+That's 80 lines to intersect a ray with a torus. Compare to 15 for the sphere.
+
+We also need the normal. For any implicit surface $F(\mathbf{p}) = 0$, the gradient $\nabla F$ is perpendicular to the level set, so the normal is $\nabla F / |\nabla F|$. For the torus, $F(x,y,z) = (\sqrt{x^2 + z^2} - R)^2 + y^2 - r^2$:
+
+$$\frac{\partial F}{\partial x} = 2\left(\sqrt{x^2+z^2} - R\right) \frac{x}{\sqrt{x^2+z^2}}$$
+
+$$\frac{\partial F}{\partial y} = 2y$$
+
+$$\frac{\partial F}{\partial z} = 2\left(\sqrt{x^2+z^2} - R\right) \frac{z}{\sqrt{x^2+z^2}}$$
+
+In code:
+
+```glsl
+vec3 torusNormal(vec3 p, vec2 tor) {
+    float R = tor.x;
+    float k = sqrt(p.x*p.x + p.z*p.z);
+    return normalize(vec3(p.x * (1.0 - R/k), p.y, p.z * (1.0 - R/k)));
+}
+```
+
+With intersection and normal in hand, we wrap it in our `Hit` infrastructure:
+
+```glsl
+Hit intersectTorus(Ray ray, vec2 tor, vec3 color) {
+    Hit hit;
+    hit.t = intersectTorusRaw(ray, tor);
+    if (hit.t > 0.0) {
+        hit.point = ray.origin + hit.t * ray.dir;
+        hit.normal = torusNormal(hit.point, tor);
+        hit.color = color;
+    }
+    return hit;
+}
+```
+
+::shader{src="torus-analytical" layout="tabbed"}
+
+It works. Drag to orbit and admire the donut. But look at what it cost us: 80 lines of intricate algebra for a quartic. And most surfaces don't admit closed-form ray intersections at all—the torus is a special case where someone worked it out.
+
+:::note
+## What About Meshes?
+
+Production renderers typically approximate surfaces with **triangle meshes**—thousands of tiny triangles. Ray-triangle intersection is simple (a linear system), and spatial data structures make it fast to find which triangles a ray might hit.
+
+But meshes require vertex data, connectivity, and substantial infrastructure. For mathematical visualization—where we define shapes with equations—there's a more direct path.
+:::
+
+We need a different approach. Instead of solving for the exact intersection, what if we could *walk* toward the surface?
+
+
+## Signed Distance Functions
+
+We've been asking: "where exactly does this ray hit the surface?" For a sphere, that's a quadratic. For a torus, a quartic. For most surfaces, there's no closed form at all.
+
+What if we asked an easier question?
+
+### A Different Question
+
+Suppose we have a function that, given any point in space, tells us the distance to the nearest surface. Not *which* surface, not *where* on the surface—just how far.
+
+Now imagine walking along a ray. At each step, we ask: "how far is the surface from here?" If the answer is $d$, we know it's safe to step forward by $d$—we can't hit anything closer. So we step, ask again, step again. Eventually either the distance gets very small (we've arrived) or we've walked far without hitting anything (the ray misses).
+
+This is **raymarching**, also called **sphere tracing**. The name comes from the geometry: the distance $d$ defines a sphere of empty space around our current position. We can step anywhere within that sphere safely, so we step along the ray by exactly $d$. Then we get a new sphere, take a new step, and repeat.
+
+The function that answers "how far to the surface?" is called a **signed distance function** (SDF).
+
+### Definition
+
+A signed distance function maps every point in space to a number:
+
+$$d(\mathbf{p}) = \begin{cases}
+> 0 & \text{outside the surface} \\
+= 0 & \text{on the surface} \\
+< 0 & \text{inside the surface}
+\end{cases}$$
+
+The magnitude $|d(\mathbf{p})|$ is the Euclidean distance to the nearest point on the surface. The sign tells you which side you're on.
+
+### Visualizing SDFs in 2D
+
+Before we raymarch in 3D, let's build intuition in 2D. We visualize an SDF by coloring the plane according to distance, with contour lines showing level sets.
+
+The simplest SDF is a circle of radius $r$ centered at the origin:
+
+$$d(\mathbf{p}) = |\mathbf{p}| - r$$
+
+If you're at distance $|\mathbf{p}|$ from the origin, your signed distance to the circle is how much farther (positive) or closer (negative) you are than $r$.
+
+```glsl
+float sdCircle(vec2 p, float r) {
+    return length(p) - r;
+}
+```
+
+::shader{src="sdf-circle-2d" layout="tabbed"}
+
+The contour lines are level sets—curves where $d = k$ for various $k$. On the boundary ($k = 0$), you're exactly on the circle. Inside is negative; outside is positive.
+
+A box is more interesting. For an axis-aligned box with half-widths $(w, h)$:
+
+```glsl
+float sdBox(vec2 p, vec2 halfSize) {
+    vec2 d = abs(p) - halfSize;
+    return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
+}
+```
+
+::shader{src="sdf-box-2d" layout="tabbed"}
+
+Notice how the contours round out near corners—the SDF measures distance, and distance from a corner is distance from a point.
+
+### 3D Primitives
+
+The same idea extends to 3D. Here's where SDFs shine.
+
+**Sphere:**
+```glsl
+float sdSphere(vec3 p, float radius) {
+    return length(p) - radius;
+}
+```
+
+One line. Compare to our 15-line analytical intersection.
+
+**Torus:**
+```glsl
+float sdTorus(vec3 p, vec2 tor) {
+    vec2 q = vec2(length(p.xz) - tor.x, p.y);
+    return length(q) - tor.y;
+}
+```
+
+Four lines. Compare to the 80-line quartic solver.
+
+The logic: `length(p.xz) - tor.x` gives the distance from the central ring (a circle of radius $R$ in the xz-plane). Then we measure distance from that to the point, accounting for $y$, and subtract the tube radius.
+
+**Box:**
+```glsl
+float sdBox(vec3 p, vec3 halfSize) {
+    vec3 d = abs(p) - halfSize;
+    return length(max(d, 0.0)) + min(max(d.x, max(d.y, d.z)), 0.0);
+}
+```
+
+Same pattern as 2D, extended to three dimensions.
+
+**Plane:**
+```glsl
+float sdPlane(vec3 p, float height) {
+    return p.y - height;
+}
+```
+
+A horizontal plane at $y = h$. Points above have positive distance; points below have negative.
+
+### Normals from SDFs
+
+For lighting, we need surface normals. An SDF is an implicit function—the surface is where $d(\mathbf{p}) = 0$. The gradient $\nabla d$ points perpendicular to level sets, so it gives us the normal direction.
+
+We estimate the gradient numerically:
+
+```glsl
+vec3 calcNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sceneSDF(p + vec3(eps, 0, 0)) - sceneSDF(p - vec3(eps, 0, 0)),
+        sceneSDF(p + vec3(0, eps, 0)) - sceneSDF(p - vec3(0, eps, 0)),
+        sceneSDF(p + vec3(0, 0, eps)) - sceneSDF(p - vec3(0, 0, eps))
+    ));
+}
+```
+
+This works for *any* SDF. We evaluate at six nearby points and see which direction the function increases fastest. That's the normal.
+
+
+## Raymarching
+
+We've defined SDFs. Now we march along rays using them.
+
+### The Algorithm
+
+Starting from the ray origin, we repeatedly:
+1. Evaluate the SDF at our current position
+2. Step forward along the ray by that distance
+3. Stop if we're close enough to the surface (hit) or too far away (miss)
+
+```glsl
+float raymarch(Ray ray) {
+    float t = 0.0;
+    
+    for (int i = 0; i < 100; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sceneSDF(p);
+        
+        if (d < 0.001) return t;  // Hit
+        
+        t += d;
+        
+        if (t > 100.0) return -1.0;  // Miss
+    }
+    
+    return -1.0;  // Ran out of steps
+}
+```
+
+The threshold `0.001` controls how close we need to get before declaring a hit—smaller means more precision but more steps. The maximum distance `100.0` and iteration count `100` are practical limits.
+
+### Raymarched Sphere
+
+Let's render a sphere with raymarching:
+
+```glsl
+float sceneSDF(vec3 p) {
+    return length(p) - 1.0;  // Unit sphere at origin
+}
+```
+
+That's the entire scene definition. Combined with our `raymarch` function, `calcNormal`, and the same `shade` function we've been using:
+
+::shader{src="raymarch-sphere" layout="tabbed"}
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = generateRay(fragCoord);
+    ray = orbitCamera(ray, 5.0);
+    
+    Light light = Light(normalize(vec3(1.0, 1.0, 1.0)), vec3(1.0));
+    
+    float t = raymarch(ray);
+    
+    vec3 color = vec3(0.1, 0.1, 0.2);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 normal = calcNormal(p);
+        
+        Hit hit;
+        hit.t = t;
+        hit.point = p;
+        hit.normal = normal;
+        hit.color = vec3(1.0, 0.0, 0.0);
+        
+        color = shade(hit, light, -ray.dir);
+    }
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+The result looks identical to our analytical sphere—same shape, same lighting. But we found the intersection by marching, not by solving a quadratic.
+
+### Raymarched Torus
+
+Now for the payoff. To render a torus, we change one function:
+
+```glsl
+float sceneSDF(vec3 p) {
+    vec2 tor = vec2(1.0, 0.4);  // major radius, minor radius
+    vec2 q = vec2(length(p.xz) - tor.x, p.y);
+    return length(q) - tor.y;
+}
+```
+
+Four lines. The raymarching loop doesn't change. The normal calculation doesn't change. The lighting doesn't change.
+
+::shader{src="raymarch-torus" layout="tabbed"}
+
+Compare: 80 lines of quartic algebra reduced to 4 lines of distance calculation. The raymarching framework absorbs all the complexity—we just answer "how far is the surface?"
+
+
+## Building Scenes
+
+We can render a sphere. We can render a torus. How do we render both at once?
+
+### Combining Objects
+
+The SDF tells us distance to the nearest surface. If we have two objects, the nearest surface is whichever is closer. So we take the minimum:
+
+```glsl
+float sceneSDF(vec3 p) {
+    float sphere = length(p - vec3(-1.5, 0.0, 0.0)) - 1.0;
+    float torus = sdTorus(p - vec3(1.5, 0.0, 0.0), vec2(0.8, 0.3));
+    return min(sphere, torus);
+}
+```
+
+That's it. The raymarcher doesn't change—it still asks "how far to the nearest surface?" and marches accordingly. Now "nearest" might be the sphere or the torus depending on where we are.
+
+Adding a ground plane:
+
+```glsl
+float sceneSDF(vec3 p) {
+    float sphere = length(p - vec3(-1.5, 0.0, 0.0)) - 1.0;
+    float torus = sdTorus(p - vec3(1.5, 0.0, 0.0), vec2(0.8, 0.3));
+    float ground = p.y + 1.0;
+    return min(sphere, min(torus, ground));
+}
+```
+
+::shader{src="scene-multi" layout="tabbed"}
+
+Three objects, one `min` chain. Drag to orbit and see them from all angles.
+
+:::note
+## Constructive Solid Geometry
+
+An SDF represents a shape as a function $f: \mathbb{R}^3 \to \mathbb{R}$. Set operations become pointwise operations:
+
+- **Union** $A \cup B$: `min(a, b)`
+- **Intersection** $A \cap B$: `max(a, b)`
+- **Subtraction** $A \setminus B$: `max(a, -b)`
+
+This is **constructive solid geometry** (CSG)—building complex shapes from simple primitives. With SDFs, CSG is just arithmetic. We'll explore intersection and subtraction in the exercises.
+:::

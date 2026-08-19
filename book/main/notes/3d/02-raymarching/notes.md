@@ -1,0 +1,476 @@
+# Raymarching
+
+## Overview
+
+The torus required 80 lines of algebra to intersect analytically. Most surfaces don't admit closed-form intersections at all. We need a different approach.
+
+The key insight: instead of asking "where exactly does this ray hit the surface?" we ask an easier question — "how far is the surface from this point?" If we can answer that, we can *walk* toward the surface, taking safe steps until we arrive.
+
+By the end of this chapter you'll render scenes like this:
+
+::shader{src="scene-complete" layout="tabbed"}
+
+Multiple objects, different colors, all from distance functions. The 80-line torus becomes 4 lines. And shapes with no closed-form intersection become just as easy as spheres.
+
+
+## A Different Question
+
+Suppose we have a function that, given any point in space, tells us the distance to the nearest surface. Not *which* surface, not *where* on the surface — just how far.
+
+Now imagine walking along a ray. At each step, we ask: "how far is the surface from here?" If the answer is $d$, we know it's safe to step forward by $d$ — we can't hit anything closer. So we step, ask again, step again. Eventually either the distance gets very small (we've arrived) or we've walked far without hitting anything (the ray misses).
+
+This is **raymarching**, also called **sphere tracing**. The name comes from the geometry: the distance $d$ defines a sphere of empty space around our current position. We can step anywhere within that sphere safely, so we step along the ray by exactly $d$. Then we get a new sphere, take a new step, and repeat.
+
+The function that answers "how far to the surface?" is called a **signed distance function** (SDF).
+
+
+## Signed Distance Functions
+
+### Definition
+
+A signed distance function maps every point in space to a number:
+
+$$d(\mathbf{p}) = \begin{cases}
+> 0 & \text{outside the surface} \\
+= 0 & \text{on the surface} \\
+< 0 & \text{inside the surface}
+\end{cases}$$
+
+The magnitude $|d(\mathbf{p})|$ is the Euclidean distance to the nearest point on the surface. The sign tells you which side you're on.
+
+
+### Building Intuition in 2D
+
+Before we raymarch in 3D, let's visualize SDFs in 2D. We color the plane according to distance, with contour lines showing level sets.
+
+The simplest SDF is a circle of radius $r$ centered at the origin:
+
+$$d(\mathbf{p}) = |\mathbf{p}| - r$$
+
+If you're at distance $|\mathbf{p}|$ from the origin, your signed distance to the circle is how much farther (positive) or closer (negative) you are than $r$.
+
+```glsl
+float sdCircle(vec2 p, float r) {
+    return length(p) - r;
+}
+```
+
+::shader{src="sdf-circle-2d" layout="tabbed"}
+
+The contour lines are level sets — curves where $d = k$ for various $k$. On the boundary ($k = 0$), you're exactly on the circle. Inside is negative (blue); outside is positive (orange).
+
+
+## The Algorithm
+
+Starting from the ray origin, we repeatedly:
+
+1. Evaluate the SDF at our current position
+2. Step forward along the ray by that distance
+3. Stop if we're close enough to the surface (hit) or too far away (miss)
+
+```glsl
+float raymarch(Ray ray) {
+    float t = 0.0;
+
+    for (int i = 0; i < MAX_STEPS; i++) {
+        vec3 p = ray.origin + t * ray.dir;
+        float d = sdScene(p);
+
+        if (d < HIT_THRESHOLD) return t;   // Hit
+
+        t += d;
+
+        if (t > MAX_DIST) return -1.0;     // Miss
+    }
+
+    return -1.0;  // Ran out of steps
+}
+```
+
+The threshold `HIT_THRESHOLD` (typically 0.001) controls how close we need to get before declaring a hit — smaller means more precision but more steps. The maximum distance `MAX_DIST` and iteration count `MAX_STEPS` are practical limits.
+
+We use constants for these so they're easy to tune:
+
+```glsl
+const int MAX_STEPS = 100;
+const float MAX_DIST = 100.0;
+const float HIT_THRESHOLD = 0.001;
+```
+
+
+## 3D Primitives
+
+Here's where SDFs shine. Complex surfaces become simple distance calculations.
+
+**Sphere:**
+```glsl
+float sdSphere(vec3 p, float radius) {
+    return length(p) - radius;
+}
+```
+
+One line. Compare to our 15-line analytical intersection.
+
+**Torus:**
+```glsl
+float sdTorus(vec3 p, float majorRadius, float minorRadius) {
+    vec2 q = vec2(length(p.xz) - majorRadius, p.y);
+    return length(q) - minorRadius;
+}
+```
+
+Four lines. Compare to the 80-line quartic solver. This is the payoff of raymarching: shapes that were nightmares to intersect analytically become trivial distance calculations.
+
+Where does this formula come from? We'll derive it properly in the **Deriving SDFs** chapter — it follows naturally from the distance to a circle. For now, just use it.
+
+**Plane:**
+```glsl
+float sdPlane(vec3 p, float height) {
+    return p.y - height;
+}
+```
+
+A horizontal plane at $y = h$. Points above have positive distance; points below have negative.
+
+
+## Normals from SDFs
+
+For shading, we need surface normals. An SDF is an implicit function — the surface is where $d(\mathbf{p}) = 0$. The gradient $\nabla d$ points perpendicular to level sets, so it gives us the normal direction.
+
+We estimate the gradient numerically using central differences:
+
+```glsl
+vec3 calcNormal(vec3 p) {
+    float eps = 0.001;
+    return normalize(vec3(
+        sdScene(p + vec3(eps, 0, 0)) - sdScene(p - vec3(eps, 0, 0)),
+        sdScene(p + vec3(0, eps, 0)) - sdScene(p - vec3(0, eps, 0)),
+        sdScene(p + vec3(0, 0, eps)) - sdScene(p - vec3(0, 0, eps))
+    ));
+}
+```
+
+This works for *any* SDF. We evaluate at six nearby points and see which direction the function increases fastest. That's the normal. No need to derive normal formulas for each shape.
+
+
+## First Raymarched Render
+
+Let's render a sphere with raymarching:
+
+```glsl
+float sdScene(vec3 p) {
+    return sdSphere(p, 1.0);
+}
+```
+
+That's the entire scene definition. Combined with `raymarch` and `calcNormal`:
+
+::shader{src="sphere-normals" layout="tabbed"}
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = makeRay(fragCoord);
+    ray = orbitRay(ray, 5.0);
+
+    float t = raymarch(ray);
+
+    vec3 color = vec3(0.1, 0.1, 0.2);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 normal = calcNormal(p);
+        color = shadeNormal(normal);
+    }
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+Normal shading confirms we found the same sphere — the colors match our analytical version from the previous chapter. But we found the intersection by marching, not by solving a quadratic. The sphere looks the same; the machinery is completely different.
+
+
+## The Torus, Redeemed
+
+Now for the payoff. To render a torus, we change one function:
+
+```glsl
+float sdScene(vec3 p) {
+    return sdTorus(p, 1.0, 0.4);
+}
+```
+
+::shader{src="torus" layout="tabbed"}
+
+Four lines of distance calculation replace 80 lines of quartic algebra. The raymarching loop doesn't change. The normal calculation doesn't change. We just answer a different distance question and a new shape appears.
+
+Normal shading is especially revealing on the torus — the swirling color bands trace out the surface orientation, showing how the normal rotates around the tube as it wraps around the ring.
+
+
+## Building Scenes
+
+We can render a sphere. We can render a torus. How do we render both at once?
+
+
+### Combining Objects with Min
+
+The SDF tells us distance to the nearest surface. If we have two objects, the nearest surface is whichever is closer. So we take the minimum:
+
+```glsl
+float sdScene(vec3 p) {
+    float sphere = sdSphere(p - vec3(-1.5, 0.0, 0.0), 1.0);
+    float torus = sdTorus(p - vec3(1.5, 0.0, 0.0), 0.8, 0.3);
+    return min(sphere, torus);
+}
+```
+
+That's it. The raymarcher doesn't change — it still asks "how far to the nearest surface?" and marches accordingly. Now "nearest" might be the sphere or the torus depending on where we are.
+
+Adding a ground plane:
+
+```glsl
+float sdScene(vec3 p) {
+    float sphere = sdSphere(p - vec3(-1.5, 0.0, 0.0), 1.0);
+    float torus = sdTorus(p - vec3(1.5, 0.0, 0.0), 0.8, 0.3);
+    float ground = sdPlane(p, -1.0);
+    return min(sphere, min(torus, ground));
+}
+```
+
+With just `shadeDiffuse`, every object gets the same color treatment — readable, but we can't tell the sphere from the torus by appearance alone. To give each object its own color, we need to know *which* one we hit.
+
+
+### The Color Problem
+
+`sdScene` returns a distance, not information about *which* object we hit. How do we color the sphere red and the torus blue?
+
+We need a separate function that, given a hit point, determines which object is there and returns its color. The approach: check each object's distance and return the color of whichever is closest.
+
+```glsl
+vec3 getMaterial(vec3 p) {
+    float eps = 0.01;
+
+    if (sdSphere(p - vec3(-1.5, 0.0, 0.0), 1.0) < eps) return vec3(1.0, 0.0, 0.0);
+    if (sdTorus(p - vec3(1.5, 0.0, 0.0), 0.8, 0.3) < eps) return vec3(0.0, 0.7, 1.0);
+    if (sdPlane(p, -1.0) < eps) return vec3(0.3, 0.3, 0.35);
+
+    return vec3(0.5, 0.0, 0.2);  // maroon = error, shouldn't happen
+}
+```
+
+We check `< eps` rather than `== 0` because floating-point imprecision means we'll be *near* the surface, not exactly on it. The epsilon should be slightly larger than `HIT_THRESHOLD` to account for any drift.
+
+This function is called once per pixel, at the hit point — not during the march. The raymarcher only cares about distance; material lookup happens after.
+
+
+### Using Object Structs
+
+For cleaner code, we define each object as a struct with its geometry and color, then write `sdf` functions that take the struct:
+
+```glsl
+struct Sphere {
+    vec3 center;
+    float radius;
+    vec3 color;
+};
+
+struct Torus {
+    vec3 center;
+    float majorRadius;
+    float minorRadius;
+    vec3 color;
+};
+
+float sdf(vec3 p, Sphere s) {
+    return sdSphere(p - s.center, s.radius);
+}
+
+float sdf(vec3 p, Torus t) {
+    return sdTorus(p - t.center, t.majorRadius, t.minorRadius);
+}
+```
+
+Now we can define our scene objects once and reference them everywhere:
+
+```glsl
+Sphere ball = Sphere(vec3(-1.5, 0.0, 0.0), 1.0, vec3(1.0, 0.0, 0.0));
+Torus ring = Torus(vec3(1.5, 0.0, 0.0), 0.8, 0.3, vec3(0.0, 0.7, 1.0));
+
+float sdScene(vec3 p) {
+    float d = sdf(p, ball);
+    d = min(d, sdf(p, ring));
+    d = min(d, sdPlane(p, -1.0));
+    return d;
+}
+
+vec3 getMaterial(vec3 p) {
+    float eps = 0.01;
+
+    if (sdf(p, ball) < eps) return ball.color;
+    if (sdf(p, ring) < eps) return ring.color;
+    if (sdPlane(p, -1.0) < eps) return vec3(0.3, 0.3, 0.35);
+
+    return vec3(0.5, 0.0, 0.2);
+}
+```
+
+The geometry and colors are defined once in the structs. Both `sdScene` and `getMaterial` reference the same objects.
+
+:::note
+## Alternative: Inline Style
+
+Many Shadertoy shaders skip structs entirely, inlining positions and colors directly:
+
+```glsl
+float sdScene(vec3 p) {
+    return min(sdSphere(p - vec3(-1.5, 0.0, 0.0), 1.0),
+               sdTorus(p - vec3(1.5, 0.0, 0.0), 0.8, 0.3));
+}
+
+vec3 getMaterial(vec3 p) {
+    if (sdSphere(p - vec3(-1.5, 0.0, 0.0), 1.0) < 0.01) return vec3(1.0, 0.0, 0.0);
+    if (sdTorus(p - vec3(1.5, 0.0, 0.0), 0.8, 0.3) < 0.01) return vec3(0.0, 0.7, 1.0);
+    ...
+}
+```
+
+This is more compact but duplicates magic numbers. We use structs for clarity — define geometry and color once, reference everywhere. When reading code in the wild, expect both styles.
+:::
+
+
+### Putting It Together
+
+The full render loop:
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = makeRay(fragCoord);
+    ray = orbitRay(ray, 6.0);
+
+    float t = raymarch(ray);
+
+    vec3 color = vec3(0.1, 0.1, 0.2);
+    if (t > 0.0) {
+        vec3 p = ray.origin + t * ray.dir;
+        vec3 normal = calcNormal(p);
+        vec3 material = getMaterial(p);
+        color = shadeDiffuse(normal, material);
+    }
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+::shader{src="scene-complete" layout="tabbed"}
+
+Three objects, three colors, one `shadeDiffuse` call. The raymarcher finds the surface; `getMaterial` identifies it; the shading function makes it visible.
+
+
+## What's Next
+
+We've seen that SDFs make raymarching flexible — swap one distance function for another and new shapes appear. But where do these distance functions come from?
+
+The next chapter, **Deriving SDFs**, explores the mathematical patterns behind distance functions. You'll learn to derive SDFs for new shapes yourself, not just copy them from a library.
+
+After that, the **SDF Library** provides a comprehensive reference of shapes you can use directly. And **Sculpting** shows how to go beyond `min` — intersection, subtraction, smooth blending, and domain transformations that let you carve, warp, and repeat shapes to build complex objects from simple primitives.
+
+
+## Exercises
+
+### Checkpoints
+
+Quick exercises to verify understanding. A few minutes each.
+
+**Checkpoint 1: Move the Sphere**
+
+In the first raymarched render, the sphere is at the origin. Move it to `vec3(1.0, 0.5, 0.0)`. What changes in the code? (Just one line in `sdScene`.)
+
+**Checkpoint 2: Torus Proportions**
+
+The torus has major radius 1.0 and minor radius 0.4. Try:
+- A thin ring: major 1.0, minor 0.1
+- A fat donut: major 1.0, minor 0.8
+- What happens when minor radius exceeds major radius?
+
+**Checkpoint 3: Shading Comparison**
+
+Render the multi-object scene with each shading function:
+- `shadeNormal(normal)` — what do the color boundaries between objects look like?
+- `shadeDepth(t)` — which object is closest to the camera?
+- `shadeDiffuse(normal, material)` — the default for readable scenes
+
+**Checkpoint 4: Field of View**
+
+In `makeRay`, the FOV is 90°. Try 60° (telephoto) and 120° (wide angle). How does the scene change?
+
+
+### Explorations
+
+Deeper exercises that build on the core concepts.
+
+**Exploration 1: Per-Object Colors**
+
+Starting from a single-color scene using `shadeDiffuse(normal, vec3(1.0, 0.5, 0.0))`, add per-object colors using the `getMaterial` approach from the chapter. Give the sphere, torus, and ground plane distinct colors.
+
+**Exploration 2: Object Animation**
+
+Make the sphere or torus move. Modify its position in `sdScene` to depend on `iTime`:
+
+```glsl
+float y = sin(iTime);
+float sphere = sdSphere(p - vec3(-1.5, y, 0.0), 1.0);
+```
+
+Try:
+- Circular orbit: `vec3(cos(iTime) * 2.0, 0.0, sin(iTime) * 2.0)`
+- Bouncing: `abs(sin(iTime))`
+
+**Exploration 3: Add More Objects**
+
+Add a third and fourth object to the scene. Each one needs:
+- An SDF primitive in `sdScene` (with `min`)
+- A color check in `getMaterial`
+
+Try a box: `sdBox(p - center, halfSize)` where `sdBox` is:
+```glsl
+float sdBox(vec3 p, vec3 halfSize) {
+    vec3 d = abs(p) - halfSize;
+    return length(max(d, 0.0)) + min(max(d.x, max(d.y, d.z)), 0.0);
+}
+```
+
+
+### Challenges
+
+Substantial projects requiring creative problem-solving.
+
+**Challenge 1: Infinite Repetition**
+
+The `mod` function can repeat space infinitely:
+
+```glsl
+float sdScene(vec3 p) {
+    vec3 spacing = vec3(4.0);
+    vec3 q = mod(p + spacing * 0.5, spacing) - spacing * 0.5;
+    return sdSphere(q, 0.5);
+}
+```
+
+Experiment with:
+- Different spacing in different directions
+- Repeating only in 2D (an infinite floor of objects)
+- Mixing repeated and non-repeated objects
+
+Render with `shadeNormal` — the repeating normal pattern is visually striking.
+
+**Challenge 2: Normal Visualization**
+
+Use `shadeNormal` as a debugging and visualization tool:
+- Render the torus with normal shading and identify where each RGB component dominates
+- Try `abs(normal)` — what changes?
+- Try `vec3(normal.y * 0.5 + 0.5)` — height-based coloring
+- Blend between `shadeNormal` and `shadeDiffuse` based on mouse $x$ position
+
+**Challenge 3: Step Count Visualization**
+
+Write a new shading function that colors by how many raymarching steps were needed to find the surface. Modify `raymarch` to return the step count (you'll need to change what it returns — try a struct). Color low step counts blue and high step counts red.
+
+This reveals where the raymarcher works hardest: near edges, grazing angles, and thin features. It's a useful profiling tool — if a region is red, that's where your frame rate is being spent.

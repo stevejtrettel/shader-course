@@ -1,0 +1,477 @@
+# First Rays
+
+## Overview
+
+We want to render 3D scenes. The approach: cast a ray from the camera through each pixel, find where it hits a surface, compute how light interacts there, and return a color. This is **raytracing** — the same idea behind photorealistic rendering in film and games, stripped to essentials.
+
+By the end of this chapter you'll have a lit, interactive 3D sphere that you can orbit with the mouse:
+
+::shader{src="sphere-orbit" layout="tabbed"}
+
+We start with the simplest case: one sphere, one light, analytical intersection. This establishes the machinery — rays, hits, shading, camera control — that carries through the rest of the 3D rendering chapters.
+
+
+## Cameras and Rays
+
+Light travels from sources, bounces off surfaces, and some of it reaches a camera. Simulating this forward process is expensive — most light never hits the camera. So we reverse it: cast rays *from* the camera into the scene, and ask what each ray hits.
+
+We use the simplest camera model: a **pinhole camera**, where all light enters through a single point. Every ray passes through the same origin (the camera position); only the direction varies from pixel to pixel.
+
+Our camera sits at the origin, looking down the negative $z$-axis. We use the standard graphics convention: $y$ points up, $x$ points right, $z$ points toward the camera. Right-handed coordinates.
+
+
+### Rays
+
+A **ray** is a half-line:
+$$\mathbf{r}(t) = \mathbf{o} + t\mathbf{d}$$
+where $\mathbf{o}$ is the origin, $\mathbf{d}$ is a unit direction vector, and $t \geq 0$. We bundle these into a struct:
+
+```glsl
+struct Ray {
+    vec3 origin;
+    vec3 dir;
+};
+```
+
+
+### Field of View
+
+The **field of view** (FOV) controls how wide the camera sees. Imagine an image plane at distance $f$ in front of the camera, spanning $[-1, 1]$ in both $x$ and $y$. Each pixel maps to a point on this plane; the ray direction is the vector from the camera through that point.
+
+A ray to the top edge reaches $(0, 1, -f)$, forming a right triangle with opposite side 1 and adjacent side $f$. If $\theta$ is half the FOV, then $\tan\theta = 1/f$, so:
+$$f = \frac{1}{\tan(\text{FOV}/2)}$$
+
+Wide FOV means the image plane is close and rays spread sharply. Narrow FOV means rays stay nearly parallel — a telephoto lens.
+
+
+### Generating Rays
+
+For a pixel at `fragCoord`, we normalize to $[-1,1]^2$, correct the aspect ratio, and form the direction toward the image plane:
+
+```glsl
+Ray makeRay(vec2 fragCoord) {
+    vec2 uv = (fragCoord / iResolution.xy) * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+
+    float fov = 90.0;
+    float f = 1.0 / tan(radians(fov) / 2.0);
+
+    Ray ray;
+    ray.origin = vec3(0.0);
+    ray.dir = normalize(vec3(uv, -f));
+    return ray;
+}
+```
+
+The $z$-component is $-f$ because we look down the negative $z$-axis.
+
+
+### Visualizing Rays
+
+We can verify the setup by coloring pixels according to their ray direction:
+
+::shader{src="ray-visualization" layout="tabbed"}
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = makeRay(fragCoord);
+    vec3 color = ray.dir * 0.5 + 0.5;
+    fragColor = vec4(color, 1.0);
+}
+```
+
+The center is bluish (ray pointing into $-z$); edges shift toward red and green (larger $x$ and $y$ components). The gradient confirms our rays fan out correctly from the camera.
+
+
+## Intersection
+
+We have rays. Now we find where they hit things.
+
+
+### The Sphere
+
+We define our scene object as a struct bundling geometry and appearance:
+
+```glsl
+struct Sphere {
+    vec3 center;
+    float radius;
+    vec3 color;
+};
+```
+
+Even with just one object, this establishes the pattern we'll use throughout: shapes carry their own data, including an intrinsic color. Think of this color as the object's **albedo** — its inherent reflectance, independent of lighting. A red sphere is red whether it's in bright light or shadow; the albedo is a property of the material, not the illumination.
+
+
+### Ray-Sphere Intersection
+
+A sphere of radius $r$ centered at $\mathbf{c}$ is the set of points with $|\mathbf{p} - \mathbf{c}|^2 = r^2$. Substituting the ray equation $\mathbf{p} = \mathbf{o} + t\mathbf{d}$:
+
+$$|\mathbf{o} + t\mathbf{d} - \mathbf{c}|^2 = r^2$$
+
+Let $\boldsymbol{\delta} = \mathbf{o} - \mathbf{c}$. Expanding and using $|\mathbf{d}|^2 = 1$:
+
+$$t^2 + 2(\boldsymbol{\delta} \cdot \mathbf{d})t + (|\boldsymbol{\delta}|^2 - r^2) = 0$$
+
+A quadratic in $t$. The discriminant tells us: no real roots means the ray misses; two roots means it enters and exits. We want the smallest positive $t$ — the first intersection in front of the camera.
+
+```glsl
+float intersect(Ray ray, Sphere s) {
+    vec3 delta = ray.origin - s.center;
+
+    float b = dot(delta, ray.dir);
+    float c = dot(delta, delta) - s.radius * s.radius;
+    float discriminant = b * b - c;
+
+    if (discriminant < 0.0) return -1.0;
+
+    float sqrtDisc = sqrt(discriminant);
+    float t1 = -b - sqrtDisc;
+    float t2 = -b + sqrtDisc;
+
+    if (t1 > 0.0) return t1;
+    if (t2 > 0.0) return t2;
+    return -1.0;
+}
+```
+
+We return $-1$ as a sentinel for "no hit" — any negative value works since valid intersections have $t > 0$.
+
+
+### First Render
+
+Let's test it:
+
+::shader{src="sphere-flat" layout="tabbed"}
+
+```glsl
+Sphere sphere = Sphere(vec3(0.0, 0.0, -3.0), 1.0, vec3(1.0, 0.0, 0.0));
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = makeRay(fragCoord);
+
+    float t = intersect(ray, sphere);
+
+    vec3 color = vec3(0.1, 0.1, 0.2);
+    if (t > 0.0) color = sphere.color;
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+A red disk. We found the sphere and used its color, but it looks flat — every hit pixel gets the same shade. To see the curvature, we need to vary the color across the surface. That requires knowing the surface orientation.
+
+
+## Surface Normals
+
+The **surface normal** is the unit vector perpendicular to the surface. For a sphere, it points radially outward from the center:
+
+$$\mathbf{n} = \frac{\mathbf{p} - \mathbf{c}}{r}$$
+
+where $\mathbf{p}$ is the hit point. The normal is the fundamental geometric quantity at a surface point — it tells us which way the surface faces. Everything in shading depends on it.
+
+Computing the normal at a hit point:
+
+```glsl
+vec3 hitPoint = ray.origin + t * ray.dir;
+vec3 normal = (hitPoint - sphere.center) / sphere.radius;
+```
+
+Now we need to turn this geometric data into color. That's the job of a **shading function**.
+
+
+## Shading
+
+We've found a surface and computed its normal. Now we need to assign colors to pixels — turning geometric data into a visible image. This is **shading**.
+
+Later chapters will develop physically-based lighting from the rendering equation. For now, we need something simpler: visualization tools that let us *see* our geometry. We'll build three shading functions, each revealing different information about the surface. These are utilities — quick ways to make geometry readable — not physical light simulation.
+
+
+### Normal Shading
+
+The most direct visualization: map the normal vector to a color. Normal components live in $[-1, 1]$; RGB values live in $[0, 1]$. The standard conversion:
+
+```glsl
+vec3 shadeNormal(vec3 normal) {
+    return normal * 0.5 + 0.5;
+}
+```
+
+::shader{src="sphere-normals" layout="tabbed"}
+
+```glsl
+if (t > 0.0) {
+    vec3 hitPoint = ray.origin + t * ray.dir;
+    vec3 normal = (hitPoint - sphere.center) / sphere.radius;
+    color = shadeNormal(normal);
+}
+```
+
+Red on the right ($+x$), green on top ($+y$), blue facing us ($+z$). The sphere is revealing its geometry through the normal vectors. Normal shading ignores the object's color entirely — it's purely diagnostic. You'll use it constantly for debugging: if normals look wrong, nothing downstream will look right.
+
+
+### Depth Shading
+
+Color by distance from the camera. Nearby surfaces are bright; distant surfaces fade to black:
+
+```glsl
+vec3 shadeDepth(float t) {
+    float brightness = 1.0 - clamp(t / 10.0, 0.0, 1.0);
+    return vec3(brightness);
+}
+```
+
+::shader{src="sphere-depth" layout="tabbed"}
+
+The divisor (10.0) sets the range — surfaces farther than 10 units fade to black. Adjust this to match your scene's scale. Like normal shading, this ignores the object's color. It's useful for verifying intersection distances and understanding the spatial layout of a scene.
+
+
+### Diffuse Shading
+
+Normal shading shows orientation; depth shading shows distance. Neither looks like a 3D object under illumination. For that, we need brightness to depend on which way the surface faces relative to some fixed direction.
+
+Pick a direction — say, `normalize(vec3(1.0, 1.0, 1.0))`, from the upper right. Surfaces facing toward this direction should be bright; surfaces facing away should be dark. The dot product measures exactly this:
+
+$$\text{brightness} = \max(0, \; \mathbf{n} \cdot \mathbf{l})$$
+
+The $\max$ prevents negative values for surfaces facing away. Multiply by the object's albedo to get a colored result:
+
+```glsl
+vec3 shadeDiffuse(vec3 normal, vec3 albedo) {
+    vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+    float brightness = max(0.0, dot(normal, lightDir));
+    return albedo * (0.15 + 0.85 * brightness);
+}
+```
+
+The `0.15` floor prevents surfaces facing away from going completely black — a crude stand-in for light arriving from directions we're ignoring. The `0.85` scales the lit contribution so the total doesn't exceed 1.0.
+
+::shader{src="sphere-lit" layout="tabbed"}
+
+```glsl
+Sphere sphere = Sphere(vec3(0.0, 0.0, -3.0), 1.0, vec3(1.0, 0.0, 0.0));
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = makeRay(fragCoord);
+
+    float t = intersect(ray, sphere);
+
+    vec3 color = vec3(0.1, 0.1, 0.2);  // background
+    if (t > 0.0) {
+        vec3 hitPoint = ray.origin + t * ray.dir;
+        vec3 normal = (hitPoint - sphere.center) / sphere.radius;
+        color = shadeDiffuse(normal, sphere.color);
+    }
+
+    fragColor = vec4(color, 1.0);
+}
+```
+
+The sphere looks 3D: bright where it faces the "light" direction, dark on the opposite side. Same contract as the other two shading functions — pass in hit data, get back a final color.
+
+Why does the dot product give a convincing 3D look? There's real physics behind it — the dot product is the cosine of the angle between the surface and the light beam, which determines how much energy the surface intercepts. We'll derive this properly in the **Lighting** chapter from the rendering equation. For now, it's a one-line function that makes geometry look solid, and that's enough.
+
+:::note
+## The Hardcoded Direction
+
+The light direction in `shadeDiffuse` is baked in — `normalize(vec3(1.0, 1.0, 1.0))`. This is a deliberate choice: for these early chapters, we don't want to manage light objects. We just want to see our geometry. In the Lighting chapter, this magic constant becomes a proper light source with direction, color, and physical justification.
+:::
+
+
+### Choosing a Shading Function
+
+All three functions are tools. Use whichever reveals what you need:
+
+- **`shadeNormal`** — debugging geometry, verifying normals point the right way
+- **`shadeDepth`** — checking intersection distances, understanding scene layout
+- **`shadeDiffuse`** — the default for "make it look 3D." Used throughout the next several chapters
+
+In the demos and exercises that follow, we'll mostly use `shadeDiffuse`. But keep the others handy — when something looks wrong, switching to normal or depth shading often reveals the problem immediately.
+
+
+## Camera Motion
+
+A static camera gets boring. Let's add mouse control to orbit around the scene.
+
+We map mouse position to rotation angles and transform the ray accordingly:
+
+```glsl
+mat3 rotateX(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(1, 0, 0, 0, c, -s, 0, s, c);
+}
+
+mat3 rotateY(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
+}
+
+Ray orbitRay(Ray ray, float distance) {
+    vec2 mouse = iMouse.xy / iResolution.xy;
+    float angleY = (mouse.x - 0.5) * 6.28;
+    float angleX = (0.5 - mouse.y) * 3.14;
+
+    mat3 rot = rotateX(angleX) * rotateY(angleY);
+    ray.origin = rot * vec3(0.0, 0.0, distance);
+    ray.dir = rot * ray.dir;
+    return ray;
+}
+```
+
+The camera position rotates around the origin at the given distance; the ray direction rotates to match. Usage:
+
+```glsl
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    Ray ray = makeRay(fragCoord);
+    ray = orbitRay(ray, 5.0);
+
+    // ... intersection and shading
+}
+```
+
+::shader{src="sphere-orbit" layout="tabbed"}
+
+Drag to orbit. The sphere stays at the origin; the camera circles it. This is our complete first raytracer: one sphere, diffuse shading, full mouse control.
+
+
+## The Limits of Analytical Intersection
+
+The sphere gave us a quadratic — easy to solve. But what about other shapes?
+
+### The Torus Problem
+
+A torus is a circle revolved around an axis. It has two radii: the **major radius** $R$ (center of torus to center of tube) and the **minor radius** $r$ (radius of the tube). The implicit equation for a torus centered at the origin with axis along $y$:
+
+$$\left(\sqrt{x^2 + z^2} - R\right)^2 + y^2 = r^2$$
+
+Substituting the ray equation and eliminating the square root (by squaring twice) yields a **quartic** in $t$:
+
+$$a_4 t^4 + a_3 t^3 + a_2 t^2 + a_1 t + a_0 = 0$$
+
+Unlike quadratics, there's no formula you'd want to memorize. Solving a quartic requires either the [quartic formula](https://en.wikipedia.org/wiki/Quartic_function#General_formula_for_roots) (unwieldy), numerical methods (iterative), or careful algebraic manipulation.
+
+Inigo Quilez, the creator of Shadertoy, worked out an analytical solution. Here's what it looks like:
+
+::shader{src="torus-analytical" layout="tabbed"}
+
+The torus renders correctly — drag to orbit and admire the donut. But look at the code in the full shader: **80 lines** of intricate algebra to solve one quartic.
+
+Compare to 15 lines for the sphere. And the torus is a *special case* where someone worked it out. Most surfaces don't admit closed-form ray intersections at all.
+
+:::note
+## What About Meshes?
+
+Production renderers typically approximate surfaces with **triangle meshes** — thousands of tiny triangles. Ray-triangle intersection is simple (a linear system), and spatial data structures make it fast.
+
+But meshes require vertex data, connectivity, and substantial infrastructure. For mathematical visualization — where we define shapes with equations — there's a more direct path.
+:::
+
+
+## Exercises
+
+### Checkpoints
+
+Quick exercises to verify understanding. A few minutes each.
+
+**Checkpoint 1: Field of View**
+
+The FOV is set to 90°. Try changing it:
+- 60° (telephoto) — what happens to the sphere's apparent size?
+- 120° (wide angle) — what distortion do you notice at the edges?
+
+**Checkpoint 2: Move the Sphere**
+
+The sphere is at `vec3(0.0, 0.0, -3.0)`. Move it:
+- To the left: `vec3(-1.0, 0.0, -3.0)`
+- Closer: `vec3(0.0, 0.0, -2.0)` — how does it change?
+- Behind the camera: `vec3(0.0, 0.0, 1.0)` — what happens?
+
+**Checkpoint 3: Shading Comparison**
+
+Render the sphere with each shading function:
+- `shadeNormal(normal)` — which directions map to which colors?
+- `shadeDepth(t)` — how does the brightness vary across the sphere?
+- `shadeDiffuse(normal, sphere.color)` — where is the bright spot?
+
+Change the light direction in `shadeDiffuse` to `normalize(vec3(-1.0, 0.0, 0.0))`. Where does the bright region move?
+
+**Checkpoint 4: Normal Variations**
+
+Try these variations on normal shading:
+- `abs(normal)` — what's different from `normal * 0.5 + 0.5`?
+- `vec3(normal.y * 0.5 + 0.5)` — what does this show?
+- `vec3(dot(normal, vec3(0,1,0)) * 0.5 + 0.5)` — height-based shading
+
+
+### Explorations
+
+Deeper exercises that build on the core concepts.
+
+**Exploration 1: Two Spheres**
+
+Add a second sphere to the scene. You'll need to:
+1. Create another `Sphere` variable
+2. Test intersection with both
+3. Keep track of which hit is closer (smaller positive `t`)
+4. Use the closer sphere's color in `shadeDiffuse`
+
+**Exploration 2: Animate Position**
+
+Make the sphere move. Use `iTime` to vary the position:
+
+```glsl
+float y = sin(iTime);
+Sphere sphere = Sphere(vec3(0.0, y, -3.0), 1.0, vec3(1.0, 0.0, 0.0));
+```
+
+Try:
+- Circular motion: `vec3(cos(iTime), 0.0, sin(iTime) - 3.0)`
+- Bouncing with `abs(sin(iTime))`
+
+**Exploration 3: Ray-Plane Intersection**
+
+Add a ground plane at $y = -1$. A plane at height $h$ satisfies $y = h$. Substituting the ray equation $y = o_y + t \cdot d_y$:
+
+$$t = \frac{h - o_y}{d_y}$$
+
+Implement this and shade the ground with `shadeDiffuse` using a gray color. Watch for division by zero when $d_y = 0$ (ray parallel to plane).
+
+
+### Challenges
+
+Substantial projects requiring creative problem-solving.
+
+**Challenge 1: Solar System**
+
+Create a mini solar system:
+- A yellow sphere at the origin (the sun)
+- A smaller sphere orbiting the sun using `iTime`
+- A tiny sphere orbiting that one (a moon)
+
+Use trigonometry for circular orbits: position at `(R * cos(speed * iTime), 0, R * sin(speed * iTime))`.
+
+**Challenge 2: Reflection**
+
+When the ray hits a surface, compute the reflection direction:
+
+```glsl
+vec3 reflectDir = reflect(ray.dir, normal);
+```
+
+Trace a second ray from the hit point in this direction. If it hits another sphere, blend that color into the result. This is the first step toward recursive raytracing.
+
+Start simple: use `shadeNormal` on the reflected ray's direction to verify it's correct, then add intersection.
+
+**Challenge 3: Custom Shading**
+
+Write your own shading function. Some ideas:
+- **Fresnel shading**: surfaces facing the camera are dark, edges are bright — `pow(1.0 - dot(normal, -ray.dir), 3.0)`
+- **Toon shading**: quantize the dot product into 3-4 discrete bands using `floor`
+- **Matcap**: use the normal's $xy$ components as texture coordinates into a 2D lookup (use a procedural pattern if you don't have textures)
+
+
+## What's Next
+
+We need a different approach. Instead of asking "where exactly does this ray hit the surface?" and solving polynomial equations, what if we asked an easier question?
+
+The next chapter introduces **signed distance functions** and **raymarching** — a technique that trades exact intersection for dramatic flexibility. If you can write a function that measures distance to a surface, you can render it. The 80-line torus becomes 4 lines. And shapes that have no closed-form intersection at all become just as easy as spheres.

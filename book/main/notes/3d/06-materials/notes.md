@@ -1,0 +1,1013 @@
+# Materials
+
+## Overview
+
+The Lighting & Shadows chapter built a complete rendering pipeline as a sequence of approximations to the rendering equation:
+
+$$\operatorname{Light}(\mathbf{p}, \omega_o) = \int_{\Omega_\mathbf{p}} f(\mathbf{p}, \omega_i, \omega_o) \;\; \operatorname{Incoming}(\mathbf{p}, \omega_i) \;\; d\omega_i^\perp$$
+
+We simplified $\operatorname{Incoming}$ (delta functions for directional lights, a constant for ambient light), added visibility for shadows and ambient occlusion, and handled multiple lights by superposition. But we made one aggressive simplification that we never revisited: we set the **BRDF** — the bidirectional reflectance distribution function $f$ — to a constant.
+
+The BRDF is the kernel of this integral. It takes two directions on the hemisphere above a surface point — one incoming, one outgoing — and returns a number encoding how much light from the incoming direction gets scattered toward the outgoing direction. Different choices of $f$ produce different material appearances: matte, glossy, metallic, mirror-like.
+
+We set $f = \rho/\pi$ throughout the Lighting chapter. This is the **Lambertian** BRDF: light scatters uniformly across the hemisphere regardless of viewing direction. The only thing distinguishing one surface from another was the albedo $\rho$ — a color. The world looked like it was made of chalk.
+
+This chapter opens up $f$. We replace the constant kernel with functions that concentrate reflected energy in particular directions, producing highlights that shift with the viewer, surfaces that behave as mirrors, and materials that look metallic rather than matte. Each new BRDF is a different choice of kernel in the same integral — the infrastructure from the previous chapter carries over unchanged. Only $f$ changes.
+
+The mathematical trajectory: we start from the two constraints every BRDF must satisfy (reciprocity and energy conservation), then explore the space of valid kernels. The constant kernel and the delta kernel are the two extremes. Convex combinations give partial reflectivity. A smooth family of lobes interpolates between the extremes, producing specular highlights whose size encodes surface roughness. Finally, the physics of light at an interface — Fresnel reflectance — tells us what the mixing weights *should* be, replacing ad hoc parameters with derived ones, and splitting materials into two fundamentally different classes: metals and dielectrics.
+
+By the end, the `Material` struct will have grown from a bare `vec3` albedo to a full description encoding roughness, metallic character, and surface coatings — each field motivated by a specific term in the BRDF.
+
+This is what we are building toward: nine spheres, each with different material properties, all rendered by the same integral — only the BRDF $f$ changes. This chapter is about how different material properties are encoded in the rendering equation.
+
+::shader{src="materials-complete" layout="tabbed"}
+
+
+---
+
+
+## The Reflectance Kernel
+
+### The BRDF as an integral kernel
+
+Fix a surface point $\mathbf{p}$ with unit normal $\mathbf{n}$. The upper hemisphere at $\mathbf{p}$ is
+
+$$\Omega_\mathbf{p} = \{\, \omega \in T_\mathbf{p}S : |\omega| = 1, \; \omega \cdot \mathbf{n} > 0 \,\}$$
+
+The BRDF takes two directions on this hemisphere — one incoming ($\omega_i$), one outgoing ($\omega_o$, toward the camera) — and returns a non-negative real number:
+
+$$f(\omega_i, \omega_o) : \Omega_\mathbf{p} \times \Omega_\mathbf{p} \to [0, \infty)$$
+
+(We suppress the dependence on $\mathbf{p}$ when the point is clear from context.) In the rendering equation, $f$ plays the role of an integral kernel: $\operatorname{Incoming}$ is the input, $\operatorname{Light}$ is the output, and $f$ is the operator that transforms one into the other.
+
+To understand the units of $f$, we need to look at what is being integrated and against which measure. The rendering equation as we stated it in the Lighting chapter uses the **projected solid angle** measure $d\omega^\perp$:
+
+$$\operatorname{Light}(\mathbf{p}, \omega_o) = \int_{\Omega} f(\omega_i, \omega_o) \;\; \operatorname{Incoming}(\omega_i) \;\; d\omega_i^\perp$$
+
+Recall from the Lighting chapter that $d\omega^\perp$ is the area form on the hemisphere projected onto the tangent plane. It relates to the standard solid angle measure $d\omega$ on the hemisphere by a cosine factor:
+
+$$d\omega_i^\perp = (\omega_i \cdot \mathbf{n}) \; d\omega_i$$
+
+so the rendering equation can also be written:
+
+$$\operatorname{Light}(\mathbf{p}, \omega_o) = \int_{\Omega} f(\omega_i, \omega_o) \;\; \operatorname{Incoming}(\omega_i) \;\; (\omega_i \cdot \mathbf{n}) \;\; d\omega_i$$
+
+Both forms are the same integral — they differ only in whether the cosine is written explicitly or absorbed into the measure. We will use whichever is clearer in context. But it is important to track which measure is in play, because it affects how we write delta functions and how we check energy conservation.
+
+The incoming radiance $\operatorname{Incoming}$ has units of $\text{W}\,\text{m}^{-2}\,\text{sr}^{-1}$. The outgoing radiance $\operatorname{Light}$ has the same units. The measure $d\omega_i$ has units of steradians. For the integral to produce the right units, $f$ must carry $\text{sr}^{-1}$. In the projected-measure form, $d\omega_i^\perp$ also has units of steradians (it is still a measure on directions), so the same conclusion holds: $f$ is a density with respect to solid angle.
+
+
+### Two constraints
+
+Not every function $\Omega \times \Omega \to [0, \infty)$ is a physically valid BRDF. There are two constraints, both with clear geometric meaning.
+
+**Reciprocity.** Helmholtz's reciprocity principle states that light paths are reversible:
+
+$$f(\omega_i, \omega_o) = f(\omega_o, \omega_i)$$
+
+The kernel is symmetric in its arguments. If you swap the roles of source and camera — shine the light from where the camera was, put the camera where the light was — you measure the same reflectance. This is a consequence of time-reversal symmetry in the underlying wave optics. (Not every BRDF model in the literature satisfies reciprocity. The ones we write down all will.)
+
+**Energy conservation.** A surface cannot reflect more light than it receives. For any incoming direction $\omega_i$, the total fraction of energy scattered across the outgoing hemisphere cannot exceed 1:
+
+$$\int_{\Omega} f(\omega_i, \omega_o) \; d\omega_o^\perp \leq 1 \qquad \text{for all } \omega_i$$
+
+The left side is the **directional-hemispherical reflectance** — the fraction of energy arriving from $\omega_i$ that leaves the surface in any direction. A value of 1 means all energy is reflected. A value less than 1 means some is absorbed.
+
+Note the measure: this integral is over the *outgoing* hemisphere, against $d\omega_o^\perp$. The projected measure is the correct one here because it weights outgoing directions by the cosine factor that governs how much power they carry per unit surface area. Expanding the measure:
+
+$$\int_{\Omega} f(\omega_i, \omega_o) \; (\omega_o \cdot \mathbf{n}) \; d\omega_o \leq 1$$
+
+For the Lambertian kernel $f = \rho/\pi$, we verified this in the Lighting chapter: the integral evaluates to $\rho$, and $\rho \in [0, 1]$ by assumption. Every BRDF we introduce will need to pass the same check.
+
+Together, reciprocity and energy conservation are the axioms. Everything that follows is a choice of kernel satisfying these two conditions — different choices giving different visual character to the surface.
+
+
+### What the choice of kernel controls
+
+The kernel $f$ determines how incoming energy is redistributed across outgoing directions. Different kernels redistribute this energy differently:
+
+- A **constant** kernel ($f = \rho/\pi$) spreads energy uniformly — every outgoing direction gets the same share. No view dependence. This is the Lambertian model: chalk, matte paint, unfinished wood.
+
+- A kernel **concentrated near the mirror direction** sends most energy into a narrow cone around the reflection of $\omega_i$. The surface appears shiny — highlights appear where the mirror direction aligns with the camera.
+
+- A **delta function** kernel sends all energy into exactly one direction: the mirror reflection. This is a perfect mirror. The integral collapses to a point evaluation.
+
+We will work through these in order: the constant kernel we already have, then the delta, then convex combinations, then a smooth family interpolating between the extremes. Each choice of $f$ gives us a different `shade` function. The rest of the pipeline — `sdScene`, `getMaterial`, shadows, ambient occlusion — does not change.
+
+
+---
+
+
+## Perfect Mirror
+
+The Lambertian kernel spreads energy uniformly across the hemisphere. The opposite extreme: concentrate all the energy in a single direction.
+
+
+### What if $f$ is a delta function?
+
+Suppose that for a given outgoing direction $\omega_o$, the BRDF $f(\omega_i, \omega_o)$ is zero for every incoming direction except one — call it $\omega^\star$. Then the rendering integral collapses. The hemisphere sum reduces to a point evaluation: the only light you see from that surface point is whatever arrives from direction $\omega^\star$. Every other incoming ray is multiplied by zero.
+
+This is a reflection. The surface takes all the light arriving from $\omega^\star$ and redirects it toward $\omega_o$. If $\omega^\star$ depends on $\omega_o$ in the right way — different viewing angles see different incoming directions — you get a mirror.
+
+Which direction should $\omega^\star$ be?
+
+
+### Fermat's principle
+
+In the real world, light takes the path of least time between two points (Fermat's principle). In a uniform medium the speed of light is constant, so least time is least distance. For light bouncing off a flat surface, this means: of all the paths from a source $A$ to the surface to a destination $B$, the shortest one is the path where the **angle of incidence equals the angle of reflection**.
+
+This is easy to see geometrically. Reflect $B$ through the surface to get $B'$. Any path $A \to P \to B$ that bounces at point $P$ on the surface has the same length as $A \to P \to B'$, since $P \to B$ and $P \to B'$ have the same length by symmetry. The shortest such path is the straight line $A \to P^\star \to B'$, which requires $P^\star$ to lie on the line segment $AB'$. At $P^\star$, the angle of incidence equals the angle of reflection — because $B$ and $B'$ are symmetric about the surface.
+
+The argument extends to curved surfaces by taking the tangent plane at the bounce point. So the direction that $f$ should concentrate on is determined: given outgoing direction $\omega_o$ and surface normal $\mathbf{n}$, the unique incoming direction that satisfies Fermat's condition is the **reflection** of $\omega_o$ about $\mathbf{n}$.
+
+
+### The reflection map
+
+Given a unit vector $\omega$ and a surface normal $\mathbf{n}$, decompose $\omega$ into components along and perpendicular to $\mathbf{n}$:
+
+$$\omega = (\omega \cdot \mathbf{n})\,\mathbf{n} + \omega_\perp$$
+
+The **reflection** $R(\omega)$ negates the tangential component and preserves the normal component:
+
+$$R(\omega) = 2(\omega \cdot \mathbf{n})\,\mathbf{n} - \omega$$
+
+This map has two properties we will use repeatedly. First, it is an **involution**: $R(R(\omega)) = \omega$. Reflecting twice returns to the original direction. Second, it **preserves the normal component**: $R(\omega) \cdot \mathbf{n} = \omega \cdot \mathbf{n}$, because $R$ negates only the tangential part. In particular, $R$ maps the hemisphere $\Omega$ to itself, and the cosine of the angle with the normal is unchanged.
+
+$R$ is also an isometry of the hemisphere — it preserves angles, and therefore preserves the solid angle measure: if $A \subset \Omega$ is a measurable set, then $R(A)$ has the same solid angle as $A$. Since it also preserves cosines, it preserves the projected solid angle measure as well.
+
+GLSL provides this as a built-in. Note the sign convention: `reflect(-wo, n)` gives the mirror direction for an outgoing ray, because GLSL's `reflect` expects the incident vector pointing *toward* the surface:
+
+```glsl
+vec3 reflDir = reflect(-viewDir, normal);
+```
+
+
+### The delta kernel
+
+We said $f$ should concentrate all its weight at $\omega_i = R(\omega_o)$. Now we write this formally.
+
+The physical requirement is that the outgoing radiance equals the incoming radiance from the mirror direction, for any incoming light field:
+
+$$\operatorname{Light}(\mathbf{p}, \omega_o) = \operatorname{Incoming}(\mathbf{p}, R(\omega_o))$$
+
+We need to find $f$ such that the rendering equation produces this. Writing the rendering equation with the solid angle measure explicit:
+
+$$\operatorname{Light}(\omega_o) = \int_{\Omega} f(\omega_i, \omega_o) \; \operatorname{Incoming}(\omega_i) \; (\omega_i \cdot \mathbf{n}) \; d\omega_i$$
+
+For this to equal $\operatorname{Incoming}(R(\omega_o))$ for *every* choice of $\operatorname{Incoming}$, the product $f(\omega_i, \omega_o) \, (\omega_i \cdot \mathbf{n})$ must act as a delta distribution concentrated at $\omega_i = R(\omega_o)$. That is:
+
+$$f(\omega_i, \omega_o) \; (\omega_i \cdot \mathbf{n}) = \delta(\omega_i - R(\omega_o))$$
+
+Here $\delta$ is the Dirac delta on the sphere, defined with respect to the solid angle measure $d\omega$: it satisfies $\int_\Omega g(\omega) \, \delta(\omega - \mathbf{v}) \, d\omega = g(\mathbf{v})$ for any continuous $g$. We will always write our deltas with respect to this measure unless stated otherwise.
+
+Solving for $f$:
+
+$$f(\omega_i, \omega_o) = \frac{\delta(\omega_i - R(\omega_o))}{\omega_i \cdot \mathbf{n}}$$
+
+The factor $1/(\omega_i \cdot \mathbf{n})$ is forced by the rendering equation: it cancels the cosine that the rendering equation multiplies into the integrand, so that the integral sifts out $\operatorname{Incoming}(R(\omega_o))$ cleanly — without an extra cosine weighting. If this factor were absent, a mirror would darken at oblique angles: light arriving at a glance would contribute less than it should, because the cosine $\omega_i \cdot \mathbf{n}$ would attenuate it.
+
+Physically, this makes sense. For every smooth BRDF in this chapter, the cosine weighting is physical — light arriving at a glancing angle really does deliver less energy per unit surface area, and the material scatters only a fraction of what arrives. But a mirror redirects the *entire beam*. It does not scatter a cosine-weighted fraction; it redirects all arriving light into one direction. Its BRDF must undo the geometric projection that the rendering equation builds in.
+
+
+### Checking the axioms
+
+**Reciprocity.** We need $f(\omega_i, \omega_o) = f(\omega_o, \omega_i)$. Write out both sides:
+
+$$f(\omega_i, \omega_o) = \frac{\delta(\omega_i - R(\omega_o))}{\omega_i \cdot \mathbf{n}}, \qquad f(\omega_o, \omega_i) = \frac{\delta(\omega_o - R(\omega_i))}{\omega_o \cdot \mathbf{n}}$$
+
+Both distributions are supported on the same set: $\omega_i = R(\omega_o)$ is the same constraint as $\omega_o = R(\omega_i)$, because $R$ is an involution. So the two deltas encode the same condition. To verify they agree as distributions, integrate each side against a test function $g(\omega_i)$ with $\omega_o$ fixed:
+
+$$\text{Left:} \quad \int_\Omega \frac{\delta(\omega_i - R(\omega_o))}{\omega_i \cdot \mathbf{n}} \, g(\omega_i) \, d\omega_i = \frac{g(R(\omega_o))}{R(\omega_o) \cdot \mathbf{n}}$$
+
+$$\text{Right:} \quad \int_\Omega \frac{\delta(\omega_o - R(\omega_i))}{\omega_o \cdot \mathbf{n}} \, g(\omega_i) \, d\omega_i = \frac{g(R(\omega_o))}{\omega_o \cdot \mathbf{n}}$$
+
+The right integral sifts out the unique $\omega_i$ satisfying $\omega_o = R(\omega_i)$, which is $\omega_i = R(\omega_o)$. And $R(\omega_o) \cdot \mathbf{n} = \omega_o \cdot \mathbf{n}$ because $R$ preserves the normal component. The two results are equal. ✓
+
+**Energy conservation.** Integrate over outgoing directions against the projected measure:
+
+$$\int_\Omega f(\omega_i, \omega_o) \; d\omega_o^\perp = \int_\Omega \frac{\delta(\omega_o - R(\omega_i))}{\omega_i \cdot \mathbf{n}} \; (\omega_o \cdot \mathbf{n}) \; d\omega_o$$
+
+Here we used reciprocity to write the delta as $\delta(\omega_o - R(\omega_i))$, and expanded $d\omega_o^\perp = (\omega_o \cdot \mathbf{n})\,d\omega_o$. The delta sifts out $\omega_o = R(\omega_i)$, where $\omega_o \cdot \mathbf{n} = R(\omega_i) \cdot \mathbf{n} = \omega_i \cdot \mathbf{n}$. The cosines cancel:
+
+$$= \frac{\omega_i \cdot \mathbf{n}}{\omega_i \cdot \mathbf{n}} = 1$$
+
+All incoming energy is reflected — none absorbed. A perfect mirror conserves energy exactly. ✓
+
+
+:::note
+## The delta function and the two measures
+
+We defined $\delta$ with respect to the solid angle measure $d\omega$. We could instead work with a delta defined against the *projected* solid angle measure $d\omega^\perp$ — call it $\delta^\perp$, satisfying $\int g \, \delta^\perp(\mathbf{v}) \, d\omega^\perp = g(\mathbf{v})$. The two are related by the Radon–Nikodym derivative of $d\omega$ with respect to $d\omega^\perp$:
+
+$$\delta(\omega - \mathbf{v}) = (\omega \cdot \mathbf{n}) \; \delta^\perp(\omega - \mathbf{v})$$
+
+Using this, the mirror BRDF becomes $f = \delta^\perp(\omega_i - R(\omega_o)) / (\omega_i \cdot \mathbf{n})^2$. This is the same distribution expressed in different coordinates. The solid angle form is more natural here because it makes the cosine cancellation explicit: the single $1/\cos$ in $f$ cancels the single $\cos$ in the rendering equation, and both the substitution and the energy conservation check work out cleanly.
+:::
+
+
+### One bounce
+
+Computing $\operatorname{Incoming}(\mathbf{p}, R(\omega_o))$ means marching a ray from $\mathbf{p}$ in direction $R(\omega_o)$ and evaluating the lighting at whatever surface it hits. This is the same operation as the primary ray — find a surface point, compute its normal and material, shade it — just starting from a different origin and direction.
+
+For now, we shade the reflected hit with diffuse lighting only — the same `shadeDiffuse` from the Lighting chapter. This is a single bounce: the mirror sees other objects, but those objects appear matte in the reflection.
+
+```glsl
+vec3 shadeMirror(vec3 p, vec3 n, vec3 viewDir, DirLight key, DirLight fill) {
+    vec3 reflDir = reflect(-viewDir, n);
+
+    Ray reflRay = Ray(p + n * 0.02, reflDir);
+    float t = raymarch(reflRay);
+
+    if (t > 0.0) {
+        vec3 rp = reflRay.origin + t * reflRay.dir;
+        vec3 rn = calcNormal(rp);
+        vec3 rmat = getMaterial(rp);
+
+        return shadeDiffuse(rp, rn, rmat, key, fill);
+    }
+
+    return vec3(0.5, 0.6, 0.7);  // sky color if nothing hit
+}
+```
+
+The offset `p + n * 0.02` prevents the reflected ray from immediately hitting the surface it started on — the same self-intersection issue as shadow rays.
+
+In `mainImage`, the mirror is hardcoded: one specific sphere gets `shadeMirror`, everything else gets `shadeDiffuse`. The `getMaterial` function still returns a `vec3` — there is no Material struct yet, and no way for a surface to be "partially" reflective. The next section introduces both.
+
+::shader{src="mirror" layout="tabbed"}
+
+The mirror sphere reflects the other objects in the scene. Move the camera and the reflections shift — this is the first time the rendered image depends on $\omega_o$, the viewing direction. Every surface until now looked the same from every angle.
+
+
+---
+
+
+## Mixing Kernels
+
+We now have two BRDF kernels: the constant $\rho/\pi$ (Lambertian) and the delta (perfect mirror). These are extreme points — one spreads energy uniformly, the other concentrates it into a single direction. Most real surfaces lie somewhere between these extremes: polished stone, lacquered wood, glazed ceramic all have a material color *and* visible reflections. We need a way to interpolate.
+
+
+### BRDFs form a convex set
+
+A convex combination of valid BRDFs is itself a valid BRDF. The proof is immediate from the axioms.
+
+Let $f_1$ and $f_2$ be BRDFs satisfying reciprocity and energy conservation, and let $k \in [0, 1]$. Define $f = (1 - k)\,f_1 + k\,f_2$.
+
+**Reciprocity.** Both $f_1$ and $f_2$ are symmetric in $(\omega_i, \omega_o)$. A linear combination of symmetric functions is symmetric:
+
+$$f(\omega_i, \omega_o) = (1-k)\,f_1(\omega_i, \omega_o) + k\,f_2(\omega_i, \omega_o) = (1-k)\,f_1(\omega_o, \omega_i) + k\,f_2(\omega_o, \omega_i) = f(\omega_o, \omega_i)$$
+
+✓
+
+**Energy conservation.** The integral is linear, so the directional-hemispherical reflectance of $f$ is a convex combination of the reflectances of $f_1$ and $f_2$:
+
+$$\int_\Omega f \; d\omega_o^\perp = (1-k) \int_\Omega f_1 \; d\omega_o^\perp + k \int_\Omega f_2 \; d\omega_o^\perp \leq (1-k) \cdot 1 + k \cdot 1 = 1$$
+
+✓
+
+This means the set of valid BRDFs is convex: given any two valid kernels, the line segment between them consists entirely of valid kernels. We can mix materials freely, and the physics takes care of itself.
+
+
+### The mixed kernel
+
+Mixing our two extremes:
+
+$$f(\omega_i, \omega_o) = (1 - k)\,\frac{\rho}{\pi} + k\,\frac{\delta(\omega_i - R(\omega_o))}{\omega_i \cdot \mathbf{n}}$$
+
+At $k = 0$ this is pure Lambertian. At $k = 1$ it is a perfect mirror. In between, the surface has a matte base color with reflections blended on top.
+
+Substituting into the rendering equation, the integral splits by linearity into a Lambertian term and a mirror term — one we already solved in the Lighting chapter, one we solved in the previous section:
+
+$$\operatorname{Light}(\mathbf{p}, \omega_o) = (1-k) \cdot \operatorname{Light}_{\text{Lambertian}}(\mathbf{p}, \omega_o) \;+\; k \cdot \operatorname{Incoming}(\mathbf{p}, R(\omega_o))$$
+
+The energy conservation bound for this kernel is $(1-k)\rho + k$. Since $\rho \leq 1$, this is at most 1. At $k = 1$ (mirror) all energy is reflected. At $k = 0$ (Lambertian) the fraction $\rho$ is reflected and the rest absorbed.
+
+
+### The Material struct
+
+Until now, `getMaterial` returned a `vec3` — an albedo color, and nothing else. With two parameters per surface (albedo and reflectivity), we bundle them into a struct:
+
+```glsl
+struct Material {
+    vec3 albedo;
+    float reflectivity;   // 0 = matte, 1 = mirror
+};
+```
+
+The `getMaterial` function now returns a `Material`, and different surfaces can sit anywhere along the matte–mirror axis:
+
+```glsl
+Material getMaterial(vec3 p) {
+    float eps = 0.01;
+    if (length(p - S1) - R < eps)
+        return Material(vec3(0.80, 0.45, 0.30), 0.0);    // matte
+    if (length(p - S2) - R < eps)
+        return Material(vec3(0.50, 0.70, 0.50), 0.15);   // subtle sheen
+    if (length(p - S3) - R < eps)
+        return Material(vec3(0.40, 0.55, 0.75), 0.5);    // polished
+    if (length(p - S4) - R < eps)
+        return Material(vec3(0.90, 0.85, 0.75), 1.0);    // mirror
+    return Material(vec3(0.60, 0.60, 0.55), 0.0);
+}
+```
+
+
+### In code
+
+The Lambertian term is what `shadeDiffuse` already computes. The mirror term is `shadeMirror` — march a reflected ray, shade the hit with diffuse lighting. The mix is a `lerp`:
+
+```glsl
+vec3 shadeSurface(vec3 p, vec3 n, Material mat, vec3 viewDir,
+                  DirLight key, DirLight fill) {
+    vec3 diffuse = shadeDiffuse(p, n, mat.albedo, key, fill);
+    vec3 refl = shadeReflected(p, n, viewDir, key, fill);
+    return mix(diffuse, refl, mat.reflectivity);
+}
+```
+
+At `reflectivity = 0.0` the surface is pure matte — the reflection term is discarded entirely. At 0.15 you get a subtle sheen: the reflections are there but the material color dominates. At 0.5 the surface reads as polished. At 1.0 it is a perfect mirror and the albedo is irrelevant.
+
+The reflected hit is shaded with `shadeDiffuse` only — the same single-bounce limitation as the previous section. A reflected surface always appears matte in the reflection, regardless of its own reflectivity. We will lift this limitation later.
+
+::shader{src="partial-mirror" layout="tabbed"}
+
+
+### The problem with $k$
+
+The parameter $k$ — `reflectivity` in the struct — is a manual knob. We chose it per surface to look right: 0.15 for a subtle sheen, 0.5 for polished, 1.0 for a mirror. But the rendering equation has no free parameter for "how reflective." The fraction of light that reflects off a surface should be determined by something physical — the material itself, and the angle of incidence. We will find out what in the Interface Physics section, where Fresnel reflectance absorbs $k$ into a derived quantity. For now, $k$ is a placeholder that lets us see the visual effect of partial reflectivity before we know the physics behind it.
+
+
+---
+
+
+## Specular Highlights
+
+The mixed Lambertian-mirror model gives surfaces both color and reflections. But something is missing. Look at a polished ceramic mug or a lacquered table — you see bright highlights where the light source is, not a crisp mirror image of it. The surface is shiny but not a mirror. There is a visual phenomenon between matte and mirror that our two-kernel mix cannot produce.
+
+The issue is the delta function. A real surface is not perfectly smooth at the microscopic level — it has roughness that scatters reflected light into a *range* of directions around the mirror direction. The rougher the surface, the wider the scatter. A perfect mirror has zero roughness (the delta function); chalk has infinite roughness (the constant kernel). We want a smooth family of kernels parametrized by roughness, interpolating between these extremes.
+
+We cannot simply blur the reflected ray — that would mean sampling many directions per pixel, which is what a path tracer does. Instead, we model the *effect* of this blur: when we evaluate the rendering equation against a directional light (a delta function in $\operatorname{Incoming}$), a blurred kernel produces a bright spot whose size depends on the roughness. This bright spot is a **specular highlight**.
+
+
+### The Phong lobe
+
+Phong (1975) proposed a simple model: the specular BRDF is proportional to the cosine of the angle between the outgoing direction $\omega_o$ and the mirror reflection direction $R(\omega_i)$, raised to a power:
+
+$$f_{\text{spec}}(\omega_i, \omega_o) = C_s \; \max(0, \;\omega_o \cdot R(\omega_i))^n$$
+
+The parameter $n$ controls the **shininess** — the concentration of the lobe around the mirror direction. Think of this as a smooth approximation to the delta function. As $n \to \infty$, the function sharpens into a peak at $\omega_o = R(\omega_i)$, approaching the delta kernel. As $n \to 0$, the function flattens toward a constant, approaching Lambertian. The family interpolates continuously between our two extremes.
+
+Large $n$ concentrates the lobe tightly around the mirror direction — a small, bright highlight that reads as "polished." Small $n$ spreads the lobe wide — a large, dim highlight that reads as "waxy" or "rough."
+
+**Reciprocity.** Since $R$ is an involution, $\omega_o \cdot R(\omega_i) = \omega_i \cdot R(\omega_o)$. (If $\omega_o$ makes angle $\alpha$ with the mirror image of $\omega_i$, then $\omega_i$ makes the same angle $\alpha$ with the mirror image of $\omega_o$.) So $f_{\text{spec}}(\omega_i, \omega_o) = f_{\text{spec}}(\omega_o, \omega_i)$. ✓
+
+
+### Evaluating against a directional light
+
+When $\operatorname{Incoming}$ is a delta function from direction $\mathbf{l}$, the hemisphere integral collapses as usual. The specular contribution at a surface point is:
+
+$$\operatorname{Light}_{\text{spec}} = C_s \; \max(0, \;\omega_o \cdot R(\mathbf{l}))^n \; (\mathbf{n} \cdot \mathbf{l})$$
+
+In code — compute the reflection of the light direction, then take the dot product with the view direction:
+
+```glsl
+vec3 reflDir = reflect(-light.dir, n);
+float spec = pow(max(0.0, dot(viewDir, reflDir)), shininess);
+```
+
+The highlight appears where $\omega_o \approx R(\mathbf{l})$ — where the camera is near the mirror direction for the light. Move the camera, and the highlight slides across the surface. This is the first time a direct-lighting term depends on the viewing direction.
+
+
+### The lobe in polar coordinates
+
+Here is $\cos^n\theta$ plotted in polar coordinates for several values of $n$. At $n = 4$ the lobe is broad and dome-like — energy scatters over a wide range of directions. At $n = 256$ it is a tight spike, nearly all energy concentrated at the mirror direction.
+
+::shader{src="phong-lobe" layout="tabbed"}
+
+Notice that as the lobe narrows, its peak grows taller. This is not an accident — it is forced by energy conservation. The total reflected energy (proportional to the area under each curve) must remain bounded. Concentrating energy into a smaller solid angle means higher peak intensity. The normalization constant $C_s$ enforces this.
+
+
+### Normalizing the Phong lobe
+
+What should $C_s$ be? Energy conservation requires $\int_\Omega f_{\text{spec}} \, d\omega_o^\perp \leq 1$. We compute this integral at normal incidence ($\omega_i = \mathbf{n}$), where the reflection direction is $R(\mathbf{n}) = \mathbf{n}$ and the lobe simplifies to $C_s \cos^n\theta_o$.
+
+Expanding the projected measure and switching to spherical coordinates:
+
+$$\int_\Omega C_s \cos^n\theta \; d\omega^\perp = C_s \int_0^{2\pi}\!\int_0^{\pi/2} \cos^n\theta \cdot \cos\theta \; \sin\theta \; d\theta \; d\phi$$
+
+The $\cos\theta$ inside the integral comes from $d\omega^\perp = \cos\theta \, d\omega$. The azimuthal integral gives $2\pi$. For the polar integral, substitute $u = \cos\theta$, $du = -\sin\theta\,d\theta$:
+
+$$\int_0^{\pi/2} \cos^{n+1}\theta\,\sin\theta\,d\theta = \int_0^1 u^{n+1}\,du = \frac{1}{n+2}$$
+
+So the total is $C_s \cdot \frac{2\pi}{n + 2}$. Setting this equal to 1:
+
+$$C_s = \frac{n + 2}{2\pi}$$
+
+This makes physical sense. As $n$ grows, the lobe narrows, so $C_s$ must grow to keep the total energy constant — the same energy concentrated into a smaller solid angle means higher peak intensity. A highlight from a polished surface ($n = 256$) is brighter but smaller than one from a rough surface ($n = 4$).
+
+:::note
+## The normalization at non-normal incidence
+
+We computed $C_s$ at normal incidence. At other angles, the integral changes — the lobe axis tilts away from the surface normal, and the cosine weighting from $d\omega^\perp$ interacts differently with the lobe shape. The exact integral at arbitrary incidence does not have a clean closed form.
+
+However, the normalization at normal incidence is the *tightest* constraint. The lobe is maximally aligned with the cosine weight at normal incidence, so the integral is largest there. If energy is conserved at normal incidence, it is conserved at all angles. The proof: at any other incidence angle, part of the lobe points below the horizon and contributes nothing, so the integral over the visible hemisphere is strictly smaller.
+:::
+
+
+### The full shade function
+
+We now have two terms contributing to direct lighting: the Lambertian diffuse and the Phong specular. Adding shininess to the Material struct:
+
+```glsl
+struct Material {
+    vec3 albedo;
+    float reflectivity;
+    float shininess;
+};
+```
+
+The `shadeDirect` function computes both terms:
+
+```glsl
+vec3 shadeDirect(vec3 p, vec3 n, Material mat, vec3 viewDir, DirLight light) {
+    float diff = max(0.0, dot(n, light.dir));
+
+    vec3 reflDir = reflect(-light.dir, n);
+    float normFactor = (mat.shininess + 2.0) / (2.0 * PI);
+    float spec = normFactor * pow(max(0.0, dot(viewDir, reflDir)), mat.shininess);
+
+    float sh = softShadow(p + n * 0.01, light.dir, 16.0);
+    return (mat.albedo * diff + vec3(0.3) * spec) * light.color * sh;
+}
+```
+
+The diffuse term `mat.albedo * diff` is colored by the surface. The specular term `vec3(0.3) * spec` adds a white highlight. The normalization factor $(n+2)/(2\pi)$ ensures that the specular lobe integrates to at most 1 over the hemisphere.
+
+There are two things to be uneasy about in this function. First, the specular coefficient `vec3(0.3)` is ad hoc — we chose it to look reasonable, but it is not derived from the material or the physics. How bright should the specular highlight be? What determines whether a surface has strong or faint reflections? And why is the highlight white rather than the color of the surface?
+
+Second, the two terms are uncoupled: we add `albedo * diff` and `vec3(0.3) * spec` independently. But energy that goes into specular reflection cannot also scatter diffusely — the two terms draw from the same pool of incoming light. As written, a surface can reflect more energy than it receives. The diffuse and specular contributions should be coupled: the more that goes into specular, the less should go into diffuse.
+
+Both problems have the same answer, and it comes from the physics of what happens when light hits a surface interface — the subject of the next section. For now, the function is a useful approximation: it gives us view-dependent highlights with the correct shape and size, which is the new mathematical content of this section. The missing piece is the correct *weight*.
+
+::shader{src="specular" layout="tabbed"}
+
+The highlights track the viewer. Rotate the camera and they slide across the surface — this is the dot product $\omega_o \cdot R(\mathbf{l})$ in action. Compare to the Lambertian-only rendering from the Lighting chapter: the shapes read as more solid, more three-dimensional, because the highlights provide cues about surface curvature.
+
+
+---
+
+
+## Fresnel Reflectance
+
+The Specular Highlights section left two open questions: how bright should the specular term be, and why is the highlight white? Both answers come from the same physics — what happens when light crosses the boundary between two media.
+
+
+### What happens at an interface
+
+When a light ray hits the boundary between air and a solid material, two things happen simultaneously. A fraction of the energy reflects off the interface — it bounces back without ever entering the material. The rest transmits through the interface into the material's interior.
+
+This is not a modeling choice. It is a consequence of Maxwell's equations: any change in refractive index produces a partial reflection. The fraction that reflects depends on the angle of incidence and the refractive indices of the two media. This fraction is the **Fresnel reflectance** $F(\theta)$.
+
+
+### Snell's law
+
+A ray arriving at angle $\theta_i$ to the surface normal, crossing from a medium with refractive index $n_1$ into one with index $n_2$, transmits at angle $\theta_t$ given by Snell's law:
+
+$$n_1 \sin\theta_i = n_2 \sin\theta_t$$
+
+This determines the transmitted direction geometrically. For light arriving from air ($n_1 = 1$) into glass ($n_2 = 1.5$), the transmitted ray bends toward the normal: $\sin\theta_t = \sin\theta_i / 1.5 < \sin\theta_i$. We need $\theta_t$ to compute the Fresnel reflectance.
+
+
+### The Fresnel equations
+
+The reflectance splits into two polarizations — the $s$-polarization (electric field perpendicular to the plane of incidence) and the $p$-polarization (parallel to it):
+
+$$R_s = \left(\frac{n_1\cos\theta_i - n_2\cos\theta_t}{n_1\cos\theta_i + n_2\cos\theta_t}\right)^2, \qquad R_p = \left(\frac{n_2\cos\theta_i - n_1\cos\theta_t}{n_2\cos\theta_i + n_1\cos\theta_t}\right)^2$$
+
+For unpolarized light (which is what we assume in rendering), the reflectance is the average:
+
+$$F(\theta_i) = \frac{R_s + R_p}{2}$$
+
+At normal incidence ($\theta_i = 0$, so $\theta_t = 0$), both polarizations give the same result:
+
+$$F_0 = \left(\frac{n_1 - n_2}{n_1 + n_2}\right)^2$$
+
+For light arriving from air ($n_1 = 1$) into a material with refractive index $n$:
+
+$$F_0 = \left(\frac{n - 1}{n + 1}\right)^2$$
+
+Some values: water ($n = 1.33$) gives $F_0 = 0.02$. Glass and most plastics ($n \approx 1.5$) give $F_0 \approx 0.04$. Diamond ($n = 2.42$) gives $F_0 = 0.17$. These are all small — at normal incidence, most light transmits. But at grazing angles, all dielectrics approach $F = 1$: the surface becomes a perfect mirror.
+
+This is something you have seen. Look at a lake. Straight down, you see the bottom — the water transmits most light and reflects little. At a shallow angle, the surface becomes a mirror reflecting the sky. Every dielectric does this: low reflectance at normal incidence, high reflectance at grazing incidence.
+
+
+### Schlick's approximation
+
+The full Fresnel equations require computing $\cos\theta_t$ via Snell's law, then separately evaluating two rational functions. This is correct but expensive for a per-pixel, per-light calculation.
+
+Schlick (1994) observed that the Fresnel curve from $F_0$ to $1$ is well-approximated by a fifth-power polynomial:
+
+$$F_{\text{Schlick}}(\theta) = F_0 + (1 - F_0)(1 - \cos\theta)^5$$
+
+At $\theta = 0$: $F = F_0$. At $\theta = \pi/2$: $F = 1$. The exponent 5 is a fit — not derived from the physics, but matching the shape of the true Fresnel curve across a wide range of refractive indices. The approximation is remarkably accurate:
+
+::shader{src="fresnel-graph" layout="tabbed"}
+
+The graph plots the exact Fresnel reflectance (solid lines) and Schlick's approximation (dashed) for water ($n = 1.33$), glass ($n = 1.5$), and diamond ($n = 2.42$). The curves nearly overlap. The largest discrepancy is for diamond at mid-angles, and even there the error is small enough to be invisible in a rendered image.
+
+In GLSL:
+
+```glsl
+float fresnelSchlick(float cosTheta, float f0) {
+    return f0 + (1.0 - f0) * pow(1.0 - cosTheta, 5.0);
+}
+```
+
+One line. The input is $\cos\theta$ — a dot product we already have — and the reflectance at normal incidence $F_0$. We will also need a `vec3` version, because for metals $F_0$ varies per color channel:
+
+```glsl
+vec3 fresnelSchlick(float cosTheta, vec3 f0) {
+    return f0 + (1.0 - f0) * pow(1.0 - cosTheta, 5.0);
+}
+```
+
+
+### What Fresnel answers
+
+Fresnel reflectance tells us the fraction of incoming energy that reflects at the interface. This is exactly the weight we were missing. In §5, the specular coefficient `vec3(0.3)` was a guess at this fraction. Fresnel says: it is $F(\theta)$, and it depends on the angle of incidence and the material's refractive index. In §4, the reflectivity parameter $k$ was a manual knob controlling how mirror-like a surface appears. Fresnel says: it is $F(\theta)$ again — the same physics governs both the specular highlight and the environmental reflection.
+
+For dielectrics — plastic, ceramic, wood, stone — the refractive index is nearly constant across the visible spectrum, and $F_0 \approx 0.04$. We can use this immediately.
+
+
+### Fresnel-coupled shading
+
+The Material struct no longer needs `reflectivity`. Fresnel determines both the specular weight and the reflection weight from physics:
+
+```glsl
+struct Material {
+    vec3 albedo;
+    float shininess;
+};
+```
+
+The direct lighting function couples diffuse and specular through Fresnel:
+
+```glsl
+vec3 shadeDirect(vec3 p, vec3 n, Material mat, vec3 V, DirLight light) {
+    vec3 L = light.dir;
+    float NdotL = max(0.0, dot(n, L));
+    if (NdotL <= 0.0) return vec3(0.0);
+
+    vec3 reflDir = reflect(-L, n);
+    float RdotV = max(0.0, dot(reflDir, V));
+
+    vec3 Fi = fresnelSchlick(NdotL, vec3(0.04));
+    vec3 Fr = fresnelSchlick(RdotV, vec3(0.04));
+    float normFactor = (mat.shininess + 2.0) / (2.0 * PI);
+    float spec = normFactor * pow(RdotV, mat.shininess);
+
+    vec3 diffuse = (vec3(1.0) - Fi) * mat.albedo / PI;
+    vec3 specular = Fr * spec;
+
+    float sh = softShadow(p + n * 0.02, light.dir, 16.0);
+    return (diffuse + specular) * light.color * NdotL * sh;
+}
+```
+
+Compare this to the uncoupled version from §5. The ad hoc `vec3(0.3)` is replaced by Fresnel — a physically derived quantity that depends on the angle. The specular color is `vec3(0.04)` — a dim, achromatic highlight that brightens at grazing angles. The diffuse term carries the factor $(1 - F_i)$: energy that reflects at the interface cannot also scatter diffusely.
+
+We evaluate Fresnel at two different angles. The **specular** Fresnel $F_r$ uses $\cos\theta = \omega_o \cdot R(\mathbf{l})$ — the angle between the viewing direction and the mirror reflection of the light. At the peak of the highlight ($\omega_o = R(\mathbf{l})$), $\cos\theta = 1$ and $F_r = F_0$. Away from the peak, $\cos\theta$ decreases and $F_r$ increases. The **diffuse** Fresnel $F_i$ uses the incidence angle $\cos\theta = \mathbf{n} \cdot \mathbf{l}$ — how much light enters the material at this surface point. This depends only on the light's angle of incidence, not on where the camera is. Using the same reflection-based angle for both terms would make the diffuse contribution vanish whenever the camera is far from the specular highlight — an artifact that is especially visible on flat surfaces like floors.
+
+
+### Environmental reflections
+
+Fresnel also determines the weight for environmental reflections — the single-bounce mirror term from §4. The angle is the incidence angle at the surface, $\cos\theta = \mathbf{n} \cdot \omega_o$:
+
+```glsl
+vec3 Fenv = fresnelSchlick(max(0.0, dot(n, viewDir)), vec3(0.04));
+```
+
+Here we are asking: "what fraction of light from the environment reflects off this surface toward the camera?" The reflected hit gets the full pipeline — Fresnel-coupled diffuse and specular, shadows, the works:
+
+```glsl
+vec3 directColor = shadePoint(p, n, mat, viewDir, key, fill);
+
+vec3 Fenv = fresnelSchlick(max(0.0, dot(n, viewDir)), vec3(0.04));
+
+vec3 reflDir = reflect(-viewDir, n);
+Ray reflRay = Ray(p + n * 0.02, reflDir);
+float rt = raymarch(reflRay);
+
+vec3 reflColor;
+if (rt < 0.0) {
+    reflColor = skyColor(reflDir);
+} else {
+    vec3 rp = reflRay.origin + rt * reflRay.dir;
+    vec3 rn = calcNormal(rp);
+    Material rmat = getMaterial(rp);
+    vec3 rv = -reflDir;
+    reflColor = shadePoint(rp, rn, rmat, rv, key, fill);
+}
+
+color = directColor + Fenv * reflColor;
+```
+
+Compare this to the §4 version: `mix(diffuse, refl, mat.reflectivity)`. The manual weight is gone. In its place: a physically derived $F_{\text{env}}$ that varies with angle, and an additive formulation — the direct lighting already accounts for $(1 - F)$ in its diffuse term, so we add the reflection weighted by $F$ rather than interpolating.
+
+A rough surface should not show crisp reflections — it scatters reflected light into a broad cone. Without sampling multiple directions per pixel, we cannot blur reflections, but we can fade them out when the shininess is low:
+
+```glsl
+float clarity = clamp((mat.shininess - 16.0) / 112.0, 0.0, 1.0);
+color = mix(directColor, color, clarity);
+```
+
+::shader{src="dielectric" layout="tabbed"}
+
+The same four spheres as §5, now Fresnel-coupled. The highlights are dimmer at normal incidence ($F_0 = 0.04$ instead of the ad hoc $0.3$) but grow stronger at grazing angles. The polished sphere shows environmental reflections at its rim — the Fresnel effect. The rough sphere suppresses them entirely.
+
+This is the complete dielectric pipeline: Fresnel-coupled Phong specular, Fresnel-weighted environmental reflections, and a clarity fade for rough surfaces. The only assumption is $F_0 = 0.04$ — correct for all common dielectrics.
+
+But what about gold? Copper? Chrome? These materials have much larger $F_0$, it varies by wavelength, and there is no diffuse term. The next section adds one parameter to handle this.
+
+
+---
+
+
+## Metals and Dielectrics
+
+
+### Two fates for transmitted light
+
+The dielectric pipeline from §6 uses $F_0 = 0.04$ everywhere. What happens to the remaining $1 - F$ — the light that transmits into the material? The answer splits materials into two fundamentally different classes.
+
+**Dielectrics** — plastic, ceramic, wood, skin, stone — are electrical insulators. Light that enters the material scatters off pigment particles, internal fibers, or crystal boundaries, bouncing around before some of it escapes back through the surface. This subsurface scattering is the physical origin of the diffuse term: light enters, randomizes its direction inside the material, and exits uniformly. The color of the surface is determined by which wavelengths survive this internal journey — red pigment absorbs blue and green, so only red light escapes.
+
+But the specular reflection happens at the surface interface *before* the light ever encounters the pigment. It is governed by the refractive index, which for most dielectrics is nearly constant across the visible spectrum. The specular highlight is the color of the light, not the color of the material. This is why a red plastic ball has a white highlight — and why the §6 shader uses `vec3(0.04)` for all its spheres.
+
+**Metals** — gold, copper, aluminum, steel — are electrical conductors. Light that penetrates past the interface is absorbed within nanometers by the free electron gas. There is no subsurface scattering, no internal bouncing, no diffuse term. All reflected light comes from the interface. But unlike dielectrics, the free electron response *does* depend on wavelength: gold absorbs short wavelengths (blue) more than long ones (red, yellow), so its specular reflection is warm. Copper absorbs blue and green. Aluminum reflects all wavelengths nearly equally, giving a neutral metallic sheen.
+
+The color of a metal *is* its specular color. There is no separate diffuse color. And $F_0$ is large — gold has $F_0 \approx (1.0, 0.71, 0.29)$ in RGB.
+
+:::note
+## Metal $F_0$ values
+
+For dielectrics, $F_0$ is computed from the refractive index: $F_0 = ((n-1)/(n+1))^2$. Most dielectrics have $n \approx 1.5$, giving $F_0 \approx 0.04$. The exact value barely matters — we use `vec3(0.04)` for all dielectrics.
+
+For metals, $F_0$ is measured empirically, because the interaction involves the complex refractive index (which includes an absorption coefficient). Standard measured values in linear RGB:
+
+- Gold: $(1.0, 0.71, 0.29)$
+- Copper: $(0.95, 0.64, 0.54)$
+- Chrome: $(0.95, 0.93, 0.88)$
+- Aluminum: $(0.91, 0.92, 0.92)$
+
+These are the values we put in `albedo` for metallic surfaces. The warm color of gold and copper comes from their $F_0$ — the interface itself is wavelength-selective.
+:::
+
+
+### The metallic parameter
+
+The dielectric pipeline from §6 needs two changes to handle metals. First, $F_0$ is no longer `vec3(0.04)` — it is the material's albedo, which now encodes the measured interface reflectance. Second, the diffuse term vanishes — all light is either reflected at the interface or absorbed.
+
+A single parameter `metallic` interpolates between the two regimes:
+
+```glsl
+struct Material {
+    vec3 albedo;
+    float shininess;
+    float metallic;       // 0 = dielectric, 1 = metal
+};
+```
+
+The `metallic` parameter does not control a continuous physical quantity — a material is either a conductor or it isn't. But the interpolation is useful for worn or coated metals where a patina or oxide layer introduces some diffuse scattering.
+
+The meaning of `albedo` shifts with `metallic`:
+
+- At `metallic = 0`: albedo is the diffuse color (subsurface absorption spectrum).
+- At `metallic = 1`: albedo is $F_0$ — the specular reflectance at normal incidence (interface absorption spectrum).
+
+In `shadeDirect`, only two lines change from the §6 version. The hardcoded `vec3(0.04)` becomes a `specColor` that interpolates between dielectric and metallic $F_0$, and the diffuse color is scaled down by `(1 - metallic)`:
+
+```glsl
+vec3 diffColor = mat.albedo * (1.0 - mat.metallic);
+vec3 specColor = mix(vec3(0.04), mat.albedo, mat.metallic);
+```
+
+These replace every `vec3(0.04)` in the Fresnel calls and every `mat.albedo` in the diffuse term. The rest of the function — the two-angle Fresnel evaluation, the normalized Phong lobe, the shadow query — is identical.
+
+The environmental reflection weight updates similarly:
+
+```glsl
+vec3 f0 = mix(vec3(0.04), mat.albedo, mat.metallic);
+vec3 Fenv = fresnelSchlick(max(0.0, dot(n, viewDir)), f0);
+```
+
+For dielectrics, $F_0 = 0.04$: direct lighting dominates, and reflections are subtle except at grazing angles. For metals, $F_0$ is large: both the highlights and the environmental reflections are strong, and between them there is no diffuse term to fill in. A metal's appearance *is* these two components together. Without reflections, a metal is just a dark sphere with a colored dot.
+
+The clarity fade from §6 also needs one addition — a rough metal must still show reflections, because without them there is no diffuse term to fall back on:
+
+```glsl
+float clarity = clamp((mat.shininess - 16.0) / 112.0, 0.0, 1.0);
+clarity = max(clarity, mat.metallic);  // metals always reflect
+color = mix(directColor, color, clarity);
+```
+
+
+### In the scene
+
+```glsl
+Material getMaterial(vec3 p) {
+    float eps = 0.01;
+
+    // Dielectrics
+    if (length(p - P0) - SR < eps)
+        return Material(vec3(0.72, 0.36, 0.24), 8.0, 0.0);       // matte terra cotta
+    if (length(p - P1) - SR < eps)
+        return Material(vec3(0.80, 0.08, 0.05), 64.0, 0.0);      // glossy red plastic
+    if (length(p - P2) - SR < eps)
+        return Material(vec3(0.92, 0.89, 0.82), 256.0, 0.0);     // polished ceramic
+
+    // Metals (albedo = measured F0)
+    if (length(p - P3) - SR < eps)
+        return Material(vec3(0.95, 0.64, 0.54), 64.0, 1.0);      // copper
+    if (length(p - P4) - SR < eps)
+        return Material(vec3(1.0, 0.71, 0.29), 256.0, 1.0);      // gold
+    if (length(p - P5) - SR < eps)
+        return Material(vec3(0.95, 0.93, 0.88), 512.0, 1.0);     // chrome
+
+    return Material(vec3(0.55, 0.53, 0.50), 4.0, 0.0);
+}
+```
+
+::shader{src="reflections" layout="tabbed"}
+
+Copper reflects its neighbors with a warm tint. Chrome is a near-perfect mirror. The dielectrics show subtle reflections at their rims — the Fresnel effect — while their centers are dominated by the diffuse color. Every surface is rendered by the same pipeline; only the material parameters differ.
+
+
+---
+
+
+## Clear Coat
+
+There is a class of materials our pipeline cannot yet produce: surfaces that are rough underneath but show sharp reflections on top. Car paint, lacquered wood, glazed ceramic, wet stone — these all have a matte or textured base covered by a smooth transparent layer. The base scatters light diffusely (broad highlights, muted color), but the coating reflects sharply (tight highlights, mirror-like reflections). The two layers are visually distinct, and they interact through the same Fresnel physics we have been using all along.
+
+
+### A second interface
+
+A clearcoated surface has two interfaces stacked on top of each other. Light arriving from outside first hits the **coat** — a smooth dielectric layer (varnish, glaze, lacquer, water). A fraction $F_{\text{coat}}(\theta)$ reflects off this outer interface. The rest transmits through the coat and hits the **base** — the actual material underneath, which can be rough, colored, metallic, or anything else we already know how to shade.
+
+This is the same physics as §6, applied twice. The coat is a dielectric with $F_0 \approx 0.04$ (or slightly higher for thick varnishes — up to about 0.09). Because it is smooth, its specular lobe is tight — high effective shininess. The base has whatever properties we assigned it: a rough terra cotta, a matte red pigment, a metallic flake.
+
+The layered BRDF is:
+
+$$f = F_{\text{coat}} \cdot f_{\text{coat}} + (1 - F_{\text{coat}}) \cdot f_{\text{base}}$$
+
+Light hits the coat first. Fraction $F_{\text{coat}}$ reflects with the coat's sharp specular lobe. Fraction $(1 - F_{\text{coat}})$ transmits to the base and interacts with whatever BRDF the base has. This is another convex combination of valid BRDFs — the §4 argument applies — so reciprocity and energy conservation are preserved automatically.
+
+
+### The Material struct, expanded
+
+One new field:
+
+```glsl
+struct Material {
+    vec3 albedo;
+    float shininess;
+    float metallic;
+    float clearcoat;      // 0 = bare, 1 = fully coated
+};
+```
+
+At `clearcoat = 0`, the surface behaves exactly as before — no coat layer, no change to the pipeline. At `clearcoat = 1`, the full coat layer is applied. Values in between blend, modeling partial or worn coatings.
+
+
+### In code
+
+In `shadeDirect`, after computing the base contribution, we layer the coat on top:
+
+```glsl
+// Base shading (same as before)
+vec3 diffuse = (vec3(1.0) - Fi) * diffColor / PI;
+vec3 specular = Fr * spec;
+vec3 base = (diffuse + specular) * light.color * NdotL;
+
+// Clear coat
+if (mat.clearcoat > 0.0) {
+    vec3 FcoatR = fresnelSchlick(RdotV, vec3(0.04));
+    vec3 FcoatI = fresnelSchlick(NdotL, vec3(0.04));
+    float coatShininess = 256.0;
+    float coatNorm = (coatShininess + 2.0) / (2.0 * PI);
+    float coatSpec = coatNorm * pow(RdotV, coatShininess);
+    vec3 coat = FcoatR * coatSpec * light.color * NdotL;
+    base = base * (vec3(1.0) - FcoatI * mat.clearcoat) + coat * mat.clearcoat;
+}
+
+float sh = softShadow(p + n * 0.02, light.dir, 16.0);
+return base * sh;
+```
+
+The coat's $F_0$ is `vec3(0.04)` — a standard dielectric interface. Its shininess is 256 — smooth enough to produce a tight, sharp highlight that sits visibly on top of the base's broader, rougher highlight. The `(vec3(1.0) - FcoatI * mat.clearcoat)` factor on the base is energy conservation: the fraction of incoming light reflected by the coat at incidence never reaches the base. The coat's specular highlight uses the reflection-based `FcoatR`, while the base attenuation uses the incidence-based `FcoatI` — the same split as the base layer's own Fresnel.
+
+For reflections, the coat overrides the roughness–clarity fade. A glazed terra cotta sphere has a rough base ($\text{shininess} = 6$) that would normally suppress reflections entirely, but the smooth coat means the surface *does* produce sharp reflections:
+
+```glsl
+float effectiveShininess = mat.shininess;
+if (mat.clearcoat > 0.0)
+    effectiveShininess = max(effectiveShininess, 256.0 * mat.clearcoat);
+float clarity = clamp((effectiveShininess - 16.0) / 112.0, 0.0, 1.0);
+clarity = max(clarity, mat.metallic);
+```
+
+The coat also contributes to the reflection Fresnel. A coated surface reflects more of the environment than its bare base would, because the smooth outer interface has its own Fresnel term:
+
+```glsl
+if (mat.clearcoat > 0.0) {
+    vec3 Fcoat = fresnelSchlick(NdotV, vec3(0.04));
+    Fenv = mix(Fenv, max(Fenv, Fcoat), mat.clearcoat);
+}
+```
+
+
+### In the scene
+
+Compare three spheres with the same warm base color:
+
+```glsl
+// Bare terra cotta — rough, no reflections
+Material(vec3(0.72, 0.36, 0.24), 6.0, 0.0, 0.0)
+
+// Glazed terra cotta — same rough base, but coated
+Material(vec3(0.65, 0.35, 0.22), 6.0, 0.0, 1.0)
+
+// Glossy plastic — smooth base, no coat needed
+Material(vec3(0.80, 0.08, 0.05), 64.0, 0.0, 0.0)
+```
+
+The bare terra cotta is matte — broad, dim highlights, no reflections. The glossy plastic is smooth — tight highlights, subtle reflections from its own high shininess. The glazed terra cotta is the interesting one: it has the *body color* of the rough base (warm, diffuse, muted) but the *reflective behavior* of a smooth surface (sharp highlight from the coat, crisp reflections). You can see both layers — the broad warm scattering of the clay underneath, and the sharp white glint of the glaze on top.
+
+This dual character — rough base, sharp coat — is what makes car paint, lacquered furniture, and wet stone visually distinctive. It cannot be achieved by simply raising the shininess of a single-layer material, because that would narrow the diffuse-like scattering too. The two layers are genuinely independent.
+
+::shader{src="clearcoat" layout="tabbed"}
+
+
+---
+
+
+## A Survey of Materials
+
+The pipeline is complete. Every surface in the scene is shaded by the same code path — `shadeDirect` for each light, Fresnel-weighted reflection, roughness–clarity fade, clearcoat if present — with only the four material parameters varying: albedo, shininess, metallic, and clearcoat. This final demo puts nine spheres on display, organized to show the range of appearances these four parameters can produce.
+
+**Back row — dielectrics.** Matte terra cotta ($\text{shininess} = 4$, no reflections visible), glossy red plastic ($\text{shininess} = 64$, subtle rim reflections), polished white ceramic ($\text{shininess} = 512$, crisp reflections at grazing angles). All three have white highlights — the interface reflection is achromatic.
+
+**Middle row — clearcoat.** Glazed terra cotta (rough base + smooth coat), deep red car paint (low-shininess pigment base + high-gloss coat), white lacquer (matte base + smooth coat). Each shows the dual character: the body color of the rough base visible through the sharp reflections of the coat.
+
+**Front row — metals.** Copper, red-tinted metal, chrome. No diffuse color — the `(1 - \text{metallic})` factor kills it. Highlights are tinted by the albedo. Between highlights, the surface shows reflections of its neighbors.
+
+::shader{src="materials-complete" layout="tabbed"}
+
+Look at the chrome sphere where it reflects the copper sphere. The reflection is darker than it should be — the copper in the reflection appears nearly black between the highlights. This is the **metal-in-metal artifact**: our single-bounce reflections shade the reflected hit with direct lighting only. A metal's direct lighting is almost entirely specular highlights — small bright dots on a dark surface. Between the highlights, a metal depends on reflecting *its* environment to look correct. But our reflected hit does not reflect its environment — it only receives direct light. A metal reflected in a metal loses its luster.
+
+The fix is multiple bounces — letting reflected hits reflect again. The Further Topics section develops this.
+
+
+---
+
+
+## Further Topics
+
+### Multi-bounce reflections
+
+The metal-in-metal artifact is a single-bounce limitation. The reflected copper sphere shows only its direct lighting: specular highlights and the $(1-F)$ diffuse term, which for a metal is zero. The copper's own environmental reflections — which are what make it look like copper in the first place — are missing.
+
+The fix: let reflected hits reflect again. Each bounce adds the direct lighting at the hit point, weighted by the accumulated Fresnel throughput, then reflects again with the throughput multiplied by $F$:
+
+```glsl
+vec3 reflColor = vec3(0.0);
+vec3 throughput = Fenv;
+vec3 ro = p, rd = reflect(-viewDir, n), rn = n;
+
+for (int bounce = 0; bounce < 3; bounce++) {
+    Ray rr = Ray(ro + rn * 0.02, rd);
+    float rt = raymarch(rr);
+
+    if (rt < 0.0) {
+        reflColor += throughput * skyColor(rd);
+        break;
+    }
+
+    vec3 rp = rr.origin + rt * rr.dir;
+    vec3 rnew = calcNormal(rp);
+    Material rmat = getMaterial(rp);
+    vec3 rv = -rd;
+
+    vec3 rf0 = mix(vec3(0.04), rmat.albedo, rmat.metallic);
+    vec3 rFenv = fresnelSchlick(max(0.001, dot(rnew, rv)), rf0);
+
+    vec3 hitDirect = shadePoint(rp, rnew, rmat, rv, key, fill);
+    reflColor += throughput * (vec3(1.0) - rFenv) * hitDirect;
+    throughput *= rFenv;
+
+    if (max(max(throughput.r, throughput.g), throughput.b) < 0.005) break;
+    rd = reflect(rd, rnew);
+    ro = rp;
+    rn = rnew;
+}
+
+color = directColor + reflColor;
+```
+
+At each bounce, the loop separates the hit point's color into two parts: the fraction $(1 - F)$ that stays (direct lighting visible at this hit), and the fraction $F$ that continues reflecting. The accumulated `throughput` tracks how much of the original ray's energy is still bouncing. After three bounces at $F = 0.9$ (polished metal), the throughput is $0.73$ — still significant. After three bounces at $F = 0.04$ (dielectric), the throughput is $6 \times 10^{-5}$ — negligible after the first bounce.
+
+The name **throughput** is standard in path tracing. Students will see it again if they go on to build a Monte Carlo renderer.
+
+The cost is up to 3 extra raymarches per pixel. For the metal-in-metal artifact, the visual improvement is large: the reflected copper sphere now shows its own environmental reflections, and reads as copper rather than as a dark silhouette.
+
+
+### Environment maps
+
+Our reflections see geometry or a flat procedural sky. A reflective sphere in our scene reflects other spheres, a ground plane, and a color gradient — not very interesting. In the real world, reflective objects are compelling because they reflect a complex environment: clouds, trees, architecture.
+
+An **environment map** is a photograph of real-world lighting stored as a texture on a sphere (or cube) surrounding the scene. When a reflected ray misses all geometry, instead of returning a procedural sky color, we sample the environment map at the ray's direction. This gives reflective surfaces something rich and detailed to reflect — and it is a strictly better approximation to $\operatorname{Incoming}$ on the hemisphere than our flat gradient.
+
+Environment maps are typically stored in high dynamic range (HDR), preserving the full brightness range of the real scene. A bright sun in the environment map produces a bright reflection on a metallic sphere, just as it would in reality. This interacts correctly with our tone mapping pipeline.
+
+We do not implement environment maps in this chapter — they require texture sampling, which we have not introduced — but they are the natural next step for anyone who wants reflective surfaces to look their best.
+
+
+---
+
+
+## Exercises
+
+### Checkpoints
+
+Quick exercises to verify understanding.
+
+**Checkpoint 1: Shininess**
+
+Vary the shininess exponent from 4 to 512 on a single sphere. How does the highlight size change? Verify that a highlight from $n = 512$ is brighter than one from $n = 4$ — relate this to the normalization factor $(n + 2)/(2\pi)$.
+
+**Checkpoint 2: Metallic toggle**
+
+Take a sphere with albedo $(0.8, 0.1, 0.05)$ (red) and toggle `metallic` between 0 and 1. At `metallic = 0` (dielectric), where does the red color appear? At `metallic = 1` (metal), where does it appear? Where does it disappear?
+
+**Checkpoint 3: Fresnel rim**
+
+Comment out the Fresnel computation and replace $F$ with a constant `vec3(0.04)`. What changes at the rim of dielectric spheres? What changes for metals?
+
+**Checkpoint 4: Clearcoat comparison**
+
+Place two spheres side by side with the same base color and low shininess (say, 6). Give one a clearcoat of 1.0 and the other none. Identify which visual features come from the coat and which from the base.
+
+**Checkpoint 5: The artifact**
+
+In the nine-sphere showcase, identify which sphere pairs show the metal-in-metal artifact most clearly. Why is it more visible for some pairs than others?
+
+
+### Explorations
+
+Deeper exercises that build on the core concepts.
+
+**Exploration 1: Colored light on metals vs. dielectrics**
+
+Place a red metal and a red dielectric under a blue directional light. The red dielectric under blue light should show a blue highlight (interface reflection is achromatic, and the surface color is in the diffuse term which gets no blue light). The red metal under blue light should show a dark highlight (the interface reflection is red, and blue light reflected through a red $F_0$ is attenuated). Verify this and explain the result in terms of the componentwise RGB computation.
+
+**Exploration 2: Fresnel visualization**
+
+Render just the Fresnel reflectance $F(\theta)$ as grayscale on a sphere: `color = vec3(F)`. Compare a dielectric ($F_0 = 0.04$) to a metal ($F_0 = (0.95, 0.64, 0.54)$ for copper). Where on the sphere does the dielectric's reflectance change most rapidly? Why is the metal's reflectance more uniform?
+
+**Exploration 3: Phong lobe polar plot**
+
+Modify the phong-lobe shader to show normalized lobes: multiply each curve by $(n + 2)/(2\pi)$, so the plotted quantity is $C_s \cos^n\theta$, not just $\cos^n\theta$. The unnormalized lobes shrink with increasing $n$; the normalized lobes grow taller. Verify that the area under each normalized curve is the same (up to the polar plot distortion).
+
+**Exploration 4: Scalar vs. vec3 Fresnel**
+
+Replace the `vec3` Fresnel with a scalar version using the average of `specColor` as $F_0$. Where is the difference visible? (Hint: look at the rim of a copper sphere — the per-channel Fresnel produces a subtle color shift at grazing angles that the scalar version misses.)
+
+**Exploration 5: Clearcoat $F_0$**
+
+Vary the clearcoat's $F_0$ from 0.02 to 0.12 in the `shadeDirect` function. At 0.02 (close to water), the coat reflection is barely visible. At 0.12 (a thick resin), it dominates the base. What real-world coatings might correspond to each end of this range?
+
+
+### Challenges
+
+Substantial projects requiring creative problem-solving.
+
+**Challenge 1: Multi-bounce reflections**
+
+Implement the multi-bounce reflection loop from the Further Topics section. Compare the nine-sphere showcase before and after. Which sphere pairs show the biggest improvement? What is the performance cost (measure frame time) of 1, 2, and 3 bounces?
+
+**Challenge 2: Environment map**
+
+Implement a simple procedural environment map: instead of a flat sky gradient, use a function that produces distinct features in different directions — a bright sun disk, a horizon line, colored regions. Replace `skyColor(rd)` with this function and observe how the reflections on metallic surfaces become more interesting. How does the environment map interact with the Fresnel rim brightening on dielectrics?
+
+**Challenge 3: Metals and dielectrics under colored light**
+
+Create a scene with three lights of different colors (red, green, blue) and six spheres: three dielectrics and three metals, each with a different albedo. Predict, before rendering, what color each sphere's highlight should be. Then render and verify. The per-wavelength nature of the rendering equation — each RGB channel computed independently — makes this fully predictable.
+
+**Challenge 4: Energy audit**
+
+For a single surface point under a single directional light, compute the total outgoing energy: integrate `shadeDirect` over all outgoing directions (by rendering a hemisphere of pixels from that point and summing). Verify that the result does not exceed the incoming energy. Try this for a dielectric, a metal, and a clearcoated surface. Where does the energy go in each case?
+
+**Challenge 5: Layered materials**
+
+Extend the clearcoat system to support an arbitrary number of dielectric layers, each with its own $F_0$ and shininess. A three-layer system (rough base + colored translucent middle + clear top) can approximate materials like opal, car paint with metallic flake, or nail polish. Each layer's contribution is weighted by the product of $(1 - F)$ factors from all layers above it.
